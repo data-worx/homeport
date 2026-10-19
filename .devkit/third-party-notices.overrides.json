@@ -1,0 +1,17 @@
+{
+  "comment": [
+    "Hand-maintained input to .devkit/generate-third-party-notices.cs.",
+    "'copyright': notices for packages whose nuspec declares none and which ship",
+    "no licence file either. MIT requires the copyright notice to travel with the",
+    "software, so an empty row does not discharge the obligation - but neither",
+    "would inventing one from the <authors> field. Copy each notice verbatim from",
+    "the licence file in the package's own repository and name it in 'source':",
+    "  \"Some.Package\": { \"notice\": \"Copyright (c) ...\", \"source\": \"https://...\" }",
+    "'assets': shipped files no deps.json names - fonts, icons. Each entry is",
+    "  { \"name\", \"version\", \"license\", \"copyright\", \"files\": [ \"path\", ... ] }",
+    "The generator fails when an entry names a package that is not shipped, or a",
+    "file that does not exist."
+  ],
+  "copyright": {},
+  "assets": []
+}
