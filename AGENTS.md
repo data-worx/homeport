@@ -23,21 +23,191 @@ does not exist.
 
 ## Overview
 
-<!-- What this project is, in three or four sentences. What it does, who runs
-     it, and the one or two facts a newcomer gets wrong without being told. -->
+Homeport is a self-hosted platform for deep business modules: an operator runs
+it in their own environment, and it provides gateway, multi-tenancy,
+authentication, throttling, usage metering, observability and an admin portal.
+Each module covers one thick business domain in depth.
+
+Two facts a newcomer gets wrong:
+
+- **Not a hosted SaaS.** Business data never leaves the operator's
+  infrastructure. Nothing may phone home, and nothing may depend on a service
+  operated by data-worx.
+- **Not an invoicing system.** Homeport meters and exports usage for showback
+  and chargeback. It never creates invoices.
+
+Background: [docs/vision.md](docs/vision.md).
+
+## Decisions
+
+The architecture decisions are recorded in [docs/adr/](docs/adr/README.md).
+They are binding.
+
+- **Do not change a decision silently.** To change one, propose a new ADR that
+  supersedes it and get the maintainer's approval before writing code.
+- **An ADR is required** when a decision is hard to reverse or crosses a
+  boundary: the module contract, a public API, the data model of tenant-owned
+  data, a new infrastructure component (broker, store, identity provider), a
+  security mechanism, the licence or the distribution model.
+- **No ADR** for anything else — a library inside one service, naming,
+  internal structure. That is decided in the pull request.
 
 ## Tech stack
 
-<!-- Only what binds. The descriptive version belongs in docs/tech-stack.md. -->
+- .NET 10, ASP.NET Core, C# latest.
+- The .NET Aspire AppHost is the source of truth for the topology. Compose
+  files are generated from it, never edited by hand.
+- PostgreSQL through EF Core. RabbitMQ through Wolverine. Valkey for
+  distributed counters. YARP for the gateway. Blazor with MudBlazor for the
+  portal. Keycloak only in the dev/test compose.
+- Tests: xUnit, Shouldly, Testcontainers for PostgreSQL, RabbitMQ and Valkey,
+  Aspire testing for end-to-end.
+- Central package management: every package version lives in
+  `Directory.Packages.props`.
+- Use `TimeProvider`, never `DateTime.Now` or `DateTime.UtcNow`.
+- Keep data access provider-neutral. Vendor-specific SQL is allowed only for
+  the row-level security setup.
 
 ## Architecture
 
-<!-- The dependency rules that must not be broken, and what happens when they
-     are. The current project layout belongs in docs/architecture.md. -->
+**Provisional** — see the `dotnet.layout` row under *Deviations*. Revisit with
+the first service tickets.
+
+```text
+Homeport.slnx
+src/
+  Aspire/Homeport.AppHost
+  Shared/Homeport.ServiceDefaults
+  Shared/Homeport.Contracts
+  Sdk/Homeport.Module.Sdk
+  Platform/<Service>/Homeport.<Service>
+  Platform/<Service>/Homeport.<Service>.Domain | .Application | .Infrastructure | .Api
+  Modules/<Module>/Homeport.Modules.<Module>[.Domain | .Application | .Infrastructure | .Api]
+  Tests/
+```
+
+- **One module = one API service plus an optional worker.** Features inside a
+  module are components, not services.
+- **The layer rule of `dotnet.layout` applies per service.** A service is one
+  project while it carries no business rules. Once it does, it is cut into
+  Domain, Application, Infrastructure and a host project that is its
+  composition root. Business modules are cut from the start.
+- A service never references another service's projects. Services talk over
+  HTTP or messages; shared types live in `Homeport.Contracts`.
+- Modules are reachable only through the gateway.
+- `Architecture.Tests` asserts the per-service rule, not the single-application
+  layout of the template.
+- Messages between services (for example `UsageRecorded`) are contracts in
+  `Homeport.Contracts`. Changing one is a breaking change for every consumer.
+
+Current state: [docs/architecture.md](docs/architecture.md).
+
+### Module contract
+
+The contract is normative in
+[docs/module-contract/](docs/module-contract/README.md). Any change to it bumps
+`contractVersion` and updates the SDK, the documentation and the Echo module
+**in the same pull request**.
+
+## Multi-tenancy
+
+Security-critical. No exception without an ADR.
+
+- Every tenant-owned table has a non-null `TenantId` (uuid).
+- EF Core global query filters on every tenant-owned entity.
+  `IgnoreQueryFilters()` only in code paths explicitly marked as platform
+  admin.
+- PostgreSQL row-level security on every tenant-owned table, driven by the
+  session setting `homeport.tenant_id`, which an interceptor sets per
+  connection or transaction.
+- Platform-admin access uses a dedicated database role and is audited.
+- Every feature that touches tenant data has a **cross-tenant leakage test**.
+
+## Gateway
+
+- The gateway strips every incoming `X-Homeport-*` header and sets
+  `X-Homeport-Tenant-Id` and `X-Homeport-Client-Id` itself.
+- W3C `traceparent` is propagated to the module.
+- If the registry is unavailable, the gateway keeps serving the last known
+  routes.
+
+## Throttling
+
+- Two layers, both per tenant and plan: a rate limit (token bucket, requests
+  per second) and a quota (per meter, per day or month).
+- Counters live in Valkey, so limits hold across gateway replicas.
+- Exceeding a limit returns `429` with `Retry-After`. Remaining limits are
+  exposed through RateLimit headers.
+
+## Metering
+
+- `UsageRecorded` carries `eventId` (idempotency key), `occurredAt`,
+  `tenantId`, `clientId`, `moduleId`, `route`, `meter`, `quantity`,
+  `statusCode`, `durationMs`, `traceId`.
+- The consumer is idempotent: a unique constraint on `eventId`. A duplicate is
+  never counted twice.
+- Aggregates per tenant, module, meter, hour and day. Export as CSV and JSON;
+  a webhook fires when a period closes.
+
+## Observability
+
+- Every service uses `Homeport.ServiceDefaults`.
+- `service.name` is `homeport-<component>` or `homeport-module-<id>`.
+- Custom attributes: `homeport.tenant.id`, `homeport.client.id`,
+  `homeport.module.id`, `homeport.meter`.
+- Metric names start with `homeport.` (`homeport.gateway.requests`,
+  `homeport.gateway.throttled`, `homeport.metering.events`).
+- No high-cardinality metric labels: no request ids, trace ids or user input.
+- One trace spans gateway → module → RabbitMQ → metering.
+
+## Licensing and dependencies
+
+- Every source file starts with `SPDX-License-Identifier: AGPL-3.0-or-later`
+  in the comment syntax of its language (`// …` in C#).
+- Only dependencies under AGPL-compatible permissive licences: MIT,
+  Apache-2.0, BSD, ISC, PostgreSQL, and SIL OFL for fonts. Check the licence
+  **before** adding the package and record it in `THIRD-PARTY-NOTICES.md`.
+- No commercial or source-available packages. This excludes MassTransit v9+
+  and the commercial versions of MediatR, AutoMapper and FluentAssertions.
+- Contributions require the signed CLA — see [CONTRIBUTING.md](CONTRIBUTING.md).
+- The names "Homeport" and "data-worx" and their logos are not licensed with
+  the code.
+
+## Supply chain
+
+- CI builds, tests, creates an SBOM and scans **every image in the compose
+  files** — own and third-party — with Trivy. High or Critical fails the build.
+- Exceptions only in `.trivyignore`, each with a reason and an expiry date.
+- A nightly scheduled re-scan covers all images.
+- Third-party images are pinned by digest. Dependabot proposes updates.
+- Own images use chiseled .NET base images, run as non-root, and are signed
+  with cosign on release.
+
+## Work organisation
+
+- Every issue belongs to a milestone. A pull request carries the milestone of
+  the issue it closes.
+- Pull requests are squash-merged. The title becomes the commit on `main` and
+  follows `forge.commits`.
+- Open questions and ideas live in GitHub Discussions, not in issues.
+- Everything stays runnable through the AppHost.
 
 ## Domain terms
 
-<!-- | Term | Means | — the words this project uses in a specific sense. -->
+| Term | Means |
+|---|---|
+| Operator | The company that runs a Homeport installation in its own environment |
+| Tenant | A department or customer of the operator; the unit of isolation and of metering |
+| Client | A machine identity of a tenant (client credentials, later API key) |
+| Plan | The limits a tenant gets: rate limit and quotas per meter |
+| Module | One deep business domain: an API service plus an optional worker |
+| Catalog module | A module shipped with Homeport and signed by data-worx |
+| Internal module | A module the operator builds on the same contract |
+| Manifest | What a module declares about itself at `/.well-known/homeport/manifest` |
+| Registry | The service modules register with and send heartbeats to |
+| Meter | A unit usage is counted in (`requests`, `messages`, `documents`) |
+| Quota | A limit on a meter per day or month |
+| Showback / chargeback | Showing or allocating usage to tenants; Homeport exports, it never invoices |
 
 ## Deviations from the shared rules
 
@@ -47,4 +217,4 @@ Every row was decided once and is recorded in `devkit.lock.json`, so
 
 | Rule | Deviation | Why |
 |---|---|---|
-| — | none yet | — |
+| `dotnet.layout` | **Provisional.** The layer cut applies per service, not to one application: services under `src/Platform/<Service>/`, modules under `src/Modules/<Module>/`, plus `src/Aspire/`, `src/Shared/` and `src/Sdk/`. A service without business rules is a single project. See *Architecture* | Homeport is a set of independently deployable services, not one application. Revisit with the first service tickets |

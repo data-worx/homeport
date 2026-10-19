@@ -13,17 +13,25 @@ binding rules — the dependency direction, who may reference what — live in t
 
 | Project | Role | May depend on |
 |---|---|---|
-| — | — | — |
+| `Architecture.Tests` | Asserts the reference graph and the layout (devkit template, not yet in a solution) | — |
+
+No production project exists yet. The target picture is in
+[vision.md](vision.md); the binding layout is in
+[`AGENTS.md`](../AGENTS.md#architecture).
 
 ## Directory layout
 
-<!-- The tree as it is on disk, down to the project directories. -->
-
-```
+```text
+src/
+  Directory.Build.props
+  Tests/
+    Architecture.Tests/
 ```
 
 ## Why it is cut this way
 
-<!-- One bullet per decision that is not obvious from the table: what was
-     chosen, and what it prevents. The rule itself belongs in AGENTS.md; this
-     is the reason behind it. -->
+- Services and modules are separate deployables, so the layer rule of
+  `dotnet.layout` is applied per service instead of to one application
+  ([ADR-0003](adr/0003-service-granularity-and-module-contract.md)). A
+  service without business rules stays a single project, which keeps the
+  infrastructure-only services (gateway, registry) small.
