@@ -1,0 +1,18 @@
+<!-- @dsCard group="Data" height=250 subtitle="Usage intensity: tenant x hour, sequential ramp" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Heatmap</title></head>
+<body>
+<div class="hp-pad"><div class="hp-card">
+  <div class="hp-card__head"><div><h3 class="hp-card__title">Load by hour</h3><p class="hp-card__sub">Requests per tenant, today</p></div></div>
+  <div id="c" style="max-width:720px"></div>
+</div></div>
+<script>
+var hours = Array.from({length:24}, function(_, i){ return (i<10?'0':'') + i + ':00'; });
+var rows = ['Finance','Logistics','Billing','HR','Sales'];
+var vals = rows.map(function(_, r){ return hours.map(function(_, h){ var w = h>=7 && h<=18 ? Math.sin((h-7)/11*Math.PI) : 0; return Math.max(0, Math.round((3200 - r*520) * w + (h===2 && r===2 ? 900 : 0))); }); });
+Homeport.chart.heatmap(document.getElementById('c'), { label: 'Requests per tenant and hour', rows: rows, cols: hours, values: vals, colStep: 3 });
+</script>
+</body>
+</html>

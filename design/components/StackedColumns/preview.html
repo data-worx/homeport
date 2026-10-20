@@ -1,0 +1,18 @@
+<!-- @dsCard group="Data" height=330 subtitle="Usage per module per day: 2px gaps, rounded top, column tooltip" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Stacked columns</title></head>
+<body>
+<div class="hp-pad"><div class="hp-card">
+  <div class="hp-card__head"><div><h3 class="hp-card__title">Requests by module</h3><p class="hp-card__sub">Tenant Finance · last 14 days</p></div></div>
+  <div id="c"></div>
+</div></div>
+<script>
+var d = Array.from({length:14}, function(_, i){ return (i+5) + ' Oct'; });
+function v(b, s){ return d.map(function(_, i){ return Math.round(b*(0.75 + 0.25*Math.sin(i/1.7+s)) * ((i%7)>4 ? 0.45 : 1)); }); }
+Homeport.chart.stacked(document.getElementById('c'), { label: 'Requests per day by module', labels: d,
+  series: [ {name:'Module A', color:'viz-1', values:v(18000,0)}, {name:'Module B', color:'viz-2', values:v(11000,1)}, {name:'Orders API', color:'viz-3', values:v(7000,2)}, {name:'Pricing service', color:'viz-4', values:v(3000,3)} ] });
+</script>
+</body>
+</html>

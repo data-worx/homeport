@@ -1,0 +1,15 @@
+<!-- @dsCard group="Feedback" height=250 subtitle="Inline notices: info, success, warning, error" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Alert</title></head>
+<body>
+<div class="hp-pad hp-stack" style="max-width:640px">
+  <div class="hp-alert hp-alert--info" role="status"><i data-icon="info"></i><div><strong>Period closes on 31 Oct</strong>Usage after closing goes into November.</div></div>
+  <div class="hp-alert hp-alert--success" role="status"><i data-icon="circle-check"></i><div><strong>Module docked</strong>Orders API 4.2.0 (internal) is routing traffic. No restart needed.</div></div>
+  <div class="hp-alert hp-alert--warning" role="status"><i data-icon="triangle-alert"></i><div><strong>Registry not reachable</strong>Showing last known data from 14:02. We retry every 30 s.</div></div>
+  <div class="hp-alert hp-alert--error" role="alert"><i data-icon="circle-x"></i><div><strong>Export failed</strong>The webhook returned 503. <a href="#" style="color:var(--primary)">Retry now</a></div></div>
+</div>
+<script>Homeport.hydrate();</script>
+</body>
+</html>

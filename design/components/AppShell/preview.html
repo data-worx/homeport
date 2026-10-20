@@ -1,0 +1,31 @@
+<!-- @dsCard group="Layout" height=420 width=1024 subtitle="App bar + tenant switcher + collapsible drawer + content" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>App shell</title>
+<style>html,body{height:100%} .hp-shell{min-height:420px} .spacer{flex:1} .avatar{width:32px;height:32px;border-radius:var(--radius-full);background:#24405a;color:#e6edf3;display:grid;place-items:center;font:600 12px/1 var(--font-sans)}
+</style></head>
+<body>
+<div class="hp-shell">
+  <header class="hp-appbar">
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Collapse navigation" style="border:0"><i data-icon="menu"></i></button>
+    <a class="hp-appbar__brand" href="#"><i data-logo data-size="28"></i>Homeport <small>Platform admin</small></a>
+    <button class="hp-tenant-switch" aria-haspopup="listbox"><i data-icon="building-2" class="hp-icon--sm"></i>All tenants<i data-icon="chevron-down" class="hp-icon--sm"></i></button>
+    <span class="spacer"></span>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Search" style="border:0"><i data-icon="search"></i></button>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Switch light or dark theme" style="border:0" onclick="var h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark')"><i data-icon="moon"></i></button>
+    <span class="avatar" aria-label="Signed in as René K.">RK</span>
+  </header>
+  <nav class="hp-drawer" aria-label="Main">
+    <a class="hp-nav" href="#" aria-current="page"><i data-icon="layout-dashboard"></i>Overview</a><a class="hp-nav" href="#"><i data-icon="hp-tenant"></i>Tenants</a><a class="hp-nav" href="#"><i data-icon="hp-plan"></i>Plans & quotas</a><a class="hp-nav" href="#"><i data-icon="key-round"></i>Clients & API keys</a><a class="hp-nav" href="#"><i data-icon="hp-registry"></i>Modules</a><a class="hp-nav" href="#"><i data-icon="receipt-text"></i>Usage & chargeback</a>
+    <h6>Platform</h6>
+    <a class="hp-nav" href="#"><i data-icon="history"></i>Audit log</a><a class="hp-nav" href="#"><i data-icon="settings"></i>Settings</a>
+  </nav>
+  <main class="hp-main">
+    <div class="hp-page-head"><div><h1>Page title</h1><p>One line that says what this page is for.</p></div><button class="hp-btn hp-btn--primary"><i data-icon="plus" class="hp-icon--sm"></i>Primary action</button></div>
+    <div class="hp-card" style="height:160px;display:grid;place-items:center;color:var(--ink-muted)">Content</div>
+  </main>
+</div>
+<script>Homeport.hydrate();</script>
+</body>
+</html>

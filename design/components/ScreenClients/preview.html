@@ -1,0 +1,45 @@
+<!-- @dsCard group="Screens" height=760 width=1280 subtitle="Admin screen 5: clients, rotate, secret shown once" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Clients & API keys</title>
+<style>html,body{height:100%} .hp-shell{min-height:760px} .spacer{flex:1} .avatar{width:32px;height:32px;border-radius:var(--radius-full);background:#24405a;color:#e6edf3;display:grid;place-items:center;font:600 12px/1 var(--font-sans)}
+.hp-shell{position:relative}.scrim{position:absolute;inset:0;background:rgba(7,18,29,.55);display:grid;place-items:center;z-index:10}
+.dlg{width:560px;background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-3)}
+.dlg header{padding:var(--space-5) var(--space-6) 0}.dlg h2{margin:0;font:600 20px/28px var(--font-sans)}.dlg .body{padding:var(--space-4) var(--space-6);display:grid;gap:var(--space-4)}
+.dlg footer{padding:var(--space-4) var(--space-6);border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:var(--space-3)}
+.secret{display:flex;gap:var(--space-2);align-items:center;background:var(--surface-sunken);border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:6px 6px 6px var(--space-3)}
+.secret code{flex:1;font:500 14px/22px var(--font-mono);word-break:break-all}.lbl{font:600 12px/16px var(--font-sans);color:var(--ink-muted);margin-bottom:4px}label.ck{display:flex;gap:8px;align-items:center}</style></head>
+<body>
+<div class="hp-shell">
+  <header class="hp-appbar">
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Collapse navigation" style="border:0"><i data-icon="menu"></i></button>
+    <a class="hp-appbar__brand" href="#"><i data-logo data-size="28"></i>Homeport <small>Platform admin</small></a>
+    <button class="hp-tenant-switch" aria-haspopup="listbox"><i data-icon="building-2" class="hp-icon--sm"></i>All tenants<i data-icon="chevron-down" class="hp-icon--sm"></i></button>
+    <span class="spacer"></span>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Search" style="border:0"><i data-icon="search"></i></button>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Switch light or dark theme" style="border:0" onclick="var h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark')"><i data-icon="moon"></i></button>
+    <span class="avatar" aria-label="Signed in as René K.">RK</span>
+  </header>
+  <nav class="hp-drawer" aria-label="Main">
+    <a class="hp-nav" href="#"><i data-icon="layout-dashboard"></i>Overview</a><a class="hp-nav" href="#"><i data-icon="hp-tenant"></i>Tenants</a><a class="hp-nav" href="#"><i data-icon="hp-plan"></i>Plans & quotas</a><a class="hp-nav" href="#" aria-current="page"><i data-icon="key-round"></i>Clients & API keys</a><a class="hp-nav" href="#"><i data-icon="hp-registry"></i>Modules</a><a class="hp-nav" href="#"><i data-icon="receipt-text"></i>Usage & chargeback</a>
+    <h6>Platform</h6>
+    <a class="hp-nav" href="#"><i data-icon="history"></i>Audit log</a><a class="hp-nav" href="#"><i data-icon="settings"></i>Settings</a>
+  </nav>
+  <main class="hp-main">
+    <div class="hp-page-head"><div><h1>Clients &amp; API keys</h1><p>Tenant Finance · machine clients that call Homeport APIs</p></div><button class="hp-btn hp-btn--primary"><i data-icon="plus" class="hp-icon--sm"></i>Create client</button></div>
+    <div class="hp-card" style="padding:0;overflow:hidden"><table class="hp-table"><thead><tr><th>Client</th><th>Client ID</th><th>Scopes</th><th>Last used</th><th>Status</th><th></th></tr></thead><tbody><tr><td><b style="font-weight:600">erp-export</b></td><td class="hp-mono">c_8f2a91d0</td><td><span class=hp-chip>usage:read</span> <span class=hp-chip>export:write</span></td><td>2 min ago</td><td><span class="hp-badge hp-badge--success"><i data-icon="circle-check"></i>active</span></td><td style="text-align:right;white-space:nowrap"><button class="hp-btn hp-btn--outline hp-btn--sm"><i data-icon="rotate-cw" class="hp-icon--sm"></i>Rotate</button> <button class="hp-btn hp-btn--text hp-btn--sm" style="color:var(--error)">Revoke</button></td></tr><tr><td><b style="font-weight:600">billing-batch</b></td><td class="hp-mono">c_31be07aa</td><td><span class=hp-chip>module-a:write</span></td><td>1 h ago</td><td><span class="hp-badge hp-badge--success"><i data-icon="circle-check"></i>active</span></td><td style="text-align:right;white-space:nowrap"><button class="hp-btn hp-btn--outline hp-btn--sm"><i data-icon="rotate-cw" class="hp-icon--sm"></i>Rotate</button> <button class="hp-btn hp-btn--text hp-btn--sm" style="color:var(--error)">Revoke</button></td></tr><tr><td><b style="font-weight:600">bi-dashboard</b></td><td class="hp-mono">c_77d0c2e1</td><td><span class=hp-chip>usage:read</span></td><td>3 days ago</td><td><span class="hp-badge hp-badge--success"><i data-icon="circle-check"></i>active</span></td><td style="text-align:right;white-space:nowrap"><button class="hp-btn hp-btn--outline hp-btn--sm"><i data-icon="rotate-cw" class="hp-icon--sm"></i>Rotate</button> <button class="hp-btn hp-btn--text hp-btn--sm" style="color:var(--error)">Revoke</button></td></tr><tr><td><b style="font-weight:600">legacy-ftp</b></td><td class="hp-mono">c_0a9f3b55</td><td><span class=hp-chip>orders-api:read</span></td><td>92 days ago</td><td><span class="hp-badge hp-badge--neutral"><i data-icon="ban"></i>revoked</span></td><td style="text-align:right;white-space:nowrap"><span class="hp-muted">–</span></td></tr></tbody></table></div>
+    <div class="scrim"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="t">
+      <header><h2 id="t">Client secret for "erp-export"</h2></header>
+      <div class="body">
+        <div class="hp-alert hp-alert--warning"><i data-icon="triangle-alert"></i><div><strong>Copy it now. You will not see it again.</strong>Homeport stores only a hash. If you lose it, rotate the secret.</div></div>
+        <div><div class="lbl">Client secret</div><div class="secret"><code id="sec">hp_live_7Kq2vX9mR4tW8nB3yL6pZ1cF5hJ0dS2g</code><button class="hp-btn hp-btn--primary hp-btn--sm" data-copy="#sec"><i data-icon="copy" class="hp-icon--sm"></i><span class="lab">Copy</span></button></div></div>
+        <label class="ck"><input type="checkbox"> I have stored the secret in a safe place</label>
+      </div>
+      <footer><span class="hp-muted" style="font-size:13px">Rotated just now. The old secret stops working in 24 h.</span><button class="hp-btn hp-btn--outline">Done</button></footer>
+    </div></div>
+  </main>
+</div>
+<script>Homeport.hydrate();</script>
+</body>
+</html>

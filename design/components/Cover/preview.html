@@ -1,0 +1,50 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script>
+<meta charset="utf-8">
+<title>Homeport</title>
+<style>
+  html, body { margin:0; height:100%; }
+  body { background:var(--surface); color:var(--ink); font-family:var(--font-sans); overflow:hidden; }
+  .cover { position:relative; height:288px; overflow:hidden; }
+  .art { position:absolute; top:0; left:480px; width:480px; height:288px; overflow:hidden; }
+  .art svg { display:block; width:480px; height:288px; }
+  .navy { fill:var(--ink); }
+  .light { fill:var(--accent); }
+  .blue { fill:var(--primary); }
+  .water { fill:var(--illus-water); }
+  .blk { rx:var(--radius-md); }
+  .box { rx:var(--radius-xs); }
+  .wave { fill:none; stroke:var(--ink); stroke-width:2; stroke-linecap:round; }
+  .words { position:absolute; left:var(--space-6); bottom:var(--space-6); max-width:440px; }
+  .name { margin:0; font-size:88px; line-height:.92; font-weight:700; letter-spacing:-.025em; color:var(--ink); }
+  .tag { margin:var(--space-3) 0 0 4px; font-size:14px; line-height:20px; color:var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="0 0 480 288" width="480" height="288">
+<!--
+  blocks      ink (= harbor navy in light, fog white at night so it never sinks into the dark ground) 168x232 bled off the top (the brand ink, largest) · primary 160x176 bled off the right · accent 128x56, a container-proportioned block docked between them · illus-water band 48 tall across the bottom; together about 45% of 960x288
+  arrangement two quay slabs with one container docked in the gap, all standing on one waterline at y=232; space-4 gutters
+  pattern     waves, from the brand's literal motif (calm water under the quay): 3 rows of half-round arcs at a space-6 pitch on the water band, in ink
+  scales      sides in space-2 multiples; gutters space-4 (16); wave pitch space-6 (24); slab corners radius-md, container corners radius-xs
+-->
+<rect class="navy blk" x="0" y="-16" width="168" height="232" rx="6"/>
+<rect class="light box" x="184" y="112" width="128" height="56" rx="2"/>
+<rect class="blue blk" x="328" y="40" width="176" height="176" rx="6"/>
+<rect class="water" x="0" y="232" width="480" height="56"/>
+<path class="wave" d="M8 248c6-6 12-6 18 0s12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0"/>
+<path class="wave" d="M-4 270c6-6 12-6 18 0s12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0 12 6 18 0 12-6 18 0" opacity=".6"/>
+</svg>
+</div>
+<div class="words">
+<h1 class="name">Homeport</h1>
+<p class="tag">Your data never leaves port.</p>
+</div>
+</div>
+</body>
+</html>

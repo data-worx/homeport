@@ -1,0 +1,28 @@
+<!-- @dsCard group="Data" height=150 subtitle="Headline number + context, optional sparkline" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Stat tile</title>
+<style>.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-4)}</style></head>
+<body>
+<div class="hp-pad tiles">
+  <div class="hp-card">
+    <div class="hp-stat__label"><i data-icon="activity" class="hp-icon--sm"></i>Requests today</div>
+    <div class="hp-stat__value">48 213</div>
+    <div class="hp-stat__meta"><span class="hp-delta--up">+6.2 %</span> vs. yesterday</div>
+    <div id="sp1" style="margin-top:8px"></div>
+  </div>
+  <div class="hp-card">
+    <div class="hp-stat__label"><i data-icon="hp-quota" class="hp-icon--sm"></i>Usage this month</div>
+    <div class="hp-stat__value">71 %</div>
+    <div class="hp-usage" style="margin-top:8px"><div class="hp-usage__track"><div class="hp-usage__fill" style="width:71%"></div></div><div class="hp-usage__meta"><span><b>1.42M</b> of 2M</span><span>12 days left</span></div></div>
+  </div>
+  <div class="hp-card">
+    <div class="hp-stat__label"><i data-icon="ban" class="hp-icon--sm"></i>Throttling hits (24 h)</div>
+    <div class="hp-stat__value">312</div>
+    <div class="hp-stat__meta"><span class="hp-badge hp-badge--warning"><i data-icon="triangle-alert"></i>3 tenants</span></div>
+  </div>
+</div>
+<script>Homeport.hydrate(); Homeport.chart.spark(document.getElementById('sp1'), [31,34,29,38,41,39,45,48], 'viz-1');</script>
+</body>
+</html>

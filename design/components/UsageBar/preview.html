@@ -1,0 +1,14 @@
+<!-- @dsCard group="Data" height=170 subtitle="Usage vs. quota: normal, warn (>= 80 %), over" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Usage bar</title></head>
+<body>
+<div class="hp-pad hp-stack" style="max-width:420px">
+  <div class="hp-usage"><div class="hp-usage__meta"><span style="color:var(--ink)">Finance</span><span><b>412 080</b> / 1 000 000 requests</span></div><div class="hp-usage__track" role="meter" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100" aria-label="Finance usage 41 percent"><div class="hp-usage__fill" style="width:41%"></div></div></div>
+  <div class="hp-usage hp-usage--warn"><div class="hp-usage__meta"><span style="color:var(--ink)">Logistics <span class="hp-badge hp-badge--warning" style="height:18px"><i data-icon="triangle-alert"></i>86 %</span></span><span><b>860 400</b> / 1 000 000</span></div><div class="hp-usage__track" role="meter" aria-valuenow="86" aria-valuemin="0" aria-valuemax="100" aria-label="Logistics usage 86 percent"><div class="hp-usage__fill" style="width:86%"></div></div></div>
+  <div class="hp-usage hp-usage--over"><div class="hp-usage__meta"><span style="color:var(--ink)">Billing <span class="hp-badge hp-badge--error" style="height:18px"><i data-icon="circle-x"></i>over quota</span></span><span><b>1 040 912</b> / 1 000 000</span></div><div class="hp-usage__track" role="meter" aria-valuenow="104" aria-valuemin="0" aria-valuemax="100" aria-label="Billing usage 104 percent, over quota"><div class="hp-usage__fill" style="width:100%"></div></div></div>
+</div>
+<script>Homeport.hydrate();</script>
+</body>
+</html>

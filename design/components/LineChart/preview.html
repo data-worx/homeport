@@ -1,0 +1,20 @@
+<!-- @dsCard group="Data" height=340 subtitle="Usage over time per tenant, with quota line and crosshair tooltip" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Line chart</title></head>
+<body>
+<div class="hp-pad"><div class="hp-card">
+  <div class="hp-card__head"><div><h3 class="hp-card__title">Requests per day</h3><p class="hp-card__sub">October 2026 · top 3 tenants</p></div>
+  <div class="hp-seg" data-seg><button aria-pressed="false">7 d</button><button aria-pressed="true">30 d</button><button aria-pressed="false">90 d</button></div></div>
+  <div id="c"></div>
+</div></div>
+<script>
+Homeport.hydrate();
+var days = Array.from({length:18}, function(_, i){ return (i+1) + ' Oct'; });
+function wave(b, a, s){ return days.map(function(_, i){ return Math.round(b + a*Math.sin(i/2.2 + s) + (i%7>4 ? -b*0.35 : 0) + i*b*0.01); }); }
+Homeport.chart.line(document.getElementById('c'), { label: 'Requests per day by tenant', labels: days, quota: 60000, directLabels: true,
+  series: [ {name:'Finance', color:'viz-1', values: wave(42000, 6000, 0)}, {name:'Logistics', color:'viz-2', values: wave(26000, 5000, 1)}, {name:'Billing', color:'viz-3', values: wave(15000, 3000, 2)} ] });
+</script>
+</body>
+</html>

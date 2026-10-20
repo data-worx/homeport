@@ -1,0 +1,20 @@
+<!-- @dsCard group="Status" height=210 subtitle="healthy · degraded · unreachable · draining" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Module state</title></head>
+<body>
+<div class="hp-pad">
+<table class="hp-table" style="max-width:720px">
+  <thead><tr><th>Module</th><th>Origin</th><th>State</th><th class="hp-num">Instances</th><th class="hp-num">Last heartbeat</th></tr></thead>
+  <tbody>
+    <tr><td>Module A</td><td><span class="hp-origin hp-origin--catalog"><i data-icon="hp-module"></i>catalog</span></td><td><span class="hp-badge hp-badge--healthy"><i data-icon="circle-check"></i>healthy</span></td><td class="hp-num">3/3</td><td class="hp-num">4 s</td></tr>
+    <tr><td>Module B</td><td><span class="hp-origin hp-origin--catalog"><i data-icon="hp-module"></i>catalog</span></td><td><span class="hp-badge hp-badge--degraded"><i data-icon="triangle-alert"></i>degraded</span></td><td class="hp-num">1/2</td><td class="hp-num">12 s</td></tr>
+    <tr><td>Orders API</td><td><span class="hp-origin hp-origin--internal"><i data-icon="building-2"></i>internal</span></td><td><span class="hp-badge hp-badge--unreachable"><i data-icon="circle-x"></i>unreachable</span></td><td class="hp-num">0/1</td><td class="hp-num">4 min</td></tr>
+    <tr><td>Pricing service</td><td><span class="hp-origin hp-origin--internal"><i data-icon="building-2"></i>internal</span></td><td><span class="hp-badge hp-badge--draining"><i data-icon="arrow-down-to-line"></i>draining</span></td><td class="hp-num">1/1</td><td class="hp-num">2 s</td></tr>
+  </tbody>
+</table>
+</div>
+<script>Homeport.hydrate();</script>
+</body>
+</html>

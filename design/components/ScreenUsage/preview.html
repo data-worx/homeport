@@ -1,0 +1,46 @@
+<!-- @dsCard group="Screens" height=900 width=1280 subtitle="Admin screen 7: usage pivot, export, webhook, period close" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Usage & chargeback</title>
+<style>html,body{height:100%} .hp-shell{min-height:900px} .spacer{flex:1} .avatar{width:32px;height:32px;border-radius:var(--radius-full);background:#24405a;color:#e6edf3;display:grid;place-items:center;font:600 12px/1 var(--font-sans)}
+</style></head>
+<body>
+<div class="hp-shell">
+  <header class="hp-appbar">
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Collapse navigation" style="border:0"><i data-icon="menu"></i></button>
+    <a class="hp-appbar__brand" href="#"><i data-logo data-size="28"></i>Homeport <small>Platform admin</small></a>
+    <button class="hp-tenant-switch" aria-haspopup="listbox"><i data-icon="building-2" class="hp-icon--sm"></i>All tenants<i data-icon="chevron-down" class="hp-icon--sm"></i></button>
+    <span class="spacer"></span>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Search" style="border:0"><i data-icon="search"></i></button>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Switch light or dark theme" style="border:0" onclick="var h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark')"><i data-icon="moon"></i></button>
+    <span class="avatar" aria-label="Signed in as René K.">RK</span>
+  </header>
+  <nav class="hp-drawer" aria-label="Main">
+    <a class="hp-nav" href="#"><i data-icon="layout-dashboard"></i>Overview</a><a class="hp-nav" href="#"><i data-icon="hp-tenant"></i>Tenants</a><a class="hp-nav" href="#"><i data-icon="hp-plan"></i>Plans & quotas</a><a class="hp-nav" href="#"><i data-icon="key-round"></i>Clients & API keys</a><a class="hp-nav" href="#"><i data-icon="hp-registry"></i>Modules</a><a class="hp-nav" href="#" aria-current="page"><i data-icon="receipt-text"></i>Usage & chargeback</a>
+    <h6>Platform</h6>
+    <a class="hp-nav" href="#"><i data-icon="history"></i>Audit log</a><a class="hp-nav" href="#"><i data-icon="settings"></i>Settings</a>
+  </nav>
+  <main class="hp-main">
+    <div class="hp-page-head"><div><h1>Usage &amp; chargeback</h1><p>Period <b>October 2026</b> · <span class="hp-badge hp-badge--info"><i data-icon="clock"></i>open</span></p></div>
+      <div class="hp-row"><button class="hp-btn hp-btn--outline"><i data-icon="download" class="hp-icon--sm"></i>CSV</button><button class="hp-btn hp-btn--outline"><i data-icon="download" class="hp-icon--sm"></i>JSON</button><button class="hp-btn hp-btn--primary"><i data-icon="lock" class="hp-icon--sm"></i>Close period</button></div></div>
+    <div class="hp-row">
+      <label class="hp-input"><i data-icon="calendar-range" class="hp-icon--sm hp-muted"></i><select aria-label="Period"><option>October 2026</option></select></label>
+      <label class="hp-input"><i data-icon="hp-tenant" class="hp-icon--sm hp-muted"></i><select aria-label="Tenants"><option>All tenants</option></select></label>
+      <label class="hp-input"><i data-icon="hp-module" class="hp-icon--sm hp-muted"></i><select aria-label="Modules"><option>All modules (catalog + internal)</option></select></label>
+      <label class="hp-input"><i data-icon="hp-meter" class="hp-icon--sm hp-muted"></i><select aria-label="Meter"><option>requests</option></select></label>
+    </div>
+    <div class="hp-grid" style="grid-template-columns:2fr 1fr;align-items:start">
+      <div class="hp-card"><div class="hp-card__head"><div><h2 class="hp-card__title">Requests by tenant</h2><p class="hp-card__sub">Per day · October 2026</p></div></div><div id="c"></div></div>
+      <div class="hp-card hp-stack"><h2 class="hp-card__title">Export webhook</h2>
+        <dl class="hp-kv"><dt>URL</dt><dd class="hp-mono" style="font-size:13px;word-break:break-all">https://erp.internal/hooks/usage</dd><dt>Format</dt><dd>JSON, per tenant × module × meter</dd><dt>Trigger</dt><dd>On period close</dd><dt>Last delivery</dt><dd><span class="hp-badge hp-badge--success"><i data-icon="circle-check"></i>200</span> 01 Oct, 00:05</dd></dl>
+        <div class="hp-row"><button class="hp-btn hp-btn--outline hp-btn--sm">Edit</button><button class="hp-btn hp-btn--text hp-btn--sm">Send test</button></div></div>
+    </div>
+    <div class="hp-card" style="padding:0;overflow:hidden"><table class="hp-table"><caption class="hp-sr">Usage by tenant and module</caption><thead><tr><th>Tenant</th><th>Cost center</th><th class="hp-num">Module A</th><th class="hp-num">Module B</th><th class="hp-num">Orders API <i data-icon="building-2" class="hp-icon--sm" style="color:var(--primary)" title="internal"></i><span class="hp-sr"> (internal)</span></th><th class="hp-num">Total units</th><th class="hp-num">Amount (EUR)</th></tr></thead><tbody><tr><td><span class="hp-dot" style="background:var(--viz-1)"></span> Finance</td><td class="hp-mono">CC-4100</td><td class="hp-num">412 080</td><td class="hp-num">88 200</td><td class="hp-num">120 450</td><td class="hp-num">620 730</td><td class="hp-num">1 241,46</td></tr><tr><td><span class="hp-dot" style="background:var(--viz-2)"></span> Logistics</td><td class="hp-mono">CC-5200</td><td class="hp-num">96 112</td><td class="hp-num">640 018</td><td class="hp-num">0</td><td class="hp-num">736 130</td><td class="hp-num">1 472,26</td></tr><tr><td><span class="hp-dot" style="background:var(--viz-3)"></span> Billing</td><td class="hp-mono">CC-4300</td><td class="hp-num">208 904</td><td class="hp-num">0</td><td class="hp-num">31 200</td><td class="hp-num">240 104</td><td class="hp-num">480,21</td></tr><tr><td><span class="hp-dot" style="background:var(--viz-4)"></span> HR</td><td class="hp-mono">CC-6100</td><td class="hp-num">18 210</td><td class="hp-num">0</td><td class="hp-num">0</td><td class="hp-num">18 210</td><td class="hp-num">36,42</td></tr></tbody></table></div>
+  </main>
+</div>
+<script>Homeport.hydrate();var d=Array.from({length:17},function(_,i){return (i+1)+' Oct';});
+function v(b,s){return d.map(function(_,i){return Math.round(b*(0.8+0.2*Math.sin(i/1.9+s))*((i%7)>3&&(i%7)<6?0.35:1));});}
+Homeport.chart.stacked(document.getElementById('c'),{label:'Requests per day by tenant',labels:d,height:240,series:[{name:'Finance',color:'viz-1',values:v(26000,0)},{name:'Logistics',color:'viz-2',values:v(30000,1)},{name:'Billing',color:'viz-3',values:v(11000,2)},{name:'HR',color:'viz-4',values:v(1100,3)}]});</script>
+</body>
+</html>
