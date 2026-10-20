@@ -1,0 +1,1140 @@
+{
+  "$description": "Homeport design tokens. Generated from tokens.json - do not edit.",
+  "color": {
+    "light": {
+      "bg": {
+        "$type": "color",
+        "$value": "#f4f6f8",
+        "$description": "Page and app background (MudBlazor Background). Light: harbor fog. Dark: night water."
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "#ffffff",
+        "$description": "Cards, tables, drawer, landing sections (MudBlazor Surface, DrawerBackground)."
+      },
+      "surface-sunken": {
+        "$type": "color",
+        "$value": "#e9eef3",
+        "$description": "Wells: code blocks, table header rows, input fills, skeleton base."
+      },
+      "surface-raised": {
+        "$type": "color",
+        "$value": "#ffffff",
+        "$description": "Menus, dialogs, popovers. In dark, height is shown by a lighter surface, not by shadow alone."
+      },
+      "surface-inverse": {
+        "$type": "color",
+        "$value": "#0e1e2e",
+        "$description": "Tooltips and chart tooltips. Text on it: ink-inverse."
+      },
+      "appbar": {
+        "$type": "color",
+        "$value": "#0e1e2e",
+        "$description": "Portal app bar and landing top bar. Text: appbar-ink. Focus here: focus-on-inverse."
+      },
+      "appbar-ink": {
+        "$type": "color",
+        "$value": "#f4f6f8",
+        "$description": "Text and icons on appbar (15.6:1 light, 15.4:1 dark)."
+      },
+      "line": {
+        "$type": "color",
+        "$value": "#dde3ea",
+        "$description": "Hairline dividers and table lines. Decorative only, never the only boundary of a control."
+      },
+      "line-strong": {
+        "$type": "color",
+        "$value": "#7a8898",
+        "$description": "Input and control borders, chart quota line. 3.6:1 on surface (light), 3.8:1 (dark)."
+      },
+      "ink": {
+        "$type": "color",
+        "$value": "#0e1e2e",
+        "$description": "Primary text on bg, surface, surface-sunken, surface-raised (>=13:1 both themes)."
+      },
+      "ink-muted": {
+        "$type": "color",
+        "$value": "#475869",
+        "$description": "Secondary text, labels, axis labels, metadata on every surface (>=6.2:1 light, >=7.2:1 dark)."
+      },
+      "ink-inverse": {
+        "$type": "color",
+        "$value": "#f4f6f8",
+        "$description": "Text on surface-inverse (tooltips)."
+      },
+      "ink-disabled": {
+        "$type": "color",
+        "$value": "#9aa7b4",
+        "$description": "Disabled text and icons only (WCAG exempts disabled controls). Never for readable content."
+      },
+      "harbor-navy": {
+        "$type": "color",
+        "$value": "#0e1e2e",
+        "$description": "The brand ink. App-icon tile, logo on light grounds. Same in both themes."
+      },
+      "primary": {
+        "$type": "color",
+        "$value": "#1d5a8e",
+        "$description": "Portal primary actions, links, selected nav, active tab. As text on every surface (>=6.2:1 light, >=7:1 dark)."
+      },
+      "on-primary": {
+        "$type": "color",
+        "$value": "#ffffff",
+        "$description": "Text and icons on a primary fill (7.2:1 light, 8.5:1 dark)."
+      },
+      "primary-soft": {
+        "$type": "color",
+        "$value": "#e3edf6",
+        "$description": "Selected row, active nav item background. Text on it: primary or ink."
+      },
+      "accent": {
+        "$type": "color",
+        "$value": "#f2b140",
+        "$description": "Harbor light. Landing CTA fill, logo container, highlights. Never a status, never text on light grounds."
+      },
+      "on-accent": {
+        "$type": "color",
+        "$value": "#0e1e2e",
+        "$description": "Text on an accent fill (9:1 light, 11:1 dark)."
+      },
+      "accent-edge": {
+        "$type": "color",
+        "$value": "#a8700c",
+        "$description": "1px border on accent fills so the button edge reads on white (4.2:1)."
+      },
+      "accent-ink": {
+        "$type": "color",
+        "$value": "#8a5600",
+        "$description": "Accent as text: eyebrows, small highlights (6.2:1 on surface light, 10.3:1 dark)."
+      },
+      "focus": {
+        "$type": "color",
+        "$value": "{color.light.primary}",
+        "$description": "Focus ring: 2px solid, 2px offset, on bg, surface, sunken and raised (>=6.2:1 light, >=7:1 dark). Same as MudBlazor Primary, so portal and site match."
+      },
+      "focus-on-inverse": {
+        "$type": "color",
+        "$value": "#f6be55",
+        "$description": "Focus ring on appbar and surface-inverse (10:1)."
+      },
+      "navlight-port": {
+        "$type": "color",
+        "$value": "#c93c3c",
+        "$description": "Decorative red port light. Landing dividers and hero only. Never near status UI."
+      },
+      "navlight-starboard": {
+        "$type": "color",
+        "$value": "#1f8a5a",
+        "$description": "Decorative green starboard light. Pairs with navlight-port. Never near status UI."
+      },
+      "illus-line": {
+        "$type": "color",
+        "$value": "#62788c",
+        "$description": "Illustration strokes. Same in both themes (4.6:1 on white, 3.8:1 on dark surface)."
+      },
+      "illus-water": {
+        "$type": "color",
+        "$value": "#b9c8d6",
+        "$description": "Illustration water lines and secondary strokes."
+      },
+      "illus-light": {
+        "$type": "color",
+        "$value": "#f2b140",
+        "$description": "Illustration highlight: harbor lights, the docked container, dawn sun."
+      },
+      "success": {
+        "$type": "color",
+        "$value": "#17733a",
+        "$description": "Success / healthy. As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "success-soft": {
+        "$type": "color",
+        "$value": "#e3f4e8",
+        "$description": "Background for success badges, alerts and banners. Text on it: success (>=5.1:1)."
+      },
+      "warning": {
+        "$type": "color",
+        "$value": "#a5480a",
+        "$description": "Warning / degraded. An orange, kept apart from the gold accent by lightness (light) and hue (dark). As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "warning-soft": {
+        "$type": "color",
+        "$value": "#fdeee2",
+        "$description": "Background for warning badges, alerts and banners. Text on it: warning (>=5.1:1)."
+      },
+      "error": {
+        "$type": "color",
+        "$value": "#b42318",
+        "$description": "Error / unreachable. As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "error-soft": {
+        "$type": "color",
+        "$value": "#fde8e6",
+        "$description": "Background for error badges, alerts and banners. Text on it: error (>=5.1:1)."
+      },
+      "info": {
+        "$type": "color",
+        "$value": "#1f5f9e",
+        "$description": "Info notices. As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "info-soft": {
+        "$type": "color",
+        "$value": "#e5eef8",
+        "$description": "Background for info badges, alerts and banners. Text on it: info (>=5.1:1)."
+      },
+      "neutral": {
+        "$type": "color",
+        "$value": "#56606b",
+        "$description": "Neutral state / draining. Planned, not a problem. As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "neutral-soft": {
+        "$type": "color",
+        "$value": "#eceef1",
+        "$description": "Background for neutral badges, alerts and banners. Text on it: neutral (>=5.1:1)."
+      },
+      "state-healthy": {
+        "$type": "color",
+        "$value": "{color.light.success}",
+        "$description": "Module state healthy. Always with icon circle-check and the word 'healthy'."
+      },
+      "state-degraded": {
+        "$type": "color",
+        "$value": "{color.light.warning}",
+        "$description": "Module state degraded. Always with icon triangle-alert and the word 'degraded'."
+      },
+      "state-unreachable": {
+        "$type": "color",
+        "$value": "{color.light.error}",
+        "$description": "Module state unreachable. Always with icon circle-x and the word 'unreachable'."
+      },
+      "state-draining": {
+        "$type": "color",
+        "$value": "{color.light.neutral}",
+        "$description": "Module state draining. Always with icon arrow-down-to-line and the word 'draining'."
+      },
+      "viz-1": {
+        "$type": "color",
+        "$value": "#2a78d6",
+        "$description": "Categorical slot 1 (blue). Assign in fixed order, by entity, never by rank."
+      },
+      "viz-2": {
+        "$type": "color",
+        "$value": "#eb6834",
+        "$description": "Categorical slot 2 (orange). Assign in fixed order, by entity, never by rank."
+      },
+      "viz-3": {
+        "$type": "color",
+        "$value": "#1baf7a",
+        "$description": "Categorical slot 3 (aqua). Assign in fixed order, by entity, never by rank. Below 3:1 on light: needs direct labels or table."
+      },
+      "viz-4": {
+        "$type": "color",
+        "$value": "#eda100",
+        "$description": "Categorical slot 4 (yellow). Assign in fixed order, by entity, never by rank. Below 3:1 on light: needs direct labels or table."
+      },
+      "viz-5": {
+        "$type": "color",
+        "$value": "#e87ba4",
+        "$description": "Categorical slot 5 (magenta). Assign in fixed order, by entity, never by rank. Below 3:1 on light: needs direct labels or table."
+      },
+      "viz-6": {
+        "$type": "color",
+        "$value": "#008300",
+        "$description": "Categorical slot 6 (green). Assign in fixed order, by entity, never by rank."
+      },
+      "viz-7": {
+        "$type": "color",
+        "$value": "#6250d6",
+        "$description": "Categorical slot 7 (violet). Assign in fixed order, by entity, never by rank."
+      },
+      "viz-8": {
+        "$type": "color",
+        "$value": "#e34948",
+        "$description": "Categorical slot 8 (red). Assign in fixed order, by entity, never by rank."
+      },
+      "seq-100": {
+        "$type": "color",
+        "$value": "#cde2fb",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-200": {
+        "$type": "color",
+        "$value": "#9ec5f4",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-300": {
+        "$type": "color",
+        "$value": "#6da7ec",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-400": {
+        "$type": "color",
+        "$value": "#3987e5",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-500": {
+        "$type": "color",
+        "$value": "#256abf",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-600": {
+        "$type": "color",
+        "$value": "#184f95",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-700": {
+        "$type": "color",
+        "$value": "#0d366b",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "viz-grid": {
+        "$type": "color",
+        "$value": "#e6eaef",
+        "$description": "Chart gridlines, 1px, horizontal only."
+      },
+      "viz-axis": {
+        "$type": "color",
+        "$value": "#9aa7b4",
+        "$description": "Chart baseline / x-axis, 1px."
+      },
+      "viz-empty": {
+        "$type": "color",
+        "$value": "#edf1f5",
+        "$description": "Empty plot area fill and skeleton bars."
+      }
+    },
+    "dark": {
+      "bg": {
+        "$type": "color",
+        "$value": "#07121d",
+        "$description": "Page and app background (MudBlazor Background). Light: harbor fog. Dark: night water."
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "#0d1b29",
+        "$description": "Cards, tables, drawer, landing sections (MudBlazor Surface, DrawerBackground)."
+      },
+      "surface-sunken": {
+        "$type": "color",
+        "$value": "#0a1622",
+        "$description": "Wells: code blocks, table header rows, input fills, skeleton base."
+      },
+      "surface-raised": {
+        "$type": "color",
+        "$value": "#132536",
+        "$description": "Menus, dialogs, popovers. In dark, height is shown by a lighter surface, not by shadow alone."
+      },
+      "surface-inverse": {
+        "$type": "color",
+        "$value": "#e6edf3",
+        "$description": "Tooltips and chart tooltips. Text on it: ink-inverse."
+      },
+      "appbar": {
+        "$type": "color",
+        "$value": "#0a1622",
+        "$description": "Portal app bar and landing top bar. Text: appbar-ink. Focus here: focus-on-inverse."
+      },
+      "appbar-ink": {
+        "$type": "color",
+        "$value": "#e6edf3",
+        "$description": "Text and icons on appbar (15.6:1 light, 15.4:1 dark)."
+      },
+      "line": {
+        "$type": "color",
+        "$value": "#1e3245",
+        "$description": "Hairline dividers and table lines. Decorative only, never the only boundary of a control."
+      },
+      "line-strong": {
+        "$type": "color",
+        "$value": "#62788c",
+        "$description": "Input and control borders, chart quota line. 3.6:1 on surface (light), 3.8:1 (dark)."
+      },
+      "ink": {
+        "$type": "color",
+        "$value": "#e6edf3",
+        "$description": "Primary text on bg, surface, surface-sunken, surface-raised (>=13:1 both themes)."
+      },
+      "ink-muted": {
+        "$type": "color",
+        "$value": "#a3b3c2",
+        "$description": "Secondary text, labels, axis labels, metadata on every surface (>=6.2:1 light, >=7.2:1 dark)."
+      },
+      "ink-inverse": {
+        "$type": "color",
+        "$value": "#0e1e2e",
+        "$description": "Text on surface-inverse (tooltips)."
+      },
+      "ink-disabled": {
+        "$type": "color",
+        "$value": "#4e6275",
+        "$description": "Disabled text and icons only (WCAG exempts disabled controls). Never for readable content."
+      },
+      "harbor-navy": {
+        "$type": "color",
+        "$value": "#0e1e2e",
+        "$description": "The brand ink. App-icon tile, logo on light grounds. Same in both themes."
+      },
+      "primary": {
+        "$type": "color",
+        "$value": "#72b4ea",
+        "$description": "Portal primary actions, links, selected nav, active tab. As text on every surface (>=6.2:1 light, >=7:1 dark)."
+      },
+      "on-primary": {
+        "$type": "color",
+        "$value": "#07121d",
+        "$description": "Text and icons on a primary fill (7.2:1 light, 8.5:1 dark)."
+      },
+      "primary-soft": {
+        "$type": "color",
+        "$value": "#10263b",
+        "$description": "Selected row, active nav item background. Text on it: primary or ink."
+      },
+      "accent": {
+        "$type": "color",
+        "$value": "#f6be55",
+        "$description": "Harbor light. Landing CTA fill, logo container, highlights. Never a status, never text on light grounds."
+      },
+      "on-accent": {
+        "$type": "color",
+        "$value": "#07121d",
+        "$description": "Text on an accent fill (9:1 light, 11:1 dark)."
+      },
+      "accent-edge": {
+        "$type": "color",
+        "$value": "#f6be55",
+        "$description": "1px border on accent fills so the button edge reads on white (4.2:1)."
+      },
+      "accent-ink": {
+        "$type": "color",
+        "$value": "#f6be55",
+        "$description": "Accent as text: eyebrows, small highlights (6.2:1 on surface light, 10.3:1 dark)."
+      },
+      "focus": {
+        "$type": "color",
+        "$value": "{color.dark.primary}",
+        "$description": "Focus ring: 2px solid, 2px offset, on bg, surface, sunken and raised (>=6.2:1 light, >=7:1 dark). Same as MudBlazor Primary, so portal and site match."
+      },
+      "focus-on-inverse": {
+        "$type": "color",
+        "$value": "#f6be55",
+        "$description": "Focus ring on appbar and surface-inverse (10:1)."
+      },
+      "navlight-port": {
+        "$type": "color",
+        "$value": "#ff6b6b",
+        "$description": "Decorative red port light. Landing dividers and hero only. Never near status UI."
+      },
+      "navlight-starboard": {
+        "$type": "color",
+        "$value": "#3fd18b",
+        "$description": "Decorative green starboard light. Pairs with navlight-port. Never near status UI."
+      },
+      "illus-line": {
+        "$type": "color",
+        "$value": "#62788c",
+        "$description": "Illustration strokes. Same in both themes (4.6:1 on white, 3.8:1 on dark surface)."
+      },
+      "illus-water": {
+        "$type": "color",
+        "$value": "#24405a",
+        "$description": "Illustration water lines and secondary strokes."
+      },
+      "illus-light": {
+        "$type": "color",
+        "$value": "#f6be55",
+        "$description": "Illustration highlight: harbor lights, the docked container, dawn sun."
+      },
+      "success": {
+        "$type": "color",
+        "$value": "#5cc98a",
+        "$description": "Success / healthy. As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "success-soft": {
+        "$type": "color",
+        "$value": "#0f2a1e",
+        "$description": "Background for success badges, alerts and banners. Text on it: success (>=5.1:1)."
+      },
+      "warning": {
+        "$type": "color",
+        "$value": "#ff9d5c",
+        "$description": "Warning / degraded. An orange, kept apart from the gold accent by lightness (light) and hue (dark). As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "warning-soft": {
+        "$type": "color",
+        "$value": "#2e1a0e",
+        "$description": "Background for warning badges, alerts and banners. Text on it: warning (>=5.1:1)."
+      },
+      "error": {
+        "$type": "color",
+        "$value": "#ff8a80",
+        "$description": "Error / unreachable. As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "error-soft": {
+        "$type": "color",
+        "$value": "#311417",
+        "$description": "Background for error badges, alerts and banners. Text on it: error (>=5.1:1)."
+      },
+      "info": {
+        "$type": "color",
+        "$value": "#7fb6ea",
+        "$description": "Info notices. As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "info-soft": {
+        "$type": "color",
+        "$value": "#10243a",
+        "$description": "Background for info badges, alerts and banners. Text on it: info (>=5.1:1)."
+      },
+      "neutral": {
+        "$type": "color",
+        "$value": "#a8b3be",
+        "$description": "Neutral state / draining. Planned, not a problem. As text or icon on every surface (>=5:1). Always with icon + label."
+      },
+      "neutral-soft": {
+        "$type": "color",
+        "$value": "#18232e",
+        "$description": "Background for neutral badges, alerts and banners. Text on it: neutral (>=5.1:1)."
+      },
+      "state-healthy": {
+        "$type": "color",
+        "$value": "{color.dark.success}",
+        "$description": "Module state healthy. Always with icon circle-check and the word 'healthy'."
+      },
+      "state-degraded": {
+        "$type": "color",
+        "$value": "{color.dark.warning}",
+        "$description": "Module state degraded. Always with icon triangle-alert and the word 'degraded'."
+      },
+      "state-unreachable": {
+        "$type": "color",
+        "$value": "{color.dark.error}",
+        "$description": "Module state unreachable. Always with icon circle-x and the word 'unreachable'."
+      },
+      "state-draining": {
+        "$type": "color",
+        "$value": "{color.dark.neutral}",
+        "$description": "Module state draining. Always with icon arrow-down-to-line and the word 'draining'."
+      },
+      "viz-1": {
+        "$type": "color",
+        "$value": "#3987e5",
+        "$description": "Categorical slot 1 (blue). Assign in fixed order, by entity, never by rank."
+      },
+      "viz-2": {
+        "$type": "color",
+        "$value": "#d95926",
+        "$description": "Categorical slot 2 (orange). Assign in fixed order, by entity, never by rank."
+      },
+      "viz-3": {
+        "$type": "color",
+        "$value": "#199e70",
+        "$description": "Categorical slot 3 (aqua). Assign in fixed order, by entity, never by rank. Below 3:1 on light: needs direct labels or table."
+      },
+      "viz-4": {
+        "$type": "color",
+        "$value": "#c98500",
+        "$description": "Categorical slot 4 (yellow). Assign in fixed order, by entity, never by rank. Below 3:1 on light: needs direct labels or table."
+      },
+      "viz-5": {
+        "$type": "color",
+        "$value": "#d55181",
+        "$description": "Categorical slot 5 (magenta). Assign in fixed order, by entity, never by rank. Below 3:1 on light: needs direct labels or table."
+      },
+      "viz-6": {
+        "$type": "color",
+        "$value": "#008300",
+        "$description": "Categorical slot 6 (green). Assign in fixed order, by entity, never by rank."
+      },
+      "viz-7": {
+        "$type": "color",
+        "$value": "#9085e9",
+        "$description": "Categorical slot 7 (violet). Assign in fixed order, by entity, never by rank."
+      },
+      "viz-8": {
+        "$type": "color",
+        "$value": "#e66767",
+        "$description": "Categorical slot 8 (red). Assign in fixed order, by entity, never by rank."
+      },
+      "seq-100": {
+        "$type": "color",
+        "$value": "#0d366b",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-200": {
+        "$type": "color",
+        "$value": "#184f95",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-300": {
+        "$type": "color",
+        "$value": "#256abf",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-400": {
+        "$type": "color",
+        "$value": "#3987e5",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-500": {
+        "$type": "color",
+        "$value": "#6da7ec",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-600": {
+        "$type": "color",
+        "$value": "#9ec5f4",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "seq-700": {
+        "$type": "color",
+        "$value": "#cde2fb",
+        "$description": "Sequential usage intensity (heatmaps). 100 = near zero, 700 = peak. Dark theme reverses so low values recede into the night."
+      },
+      "viz-grid": {
+        "$type": "color",
+        "$value": "#1a2c3e",
+        "$description": "Chart gridlines, 1px, horizontal only."
+      },
+      "viz-axis": {
+        "$type": "color",
+        "$value": "#3b5166",
+        "$description": "Chart baseline / x-axis, 1px."
+      },
+      "viz-empty": {
+        "$type": "color",
+        "$value": "#182b3d",
+        "$description": "Empty plot area fill and skeleton bars."
+      }
+    }
+  },
+  "shadow": {
+    "light": {
+      "shadow-1": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": "rgba(14,30,46,0.08)",
+            "offsetX": "0",
+            "offsetY": "1px",
+            "blur": "2px",
+            "spread": "0"
+          },
+          {
+            "color": "rgba(14,30,46,0.04)",
+            "offsetX": "0",
+            "offsetY": "0",
+            "blur": "0",
+            "spread": "1px"
+          }
+        ],
+        "$description": "Cards resting on bg."
+      },
+      "shadow-2": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": "rgba(14,30,46,0.10)",
+            "offsetX": "0",
+            "offsetY": "4px",
+            "blur": "12px",
+            "spread": "0"
+          },
+          {
+            "color": "rgba(14,30,46,0.08)",
+            "offsetX": "0",
+            "offsetY": "1px",
+            "blur": "3px",
+            "spread": "0"
+          }
+        ],
+        "$description": "Menus, popovers, sticky app bar."
+      },
+      "shadow-3": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": "rgba(14,30,46,0.16)",
+            "offsetX": "0",
+            "offsetY": "12px",
+            "blur": "32px",
+            "spread": "0"
+          },
+          {
+            "color": "rgba(14,30,46,0.08)",
+            "offsetX": "0",
+            "offsetY": "2px",
+            "blur": "6px",
+            "spread": "0"
+          }
+        ],
+        "$description": "Dialogs, the secret-once dialog."
+      }
+    },
+    "dark": {
+      "shadow-1": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": "rgba(0,0,0,0.5)",
+            "offsetX": "0",
+            "offsetY": "1px",
+            "blur": "2px",
+            "spread": "0"
+          }
+        ],
+        "$description": "Cards resting on bg."
+      },
+      "shadow-2": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": "rgba(0,0,0,0.55)",
+            "offsetX": "0",
+            "offsetY": "4px",
+            "blur": "12px",
+            "spread": "0"
+          }
+        ],
+        "$description": "Menus, popovers, sticky app bar."
+      },
+      "shadow-3": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": "rgba(0,0,0,0.6)",
+            "offsetX": "0",
+            "offsetY": "12px",
+            "blur": "32px",
+            "spread": "0"
+          }
+        ],
+        "$description": "Dialogs, the secret-once dialog."
+      }
+    }
+  },
+  "spacing": {
+    "space-0-5": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Hairline gaps, chart fill gap."
+    },
+    "space-1": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$description": "Icon-to-text in badges."
+    },
+    "space-2": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "Icon-to-label, tight stacks."
+    },
+    "space-3": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$description": "Input padding, table cell padding (y)."
+    },
+    "space-4": {
+      "$type": "dimension",
+      "$value": "16px",
+      "$description": "Card padding (portal), table cell padding (x), mobile gutter."
+    },
+    "space-5": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$description": "Form field gap."
+    },
+    "space-6": {
+      "$type": "dimension",
+      "$value": "24px",
+      "$description": "Card padding (landing), grid gap."
+    },
+    "space-8": {
+      "$type": "dimension",
+      "$value": "32px",
+      "$description": "Section inner gap."
+    },
+    "space-10": {
+      "$type": "dimension",
+      "$value": "40px",
+      "$description": "Large block gap."
+    },
+    "space-12": {
+      "$type": "dimension",
+      "$value": "48px",
+      "$description": "Landing section padding (mobile)."
+    },
+    "space-16": {
+      "$type": "dimension",
+      "$value": "64px",
+      "$description": "Landing section padding (tablet)."
+    },
+    "space-24": {
+      "$type": "dimension",
+      "$value": "96px",
+      "$description": "Landing section padding (desktop)."
+    }
+  },
+  "radius": {
+    "radius-xs": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Chart bar ends, focus-ring corners on tight items."
+    },
+    "radius-sm": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$description": "Badges, chips, inputs, small buttons."
+    },
+    "radius-md": {
+      "$type": "dimension",
+      "$value": "6px",
+      "$description": "Buttons, cards, menus. MudBlazor DefaultBorderRadius."
+    },
+    "radius-lg": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$description": "Landing cards, dialogs, code panels."
+    },
+    "radius-full": {
+      "$type": "dimension",
+      "$value": "9999px",
+      "$description": "Avatars, status dots, toggle tracks."
+    }
+  },
+  "border": {
+    "border-hairline": {
+      "$type": "dimension",
+      "$value": "1px",
+      "$description": "Dividers, card borders, inputs."
+    },
+    "border-strong": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Selected card, focus ring width."
+    },
+    "focus-offset": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Gap between element and focus ring."
+    }
+  },
+  "duration": {
+    "duration-fast": {
+      "$type": "duration",
+      "$value": "120ms",
+      "$description": "Hover, focus, toggles."
+    },
+    "duration-base": {
+      "$type": "duration",
+      "$value": "200ms",
+      "$description": "Menus, drawer, tabs."
+    },
+    "duration-slow": {
+      "$type": "duration",
+      "$value": "320ms",
+      "$description": "Dialogs, landing reveal of the docking container."
+    }
+  },
+  "easing": {
+    "ease-standard": {
+      "$type": "cubicBezier",
+      "$value": [
+        0.2,
+        0,
+        0,
+        1
+      ],
+      "$description": "Most transitions: settle into place, like a ship easing into a berth."
+    },
+    "ease-exit": {
+      "$type": "cubicBezier",
+      "$value": [
+        0.3,
+        0,
+        1,
+        1
+      ],
+      "$description": "Elements leaving the screen."
+    }
+  },
+  "breakpoint": {
+    "bp-sm": {
+      "$type": "dimension",
+      "$value": "600px",
+      "$description": "Site: 2-column grids start."
+    },
+    "bp-md": {
+      "$type": "dimension",
+      "$value": "960px",
+      "$description": "Site: desktop nav; portal: drawer docks (MudBlazor Md)."
+    },
+    "bp-lg": {
+      "$type": "dimension",
+      "$value": "1280px",
+      "$description": "Portal: 3-column dashboard (MudBlazor Lg)."
+    },
+    "bp-xl": {
+      "$type": "dimension",
+      "$value": "1920px",
+      "$description": "Portal: max content width cap (MudBlazor Xl)."
+    },
+    "content-max": {
+      "$type": "dimension",
+      "$value": "1200px",
+      "$description": "Site content column max width."
+    }
+  },
+  "zIndex": {
+    "z-drawer": {
+      "$type": "number",
+      "$value": 1100,
+      "$description": "Navigation drawer."
+    },
+    "z-appbar": {
+      "$type": "number",
+      "$value": 1300,
+      "$description": "App bar."
+    },
+    "z-dialog": {
+      "$type": "number",
+      "$value": 1400,
+      "$description": "Dialogs."
+    },
+    "z-popover": {
+      "$type": "number",
+      "$value": 1200,
+      "$description": "Menus and selects."
+    },
+    "z-snackbar": {
+      "$type": "number",
+      "$value": 1500,
+      "$description": "Snackbars."
+    },
+    "z-tooltip": {
+      "$type": "number",
+      "$value": 1600,
+      "$description": "Tooltips."
+    }
+  },
+  "fontFamily": {
+    "sans": {
+      "$type": "fontFamily",
+      "$value": [
+        "Instrument Sans",
+        "ui-sans-serif",
+        "system-ui",
+        "Segoe UI",
+        "sans-serif"
+      ]
+    },
+    "mono": {
+      "$type": "fontFamily",
+      "$value": [
+        "JetBrains Mono",
+        "ui-monospace",
+        "Cascadia Mono",
+        "Consolas",
+        "monospace"
+      ]
+    }
+  },
+  "typography": {
+    "display": {
+      "$type": "typography",
+      "$description": "Landing hero claim only. 36px/40px below 600px width.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "56px",
+        "fontWeight": 700,
+        "lineHeight": 1.071,
+        "letterSpacing": "-0.02em"
+      }
+    },
+    "h1": {
+      "$type": "typography",
+      "$description": "Landing section titles. 30px/36px on mobile.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "40px",
+        "fontWeight": 700,
+        "lineHeight": 1.2,
+        "letterSpacing": "-0.015em"
+      }
+    },
+    "h2": {
+      "$type": "typography",
+      "$description": "Landing sub-sections; portal page title on wide screens.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "30px",
+        "fontWeight": 600,
+        "lineHeight": 1.267,
+        "letterSpacing": "-0.01em"
+      }
+    },
+    "h3": {
+      "$type": "typography",
+      "$description": "Portal page title (MudBlazor H4/H5 map here).",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "24px",
+        "fontWeight": 600,
+        "lineHeight": 1.333,
+        "letterSpacing": "-0.005em"
+      }
+    },
+    "h4": {
+      "$type": "typography",
+      "$description": "Card and dialog titles.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "20px",
+        "fontWeight": 600,
+        "lineHeight": 1.4,
+        "letterSpacing": "0em"
+      }
+    },
+    "h5": {
+      "$type": "typography",
+      "$description": "Panel titles, pillar titles on mobile.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "17px",
+        "fontWeight": 600,
+        "lineHeight": 1.412,
+        "letterSpacing": "0em"
+      }
+    },
+    "h6": {
+      "$type": "typography",
+      "$description": "Group titles inside cards.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "15px",
+        "fontWeight": 600,
+        "lineHeight": 1.467,
+        "letterSpacing": "0em"
+      }
+    },
+    "body-lg": {
+      "$type": "typography",
+      "$description": "Landing lead paragraphs.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "18px",
+        "fontWeight": 400,
+        "lineHeight": 1.556,
+        "letterSpacing": "0em"
+      }
+    },
+    "body": {
+      "$type": "typography",
+      "$description": "Landing body copy; portal Body1.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "letterSpacing": "0em"
+      }
+    },
+    "body-sm": {
+      "$type": "typography",
+      "$description": "Portal default text, tables, forms (MudBlazor Body2).",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "14px",
+        "fontWeight": 400,
+        "lineHeight": 1.429,
+        "letterSpacing": "0em"
+      }
+    },
+    "label": {
+      "$type": "typography",
+      "$description": "Buttons, tabs, nav items. Sentence case, no uppercase.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "14px",
+        "fontWeight": 600,
+        "lineHeight": 1.429,
+        "letterSpacing": "0em"
+      }
+    },
+    "small": {
+      "$type": "typography",
+      "$description": "Helper text, chart legends, badge text.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "13px",
+        "fontWeight": 400,
+        "lineHeight": 1.385,
+        "letterSpacing": "0em"
+      }
+    },
+    "caption": {
+      "$type": "typography",
+      "$description": "Axis ticks, timestamps, footnotes.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "12px",
+        "fontWeight": 500,
+        "lineHeight": 1.333,
+        "letterSpacing": "0em"
+      }
+    },
+    "overline": {
+      "$type": "typography",
+      "$description": "Landing eyebrows in accent-ink; uppercase via CSS only.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "12px",
+        "fontWeight": 600,
+        "lineHeight": 1.333,
+        "letterSpacing": "0.08em"
+      }
+    },
+    "code": {
+      "$type": "typography",
+      "$description": "Code blocks, terminal snippets.",
+      "$value": {
+        "fontFamily": "{fontFamily.mono}",
+        "fontSize": "14px",
+        "fontWeight": 400,
+        "lineHeight": 1.571,
+        "letterSpacing": "0em"
+      }
+    },
+    "code-sm": {
+      "$type": "typography",
+      "$description": "Inline code, IDs, API keys, client IDs.",
+      "$value": {
+        "fontFamily": "{fontFamily.mono}",
+        "fontSize": "13px",
+        "fontWeight": 400,
+        "lineHeight": 1.538,
+        "letterSpacing": "0em"
+      }
+    },
+    "num": {
+      "$type": "typography",
+      "$description": "Numbers in tables and chart tooltips. Right-aligned. Mono is tabular by design.",
+      "$value": {
+        "fontFamily": "{fontFamily.mono}",
+        "fontSize": "13px",
+        "fontWeight": 500,
+        "lineHeight": 1.538,
+        "letterSpacing": "0em"
+      }
+    },
+    "stat": {
+      "$type": "typography",
+      "$description": "Stat tile value. Sans with tabular-nums.",
+      "$value": {
+        "fontFamily": "{fontFamily.sans}",
+        "fontSize": "32px",
+        "fontWeight": 600,
+        "lineHeight": 1.25,
+        "letterSpacing": "0em"
+      }
+    }
+  }
+}

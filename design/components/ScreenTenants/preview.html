@@ -1,0 +1,49 @@
+<!-- @dsCard group="Screens" height=1000 width=1280 subtitle="Admin screen 3: tenant list + detail" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Tenants</title>
+<style>html,body{height:100%} .hp-shell{min-height:1000px} .spacer{flex:1} .avatar{width:32px;height:32px;border-radius:var(--radius-full);background:#24405a;color:#e6edf3;display:grid;place-items:center;font:600 12px/1 var(--font-sans)}
+</style></head>
+<body>
+<div class="hp-shell">
+  <header class="hp-appbar">
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Collapse navigation" style="border:0"><i data-icon="menu"></i></button>
+    <a class="hp-appbar__brand" href="#"><i data-logo data-size="28"></i>Homeport <small>Platform admin</small></a>
+    <button class="hp-tenant-switch" aria-haspopup="listbox"><i data-icon="building-2" class="hp-icon--sm"></i>All tenants<i data-icon="chevron-down" class="hp-icon--sm"></i></button>
+    <span class="spacer"></span>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Search" style="border:0"><i data-icon="search"></i></button>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Switch light or dark theme" style="border:0" onclick="var h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark')"><i data-icon="moon"></i></button>
+    <span class="avatar" aria-label="Signed in as René K.">RK</span>
+  </header>
+  <nav class="hp-drawer" aria-label="Main">
+    <a class="hp-nav" href="#"><i data-icon="layout-dashboard"></i>Overview</a><a class="hp-nav" href="#" aria-current="page"><i data-icon="hp-tenant"></i>Tenants</a><a class="hp-nav" href="#"><i data-icon="hp-plan"></i>Plans & quotas</a><a class="hp-nav" href="#"><i data-icon="key-round"></i>Clients & API keys</a><a class="hp-nav" href="#"><i data-icon="hp-registry"></i>Modules</a><a class="hp-nav" href="#"><i data-icon="receipt-text"></i>Usage & chargeback</a>
+    <h6>Platform</h6>
+    <a class="hp-nav" href="#"><i data-icon="history"></i>Audit log</a><a class="hp-nav" href="#"><i data-icon="settings"></i>Settings</a>
+  </nav>
+  <main class="hp-main">
+    <div class="hp-page-head"><div><h1>Tenants</h1><p>6 tenants · departments and customers of this installation</p></div><button class="hp-btn hp-btn--primary"><i data-icon="plus" class="hp-icon--sm"></i>Add tenant</button></div>
+    <div class="hp-grid" style="grid-template-columns:1.25fr 1fr;align-items:start">
+      <div class="hp-card" style="padding:0;overflow:hidden">
+        <div class="hp-row" style="padding:var(--space-3)"><label class="hp-input" style="flex:1"><i data-icon="search" class="hp-icon--sm hp-muted"></i><input placeholder="Search tenants" aria-label="Search tenants"></label><label class="hp-input"><i data-icon="list-filter" class="hp-icon--sm hp-muted"></i><select aria-label="Filter by plan"><option>All plans</option><option>business</option><option>starter</option></select></label></div>
+        <table class="hp-table"><thead><tr><th>Tenant</th><th>Plan</th><th>Usage this month</th><th class="hp-num">Clients</th></tr></thead><tbody><tr aria-selected="true" style="background:var(--primary-soft)"><td><a href="#">Finance</a><div class="hp-mono hp-muted" style="font-size:12px">t_fin</div></td><td><span class="hp-chip">business</span></td><td style="width:220px"><div class="hp-usage "><div class="hp-usage__track"><div class="hp-usage__fill" style="width:62%"></div></div><div class="hp-usage__meta"><span>62 % of monthly quota</span></div></div></td><td class="hp-num">4</td></tr><tr><td><a href="#">Logistics</a><div class="hp-mono hp-muted" style="font-size:12px">t_log</div></td><td><span class="hp-chip">business</span></td><td style="width:220px"><div class="hp-usage hp-usage--warn"><div class="hp-usage__track"><div class="hp-usage__fill" style="width:86%"></div></div><div class="hp-usage__meta"><span>86 % of monthly quota</span></div></div></td><td class="hp-num">3</td></tr><tr><td><a href="#">Billing</a><div class="hp-mono hp-muted" style="font-size:12px">t_bil</div></td><td><span class="hp-chip">starter</span></td><td style="width:220px"><div class="hp-usage hp-usage--over"><div class="hp-usage__track"><div class="hp-usage__fill" style="width:100%"></div></div><div class="hp-usage__meta"><span>104 % of monthly quota</span></div></div></td><td class="hp-num">2</td></tr><tr><td><a href="#">HR</a><div class="hp-mono hp-muted" style="font-size:12px">t_hr</div></td><td><span class="hp-chip">starter</span></td><td style="width:220px"><div class="hp-usage "><div class="hp-usage__track"><div class="hp-usage__fill" style="width:18%"></div></div><div class="hp-usage__meta"><span>18 % of monthly quota</span></div></div></td><td class="hp-num">1</td></tr><tr><td><a href="#">Sales</a><div class="hp-mono hp-muted" style="font-size:12px">t_sal</div></td><td><span class="hp-chip">business</span></td><td style="width:220px"><div class="hp-usage "><div class="hp-usage__track"><div class="hp-usage__fill" style="width:44%"></div></div><div class="hp-usage__meta"><span>44 % of monthly quota</span></div></div></td><td class="hp-num">5</td></tr><tr><td><a href="#">Procurement</a><div class="hp-mono hp-muted" style="font-size:12px">t_pro</div></td><td><span class="hp-chip">starter</span></td><td style="width:220px"><div class="hp-usage "><div class="hp-usage__track"><div class="hp-usage__fill" style="width:7%"></div></div><div class="hp-usage__meta"><span>7 % of monthly quota</span></div></div></td><td class="hp-num">1</td></tr></tbody></table>
+      </div>
+      <div class="hp-card hp-stack" style="gap:var(--space-4)">
+        <div class="hp-card__head" style="margin:0"><div><h2 style="margin:0;font:600 20px/28px var(--font-sans)">Finance</h2><p class="hp-card__sub"><span class="hp-mono">t_fin</span> · cost center <span class="hp-mono">CC-4100</span></p></div><button class="hp-btn hp-btn--outline hp-btn--sm">Edit</button></div>
+        <div class="hp-tabs" role="tablist"><button role="tab" aria-selected="true">Overview</button><button role="tab" aria-selected="false">Clients</button><button role="tab" aria-selected="false">Audit</button></div>
+        <dl class="hp-kv"><dt>Plan</dt><dd><span class="hp-chip">business</span> · 50 req/s burst 100</dd><dt>Clients</dt><dd>4 active, 1 revoked</dd><dt>Created</dt><dd>03 Mar 2026 by René K.</dd></dl>
+        <div class="hp-stack" style="gap:var(--space-3)"><h3 style="margin:0;font:600 15px/22px var(--font-sans)">Quotas this month</h3>
+          <div class="hp-usage"><div class="hp-usage__meta"><span style="color:var(--ink)">requests</span><span><b>620 730</b> / 1 000 000</span></div><div class="hp-usage__track"><div class="hp-usage__fill" style="width:62%"></div></div></div>
+          <div class="hp-usage hp-usage--warn"><div class="hp-usage__meta"><span style="color:var(--ink)">documents.processed <span class="hp-badge hp-badge--warning" style="height:18px"><i data-icon="triangle-alert"></i>82 %</span></span><span><b>8 204</b> / 10 000</span></div><div class="hp-usage__track"><div class="hp-usage__fill" style="width:82%"></div></div></div>
+          <div class="hp-usage"><div class="hp-usage__meta"><span style="color:var(--ink)">storage.gb</span><span><b>3.1</b> / 20</span></div><div class="hp-usage__track"><div class="hp-usage__fill" style="width:15%"></div></div></div></div>
+        <div><h3 style="margin:0 0 8px;font:600 15px/22px var(--font-sans)">Requests, last 30 days</h3><div id="c"></div></div>
+        <div><h3 style="margin:0 0 4px;font:600 15px/22px var(--font-sans)">Recent audit</h3>
+          <table class="hp-table"><tbody><tr><td class="hp-mono">14:01</td><td>René K. rotated secret of <b>erp-export</b></td></tr><tr><td class="hp-mono">09:12</td><td>System raised quota <span class="hp-mono">storage.gb</span> to 20</td></tr></tbody></table></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>Homeport.hydrate();var d=Array.from({length:30},function(_,i){return (i+1)+' Sep';});
+Homeport.chart.line(document.getElementById('c'),{label:'Finance requests per day',labels:d,height:150,area:true,series:[{name:'Finance',color:'viz-1',values:d.map(function(_,i){return Math.round((i%7>4?14000:38000)+4000*Math.sin(i/3));})}]});</script>
+</body>
+</html>

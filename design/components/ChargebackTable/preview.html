@@ -1,0 +1,21 @@
+<!-- @dsCard group="Data" height=330 subtitle="Pivot of tenant x module, mono tabular numbers, totals" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Chargeback table</title></head>
+<body>
+<div class="hp-pad"><div class="hp-card" style="padding:0;overflow:hidden">
+<table class="hp-table">
+  <caption class="hp-sr">Usage by tenant and module, October 2026</caption>
+  <thead><tr><th>Tenant</th><th>Cost center</th><th class="hp-num">Module A</th><th class="hp-num">Module B</th><th class="hp-num">Orders API <span class="hp-sr">(internal)</span><i data-icon="building-2" class="hp-icon--sm" style="color:var(--primary);margin-left:4px" title="internal"></i></th><th class="hp-num">Total units</th><th class="hp-num">Amount (EUR)</th></tr></thead>
+  <tbody>
+    <tr><td><span class="hp-dot" style="background:var(--viz-1)"></span> Finance</td><td class="hp-mono">CC-4100</td><td class="hp-num">412 080</td><td class="hp-num">88 200</td><td class="hp-num">120 450</td><td class="hp-num">620 730</td><td class="hp-num">1 241,46</td></tr>
+    <tr><td><span class="hp-dot" style="background:var(--viz-2)"></span> Logistics</td><td class="hp-mono">CC-5200</td><td class="hp-num">96 112</td><td class="hp-num">640 018</td><td class="hp-num">0</td><td class="hp-num">736 130</td><td class="hp-num">1 472,26</td></tr>
+    <tr><td><span class="hp-dot" style="background:var(--viz-3)"></span> Billing</td><td class="hp-mono">CC-4300</td><td class="hp-num">208 904</td><td class="hp-num">0</td><td class="hp-num">31 200</td><td class="hp-num">240 104</td><td class="hp-num">480,21</td></tr>
+  </tbody>
+  <tfoot><tr><td>Total</td><td></td><td class="hp-num">717 096</td><td class="hp-num">728 218</td><td class="hp-num">151 650</td><td class="hp-num">1 596 964</td><td class="hp-num">3 193,93</td></tr></tfoot>
+</table>
+</div></div>
+<script>Homeport.hydrate();</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!-- @dsCard group="Actions" height=150 subtitle="Primary, accent CTA, outline, text, danger, disabled" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Button</title></head>
+<body>
+<div class="hp-stack hp-pad">
+  <div class="hp-row">
+    <button class="hp-btn hp-btn--primary"><i data-icon="plus" class="hp-icon--sm"></i>Create client</button>
+    <button class="hp-btn hp-btn--outline"><i data-icon="download" class="hp-icon--sm"></i>Export CSV</button>
+    <button class="hp-btn hp-btn--text">View OpenAPI<i data-icon="external-link" class="hp-icon--sm"></i></button>
+    <button class="hp-btn hp-btn--danger"><i data-icon="ban" class="hp-icon--sm"></i>Revoke</button>
+    <button class="hp-btn hp-btn--primary" disabled>Saving</button>
+    <button class="hp-btn hp-btn--outline hp-btn--icon" aria-label="Copy"><i data-icon="copy" class="hp-icon--sm"></i></button>
+  </div>
+  <div class="hp-row">
+    <a class="hp-btn hp-btn--accent hp-btn--lg" href="#quickstart">Get started</a>
+    <a class="hp-btn hp-btn--outline hp-btn--lg" href="#github"><i data-icon="git-branch"></i>View on GitHub</a>
+    <button class="hp-btn hp-btn--primary hp-btn--sm">Small</button>
+    <button class="hp-btn hp-btn--outline hp-btn--sm">Small outline</button>
+  </div>
+</div>
+<script>Homeport.hydrate();</script>
+</body>
+</html>

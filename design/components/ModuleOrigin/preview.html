@@ -1,0 +1,23 @@
+<!-- @dsCard group="Status" height=260 subtitle="catalog (shipped with Homeport) vs. internal (built by your team)" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Module origin</title></head>
+<body>
+<div class="hp-pad hp-stack">
+  <div class="hp-row">
+    <span class="hp-origin hp-origin--catalog"><i data-icon="hp-module"></i>catalog</span>
+    <span class="hp-origin hp-origin--internal"><i data-icon="building-2"></i>internal</span>
+  </div>
+  <table class="hp-table" style="max-width:720px">
+    <thead><tr><th>Module</th><th>Origin</th><th>State</th><th class="hp-num">Requests today</th></tr></thead>
+    <tbody>
+      <tr><td><div class="hp-modname"><b>Module A</b><span class="hp-mono">module-a</span></div></td><td><span class="hp-origin hp-origin--catalog"><i data-icon="hp-module"></i>catalog</span></td><td><span class="hp-badge hp-badge--healthy"><i data-icon="circle-check"></i>healthy</span></td><td class="hp-num">18 204</td></tr>
+      <tr><td><div class="hp-modname"><b>Module B</b><span class="hp-mono">module-b</span></div></td><td><span class="hp-origin hp-origin--catalog"><i data-icon="hp-module"></i>catalog</span></td><td><span class="hp-badge hp-badge--healthy"><i data-icon="circle-check"></i>healthy</span></td><td class="hp-num">9 870</td></tr>
+      <tr><td><div class="hp-modname"><b>Orders API</b><span class="hp-mono">orders-api</span></div></td><td><span class="hp-origin hp-origin--internal"><i data-icon="building-2"></i>internal</span></td><td><span class="hp-badge hp-badge--healthy"><i data-icon="circle-check"></i>healthy</span></td><td class="hp-num">12 412</td></tr>
+    </tbody>
+  </table>
+</div>
+<script>Homeport.hydrate();</script>
+</body>
+</html>

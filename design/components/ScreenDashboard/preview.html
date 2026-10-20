@@ -1,0 +1,58 @@
+<!-- @dsCard group="Screens" height=900 width=1280 subtitle="Admin screen 2: overview dashboard" -->
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../../dist/site-tokens.css"><link rel="stylesheet" href="../kit.css"><script src="../frame.js"></script><script src="../kit.js"></script><meta charset="utf-8"><title>Overview dashboard</title>
+<style>html,body{height:100%} .hp-shell{min-height:900px} .spacer{flex:1} .avatar{width:32px;height:32px;border-radius:var(--radius-full);background:#24405a;color:#e6edf3;display:grid;place-items:center;font:600 12px/1 var(--font-sans)}
+</style></head>
+<body>
+<div class="hp-shell">
+  <header class="hp-appbar">
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Collapse navigation" style="border:0"><i data-icon="menu"></i></button>
+    <a class="hp-appbar__brand" href="#"><i data-logo data-size="28"></i>Homeport <small>Platform admin</small></a>
+    <button class="hp-tenant-switch" aria-haspopup="listbox"><i data-icon="building-2" class="hp-icon--sm"></i>All tenants<i data-icon="chevron-down" class="hp-icon--sm"></i></button>
+    <span class="spacer"></span>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Search" style="border:0"><i data-icon="search"></i></button>
+    <button class="hp-btn hp-btn--icon hp-btn--ghost" aria-label="Switch light or dark theme" style="border:0" onclick="var h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark')"><i data-icon="moon"></i></button>
+    <span class="avatar" aria-label="Signed in as René K.">RK</span>
+  </header>
+  <nav class="hp-drawer" aria-label="Main">
+    <a class="hp-nav" href="#" aria-current="page"><i data-icon="layout-dashboard"></i>Overview</a><a class="hp-nav" href="#"><i data-icon="hp-tenant"></i>Tenants</a><a class="hp-nav" href="#"><i data-icon="hp-plan"></i>Plans & quotas</a><a class="hp-nav" href="#"><i data-icon="key-round"></i>Clients & API keys</a><a class="hp-nav" href="#"><i data-icon="hp-registry"></i>Modules</a><a class="hp-nav" href="#"><i data-icon="receipt-text"></i>Usage & chargeback</a>
+    <h6>Platform</h6>
+    <a class="hp-nav" href="#"><i data-icon="history"></i>Audit log</a><a class="hp-nav" href="#"><i data-icon="settings"></i>Settings</a>
+  </nav>
+  <main class="hp-main">
+    <div class="hp-page-head"><div><h1>Overview</h1><p>All tenants · updated 14:08</p></div>
+      <div class="hp-seg" data-seg role="group" aria-label="Time range"><button aria-pressed="true">Today</button><button aria-pressed="false">7 d</button><button aria-pressed="false">30 d</button><button aria-pressed="false"><i data-icon="calendar-range" class="hp-icon--sm"></i> Custom</button></div></div>
+    <div class="hp-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="hp-card"><div class="hp-stat__label"><i data-icon="activity" class="hp-icon--sm"></i>Requests today</div><div class="hp-stat__value">48 213</div><div class="hp-stat__meta"><span class="hp-delta--up">+6.2 %</span> vs. yesterday</div><div id="sp" style="margin-top:6px"></div></div>
+      <div class="hp-card"><div class="hp-stat__label"><i data-icon="hp-quota" class="hp-icon--sm"></i>Usage this month</div><div class="hp-stat__value">71 %</div><div class="hp-usage" style="margin-top:6px"><div class="hp-usage__track"><div class="hp-usage__fill" style="width:71%"></div></div><div class="hp-usage__meta"><span><b>1.42M</b> of 2M</span><span>12 days left</span></div></div></div>
+      <div class="hp-card"><div class="hp-stat__label"><i data-icon="ban" class="hp-icon--sm"></i>Throttling hits</div><div class="hp-stat__value">312</div><div class="hp-stat__meta"><span class="hp-badge hp-badge--warning"><i data-icon="triangle-alert"></i>3 tenants</span></div></div>
+      <div class="hp-card"><div class="hp-stat__label"><i data-icon="hp-heartbeat" class="hp-icon--sm"></i>Module health</div><div class="hp-stat__value">4 / 5</div><div class="hp-stat__meta"><span class="hp-badge hp-badge--degraded"><i data-icon="triangle-alert"></i>1 degraded</span></div></div>
+    </div>
+    <div class="hp-grid" style="grid-template-columns:2fr 1fr">
+      <div class="hp-card"><div class="hp-card__head"><div><h2 class="hp-card__title">Requests per hour</h2><p class="hp-card__sub">Top 3 tenants · today</p></div><a class="hp-btn hp-btn--text hp-btn--sm" href="#">Usage details<i data-icon="chevron-right" class="hp-icon--sm"></i></a></div><div id="c"></div></div>
+      <div class="hp-card"><div class="hp-card__head"><h2 class="hp-card__title">Modules</h2><a class="hp-btn hp-btn--text hp-btn--sm" href="#">Registry</a></div>
+        <table class="hp-table"><tbody>
+        <tr><td>Module A</td><td><span class="hp-badge hp-badge--healthy"><i data-icon="circle-check"></i>healthy</span></td><td class="hp-num">4 s</td></tr>
+        <tr><td>Module B</td><td><span class="hp-badge hp-badge--degraded"><i data-icon="triangle-alert"></i>degraded</span></td><td class="hp-num">12 s</td></tr>
+        <tr><td>Orders API <i data-icon="building-2" class="hp-icon--sm" style="color:var(--primary)" title="internal"></i><span class="hp-sr"> (internal)</span></td><td><span class="hp-badge hp-badge--healthy"><i data-icon="circle-check"></i>healthy</span></td><td class="hp-num">3 s</td></tr>
+        <tr><td>Pricing service <i data-icon="building-2" class="hp-icon--sm" style="color:var(--primary)" title="internal"></i><span class="hp-sr"> (internal)</span></td><td><span class="hp-badge hp-badge--draining"><i data-icon="arrow-down-to-line"></i>draining</span></td><td class="hp-num">2 s</td></tr>
+        <tr><td>Module C</td><td><span class="hp-badge hp-badge--healthy"><i data-icon="circle-check"></i>healthy</span></td><td class="hp-num">5 s</td></tr>
+        </tbody></table></div>
+    </div>
+    <div class="hp-card" style="padding:0;overflow:hidden"><div class="hp-card__head" style="padding:var(--space-4) var(--space-4) 0"><h2 class="hp-card__title">Recent errors</h2><a class="hp-btn hp-btn--text hp-btn--sm" href="#">All errors</a></div>
+      <table class="hp-table"><thead><tr><th>Time</th><th>Tenant</th><th>Module</th><th>Status</th><th>Message</th><th>Request ID</th></tr></thead><tbody>
+      <tr><td class="hp-mono">14:06:12</td><td>Logistics</td><td>Module B</td><td><span class="hp-badge hp-badge--error"><i data-icon="circle-x"></i>502</span></td><td>Upstream instance did not answer in 10 s</td><td class="hp-mono">7f3c…a1</td></tr>
+      <tr><td class="hp-mono">13:51:40</td><td>Billing</td><td>Module A</td><td><span class="hp-badge hp-badge--warning"><i data-icon="triangle-alert"></i>429</span></td><td>Rate limit reached (plan business, 50 req/s)</td><td class="hp-mono">b20e…9c</td></tr>
+      <tr><td class="hp-mono">13:12:03</td><td>Finance</td><td>Orders API</td><td><span class="hp-badge hp-badge--error"><i data-icon="circle-x"></i>422</span></td><td>Request body failed schema validation (field <span class="hp-mono">customerId</span>)</td><td class="hp-mono">1d77…e4</td></tr>
+      </tbody></table></div>
+  </main>
+</div>
+<script>Homeport.hydrate();
+var h=Array.from({length:15},function(_,i){return (i+6<10?'0':'')+(i+6)+':00';});
+function c(b,s){return h.map(function(_,i){return Math.round(b*Math.max(.15,Math.sin((i+.5)/15*Math.PI))*(1+.12*Math.sin(i*1.3+s)));});}
+Homeport.chart.line(document.getElementById('c'),{label:'Requests per hour by tenant',labels:h,directLabels:true,height:230,series:[{name:'Finance',color:'viz-1',values:c(2600,0)},{name:'Logistics',color:'viz-2',values:c(1700,1)},{name:'Billing',color:'viz-3',values:c(900,2)}]});
+Homeport.chart.spark(document.getElementById('sp'),[31,34,29,38,41,39,45,48],'viz-1');</script>
+</body>
+</html>
