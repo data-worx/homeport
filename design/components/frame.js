@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
 /* Design kit preview frame: theme from the URL hash or the kit page, height reported to the kit page. */
 (function () {
   var root = document.documentElement;

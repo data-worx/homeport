@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Homeport design kit builder.
 // Run from anywhere:  node design/tools/build-kit.mjs
 // 1. Regenerates tokens/homeport.tokens.json and dist/* from tokens/tokens.json (via gen-tokens.mjs).

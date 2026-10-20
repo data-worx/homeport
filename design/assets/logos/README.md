@@ -10,3 +10,6 @@ Original Homeport artwork. Colors are fixed in the files (`<img>` cannot inherit
 - `favicon.svg` — same icon without container ribs, for 16–32 px.
 - `homeport-icon-mono-ink.svg` / `homeport-icon-mono-white.svg` — one-color icon without tile.
 - `favicon-16.png`, `favicon-32.png`, `homeport-icon-180.png` (apple-touch-icon), `homeport-icon-512.png` (web manifest).
+
+**Licence:** the logos are brand assets of data-worx. They are not covered by
+the repository licence (AGPL-3.0).

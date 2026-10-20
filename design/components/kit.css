@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
 /* Homeport components - shared styles for previews and mockups. Reads tokens.css variables only. */
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; font-family: var(--font-sans); font-size: 14px; line-height: 20px; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }

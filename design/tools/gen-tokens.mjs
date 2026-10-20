@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Homeport token generator. Single source: tokens.json (the design system file).
 // Usage: node gen-tokens.mjs <tokens.json> <outDir> [icons.json] [dtcgDir]
 // In the design kit, run tools/build-kit.mjs instead: it calls this with the right paths.
