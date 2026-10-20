@@ -12,4 +12,5 @@ Original Homeport artwork. Colors are fixed in the files (`<img>` cannot inherit
 - `favicon-16.png`, `favicon-32.png`, `homeport-icon-180.png` (apple-touch-icon), `homeport-icon-512.png` (web manifest).
 
 **Licence:** the logos are brand assets of data-worx. They are not covered by
-the repository licence (AGPL-3.0).
+the repository licence (AGPL-3.0); see
+[TRADEMARKS.md](https://github.com/data-worx/homeport/blob/main/TRADEMARKS.md).

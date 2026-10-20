@@ -39,4 +39,4 @@ Homeport is licensed under the
 require a signed [Contributor License Agreement](CLA.md).
 
 The names "Homeport" and "data-worx" and their logos are not licensed with the
-code.
+code — see [TRADEMARKS.md](TRADEMARKS.md).
