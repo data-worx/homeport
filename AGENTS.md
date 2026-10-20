@@ -171,7 +171,7 @@ Security-critical. No exception without an ADR.
   and the commercial versions of MediatR, AutoMapper and FluentAssertions.
 - Contributions require the signed CLA — see [CONTRIBUTING.md](CONTRIBUTING.md).
 - The names "Homeport" and "data-worx" and their logos are not licensed with
-  the code.
+  the code — see [TRADEMARKS.md](TRADEMARKS.md).
 
 ## Supply chain
 
