@@ -4,7 +4,7 @@ The portal is themed through `MudTheme` only, plus one small stylesheet. No repl
 
 ## Setup
 
-1. Copy `fonts/*.woff2` to `wwwroot/fonts/`, and `assets/Code/portal.css` to `wwwroot/css/`.
+1. Copy `fonts/*.woff2` to `wwwroot/fonts/`, and the generated `portal.css` to `wwwroot/css/`.
 2. Add `HomeportTheme.cs` and `HomeportIcons.cs` (namespace `Homeport.Portal.Theming`). Built against **MudBlazor 9.11**.
 3. In `App.razor` link `css/portal.css` after MudBlazor's CSS.
 4. In the layout:

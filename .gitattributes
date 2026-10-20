@@ -14,3 +14,6 @@
 *.pdf binary
 *.zip binary
 # <<< devkit:core <<<
+
+# Fonts of the design system.
+*.woff2 binary

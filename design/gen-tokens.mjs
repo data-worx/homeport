@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Homeport token generator. Single source: tokens.json (the design system file).
 // Usage: node gen-tokens.mjs <tokens.json> <outDir> [icons.json]
 // Writes: homeport.tokens.json (W3C DTCG), site-tokens.css (landing page), portal.css (MudBlazor add-on),

@@ -1,3 +1,9 @@
+# Homeport design system
+
+The sources of the Homeport design system: tokens, icons, fonts, logos and
+illustrations. Generated outputs are not kept here, and the component previews
+referred to below (the Logo component, the bundle) live outside the repository.
+
 Homeport is a self-hosted platform for deep business modules. This system serves two surfaces that must feel like one product: the **Admin Portal** (Blazor + MudBlazor) and the **Landing Page** (static site, `homeport.data-worx.de`). `tokens.json` is the single source of truth for both.
 
 > *Your data never leaves port.*
@@ -100,7 +106,7 @@ Two equal themes: **Light, harbor at dawn** and **Dark, harbor at night**. Dark 
 
 ## Using the tokens
 
-- Edit `tokens.json` only (or this page). Then run `node assets/Code/gen-tokens.mjs tokens.json out/ icons.json` to regenerate:
+- Edit `tokens.json` only (or this page). Then run `node gen-tokens.mjs tokens.json out/ icons.json` in this directory to regenerate:
   - `homeport.tokens.json` — W3C DTCG format (`color.light.*`, `color.dark.*`, `shadow.light/dark.*`, dimensions, typography composites) for Style Dictionary and other tools,
   - `site-tokens.css` — CSS custom properties for the landing page, light by default, dark via `prefers-color-scheme` and `[data-theme="dark"]`,
   - `HomeportTheme.cs` — a `MudTheme` (MudBlazor 9) built from the same values, plus `portal.css` (fonts, focus ring, number styles) and `HomeportIcons.cs`.
