@@ -7,6 +7,27 @@ big picture, the tickets are the work.
 Phases are ordered by dependency: a later phase assumes the earlier ones are
 in place. Open questions live in GitHub Discussions.
 
+## M0 — Groundwork
+
+The repository and the organisation around it, before the first line of
+product code. Nothing of the product runs at the end of M0.
+
+Done when:
+
+1. The maintainer's setup is in place: `homeport.data-worx.de` resolves to
+   GitHub Pages, `security@data-worx.de` receives mail, and the CLA workflow
+   has its signatures token.
+2. The Homeport design kit — tokens, icons, logos, illustrations and fonts —
+   lives under `design/`.
+3. The design generator is a C# tool under `src/Tools/` and produces the same
+   output as the original, asserted by golden-file tests.
+4. `TRADEMARKS.md` states how the names "Homeport" and "data-worx" and their
+   logos may be used.
+5. `github.com/data-worx` shows an organisation profile with the data-worx
+   branding.
+
+Out of scope: any product code.
+
 ## M1 — v0.1 Walking skeleton
 
 One thin path that works end to end. No portal, no API keys, no real module.
