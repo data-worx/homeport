@@ -14,9 +14,8 @@ first pull request, and you reply with the sentence it asks for. The signature
 is stored with your GitHub account name and covers all your later
 contributions.
 
-The CLA grants the copyright holder the right to relicense your contribution.
-Homeport is licensed under AGPL-3.0-or-later, and the CLA keeps the option of
-a commercial licence open — see
+Homeport is licensed under AGPL-3.0-or-later. The CLA lets the copyright
+holder license your contribution under other terms as well — see
 [ADR-0001](docs/adr/0001-distribution-and-licensing.md).
 
 ## Before you start

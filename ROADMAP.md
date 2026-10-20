@@ -19,8 +19,9 @@ Done when:
    has its signatures token.
 2. The Homeport design kit — tokens, icons, logos, illustrations and fonts —
    lives under `design/`.
-3. The design generator is a C# tool under `src/Tools/` and produces the same
-   output as the original, asserted by golden-file tests.
+3. The design kit's generated files are committed under `design/` and are
+   rebuilt with `node design/tools/build-kit.mjs` after every change to a
+   source.
 4. `TRADEMARKS.md` states how the names "Homeport" and "data-worx" and their
    logos may be used.
 5. `github.com/data-worx` shows an organisation profile with the data-worx
