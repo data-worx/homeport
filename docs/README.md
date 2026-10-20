@@ -9,3 +9,4 @@ binding rules live in [`AGENTS.md`](../AGENTS.md), not here.
 | [`architecture.md`](architecture.md) | The projects, the directory layout and why they are cut this way |
 | [`adr/`](adr/README.md) | Architecture decision records |
 | [`module-contract/`](module-contract/README.md) | The language-neutral contract every module implements |
+| [`../design/`](../design/README.md) | The design system: tokens, icons, fonts, logos and illustrations |
