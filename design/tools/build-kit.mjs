@@ -256,18 +256,18 @@ const sections = PAGES.flatMap(([, pages]) => pages).map(([id, title, body]) => 
 const built = new Date().toISOString().slice(0, 10);
 
 const CSS = `
-html{scroll-padding-top:72px}
+html{scroll-padding-top:84px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/24px var(--font-sans)}
 a{color:var(--primary)}
 .k-skip{position:absolute;left:-999px}.k-skip:focus{left:12px;top:8px;z-index:20;background:var(--surface);padding:8px}
-.k-top{position:sticky;top:0;z-index:10;height:60px;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line)}
-.k-top img{height:30px;width:auto;display:block}
+.k-top{position:sticky;top:0;z-index:10;height:68px;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line)}
+.k-top img{height:48px;width:auto;display:block}
 .k-top img.k-lk-dark{display:none}[data-theme="dark"] .k-top img.k-lk-light{display:none}[data-theme="dark"] .k-top img.k-lk-dark{display:block}
 @media (prefers-color-scheme:dark){:root:not([data-theme]) .k-top img.k-lk-light{display:none}:root:not([data-theme]) .k-top img.k-lk-dark{display:block}}
 .k-kit{font:600 13px/18px var(--font-sans);color:var(--ink-muted);padding:3px 8px;border:1px solid var(--line-strong);border-radius:var(--radius-sm)}
 .k-spacer{flex:1}.k-built{font-size:12px;color:var(--ink-muted)}
 .k-layout{display:grid;grid-template-columns:240px minmax(0,1fr)}
-.k-nav{position:sticky;top:60px;align-self:start;height:calc(100vh - 60px);overflow:auto;padding:12px 10px 40px;border-right:1px solid var(--line);background:var(--surface)}
+.k-nav{position:sticky;top:68px;align-self:start;height:calc(100vh - 68px);overflow:auto;padding:12px 10px 40px;border-right:1px solid var(--line);background:var(--surface)}
 .k-navsec h6{margin:16px 10px 4px;font:600 11px/16px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted)}
 .k-nav a{display:block;padding:7px 10px;border-radius:var(--radius-md);color:var(--ink);text-decoration:none;font-size:14px;line-height:20px}
 .k-nav a:hover{background:var(--surface-sunken)}.k-nav a[aria-current="page"]{background:var(--primary-soft);color:var(--primary);font-weight:600}
