@@ -27,7 +27,7 @@ This folder is the single source of truth for how Homeport looks and reads: the 
 | Shared preview CSS classes (`hp-btn`, `hp-badge`, `hp-table`, …) and chart helpers | `components/kit.css`, `components/kit.js` |
 | Theme code to use in the portal | `dist/HomeportTheme.cs`, `dist/HomeportIcons.cs`, `dist/portal.css` |
 | CSS variables for the site | `dist/site-tokens.css` |
-| Logos, icons, illustrations | `assets/logos/`, `assets/icons/homeport/`, `assets/icons/lucide/`, `assets/illustrations/` (each has a README) |
+| Logos, icons, illustrations, social preview | `assets/logos/`, `assets/icons/homeport/`, `assets/icons/lucide/`, `assets/illustrations/`, `assets/social/` (each has a README) |
 | Licenses of fonts and icons | `docs/licenses.md` |
 
 ## How to work
