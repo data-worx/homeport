@@ -170,3 +170,9 @@ body { margin: 0; font-family: var(--font-sans); font-size: 14px; line-height: 2
 .hp-modname { display: flex; flex-direction: column; gap: 2px; }
 .hp-modname b { font-weight: 600; }
 .hp-modname span { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+
+/* data-worx endorsement byline (inline SVG). Fixed data-worx colours, chosen by the ground, never Homeport tokens. */
+.dwx-byline .dwx-l { fill: #18181a; } .dwx-byline .dwx-h { fill: #ffa500; }
+[data-theme="dark"] .dwx-byline .dwx-l, .on-dark .dwx-byline .dwx-l { fill: #ededea; }
+[data-theme="dark"] .dwx-byline .dwx-h, .on-dark .dwx-byline .dwx-h { fill: #ffac34; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dwx-byline .dwx-l { fill: #ededea; } :root:not([data-theme="light"]) .dwx-byline .dwx-h { fill: #ffac34; } }

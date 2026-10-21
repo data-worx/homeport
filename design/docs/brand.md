@@ -95,7 +95,11 @@ Two equal themes: **Light, harbor at dawn** and **Dark, harbor at night**. Dark 
 
 - Use the lockup "Homeport by data-worx" on the landing hero area, footer and sign-in. Use the wordmark or icon alone in the portal app bar.
 - Files in `assets/logos/`. Light grounds: `homeport-lockup.svg`. Dark grounds: `homeport-lockup-on-dark.svg`. One color: the `-mono-` files. Favicon: `favicon.svg` + PNG 16/32/180/512.
-- "by data-worx" is plain type in `ink-muted` and always smaller. It is a placeholder for a future data-worx identity.
+- "by data-worx" is the data-worx endorsement byline. The rule comes from the data-worx design system (brand book § Endorsement byline, `components/Endorsement`) and is binding:
+  - It is the data-worx signature and always keeps the data-worx colours. Never recolour it to Homeport's `ink`, `ink-muted` or `accent`, and never set it as live text or in Instrument Sans: use the artwork ("by" in Hanken Grotesk 500 plus the data-worx wordmark, outlined).
+  - Light grounds: letters `#18181a`, hyphen `#ffa500` (byline-light). Dark grounds: letters `#ededea`, hyphen `#ffac34` (byline-dark). The mono byline only in one-colour lockups.
+  - Size: byline height (top of the d to baseline) = 0.4 × the wordmark's cap height, never under 8 px on screen, so the stacked lockup is at least 45 px tall. Gap from wordmark baseline to byline top = 0.5 × cap height. Left edge on the wordmark, not the icon.
+  - Low headers: byline to the right of the wordmark, baselines aligned, gap = 1 × cap height.
 - Details and don'ts: `components/Logo/README.md`.
 
 ## Using the tokens
