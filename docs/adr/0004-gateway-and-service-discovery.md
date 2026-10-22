@@ -1,6 +1,6 @@
 # ADR-0004: Gateway and service discovery
 
-- Status: Accepted
+- Status: Accepted; identity-header bullet superseded by ADR-0011
 - Date: 2026-10-19
 
 ## Context

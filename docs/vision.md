@@ -55,7 +55,8 @@ Homeport is a **self-hosted platform for deep business modules**.
   API key)       │   ├─ tenant resolution → TenantId, ClientId            │
                  │   ├─ throttling + quotas  ──► Valkey                   │
                  │   ├─ dynamic routes       ◄── Registry                 │
-                 │   └─ UsageRecorded event  ──► RabbitMQ                 │
+                 │   ├─ UsageRecorded event  ──► RabbitMQ                 │
+                 │   └─ signed token         ──► Modules                  │
                  │                                                        │
                  │  Registry        modules register + heartbeat          │
                  │  ControlPlane    tenants, plans, clients, keys (API)   │
