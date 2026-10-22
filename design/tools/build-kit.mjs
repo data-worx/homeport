@@ -190,7 +190,7 @@ const iconGrid = keys => `<div class="k-icons">${keys.map(k => `<button type="bu
 const iconsHtml = `<h2>Homeport platform icons</h2><p class="k-note">Files: <code>assets/icons/homeport/</code>. Click an icon to copy its name.</p>${iconGrid(Object.keys(ICONS).filter(k => k.startsWith('hp-')))}${md(r('assets/icons/homeport/README.md'), { dropH1: true })}
 <h2>Lucide subset</h2><p class="k-note">Files: <code>assets/icons/lucide/</code>. ISC License.</p>${iconGrid(Object.keys(ICONS).filter(k => !k.startsWith('hp-')).sort())}${md(r('assets/icons/lucide/README.md'), { dropH1: true })}`;
 const illus = files('assets/illustrations');
-const illusHtml = `<div class="k-illus">${illus.map(f => `<figure class="${f.startsWith('hero') ? 'k-hero' : ''}"><div class="k-day"><img src="assets/illustrations/${f}" alt="${esc(f)}"></div><div class="k-night"><img src="assets/illustrations/${f}" alt=""></div><figcaption><a href="assets/illustrations/${f}" download>${f}</a></figcaption></figure>`).join('')}</div>` + md(r('assets/illustrations/README.md'), { dropH1: true });
+const illusHtml = `<div class="k-illus">${illus.map(f => `<figure class="${f.startsWith('hero') || f === 'architecture-horizontal.svg' ? 'k-hero' : ''}"><div class="k-day"><img src="assets/illustrations/${f}" alt="${esc(f)}"></div>${f.startsWith('architecture') ? '' : `<div class="k-night"><img src="assets/illustrations/${f}" alt=""></div>`}<figcaption><a href="assets/illustrations/${f}" download>${f}</a></figcaption></figure>`).join('')}</div>` + md(r('assets/illustrations/README.md'), { dropH1: true });
 
 /* ---------- files ---------- */
 const FILES = [
