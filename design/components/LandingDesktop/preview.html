@@ -121,33 +121,35 @@ code{font-family:var(--font-mono);font-size:.92em}
   <div id="quickstart" class="hp-code hp-inverse qs"><pre id="qs"><span class="hp-comment"># Quickstart</span>
 <span class="hp-prompt">$ </span>curl -fsSLO https://homeport.data-worx.de/compose.yaml
 <span class="hp-prompt">$ </span>docker compose up -d</pre><button class="hp-code__copy" data-copy="#qs" aria-label="Copy quickstart commands"><i data-icon="copy" class="hp-icon--sm"></i></button></div>
-  <figure class="card archfig"><svg class="arch arch-h" viewBox="0 0 960 360" role="img" aria-label="Architecture: your apps call the Homeport gateway, which checks your identity provider, applies throttling and metering, and routes to docked modules. Modules register with the registry. Gateway and modules send OTLP telemetry to your monitoring.">
-<rect class="zone" x="150" y="20" width="560" height="320" rx="10"/><text class="zl" x="166" y="44">Your environment · docker compose</text>
+  <figure class="card archfig"><svg class="arch arch-h" viewBox="0 0 960 360" role="img" aria-label="Architecture: your apps call the Homeport gateway. The gateway validates each caller against your identity provider (OIDC), applies throttling and metering, and calls the docked modules with its own short-lived signed token per request (audience: the module; claims: tenant, client, subject, scopes). Catalog modules and your internal API validate that token against the gateway's keys and authorise per endpoint; they never talk to the identity provider. Modules register with the registry. All components send OTLP telemetry to your monitoring."><title>Homeport architecture</title>
+<rect class="zone" x="150" y="20" width="566" height="320" rx="10"/><text class="zl" x="166" y="44">Your environment · docker compose</text>
 <rect class="box" x="10" y="150" width="110" height="60" rx="6"/><text class="bt" x="65" y="176" text-anchor="middle">Your apps</text><text class="bs" x="65" y="194" text-anchor="middle">API clients</text>
 <rect class="box key" x="180" y="140" width="150" height="80" rx="6"/><text class="bt" x="255" y="170" text-anchor="middle">Gateway</text><text class="bs" x="255" y="188" text-anchor="middle">auth · throttling</text><text class="bs" x="255" y="204" text-anchor="middle">metering</text>
 <rect class="box" x="180" y="260" width="150" height="54" rx="6"/><text class="bt" x="255" y="284" text-anchor="middle">Registry</text><text class="bs" x="255" y="300" text-anchor="middle">heartbeats · routes</text>
-<g><rect class="mod" x="420" y="80" width="250" height="48" rx="4"/><text class="bt" x="436" y="109">Module A</text><text class="tag" x="654" y="109" text-anchor="end">catalog</text>
-<rect class="mod" x="420" y="146" width="250" height="48" rx="4"/><text class="bt" x="436" y="175">Module B</text><text class="tag" x="654" y="175" text-anchor="end">catalog</text>
-<rect class="own" x="420" y="212" width="250" height="48" rx="4"/><text class="bt" x="436" y="241">Your internal API</text><text class="tag2" x="654" y="241" text-anchor="end">internal</text>
-<rect class="mod new" x="420" y="278" width="250" height="44" rx="4"/><text class="bs" x="436" y="305">+ dock more, ours or yours, no restart</text></g>
+<g><rect class="mod" x="446" y="80" width="250" height="48" rx="4"/><text class="bt" x="462" y="109">Module A</text><text class="tag" x="680" y="109" text-anchor="end">catalog</text>
+<rect class="mod" x="446" y="146" width="250" height="48" rx="4"/><text class="bt" x="462" y="175">Module B</text><text class="tag" x="680" y="175" text-anchor="end">catalog</text>
+<rect class="own" x="446" y="212" width="250" height="48" rx="4"/><text class="bt" x="462" y="241">Your internal API</text><text class="tag2" x="680" y="241" text-anchor="end">internal</text>
+<rect class="mod new" x="446" y="278" width="250" height="44" rx="4"/><text class="bs" x="462" y="305">+ dock more, ours or yours, no restart</text></g>
 <rect class="box" x="790" y="40" width="160" height="60" rx="6"/><text class="bt" x="870" y="66" text-anchor="middle">Your IdP</text><text class="bs" x="870" y="84" text-anchor="middle">Entra ID · Keycloak</text>
 <rect class="box" x="790" y="250" width="160" height="60" rx="6"/><text class="bt" x="870" y="276" text-anchor="middle">Your monitoring</text><text class="bs" x="870" y="294" text-anchor="middle">via OTLP</text>
-<path class="flow" d="M120 180h60"/><path class="flow" d="M330 180h40v-76h50M370 180h50M370 180v56h50"/>
-<path class="flow dash" d="M255 220v40M420 236h-30v51h-60"/>
+<path class="flow" d="M120 180h60"/><path class="flow" d="M330 180h20v-76h96M350 180h96M350 180v56h96"/>
+<path class="flow dash" d="M255 220v40M446 300H330"/>
 <path class="flow dash" d="M255 140V64H790"/>
-<path class="flow dash" d="M670 236 C 730 236, 740 280, 790 280"/>
-<text class="bs" x="560" y="56">OIDC sign-in</text><text class="bs" x="700" y="226">OTLP</text><text class="bs" x="342" y="252">register</text>
-</svg><svg class="arch arch-v" viewBox="0 0 320 520" role="img" aria-label="Architecture: apps to gateway to docked modules; registry, your identity provider and your monitoring around it.">
+<path class="flow dash" d="M716 200H870V250"/>
+<text class="bs" x="356" y="98">signed token</text><text class="bs" x="356" y="174">signed token</text><text class="bs" x="356" y="230">signed token</text>
+<text class="bs" x="520" y="56">OIDC · validates the caller</text><text class="bs" x="724" y="192">OTLP · all components</text><text class="bs" x="356" y="294">register</text>
+</svg><svg class="arch arch-v" viewBox="0 0 320 520" role="img" aria-label="Architecture: your apps call the gateway. The gateway validates callers with your identity provider and calls the modules with its own short-lived signed token; modules validate that token and never talk to the identity provider. Modules register with the registry. All components send OTLP telemetry to your monitoring."><title>Homeport architecture</title>
 <rect class="box" x="90" y="10" width="140" height="48" rx="6"/><text class="bt" x="160" y="39" text-anchor="middle">Your apps</text>
 <rect class="zone" x="10" y="80" width="300" height="330" rx="10"/><text class="zl" x="24" y="102">Your environment</text>
 <rect class="box key" x="60" y="118" width="200" height="66" rx="6"/><text class="bt" x="160" y="146" text-anchor="middle">Gateway</text><text class="bs" x="160" y="166" text-anchor="middle">auth · throttling · metering</text>
-<rect class="mod" x="30" y="220" width="80" height="42" rx="4"/><text class="bs" x="70" y="246" text-anchor="middle">Module A</text>
-<rect class="mod" x="120" y="220" width="80" height="42" rx="4"/><text class="bs" x="160" y="246" text-anchor="middle">Module B</text>
-<rect class="own" x="210" y="220" width="80" height="42" rx="4"/><text class="bs" x="250" y="246" text-anchor="middle">Your API</text>
-<rect class="box" x="60" y="300" width="200" height="54" rx="6"/><text class="bt" x="160" y="324" text-anchor="middle">Registry</text><text class="bs" x="160" y="342" text-anchor="middle">heartbeats · routes</text>
+<rect class="mod" x="30" y="234" width="80" height="42" rx="4"/><text class="bs" x="70" y="260" text-anchor="middle">Module A</text>
+<rect class="mod" x="120" y="234" width="80" height="42" rx="4"/><text class="bs" x="160" y="260" text-anchor="middle">Module B</text>
+<rect class="own" x="210" y="234" width="80" height="42" rx="4"/><text class="bs" x="250" y="260" text-anchor="middle">Your API</text>
+<rect class="box" x="60" y="314" width="200" height="54" rx="6"/><text class="bt" x="160" y="338" text-anchor="middle">Registry</text><text class="bs" x="160" y="356" text-anchor="middle">heartbeats · routes</text>
 <rect class="box" x="10" y="440" width="140" height="60" rx="6"/><text class="bt" x="80" y="466" text-anchor="middle">Your IdP</text><text class="bs" x="80" y="484" text-anchor="middle">OIDC</text>
 <rect class="box" x="170" y="440" width="140" height="60" rx="6"/><text class="bt" x="240" y="466" text-anchor="middle">Monitoring</text><text class="bs" x="240" y="484" text-anchor="middle">OTLP</text>
-<path class="flow" d="M160 58v60M160 184v18H70v18M160 202v18M160 202h90v18"/><path class="flow dash" d="M160 262v38M60 151H30v289M260 151h30v289"/>
+<path class="flow" d="M160 58v60M160 184v32H70v18M160 216v18M160 216h90v18"/><path class="flow dash" d="M160 276v38M60 151H30v289M296 410v30"/>
+<text class="bs" x="166" y="204">signed token</text><text class="bs" x="290" y="429" text-anchor="end">OTLP · all components</text>
 </svg><figcaption><span class="lg"><i class="sw cat"></i>From the Homeport catalog</span><span class="lg"><i class="sw own"></i>Your own services, same contract</span><br>Everything inside the frame runs in your environment. Identity and monitoring stay yours.</figcaption></figure>
 </div></section>
 

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 520" width="320" height="520" role="img" aria-label="Architecture: your apps call the gateway. The gateway validates callers with your identity provider and calls the modules with its own short-lived signed token; modules validate that token and never talk to the identity provider. Modules register with the registry. All components send OTLP telemetry to your monitoring."><title>Homeport architecture</title>
+<style>
+.zone{fill:none;stroke:#7a8898;stroke-dasharray:6 6}.zl{fill:#475869;font:600 13px "Instrument Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif}
+.box{fill:#ffffff;stroke:#7a8898;stroke-width:1.5}.key{stroke:#1d5a8e;stroke-width:2}
+.mod{fill:#f2b140;stroke:#a8700c}.mod.new{fill:none;stroke:#a8700c;stroke-dasharray:5 5}
+.own{fill:#e3edf6;stroke:#1d5a8e;stroke-width:1.5}
+.bt{fill:#0e1e2e;font:600 15px "Instrument Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif}.bs{fill:#475869;font:500 12px "Instrument Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif}
+.mod+.bt,.mod+.bs{fill:#0e1e2e}.own+.bt,.own+.bs{fill:#0e1e2e}.mod.new+.bs{fill:#475869}
+.tag{fill:#0e1e2e;font:500 12px "Instrument Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;opacity:.8}.tag2{fill:#1d5a8e;font:600 12px "Instrument Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif}
+.flow{fill:none;stroke:#475869;stroke-width:1.5}.dash{stroke-dasharray:4 5}
+</style>
+<rect class="box" x="90" y="10" width="140" height="48" rx="6"/><text class="bt" x="160" y="39" text-anchor="middle">Your apps</text>
+<rect class="zone" x="10" y="80" width="300" height="330" rx="10"/><text class="zl" x="24" y="102">Your environment</text>
+<rect class="box key" x="60" y="118" width="200" height="66" rx="6"/><text class="bt" x="160" y="146" text-anchor="middle">Gateway</text><text class="bs" x="160" y="166" text-anchor="middle">auth · throttling · metering</text>
+<rect class="mod" x="30" y="234" width="80" height="42" rx="4"/><text class="bs" x="70" y="260" text-anchor="middle">Module A</text>
+<rect class="mod" x="120" y="234" width="80" height="42" rx="4"/><text class="bs" x="160" y="260" text-anchor="middle">Module B</text>
+<rect class="own" x="210" y="234" width="80" height="42" rx="4"/><text class="bs" x="250" y="260" text-anchor="middle">Your API</text>
+<rect class="box" x="60" y="314" width="200" height="54" rx="6"/><text class="bt" x="160" y="338" text-anchor="middle">Registry</text><text class="bs" x="160" y="356" text-anchor="middle">heartbeats · routes</text>
+<rect class="box" x="10" y="440" width="140" height="60" rx="6"/><text class="bt" x="80" y="466" text-anchor="middle">Your IdP</text><text class="bs" x="80" y="484" text-anchor="middle">OIDC</text>
+<rect class="box" x="170" y="440" width="140" height="60" rx="6"/><text class="bt" x="240" y="466" text-anchor="middle">Monitoring</text><text class="bs" x="240" y="484" text-anchor="middle">OTLP</text>
+<path class="flow" d="M160 58v60M160 184v32H70v18M160 216v18M160 216h90v18"/><path class="flow dash" d="M160 276v38M60 151H30v289M296 410v30"/>
+<text class="bs" x="166" y="204">signed token</text><text class="bs" x="290" y="429" text-anchor="end">OTLP · all components</text>
+</svg>
