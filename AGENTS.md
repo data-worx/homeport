@@ -125,8 +125,11 @@ Security-critical. No exception without an ADR.
 
 ## Gateway
 
-- The gateway strips every incoming `X-Homeport-*` header and sets
-  `X-Homeport-Tenant-Id` and `X-Homeport-Client-Id` itself.
+- The gateway strips every incoming `X-Homeport-*` header.
+- The gateway calls a module with its own short-lived signed token: audience
+  the module id, claims tenant, client, subject and scopes. A module trusts
+  only that token, validates it against the gateway's JWKS and never talks to
+  the identity provider. See ADR-0011.
 - W3C `traceparent` is propagated to the module.
 - If the registry is unavailable, the gateway keeps serving the last known
   routes.

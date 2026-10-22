@@ -39,9 +39,15 @@ the .NET SDK (`Homeport.Module.Sdk`) is a convenience, not a requirement.
 ## Requests from the gateway
 
 - Modules are reachable only through the gateway, on the internal network.
-- The gateway strips every incoming `X-Homeport-*` header and sets:
-  - `X-Homeport-Tenant-Id`
-  - `X-Homeport-Client-Id`
+- The gateway strips every incoming `X-Homeport-*` header.
+- Every request carries a short-lived token signed by the gateway, as a bearer
+  token in `Authorization`:
+  - audience: the module `id`
+  - claims: tenant, client, subject and scopes
+- The module validates the token against the gateway's JWKS and rejects a
+  request without a valid token. The token is the only identity source the
+  module may trust; it authorises per endpoint from the claims.
+- The module never talks to the identity provider.
 - W3C `traceparent` is propagated.
 
 ## Metering
