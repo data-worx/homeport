@@ -27,7 +27,7 @@ DEVKIT_ASSIGNEE=raisr
 
 # no   a new issue is filed unassigned, as forge.issues prescribes
 # yes  a new issue is assigned to DEVKIT_ASSIGNEE as well
-DEVKIT_ASSIGN_ISSUES=no
+DEVKIT_ASSIGN_ISSUES=yes
 
 # ask   the drafted commit message is shown and approved before committing
 # auto  it is committed as drafted, without asking
