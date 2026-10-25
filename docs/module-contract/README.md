@@ -56,4 +56,3 @@ the .NET SDK (`Homeport.Module.Sdk`) is a convenience, not a requirement.
   quantity of the matched route.
 - A module may report a different quantity with the response header
   `X-Homeport-Usage: <meter>=<quantity>`.
-- Asynchronous workers publish usage through the SDK.
