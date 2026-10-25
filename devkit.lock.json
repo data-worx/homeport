@@ -45,6 +45,6 @@
     { "path": ".devkit/forge.sh", "from": "forges/github/forge.sh", "mode": "managed", "hash": "c954a20fa222e9c9d0894e396c25ba058337cc96" }
   ],
   "deviations": [
-    { "slug": "dotnet.layout", "against": "5af251c", "decided": "2026-10-19", "note": "Provisional. The layer cut applies per service: services under src/Platform/<Service>/, modules under src/Modules/<Module>/, plus src/Aspire/, src/Shared/ and src/Sdk/; a service without business rules is a single project. Revisit with the first service tickets. Recorded in the Deviations table of AGENTS.md." }
+    { "slug": "dotnet.layout", "scope": "src/", "reason": "Provisional. The layer cut applies per service: services under src/Platform/<Service>/, modules under src/Modules/<Module>/, plus src/Aspire/, src/Shared/ and src/Sdk/; a service without business rules is a single project. Revisit with the first service tickets. Recorded in the Deviations table of AGENTS.md.", "decidedAt": "5af251c" }
   ]
 }
