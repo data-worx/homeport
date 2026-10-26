@@ -94,15 +94,16 @@ the first service tickets.
 ```text
 Homeport.slnx
 src/
-  Aspire/Homeport.AppHost
-  Shared/Homeport.ServiceDefaults
-  Shared/Homeport.Contracts
-  Sdk/Homeport.Module.Sdk
-  Platform/<Service>/Homeport.<Service>
-  Platform/<Service>/Homeport.<Service>.Domain | .Application | .Infrastructure | .Api [| .Worker]
+  Aspire/Homeport.Aspire.AppHost
+  Shared/Homeport.Shared.ServiceDefaults
+  Shared/Homeport.Shared.Contracts
+  Sdk/Homeport.Sdk
+  Platform/<Service>/Homeport.Platform.<Service>
+  Platform/<Service>/Homeport.Platform.<Service>.Domain | .Application | .Infrastructure | .Api [| .Worker]
   Modules/<Module>/Homeport.Modules.<Module>.Domain | .Application | .Infrastructure | .Api [| .Worker]
-  Tools/
-  Tests/
+  Tools/Homeport.Tools.<Tool>
+  Tests/<project under test>.Tests.Unit | .Tests.Integration
+  Tests/Architecture.Tests
 ```
 
 - **One module = one API service plus an optional worker.** Features inside a
@@ -112,10 +113,13 @@ src/
   Domain, Application, Infrastructure and a host project that is its
   composition root. Business modules are cut from the start.
 - A service never references another service's projects. Services talk over
-  HTTP or messages; shared types live in `Homeport.Contracts`.
+  HTTP or messages; shared types live in `Homeport.Shared.Contracts`.
 - Modules are reachable only through the gateway.
-- A project's directory carries its name, and a project of a service or
-  module is named for it as in the tree above.
+- A project is named `Homeport`, then every grouping directory between `src/`
+  and the project, then its own name, as in the tree above
+  (`dotnet.layout`). Its directory, assembly and root namespace carry the
+  same name. `src/Tests/` is not a grouping directory: a test project is
+  named after the project under test (`dotnet.tests`).
 - Inside a service or module the arrow points inwards: Domain references
   nothing beyond the BCL and the exceptions listed in
   `src/Tests/Architecture.Tests/DomainExceptions.cs`; Application its own
@@ -129,7 +133,7 @@ src/
 - `Architecture.Tests` asserts the layout, naming and reference rules above,
   each also against a fixture tree that breaks it.
 - Messages between services (for example `UsageRecorded`) are contracts in
-  `Homeport.Contracts`. Changing one is a breaking change for every consumer.
+  `Homeport.Shared.Contracts`. Changing one is a breaking change for every consumer.
 
 Current state: [docs/architecture/architecture.md](docs/architecture/architecture.md).
 
@@ -213,7 +217,7 @@ Security-critical. No exception without an ADR. See
 
 ## Observability
 
-- Every service uses `Homeport.ServiceDefaults`.
+- Every service uses `Homeport.Shared.ServiceDefaults`.
 - `service.name` is `homeport-<component>` or `homeport-module-<id>`.
 - Custom attributes: `homeport.tenant.id`, `homeport.client.id`,
   `homeport.module.id`, `homeport.meter`.

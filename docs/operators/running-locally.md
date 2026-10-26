@@ -22,10 +22,10 @@ installation the operator brings their own identity provider.
 From the repository root:
 
 ```bash
-dotnet run --project src/Aspire/Homeport.AppHost
+dotnet run --project src/Aspire/Homeport.Aspire.AppHost
 ```
 
-In Visual Studio or Rider, make `Homeport.AppHost` the startup project and
+In Visual Studio or Rider, make `Homeport.Aspire.AppHost` the startup project and
 start it; the IDE opens the dashboard itself. Both use the launch profile
 `https`; the profile `http` runs without TLS.
 
@@ -49,7 +49,7 @@ them in the .NET user secrets of the AppHost project, on your machine only.
 List them from the repository root:
 
 ```bash
-dotnet user-secrets list --project src/Aspire/Homeport.AppHost
+dotnet user-secrets list --project src/Aspire/Homeport.Aspire.AppHost
 ```
 
 ```text
