@@ -5,6 +5,12 @@ binding rules live in [`AGENTS.md`](../AGENTS.md), not here.
 
 Arranged by reader. A directory exists once it has its first document.
 
+## Operators — installing, configuring and running Homeport
+
+| Document | About |
+|---|---|
+| [`operators/running-locally.md`](operators/running-locally.md) | Starting Homeport on one machine, with the AppHost or with Docker Compose |
+
 ## Architecture — why Homeport is built the way it is
 
 | Document | About |
