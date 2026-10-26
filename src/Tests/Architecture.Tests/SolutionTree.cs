@@ -14,13 +14,23 @@ internal static class SolutionTree
 
     internal static readonly string Source = Path.Combine(Root, "src");
 
-    internal static readonly IReadOnlyList<ProjectFile> Projects = ReadProjects();
-
     /// <summary>
     /// Every solution file in the root and anywhere under <c>src/</c>, relative to
     /// the root with <c>/</c> as separator.
     /// </summary>
     internal static readonly IReadOnlyList<string> SolutionPaths = ReadSolutionPaths();
+
+    /// <summary>
+    /// The name of the solution file in the root, which every project name starts
+    /// with (<c>dotnet.layout</c>). Empty when there is none, so every project
+    /// fails the naming rule rather than the tests failing to start.
+    /// </summary>
+    internal static readonly string SolutionName = SolutionPaths
+        .Where(path => !path.Contains('/'))
+        .Select(path => Path.GetFileNameWithoutExtension(path))
+        .FirstOrDefault() ?? string.Empty;
+
+    internal static readonly IReadOnlyList<ProjectFile> Projects = ReadProjects();
 
     /// <summary>
     /// Walks up from the test assembly to the directory holding <c>.git</c>. Not
@@ -74,6 +84,7 @@ internal static class SolutionTree
         var document = XDocument.Load(path);
 
         return new ProjectFile(
+            SolutionName,
             Path.GetFileNameWithoutExtension(path),
             directory,
             Includes(document, "ProjectReference").Select(ProjectName).ToList(),

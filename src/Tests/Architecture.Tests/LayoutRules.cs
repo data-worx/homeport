@@ -42,14 +42,35 @@ internal static class LayoutRules
     }
 
     /// <summary>
-    /// Projects whose directory does not carry their name, and projects of a
-    /// service or module not named <c>Homeport.&lt;Service&gt;[.&lt;Layer&gt;]</c> or
+    /// Projects whose directory does not carry their name, and projects outside
+    /// <c>src/Tests/</c> whose name is not the solution name followed by their
+    /// grouping directories: <c>Homeport.Shared[.&lt;Name&gt;]</c>,
+    /// <c>Homeport.Platform.&lt;Service&gt;[.&lt;Layer&gt;]</c>,
     /// <c>Homeport.Modules.&lt;Module&gt;.&lt;Layer&gt;</c>.
     /// </summary>
     internal static List<string> MisnamedProjects(IEnumerable<ProjectFile> projects)
     {
         return projects
             .Where(project => !IsNamedForItsPlace(project))
+            .Select(project => project.Path)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Test projects not named after a project of the tree plus <c>.Tests.Unit</c>
+    /// or <c>.Tests.Integration</c>. <c>Architecture.Tests</c> is the one
+    /// solution-wide exception (<c>dotnet.tests</c>).
+    /// </summary>
+    internal static List<string> MisnamedTestProjects(IReadOnlyList<ProjectFile> projects)
+    {
+        var production = projects
+            .Where(project => project.Location != ProjectLocation.Tests)
+            .Select(project => project.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        return projects
+            .Where(project => project.Location == ProjectLocation.Tests && project.Name != "Architecture.Tests")
+            .Where(project => project.ProjectUnderTest is not { } underTest || !production.Contains(underTest))
             .Select(project => project.Path)
             .ToList();
     }
@@ -81,7 +102,9 @@ internal static class LayoutRules
         {
             ProjectLocation.Platform => project.Layer != ProjectLayer.Unknown,
             ProjectLocation.Modules => project.Layer is not (ProjectLayer.Unknown or ProjectLayer.Single),
-            _ => true,
+            ProjectLocation.Tests or ProjectLocation.Elsewhere => true,
+            _ => project.Name == project.GroupingName
+                || project.Name.StartsWith($"{project.GroupingName}.", StringComparison.Ordinal),
         };
     }
 
