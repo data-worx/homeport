@@ -56,6 +56,13 @@ nothing. The only question is whether the upstream template moved on — if it
 did, show the user what changed and let them decide whether to take anything
 across by hand. Never overwrite a template.
 
+A project may move a template. It moves the file and sets the `path` of the
+template's lock entry, matched by `from`, to the new place; `collect.sh` then
+reports and checks that path instead of the manifest target. A template that
+reads `missing` may simply have been moved without that lock edit — ask before
+offering to re-create it. Managed and block files never move: their target is
+always the manifest's.
+
 `installed` reading `no-marker` means a block target lost its markers. Do not
 patch it, do not append a fresh block — stop and ask (step 5).
 

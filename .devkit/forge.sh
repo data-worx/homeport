@@ -69,6 +69,22 @@ forge_issue_edit() {
   gh issue edit "$1" --body-file "$2"
 }
 
+# forge_issue_block <number> <blocker> - records that <number> is blocked by
+# <blocker>, as the forge's own dependency link. <blocker> is a number in this
+# repository or <owner>/<repo>#<number> in another one. The API wants the
+# blocker's database id, not its number, so that is looked up first.
+forge_issue_block() {
+  local repo blocker_repo blocker id
+  repo="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+  case "$2" in
+    *'#'*) blocker_repo="${2%#*}"; blocker="${2##*#}" ;;
+    *)     blocker_repo="${repo}"; blocker="$2" ;;
+  esac
+  id="$(gh api "repos/${blocker_repo}/issues/${blocker}" -q .id)" || return 1
+  gh api -X POST "repos/${repo}/issues/$1/dependencies/blocked_by" \
+    -F issue_id="${id}" > /dev/null
+}
+
 # forge_pr_create <base> <head> <title> <label> <assignee> <body file>
 #   [milestone] -> URL
 # The milestone is left off when it is empty, so a request whose issue has

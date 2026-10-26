@@ -58,10 +58,22 @@ The three that get skipped and should not be:
 - **Verifiable acceptance criteria.** A concrete command and its expected
   result beats a sentence about things being set up correctly.
 
+Then ask for the **blockers**: the tickets that must be done before this one
+can start. Only the direct ones — a ticket blocked by a ticket that is itself
+blocked lists the first, never the second. A blocker in this repository is its
+number; one elsewhere is `<owner>/<repo>#<n>` (`<group>/<project>#<n>` on
+GitLab). None is a valid answer.
+
 ## 3. Present and wait
 
-Show the full title and body in the chat. Create nothing on less than a clear
-yes. If the user wants changes, redraft and show again.
+Show the full title and body in the chat, and below them the blockers:
+
+| Blocked by | Title |
+|---|---|
+| #12 | feat: add the export endpoint |
+
+or the line *Blocked by: none*. Create nothing on less than a clear yes. If the
+user wants changes, redraft and show again.
 
 ## 4. File it
 
@@ -77,6 +89,17 @@ printed `none`, leave the argument off: the ticket stays unassigned, as
 `forge.issues` prescribes. It is `DEVKIT_ASSIGN_ISSUES` in `.devkit/config.sh`
 that turns assignment on, never a guess made while filing.
 
+Then set each approved blocker on the new ticket:
+
+```bash
+forge_issue_block <n> <blocker>
+```
+
+Exit code 2 means the forge could only link the two as related — GitLab's free
+tier has no blocking links. The link is there but blocks nothing; say so in the
+report. Any other failure: report which blocker was not set, and do not retry
+by hand.
+
 Never call `gh` or `glab` directly — `forge.sh` is what makes this skill work
 on both.
 
@@ -86,6 +109,7 @@ If a type label is missing, `context.sh` said so. Create it with
 ## 5. Report back
 
 - the ticket number and its URL
+- each blocker that was set, and any that was only linked as related or failed
 - the branch name to use: `fix/<n>-<slug>` for a `fix` ticket, otherwise
   `feature/<n>-<slug>`
 
