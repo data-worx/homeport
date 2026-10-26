@@ -16,7 +16,7 @@ contributions.
 
 Homeport is licensed under AGPL-3.0-or-later. The CLA lets the copyright
 holder license your contribution under other terms as well — see
-[ADR-0001](docs/adr/0001-distribution-and-licensing.md).
+[ADR-0001](docs/architecture/adr/0001-distribution-and-licensing.md).
 
 ## Before you start
 
@@ -26,8 +26,8 @@ holder license your contribution under other terms as well — see
 - **Every change starts with an issue.** Look for an existing one first. If
   there is none, open one and wait for it to be accepted before writing code.
 - **Architecture decisions are binding.** A change that contradicts one of the
-  [ADRs](docs/adr/README.md) needs a new ADR that supersedes it, agreed before
-  the code is written.
+  [ADRs](docs/architecture/adr/README.md) needs a new ADR that supersedes it,
+  agreed before the code is written.
 - **Security issues** are never reported in public. See
   [SECURITY.md](SECURITY.md).
 

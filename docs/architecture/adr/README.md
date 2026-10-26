@@ -2,7 +2,7 @@
 
 Decisions that are hard to reverse or cross a boundary. When an ADR is
 required, and how one is changed, is a rule in
-[`AGENTS.md`](../../AGENTS.md#decisions).
+[`AGENTS.md`](../../../AGENTS.md#decisions).
 
 An ADR is never edited once accepted, apart from its status line. A changed
 decision is a new ADR that supersedes the old one, and the old one is marked

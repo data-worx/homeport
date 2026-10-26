@@ -15,7 +15,8 @@ small team cannot operate a sprawl of tiny services.
   worker. Features inside a module are components, not services.
 - The module contract is **language-neutral HTTP**: manifest, health,
   registration and heartbeat, gateway headers, usage reporting. It is
-  normative in [docs/module-contract/](../module-contract/README.md).
+  normative in
+  [docs/reference/module-contract/](../../reference/module-contract/README.md).
 - A **.NET SDK** (NuGet) implements the contract for .NET modules. It is a
   convenience, not a requirement.
 - The **Echo** module is the reference implementation.

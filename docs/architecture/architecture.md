@@ -3,7 +3,7 @@
 The projects that exist in homeport today, how they are laid out, and
 why they are cut this way. This document describes the current state. The
 binding rules — the dependency direction, who may reference what — live in the
-*Architecture* section of [`AGENTS.md`](../AGENTS.md#architecture).
+*Architecture* section of [`AGENTS.md`](../../AGENTS.md#architecture).
 
 ## Projects
 
@@ -17,7 +17,7 @@ binding rules — the dependency direction, who may reference what — live in t
 
 No production project exists yet. The target picture is in
 [vision.md](vision.md); the binding layout is in
-[`AGENTS.md`](../AGENTS.md#architecture).
+[`AGENTS.md`](../../AGENTS.md#architecture).
 
 ## Directory layout
 
