@@ -38,6 +38,11 @@ next to the old one. The module id `platform` is reserved.
   instance address.
 - It then sends a heartbeat, by default every 10 s. An instance without a
   heartbeat for 30 s (TTL) is removed from routing.
+- Registration and every heartbeat carry the module's secret registration
+  key as `Authorization: Bearer <key>`. The operator configures the key for
+  the module id at the registry. An unknown module id or a wrong key is
+  rejected with `401`. Up to two keys per module id are valid at once, so a
+  key rotates without downtime.
 - Registration and heartbeat carry no version in the path; the
   `contractVersion` in the manifest decides. The registry accepts the
   current and the previous version and rejects any other with `422`, naming
