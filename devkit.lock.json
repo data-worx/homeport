@@ -21,7 +21,7 @@
     { "path": "CHANGELOG.md", "from": "core/templates/CHANGELOG.md", "mode": "template", "hash": "ca7850e9ccc648c4b5d8376cb7da1d54df282f69" },
     { "path": "ROADMAP.md", "from": "core/templates/ROADMAP.md", "mode": "template", "hash": "6cdefe256bdf23748b0744fef3ef4c7c0dfbf0fb" },
     { "path": "docs/README.md", "from": "core/templates/docs/README.md", "mode": "template", "hash": "7c22a3628ab1de3f237e1d9dd5c98b45b0f2e6c0" },
-    { "path": "docs/architecture.md", "from": "core/templates/docs/architecture.md", "mode": "template", "hash": "a4136b98f85ce47668c8e01b8f7393c80544c4c4" },
+    { "path": "docs/architecture/architecture.md", "from": "core/templates/docs/architecture.md", "mode": "template", "hash": "a4136b98f85ce47668c8e01b8f7393c80544c4c4" },
     { "path": ".devkit/config.sh", "from": "core/templates/config.sh", "mode": "template", "hash": "0012f8cd2066502b9d47325a2bdf00758ef9b5d1" },
     { "path": "AGENTS.dotnet.md", "from": "shared/dotnet/AGENTS.dotnet.md", "mode": "managed", "hash": "ad0e20de4763a6434301c238b481455ae2bab79f" },
     { "path": ".editorconfig", "from": "shared/dotnet/editorconfig.block", "mode": "block", "hash": "06a9f7728ed1aa66dbccd42d57203178b14a5997", "marker": "devkit:shared/dotnet" },

@@ -14,7 +14,7 @@ billing files.
 - **Not an invoicing system.** Homeport meters and exports usage for showback
   and chargeback; it never creates invoices.
 
-More in [docs/vision.md](docs/vision.md).
+More in [docs/architecture/vision.md](docs/architecture/vision.md).
 
 ## Status
 

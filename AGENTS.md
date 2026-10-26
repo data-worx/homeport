@@ -36,12 +36,12 @@ Two facts a newcomer gets wrong:
 - **Not an invoicing system.** Homeport meters and exports usage for showback
   and chargeback. It never creates invoices.
 
-Background: [docs/vision.md](docs/vision.md).
+Background: [docs/architecture/vision.md](docs/architecture/vision.md).
 
 ## Decisions
 
-The architecture decisions are recorded in [docs/adr/](docs/adr/README.md).
-They are binding.
+The architecture decisions are recorded in
+[docs/architecture/adr/](docs/architecture/adr/README.md). They are binding.
 
 - **Do not change a decision silently.** To change one, propose a new ADR that
   supersedes it and get the maintainer's approval before writing code.
@@ -51,6 +51,24 @@ They are binding.
   security mechanism, the licence or the distribution model.
 - **No ADR** for anything else — a library inside one service, naming,
   internal structure. That is decided in the pull request.
+
+## Documentation
+
+`docs/` is arranged by reader. A document goes into the directory of the
+reader it is written for:
+
+| Directory | Reader |
+|---|---|
+| `docs/operators/` | Installing, configuring and running Homeport |
+| `docs/module-developers/` | Building a module on the contract and the SDK |
+| `docs/api-consumers/` | Obtaining a token, calling modules, reading usage |
+| `docs/reference/` | Normative reference, starting with the module contract |
+| `docs/architecture/` | Vision, architecture and the ADRs |
+
+- A slice adds or updates the pages of every reader it affects, in the same
+  pull request.
+- A directory is created with its first document, never empty.
+- English only. Every document is listed in [docs/README.md](docs/README.md).
 
 ## Tech stack
 
@@ -100,14 +118,14 @@ src/
 - Messages between services (for example `UsageRecorded`) are contracts in
   `Homeport.Contracts`. Changing one is a breaking change for every consumer.
 
-Current state: [docs/architecture.md](docs/architecture.md).
+Current state: [docs/architecture/architecture.md](docs/architecture/architecture.md).
 
 ### Module contract
 
 The contract is normative in
-[docs/module-contract/](docs/module-contract/README.md). Any change to it bumps
-`contractVersion` and updates the SDK, the documentation and the Echo module
-**in the same pull request**.
+[docs/reference/module-contract/](docs/reference/module-contract/README.md).
+Any change to it bumps `contractVersion` and updates the SDK, the documentation
+and the Echo module **in the same pull request**.
 
 ## Multi-tenancy
 

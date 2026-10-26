@@ -44,8 +44,8 @@ Done when:
 3. A seeded tenant and client exist (seed data and Keycloak realm import).
    `curl` with a client-credentials token reaches Echo.
 4. Echo accepts only requests that carry a valid gateway-issued token
-   ([ADR-0011](docs/adr/0011-gateway-issued-tokens-for-modules.md)); a request
-   without one is rejected with `401`.
+   ([ADR-0011](docs/architecture/adr/0011-gateway-issued-tokens-for-modules.md));
+   a request without one is rejected with `401`.
 5. Exceeding the plan's rate limit returns `429` with `Retry-After`, also with
    two gateway replicas.
 6. Every call produces a `UsageRecorded` event that ends up aggregated in
