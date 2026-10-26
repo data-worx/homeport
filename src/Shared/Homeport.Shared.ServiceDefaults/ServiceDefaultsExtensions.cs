@@ -10,7 +10,7 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
-namespace Homeport.ServiceDefaults;
+namespace Homeport.Shared.ServiceDefaults;
 
 /// <summary>
 /// What every Homeport service sets up the same way: OpenTelemetry over OTLP,

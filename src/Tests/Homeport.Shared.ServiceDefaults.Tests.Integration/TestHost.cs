@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 
-namespace Homeport.ServiceDefaults.Tests.Integration;
+namespace Homeport.Shared.ServiceDefaults.Tests.Integration;
 
 /// <summary>
 /// A web application with the service defaults, in memory and in the

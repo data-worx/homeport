@@ -50,7 +50,7 @@ gate_notices() {
 # generated .env holds the variable names only; it is committed as .env.example.
 # To update the committed files after a change to the AppHost:
 #   out="$(mktemp -d)"
-#   dotnet run --project src/Aspire/Homeport.AppHost -- --operation publish \
+#   dotnet run --project src/Aspire/Homeport.Aspire.AppHost -- --operation publish \
 #     --step publish --output-path "$(cygpath -w "${out}" 2>/dev/null || echo "${out}")"
 #   cp "${out}/docker-compose.yaml" deploy/compose/
 #   cp "${out}/.env" deploy/compose/.env.example
@@ -59,7 +59,7 @@ gate_compose() {
   generated="$(mktemp -d)"
   native="$(cygpath -w "${generated}" 2>/dev/null || echo "${generated}")"
   # The AppHost writes .env with the platform's line endings; compare without them.
-  dotnet run --project src/Aspire/Homeport.AppHost -- --operation publish \
+  dotnet run --project src/Aspire/Homeport.Aspire.AppHost -- --operation publish \
       --step publish --output-path "${native}" > /dev/null \
     && diff -u --strip-trailing-cr deploy/compose/docker-compose.yaml "${generated}/docker-compose.yaml" \
     && diff -u --strip-trailing-cr deploy/compose/.env.example "${generated}/.env" \

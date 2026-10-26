@@ -4,7 +4,7 @@ using System.Net;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Homeport.ServiceDefaults.Tests.Integration;
+namespace Homeport.Shared.ServiceDefaults.Tests.Integration;
 
 public sealed class ServiceDefaultsExtensionsTests
 {
