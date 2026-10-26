@@ -279,4 +279,4 @@ Every row was decided once and is recorded in `devkit.lock.json`, so
 
 | Rule | Deviation | Why |
 |---|---|---|
-| `dotnet.layout` | **Provisional.** The layer cut applies per service, not to one application: services under `src/Platform/<Service>/`, modules under `src/Modules/<Module>/`, plus `src/Aspire/`, `src/Shared/` and `src/Sdk/`. A service without business rules is a single project. See *Architecture* | Homeport is a set of independently deployable services, not one application. Revisit with the first service tickets |
+| `dotnet.layout` | **Provisional.** The layer cut applies per service, not to one application: services under `src/Platform/<Service>/`, modules under `src/Modules/<Module>/`, plus `src/Aspire/`, `src/Shared/` and `src/Sdk/`. A service without business rules is a single project. Project names follow the grouping rule of `dotnet.layout`, such as `Homeport.Platform.<Service>.Domain`. See *Architecture* | Homeport is a set of independently deployable services, not one application. Revisit with the first service tickets |

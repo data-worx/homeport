@@ -1,6 +1,6 @@
 {
   "source": "https://github.com/raisr/devkit",
-  "version": { "commit": "989066c", "date": "2026-10-26" },
+  "version": { "commit": "dceba58", "date": "2026-10-26" },
   "bootstrappedAt": "2026-10-19",
   "flavors": { "stacks": ["dotnet-core"], "forge": "github" },
   "files": [
@@ -23,7 +23,7 @@
     { "path": "docs/README.md", "from": "core/templates/docs/README.md", "mode": "template", "hash": "7c22a3628ab1de3f237e1d9dd5c98b45b0f2e6c0" },
     { "path": "docs/architecture/architecture.md", "from": "core/templates/docs/architecture.md", "mode": "template", "hash": "a4136b98f85ce47668c8e01b8f7393c80544c4c4" },
     { "path": ".devkit/config.sh", "from": "core/templates/config.sh", "mode": "template", "hash": "0012f8cd2066502b9d47325a2bdf00758ef9b5d1" },
-    { "path": "AGENTS.dotnet.md", "from": "shared/dotnet/AGENTS.dotnet.md", "mode": "managed", "hash": "ad0e20de4763a6434301c238b481455ae2bab79f" },
+    { "path": "AGENTS.dotnet.md", "from": "shared/dotnet/AGENTS.dotnet.md", "mode": "managed", "hash": "2860d6546a1f011a8072ef48a987f0f53b98bb6d" },
     { "path": ".editorconfig", "from": "shared/dotnet/editorconfig.block", "mode": "block", "hash": "06a9f7728ed1aa66dbccd42d57203178b14a5997", "marker": "devkit:shared/dotnet" },
     { "path": ".gitignore", "from": "shared/dotnet/gitignore.block", "mode": "block", "hash": "828a634adefc01e53bf3f9c6999b7cc7fdc6989c", "marker": "devkit:shared/dotnet" },
     { "path": "AGENTS.dotnet-core.md", "from": "stacks/dotnet-core/AGENTS.dotnet-core.md", "mode": "managed", "hash": "17995e8ff7566fa66267c037aba9ef802bddcee1" },
@@ -36,15 +36,15 @@
     { "path": ".devkit/licenses/Apache-2.0.txt", "from": "stacks/dotnet-core/templates/licenses/Apache-2.0.txt", "mode": "template", "hash": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64" },
     { "path": "src/Tests/Architecture.Tests/Architecture.Tests.csproj", "from": "stacks/dotnet-core/templates/Architecture.Tests/Architecture.Tests.csproj", "mode": "template", "hash": "72dc7dcf73ba81d180eedef48bd56bb866a64a6a" },
     { "path": "src/Tests/Architecture.Tests/DomainExceptions.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/DomainExceptions.cs", "mode": "template", "hash": "4b5020de5a485b7c148df1a9dba4359ac5c3e0c6" },
-    { "path": "src/Tests/Architecture.Tests/LayoutTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/LayoutTests.cs", "mode": "template", "hash": "c791bf1b9f7e19c2087abc6853378aeeca70241e" },
-    { "path": "src/Tests/Architecture.Tests/ProjectFile.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectFile.cs", "mode": "template", "hash": "49eb46432ed0c6381b860c8ae55fa57ece48066e" },
+    { "path": "src/Tests/Architecture.Tests/LayoutTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/LayoutTests.cs", "mode": "template", "hash": "d643fcefe19cce302e1027933071fe982fe4652d" },
+    { "path": "src/Tests/Architecture.Tests/ProjectFile.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectFile.cs", "mode": "template", "hash": "1999d189c92ea7a81d3f00468d125d470c0cf372" },
     { "path": "src/Tests/Architecture.Tests/ProjectLocation.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectLocation.cs", "mode": "template", "hash": "b5f2c54f566a3e586ff90aadd613aea92e9f8094" },
     { "path": "src/Tests/Architecture.Tests/ReferenceTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ReferenceTests.cs", "mode": "template", "hash": "e1e606b40e275cfb517812be0180da333f42c986" },
-    { "path": "src/Tests/Architecture.Tests/SolutionTree.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/SolutionTree.cs", "mode": "template", "hash": "d5ba7960cff833ea722b91331f6b53fe2e237b0b" },
+    { "path": "src/Tests/Architecture.Tests/SolutionTree.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/SolutionTree.cs", "mode": "template", "hash": "311e54f8e872d9f86ea9f4b7f79239a679ead20d" },
     { "path": "AGENTS.github.md", "from": "forges/github/AGENTS.github.md", "mode": "managed", "hash": "8d8962de643dc0365a82ef5763c1e249b90b7801" },
     { "path": ".devkit/forge.sh", "from": "forges/github/forge.sh", "mode": "managed", "hash": "21ca6807048f1d3425bddce6f972d53dce1bd47b" }
   ],
   "deviations": [
-    { "slug": "dotnet.layout", "scope": "src/", "reason": "Provisional. The layer cut applies per service: services under src/Platform/<Service>/, modules under src/Modules/<Module>/, plus src/Aspire/, src/Shared/ and src/Sdk/; a service without business rules is a single project. Revisit with the first service tickets. Recorded in the Deviations table of AGENTS.md.", "decidedAt": "5af251c" }
+    { "slug": "dotnet.layout", "scope": "src/", "reason": "Provisional. The layer cut applies per service: services under src/Platform/<Service>/, modules under src/Modules/<Module>/, plus src/Aspire/, src/Shared/ and src/Sdk/; a service without business rules is a single project. Project names follow the grouping rule of dotnet.layout, such as Homeport.Platform.<Service>.Domain. Revisit with the first service tickets. Recorded in the Deviations table of AGENTS.md.", "decidedAt": "dceba58" }
   ]
 }
