@@ -20,6 +20,12 @@ there, not here. Deviations go in the *Deviations* table of the project
 for extension classes or anything else. The analyser enforces it (`IDE0130`),
 so a mismatch fails the gate rather than surviving in review.
 
+**That holds from `src/` on.** A grouping directory between `src/` and a
+project is a segment of the project's name, and so of its root namespace and
+assembly: a file in `src/Core/Acme.Core.Domain/Orders/` is in
+`Acme.Core.Domain.Orders`. `src/Tests/` is the one directory that is not a
+segment (`dotnet.tests`).
+
 ## Solution layout {#dotnet.layout}
 
 The concrete cut of `core.architecture`. It describes the target state: a
@@ -30,24 +36,31 @@ than the rule bending to the code.
 <Name>.slnx
 src/
   Core/
-    <Name>.Domain/
-    <Name>.Application/
-    <Name>.Infrastructure/
+    <Name>.Core.Domain/
+    <Name>.Core.Application/
+    <Name>.Core.Infrastructure/
   <Name>.<Ui>/
   Tools/
+    <Name>.Tools.<Tool>/
   Tests/
     Architecture.Tests/
 ```
 
 | Project | Lives in | May reference |
 |---|---|---|
-| `<Name>.Domain` | `src/Core/` | nothing beyond the BCL, unless named as an exception |
-| `<Name>.Application` | `src/Core/` | Domain |
-| `<Name>.Infrastructure[.<Source>]` | `src/Core/` | Application, Domain |
-| a UI — web, MAUI, WinForms, WPF, console | `src/` directly | anything but another UI |
-| a development tool | `src/Tools/` | anything, when it is a composition root |
+| `<Name>.Core.Domain` | `src/Core/` | nothing beyond the BCL, unless named as an exception |
+| `<Name>.Core.Application` | `src/Core/` | Domain |
+| `<Name>.Core.Infrastructure[.<Source>]` | `src/Core/` | Application, Domain |
+| `<Name>.<Ui>` — web, MAUI, WinForms, WPF, console | `src/` directly | anything but another UI |
+| `<Name>.Tools.<Tool>` — a development tool | `src/Tools/` | anything, when it is a composition root |
 | a test project | `src/Tests/` | whatever it needs to assert something, Infrastructure included |
 
+- **A project is named `<Name>`, then every grouping directory between `src/`
+  and the project, then its own name** (`dotnet.namespaces`). `<Name>` is the
+  name of the solution file. The project directory carries that full name, and
+  so do the `.csproj`, the assembly and the root namespace. A UI directly under
+  `src/` has no grouping directory and is `<Name>.<Ui>`. `src/Tests/` is not a
+  grouping directory: a test project is named as `dotnet.tests` says.
 - **`src/Core/` holds the application, not its UIs.** A UI is a composition
   root: it wires Infrastructure to the use cases and holds no business logic.
   It is meant to be replaceable, and a repository may have several side by
@@ -64,7 +77,7 @@ src/
   the *Architecture* section of the project `AGENTS.md` points at that file
   rather than restating the list.
 - **`Architecture.Tests` is mandatory.** It asserts the reference graph, the
-  layout and the Domain exceptions against that list, so a reference nobody
+  layout, the project names and the Domain exceptions against that list, so a reference nobody
   wrote down fails the build. It is the solution-wide test project
   `dotnet.tests` allows, and the one project without the `<Name>.` prefix:
   the stack pack ships it as a template, and a template cannot land at a path
@@ -117,6 +130,10 @@ In addition to the ones in `AGENTS.core.md`:
 that same name. A project gets a test project once it actually has tests — no
 empty projects on stock.
 
+**`src/Tests/` is not a name segment.** A test project is named after the
+project under test, never `<Name>.Tests.…`, so test and source sort side by
+side.
+
 Tests that assert solution-wide rules — such as which project may reference
 which — belong to no single project and carry no `.Unit`/`.Integration`
 suffix. That is the only exception; a second one needs a ticket that argues
@@ -140,8 +157,8 @@ public sealed class OrderServiceTests            // class under test
 ```
 
 - The test file mirrors the source path *inside its project*:
-  `src/Acme.Application/Orders/OrderService.cs` becomes
-  `src/Tests/Acme.Application.Tests.Unit/Orders/OrderServiceTests.cs`. The
+  `src/Core/Acme.Core.Application/Orders/OrderService.cs` becomes
+  `src/Tests/Acme.Core.Application.Tests.Unit/Orders/OrderServiceTests.cs`. The
   project name already says which project is under test, so it is not repeated
   as a folder.
 - The method name reads `Scenario_ExpectedResult`. The method under test is

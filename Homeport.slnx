@@ -1,13 +1,13 @@
 <Solution>
   <Folder Name="/Aspire/">
-    <Project Path="src/Aspire/Homeport.AppHost/Homeport.AppHost.csproj" />
+    <Project Path="src/Aspire/Homeport.Aspire.AppHost/Homeport.Aspire.AppHost.csproj" />
   </Folder>
   <Folder Name="/Shared/">
-    <Project Path="src/Shared/Homeport.ServiceDefaults/Homeport.ServiceDefaults.csproj" />
+    <Project Path="src/Shared/Homeport.Shared.ServiceDefaults/Homeport.Shared.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="src/Tests/Architecture.Tests/Architecture.Tests.csproj" />
-    <Project Path="src/Tests/Homeport.AppHost.Tests.Integration/Homeport.AppHost.Tests.Integration.csproj" />
-    <Project Path="src/Tests/Homeport.ServiceDefaults.Tests.Integration/Homeport.ServiceDefaults.Tests.Integration.csproj" />
+    <Project Path="src/Tests/Homeport.Aspire.AppHost.Tests.Integration/Homeport.Aspire.AppHost.Tests.Integration.csproj" />
+    <Project Path="src/Tests/Homeport.Shared.ServiceDefaults.Tests.Integration/Homeport.Shared.ServiceDefaults.Tests.Integration.csproj" />
   </Folder>
 </Solution>

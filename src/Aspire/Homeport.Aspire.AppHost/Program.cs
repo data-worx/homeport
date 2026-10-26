@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Homeport.AppHost;
+namespace Homeport.Aspire.AppHost;
 
 /// <summary>
 /// The topology of Homeport and its single source of truth. Run it to start

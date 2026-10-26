@@ -3,7 +3,7 @@
 using Aspire.Hosting;
 using Aspire.Hosting.Testing;
 
-namespace Homeport.AppHost.Tests.Integration;
+namespace Homeport.Aspire.AppHost.Tests.Integration;
 
 /// <summary>
 /// The whole topology, started once for every test that shares it. Needs a
@@ -25,7 +25,7 @@ public sealed class RunningAppHost : IAsyncLifetime
     {
         using var timeout = new CancellationTokenSource(StartTimeout);
 
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Homeport_AppHost>(timeout.Token);
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Homeport_Aspire_AppHost>(timeout.Token);
         app = await builder.BuildAsync(timeout.Token);
         await app.StartAsync(timeout.Token);
     }

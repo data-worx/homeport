@@ -6,7 +6,7 @@ it changes freely, but every change still updates the SDK and the Echo module
 in the same pull request.
 
 The contract is language-neutral HTTP. A module may be written in any language;
-the .NET SDK (`Homeport.Module.Sdk`) is a convenience, not a requirement.
+the .NET SDK (`Homeport.Sdk`) is a convenience, not a requirement.
 
 ## Manifest
 

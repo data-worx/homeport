@@ -61,11 +61,11 @@ public sealed class LayoutTests
         }
 
         [Theory]
-        [InlineData("Homeport.Gateway")]
-        [InlineData("Platform/Homeport.Gateway")]
+        [InlineData("Homeport.Platform.Gateway")]
+        [InlineData("Platform/Homeport.Platform.Gateway")]
         [InlineData("Modules/Homeport.Modules.Echo.Api")]
-        [InlineData("Shared/Contracts/Homeport.Contracts")]
-        [InlineData("Platform/Gateway/Api/Homeport.Gateway.Api")]
+        [InlineData("Shared/Contracts/Homeport.Shared.Contracts")]
+        [InlineData("Platform/Gateway/Api/Homeport.Platform.Gateway.Api")]
         public void Reports_A_Project_Outside_The_Layout(string path)
         {
             ProjectFile[] projects = [Fixture.Project(path)];
@@ -76,12 +76,12 @@ public sealed class LayoutTests
         }
 
         [Theory]
-        [InlineData("Aspire/Homeport.AppHost")]
-        [InlineData("Shared/Homeport.Contracts")]
-        [InlineData("Sdk/Homeport.Module.Sdk")]
-        [InlineData("Platform/Gateway/Homeport.Gateway")]
+        [InlineData("Aspire/Homeport.Aspire.AppHost")]
+        [InlineData("Shared/Homeport.Shared.Contracts")]
+        [InlineData("Sdk/Homeport.Sdk")]
+        [InlineData("Platform/Gateway/Homeport.Platform.Gateway")]
         [InlineData("Modules/Echo/Homeport.Modules.Echo.Api")]
-        [InlineData("Tools/Homeport.Seed")]
+        [InlineData("Tools/Homeport.Tools.Seed")]
         [InlineData("Tests/Architecture.Tests")]
         public void Accepts_A_Project_In_The_Layout(string path)
         {
@@ -104,8 +104,8 @@ public sealed class LayoutTests
         }
 
         [Theory]
-        [InlineData("Platform/Gateway/Homeport.Registry.Api")]
-        [InlineData("Platform/Gateway/Homeport.Gateway.Web")]
+        [InlineData("Platform/Gateway/Homeport.Platform.Registry.Api")]
+        [InlineData("Platform/Gateway/Homeport.Platform.Gateway.Web")]
         [InlineData("Platform/Gateway/Gateway")]
         [InlineData("Modules/Echo/Homeport.Echo.Api")]
         [InlineData("Modules/Echo/Homeport.Modules.Echo")]
@@ -118,10 +118,27 @@ public sealed class LayoutTests
             Assert.Equal([$"src/{path}"], offenders);
         }
 
+        [Theory]
+        [InlineData("Platform/Gateway/Homeport.Gateway")]
+        [InlineData("Aspire/Homeport.Host")]
+        [InlineData("Shared/Homeport.Messages")]
+        [InlineData("Shared/Homeport.SharedContracts")]
+        [InlineData("Sdk/Homeport.Modules.Sdk")]
+        [InlineData("Tools/Homeport.Seed")]
+        [InlineData("Shared/Acme.Shared.Contracts")]
+        public void Reports_A_Name_Without_The_Solution_And_Its_Grouping_Directories(string path)
+        {
+            ProjectFile[] projects = [Fixture.Project(path)];
+
+            var offenders = LayoutRules.MisnamedProjects(projects);
+
+            Assert.Equal([$"src/{path}"], offenders);
+        }
+
         [Fact]
         public void Reports_A_Directory_That_Does_Not_Carry_The_Project_Name()
         {
-            ProjectFile[] projects = [new("Homeport.Contracts", "Shared/Contracts", [], [])];
+            ProjectFile[] projects = [new(Fixture.Solution, "Homeport.Shared.Contracts", "Shared/Contracts", [], [])];
 
             var offenders = LayoutRules.MisnamedProjects(projects);
 
@@ -129,16 +146,66 @@ public sealed class LayoutTests
         }
 
         [Theory]
-        [InlineData("Platform/Gateway/Homeport.Gateway")]
-        [InlineData("Platform/ControlPlane/Homeport.ControlPlane.Api")]
-        [InlineData("Platform/Metering/Homeport.Metering.Worker")]
+        [InlineData("Platform/Gateway/Homeport.Platform.Gateway")]
+        [InlineData("Platform/ControlPlane/Homeport.Platform.ControlPlane.Api")]
+        [InlineData("Platform/Metering/Homeport.Platform.Metering.Worker")]
         [InlineData("Modules/Echo/Homeport.Modules.Echo.Domain")]
-        [InlineData("Shared/Homeport.ServiceDefaults")]
+        [InlineData("Aspire/Homeport.Aspire.AppHost")]
+        [InlineData("Shared/Homeport.Shared.ServiceDefaults")]
+        [InlineData("Sdk/Homeport.Sdk")]
+        [InlineData("Sdk/Homeport.Sdk.Testing")]
+        [InlineData("Tools/Homeport.Tools.Seed")]
+        [InlineData("Tests/Homeport.Platform.Gateway.Tests.Unit")]
         public void Accepts_A_Name_That_Fits(string path)
         {
             ProjectFile[] projects = [Fixture.Project(path)];
 
             var offenders = LayoutRules.MisnamedProjects(projects);
+
+            Assert.Empty(offenders);
+        }
+    }
+
+    public sealed class MisnamedTestProjects
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = LayoutRules.MisnamedTestProjects(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Theory]
+        [InlineData("Tests/Homeport.Shared.ServiceDefaults.Tests")]
+        [InlineData("Tests/Homeport.Tests.Shared.ServiceDefaults.Unit")]
+        [InlineData("Tests/Homeport.Shared.Contracts.Tests.Unit")]
+        public void Reports_A_Test_Project_Not_Named_After_A_Project_Of_The_Tree(string path)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Shared/Homeport.Shared.ServiceDefaults"),
+                Fixture.Project(path),
+            ];
+
+            var offenders = LayoutRules.MisnamedTestProjects(projects);
+
+            Assert.Equal([$"src/{path}"], offenders);
+        }
+
+        [Theory]
+        [InlineData("Tests/Homeport.Shared.ServiceDefaults.Tests.Unit")]
+        [InlineData("Tests/Homeport.Shared.ServiceDefaults.Tests.Integration")]
+        [InlineData("Tests/Architecture.Tests")]
+        public void Accepts_A_Test_Project_Named_After_A_Project_Of_The_Tree(string path)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Shared/Homeport.Shared.ServiceDefaults"),
+                Fixture.Project(path),
+            ];
+
+            var offenders = LayoutRules.MisnamedTestProjects(projects);
 
             Assert.Empty(offenders);
         }
@@ -159,9 +226,9 @@ public sealed class LayoutTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Domain"),
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Application"),
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Api"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Domain"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Application"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Api"),
             ];
 
             var offenders = LayoutRules.IncompleteCuts(projects);
@@ -174,11 +241,11 @@ public sealed class LayoutTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Platform/Gateway/Homeport.Gateway"),
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Domain"),
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Application"),
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Infrastructure"),
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Api"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Domain"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Application"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Infrastructure"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Api"),
             ];
 
             var offenders = LayoutRules.IncompleteCuts(projects);
@@ -215,7 +282,7 @@ public sealed class LayoutTests
         [Fact]
         public void Accepts_A_Service_In_One_Project()
         {
-            ProjectFile[] projects = [Fixture.Project("Platform/ControlPlane/Homeport.ControlPlane")];
+            ProjectFile[] projects = [Fixture.Project("Platform/ControlPlane/Homeport.Platform.ControlPlane")];
 
             var offenders = LayoutRules.IncompleteCuts(projects);
 
@@ -227,11 +294,11 @@ public sealed class LayoutTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Platform/Metering/Homeport.Metering.Domain"),
-                Fixture.Project("Platform/Metering/Homeport.Metering.Application"),
-                Fixture.Project("Platform/Metering/Homeport.Metering.Infrastructure"),
-                Fixture.Project("Platform/Metering/Homeport.Metering.Api"),
-                Fixture.Project("Platform/Metering/Homeport.Metering.Worker"),
+                Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Domain"),
+                Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Application"),
+                Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Infrastructure"),
+                Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Api"),
+                Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Worker"),
             ];
 
             var offenders = LayoutRules.IncompleteCuts(projects);

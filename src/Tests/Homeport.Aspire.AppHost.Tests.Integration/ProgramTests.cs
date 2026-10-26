@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Homeport.AppHost.Tests.Integration;
+namespace Homeport.Aspire.AppHost.Tests.Integration;
 
 public sealed class ProgramTests
 {

@@ -23,13 +23,13 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Domain", "Homeport.Contracts"),
-                Fixture.Project("Shared/Homeport.Contracts"),
+                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Domain", "Homeport.Shared.Contracts"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts"),
             ];
 
             var offenders = ReferenceRules.DomainReferences(projects, []);
 
-            Assert.Equal(["Homeport.Modules.Echo.Domain -> Homeport.Contracts"], offenders);
+            Assert.Equal(["Homeport.Modules.Echo.Domain -> Homeport.Shared.Contracts"], offenders);
         }
 
         [Fact]
@@ -89,20 +89,20 @@ public sealed class ReferenceTests
         }
 
         [Theory]
-        [InlineData("Aspire", "Homeport.AppHost")]
-        [InlineData("Tools", "Homeport.Seed")]
-        [InlineData("Tests", "Homeport.Gateway.Tests.Unit")]
+        [InlineData("Aspire", "Homeport.Aspire.AppHost")]
+        [InlineData("Tools", "Homeport.Tools.Seed")]
+        [InlineData("Tests", "Homeport.Platform.Gateway.Tests.Unit")]
         public void Reports_A_Reference_To_A_Project_Outside_Services_Shared_And_Sdk(string directory, string name)
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Platform/Gateway/Homeport.Gateway", name),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway", name),
                 Fixture.Project($"{directory}/{name}"),
             ];
 
             var offenders = ReferenceRules.ReferencesInsideAUnit(projects);
 
-            Assert.Equal([$"Homeport.Gateway -> {name}"], offenders);
+            Assert.Equal([$"Homeport.Platform.Gateway -> {name}"], offenders);
         }
 
         [Fact]
@@ -115,13 +115,13 @@ public sealed class ReferenceTests
                     "Homeport.Modules.Echo.Domain",
                     "Homeport.Modules.Echo.Application",
                     "Homeport.Modules.Echo.Infrastructure",
-                    "Homeport.ServiceDefaults",
-                    "Homeport.Module.Sdk"),
+                    "Homeport.Shared.ServiceDefaults",
+                    "Homeport.Sdk"),
                 Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Domain"),
                 Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Application"),
                 Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Infrastructure"),
-                Fixture.Project("Shared/Homeport.ServiceDefaults"),
-                Fixture.Project("Sdk/Homeport.Module.Sdk"),
+                Fixture.Project("Shared/Homeport.Shared.ServiceDefaults"),
+                Fixture.Project("Sdk/Homeport.Sdk"),
             ];
 
             var offenders = ReferenceRules.ReferencesInsideAUnit(projects);
@@ -135,11 +135,11 @@ public sealed class ReferenceTests
             ProjectFile[] projects =
             [
                 Fixture.Project(
-                    "Platform/Metering/Homeport.Metering.Application",
-                    "Homeport.Metering.Domain",
-                    "Homeport.Contracts"),
-                Fixture.Project("Platform/Metering/Homeport.Metering.Domain"),
-                Fixture.Project("Shared/Homeport.Contracts"),
+                    "Platform/Metering/Homeport.Platform.Metering.Application",
+                    "Homeport.Platform.Metering.Domain",
+                    "Homeport.Shared.Contracts"),
+                Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Domain"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts"),
             ];
 
             var offenders = ReferenceRules.ReferencesInsideAUnit(projects);
@@ -163,13 +163,13 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Api", "Homeport.Registry.Application"),
-                Fixture.Project("Platform/Registry/Homeport.Registry.Application"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Api", "Homeport.Platform.Registry.Application"),
+                Fixture.Project("Platform/Registry/Homeport.Platform.Registry.Application"),
             ];
 
             var offenders = ReferenceRules.ReferencesBetweenUnits(projects);
 
-            Assert.Equal(["Homeport.Gateway.Api -> Homeport.Registry.Application"], offenders);
+            Assert.Equal(["Homeport.Platform.Gateway.Api -> Homeport.Platform.Registry.Application"], offenders);
         }
 
         [Fact]
@@ -177,13 +177,13 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Infrastructure", "Homeport.ControlPlane"),
-                Fixture.Project("Platform/ControlPlane/Homeport.ControlPlane"),
+                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Infrastructure", "Homeport.Platform.ControlPlane"),
+                Fixture.Project("Platform/ControlPlane/Homeport.Platform.ControlPlane"),
             ];
 
             var offenders = ReferenceRules.ReferencesBetweenUnits(projects);
 
-            Assert.Equal(["Homeport.Modules.Echo.Infrastructure -> Homeport.ControlPlane"], offenders);
+            Assert.Equal(["Homeport.Modules.Echo.Infrastructure -> Homeport.Platform.ControlPlane"], offenders);
         }
 
         [Fact]
@@ -216,13 +216,13 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Shared/Homeport.Contracts", "Homeport.Metering.Domain"),
-                Fixture.Project("Platform/Metering/Homeport.Metering.Domain"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts", "Homeport.Platform.Metering.Domain"),
+                Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Domain"),
             ];
 
             var offenders = ReferenceRules.SharedReferences(projects);
 
-            Assert.Equal(["Homeport.Contracts -> Homeport.Metering.Domain"], offenders);
+            Assert.Equal(["Homeport.Shared.Contracts -> Homeport.Platform.Metering.Domain"], offenders);
         }
 
         [Fact]
@@ -230,13 +230,13 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Sdk/Homeport.Module.Sdk", "Homeport.Modules.Echo.Api"),
+                Fixture.Project("Sdk/Homeport.Sdk", "Homeport.Modules.Echo.Api"),
                 Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Api"),
             ];
 
             var offenders = ReferenceRules.SharedReferences(projects);
 
-            Assert.Equal(["Homeport.Module.Sdk -> Homeport.Modules.Echo.Api"], offenders);
+            Assert.Equal(["Homeport.Sdk -> Homeport.Modules.Echo.Api"], offenders);
         }
 
         [Fact]
@@ -244,8 +244,8 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Sdk/Homeport.Module.Sdk", "Homeport.Contracts"),
-                Fixture.Project("Shared/Homeport.Contracts"),
+                Fixture.Project("Sdk/Homeport.Sdk", "Homeport.Shared.Contracts"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts"),
             ];
 
             var offenders = ReferenceRules.SharedReferences(projects);
@@ -265,21 +265,21 @@ public sealed class ReferenceTests
         }
 
         [Theory]
-        [InlineData("Platform/Gateway", "Homeport.Gateway.Domain")]
-        [InlineData("Platform/Gateway", "Homeport.Gateway.Application")]
+        [InlineData("Platform/Gateway", "Homeport.Platform.Gateway.Domain")]
+        [InlineData("Platform/Gateway", "Homeport.Platform.Gateway.Application")]
         [InlineData("Modules/Echo", "Homeport.Modules.Echo.Infrastructure")]
-        [InlineData("Sdk", "Homeport.Module.Sdk")]
+        [InlineData("Sdk", "Homeport.Sdk")]
         public void Reports_A_Reference_To_Anything_But_A_Host_Or_Shared(string directory, string name)
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Aspire/Homeport.AppHost", name),
+                Fixture.Project("Aspire/Homeport.Aspire.AppHost", name),
                 Fixture.Project($"{directory}/{name}"),
             ];
 
             var offenders = ReferenceRules.AspireReferences(projects);
 
-            Assert.Equal([$"Homeport.AppHost -> {name}"], offenders);
+            Assert.Equal([$"Homeport.Aspire.AppHost -> {name}"], offenders);
         }
 
         [Fact]
@@ -288,15 +288,15 @@ public sealed class ReferenceTests
             ProjectFile[] projects =
             [
                 Fixture.Project(
-                    "Aspire/Homeport.AppHost",
-                    "Homeport.Gateway.Api",
-                    "Homeport.ControlPlane",
-                    "Homeport.Metering.Worker",
-                    "Homeport.ServiceDefaults"),
-                Fixture.Project("Platform/Gateway/Homeport.Gateway.Api"),
-                Fixture.Project("Platform/ControlPlane/Homeport.ControlPlane"),
-                Fixture.Project("Platform/Metering/Homeport.Metering.Worker"),
-                Fixture.Project("Shared/Homeport.ServiceDefaults"),
+                    "Aspire/Homeport.Aspire.AppHost",
+                    "Homeport.Platform.Gateway.Api",
+                    "Homeport.Platform.ControlPlane",
+                    "Homeport.Platform.Metering.Worker",
+                    "Homeport.Shared.ServiceDefaults"),
+                Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway.Api"),
+                Fixture.Project("Platform/ControlPlane/Homeport.Platform.ControlPlane"),
+                Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Worker"),
+                Fixture.Project("Shared/Homeport.Shared.ServiceDefaults"),
             ];
 
             var offenders = ReferenceRules.AspireReferences(projects);
@@ -318,17 +318,17 @@ public sealed class ReferenceTests
         [Fact]
         public void Reports_A_Reference_To_A_Project_Not_Under_Src()
         {
-            ProjectFile[] projects = [Fixture.Project("Platform/Gateway/Homeport.Gateway", "Acme.Elsewhere")];
+            ProjectFile[] projects = [Fixture.Project("Platform/Gateway/Homeport.Platform.Gateway", "Acme.Elsewhere")];
 
             var offenders = ReferenceRules.ReferencesOutsideSource(projects);
 
-            Assert.Equal(["Homeport.Gateway -> Acme.Elsewhere"], offenders);
+            Assert.Equal(["Homeport.Platform.Gateway -> Acme.Elsewhere"], offenders);
         }
 
         [Fact]
         public void Accepts_Any_Reference_From_A_Test()
         {
-            ProjectFile[] projects = [Fixture.Project("Tests/Homeport.Gateway.Tests.Integration", "Acme.Elsewhere")];
+            ProjectFile[] projects = [Fixture.Project("Tests/Homeport.Platform.Gateway.Tests.Integration", "Acme.Elsewhere")];
 
             var offenders = ReferenceRules.ReferencesOutsideSource(projects);
 

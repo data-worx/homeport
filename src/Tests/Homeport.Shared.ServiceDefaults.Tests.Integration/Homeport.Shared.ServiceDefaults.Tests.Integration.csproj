@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Homeport.ServiceDefaults\Homeport.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>

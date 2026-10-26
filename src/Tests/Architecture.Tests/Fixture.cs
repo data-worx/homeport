@@ -8,12 +8,15 @@ namespace Architecture.Tests;
 /// </summary>
 internal static class Fixture
 {
+    /// <summary>The solution name every fixture project belongs to.</summary>
+    internal const string Solution = "Homeport";
+
     /// <summary>A project named after its directory.</summary>
     /// <param name="path">The directory relative to <c>src/</c>, ending in the project name.</param>
     /// <param name="projectReferences">The names of the projects it references.</param>
     internal static ProjectFile Project(string path, params string[] projectReferences)
     {
-        return new ProjectFile(path.Split('/')[^1], path, projectReferences, []);
+        return new ProjectFile(Solution, path.Split('/')[^1], path, projectReferences, []);
     }
 
     /// <summary>A project named after its directory that references packages only.</summary>
@@ -21,6 +24,6 @@ internal static class Fixture
     /// <param name="packageReferences">The names of the packages it references.</param>
     internal static ProjectFile WithPackages(string path, params string[] packageReferences)
     {
-        return new ProjectFile(path.Split('/')[^1], path, [], packageReferences);
+        return new ProjectFile(Solution, path.Split('/')[^1], path, [], packageReferences);
     }
 }
