@@ -33,10 +33,12 @@ public static class Program
             .WithImageSHA256("418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd");
 
         // Development and tests only. An operator brings their own identity
-        // provider (ADR-0006).
+        // provider (ADR-0006), so the compose file runs Keycloak in development
+        // mode as the AppHost does, rather than in production mode without TLS.
         builder.AddKeycloak("keycloak", port: 8080)
             .WithImageTag("26.6")
-            .WithImageSHA256("0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4");
+            .WithImageSHA256("0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4")
+            .PublishAsDockerComposeService((_, service) => service.Command = ["start-dev", "--import-realm"]);
 
         builder.Build().Run();
     }
