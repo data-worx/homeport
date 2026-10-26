@@ -94,6 +94,10 @@ Plus the external-system signature from `core.signature`.
   `DEVKIT_ASSIGN_ISSUES=yes` in `.devkit/config.sh`; every new ticket then goes
   to `DEVKIT_ASSIGNEE`.
 - Check the open issues for a near-duplicate before filing.
+- Dependencies are part of filing: every ticket that must be done first is set
+  as a native *blocked by* link right after the issue is created. Only the
+  direct blockers, never the transitive ones. They are links, not prose in the
+  body.
 
 The **Acceptance criteria** is the contract being fulfilled. Read it in full
 before writing code, and walk it box by box before calling the work done.

@@ -91,6 +91,7 @@ emit() {   # <pack> <src> <target> <mode>
   [ -f "${src_path}" ] && up="$(hash_of "${src_path}")"
 
   if [ "${mode}" = "template" ]; then
+    target="$(manifest_template_target "${REPO}/devkit.lock.json" "${pack}/${src}" "${target}")"
     # A template is written once, through token substitution, and then belongs
     # to the project. Its hash is never comparable to the source hash, so do
     # not invite the comparison. What matters is whether the template moved on

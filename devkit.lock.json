@@ -1,6 +1,6 @@
 {
   "source": "https://github.com/raisr/devkit",
-  "version": { "commit": "5af251c", "date": "2026-10-19" },
+  "version": { "commit": "989066c", "date": "2026-10-26" },
   "bootstrappedAt": "2026-10-19",
   "flavors": { "stacks": ["dotnet-core"], "forge": "github" },
   "files": [
@@ -10,10 +10,10 @@
     { "path": ".gitignore", "from": "core/gitignore.block", "mode": "block", "hash": "c82f916f9a1c57f7f7ee55ac949ed0613db652b8", "marker": "devkit:core" },
     { "path": ".claude/skills/commit-message/SKILL.md", "from": "core/skills/commit-message/SKILL.md", "mode": "managed", "hash": "03c47cf906778cfdedaac834644bcefa81d1a58b" },
     { "path": ".claude/skills/commit-message/collect.sh", "from": "core/skills/commit-message/collect.sh", "mode": "managed", "hash": "5b1f3188b10aec8afdddd5788a46f7b749b15768" },
-    { "path": ".claude/skills/create-issue/SKILL.md", "from": "core/skills/create-issue/SKILL.md", "mode": "managed", "hash": "1d77b487bc7a639ee7a34025995d7ef97fc86902" },
+    { "path": ".claude/skills/create-issue/SKILL.md", "from": "core/skills/create-issue/SKILL.md", "mode": "managed", "hash": "d17beb50d31891d24aba8b8f089505b10615c0b5" },
     { "path": ".claude/skills/create-issue/context.sh", "from": "core/skills/create-issue/context.sh", "mode": "managed", "hash": "73696038236609737f68c2b57b05466200a226d8" },
-    { "path": ".claude/skills/devkit-sync/SKILL.md", "from": "core/skills/devkit-sync/SKILL.md", "mode": "managed", "hash": "813868d011fdbabb2b615c9519860953245dadc5" },
-    { "path": ".claude/skills/devkit-sync/collect.sh", "from": "core/skills/devkit-sync/collect.sh", "mode": "managed", "hash": "6c3dd06c5a61933e858847c7b7846ca46a3a50de" },
+    { "path": ".claude/skills/devkit-sync/SKILL.md", "from": "core/skills/devkit-sync/SKILL.md", "mode": "managed", "hash": "4b6b3b61c2e5ebc12d9f4e3d5362f411e7d3d0b6" },
+    { "path": ".claude/skills/devkit-sync/collect.sh", "from": "core/skills/devkit-sync/collect.sh", "mode": "managed", "hash": "efaef9b8fa461de31fee558e8276fa6a2ff4f0b4" },
     { "path": ".claude/skills/implement-feature/SKILL.md", "from": "core/skills/implement-feature/SKILL.md", "mode": "managed", "hash": "9a8c6b96aaa43daf288a3cfc1f951e121b260d0e" },
     { "path": "CLAUDE.md", "from": "core/templates/CLAUDE.md", "mode": "template", "hash": "d8863f2c65063c92f9e7026d531995ffd4f19c25" },
     { "path": "AGENTS.md", "from": "core/templates/AGENTS.md", "mode": "template", "hash": "95e5e2990b6cdaa34b6aae051c84766f338d56fd" },
@@ -41,8 +41,8 @@
     { "path": "src/Tests/Architecture.Tests/ProjectLocation.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectLocation.cs", "mode": "template", "hash": "b5f2c54f566a3e586ff90aadd613aea92e9f8094" },
     { "path": "src/Tests/Architecture.Tests/ReferenceTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ReferenceTests.cs", "mode": "template", "hash": "e1e606b40e275cfb517812be0180da333f42c986" },
     { "path": "src/Tests/Architecture.Tests/SolutionTree.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/SolutionTree.cs", "mode": "template", "hash": "d5ba7960cff833ea722b91331f6b53fe2e237b0b" },
-    { "path": "AGENTS.github.md", "from": "forges/github/AGENTS.github.md", "mode": "managed", "hash": "1a5f17c1846ef7092e2d5e5c6c3efb0f8d4abf73" },
-    { "path": ".devkit/forge.sh", "from": "forges/github/forge.sh", "mode": "managed", "hash": "c954a20fa222e9c9d0894e396c25ba058337cc96" }
+    { "path": "AGENTS.github.md", "from": "forges/github/AGENTS.github.md", "mode": "managed", "hash": "8d8962de643dc0365a82ef5763c1e249b90b7801" },
+    { "path": ".devkit/forge.sh", "from": "forges/github/forge.sh", "mode": "managed", "hash": "21ca6807048f1d3425bddce6f972d53dce1bd47b" }
   ],
   "deviations": [
     { "slug": "dotnet.layout", "scope": "src/", "reason": "Provisional. The layer cut applies per service: services under src/Platform/<Service>/, modules under src/Modules/<Module>/, plus src/Aspire/, src/Shared/ and src/Sdk/; a service without business rules is a single project. Revisit with the first service tickets. Recorded in the Deviations table of AGENTS.md.", "decidedAt": "5af251c" }
