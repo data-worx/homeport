@@ -99,8 +99,9 @@ src/
   Shared/Homeport.Contracts
   Sdk/Homeport.Module.Sdk
   Platform/<Service>/Homeport.<Service>
-  Platform/<Service>/Homeport.<Service>.Domain | .Application | .Infrastructure | .Api
-  Modules/<Module>/Homeport.Modules.<Module>[.Domain | .Application | .Infrastructure | .Api]
+  Platform/<Service>/Homeport.<Service>.Domain | .Application | .Infrastructure | .Api [| .Worker]
+  Modules/<Module>/Homeport.Modules.<Module>.Domain | .Application | .Infrastructure | .Api [| .Worker]
+  Tools/
   Tests/
 ```
 
@@ -113,8 +114,20 @@ src/
 - A service never references another service's projects. Services talk over
   HTTP or messages; shared types live in `Homeport.Contracts`.
 - Modules are reachable only through the gateway.
-- `Architecture.Tests` asserts the per-service rule, not the single-application
-  layout of the template.
+- A project's directory carries its name, and a project of a service or
+  module is named for it as in the tree above.
+- Inside a service or module the arrow points inwards: Domain references
+  nothing beyond the BCL and the exceptions listed in
+  `src/Tests/Architecture.Tests/DomainExceptions.cs`; Application its own
+  Domain; Infrastructure its own Application and Domain; a host (`.Api`,
+  `.Worker`) its own inner layers. All but Domain may reference
+  `src/Shared/` and `src/Sdk/`.
+- `src/Shared/` and `src/Sdk/` reference no service or module.
+- `src/Aspire/` references hosts and `src/Shared/` only — never an inner
+  layer.
+- Tools and tests are unrestricted.
+- `Architecture.Tests` asserts the layout, naming and reference rules above,
+  each also against a fixture tree that breaks it.
 - Messages between services (for example `UsageRecorded`) are contracts in
   `Homeport.Contracts`. Changing one is a breaking change for every consumer.
 
