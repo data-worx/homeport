@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace Architecture.Tests;
 
 /// <summary>Where a project lives, which tells the tests what it is.</summary>

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace Architecture.Tests;
 
 /// <summary>One <c>.csproj</c> under <c>src/</c>, with what it references.</summary>
