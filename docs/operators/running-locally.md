@@ -40,9 +40,31 @@ Open the login link. The dashboard lists `postgres`, `rabbitmq`, `valkey` and
 `keycloak`; each reaches the state *Healthy* within a minute, longer on the
 first run while the images are pulled.
 
-The AppHost generates the passwords of all four and keeps them in the .NET
-user secrets of the AppHost project. `Ctrl+C` stops everything and removes the
-containers.
+`Ctrl+C` stops everything and removes the containers.
+
+### Credentials
+
+The AppHost generates the passwords of all four on its first start and keeps
+them in the .NET user secrets of the AppHost project, on your machine only.
+List them from the repository root:
+
+```bash
+dotnet user-secrets list --project src/Aspire/Homeport.AppHost
+```
+
+```text
+Parameters:valkey-password = …
+Parameters:rabbitmq-password = …
+Parameters:postgres-password = …
+Parameters:keycloak-password = …
+```
+
+The dashboard shows the same values under the parameter resources, masked
+until revealed.
+
+Keycloak's admin console is at <http://localhost:8080/admin>. Sign in as
+`admin` with `keycloak-password`. Keycloak takes the longest of the four to
+become healthy, around half a minute.
 
 ## With Docker Compose
 
