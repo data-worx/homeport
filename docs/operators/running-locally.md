@@ -13,7 +13,8 @@ installation the operator brings their own identity provider.
 ## Prerequisites
 
 - Docker, running
-- For the AppHost: the .NET 10 SDK
+- For the AppHost: the .NET 10 SDK, and a trusted development certificate
+  (`dotnet dev-certs https --trust`, once per machine)
 - For Compose: a shell with `openssl` — on Windows, Git Bash
 
 ## With the AppHost
@@ -24,10 +25,14 @@ From the repository root:
 dotnet run --project src/Aspire/Homeport.AppHost
 ```
 
+In Visual Studio or Rider, make `Homeport.AppHost` the startup project and
+start it; the IDE opens the dashboard itself. Both use the launch profile
+`https`; the profile `http` runs without TLS.
+
 The output ends with the dashboard address and a login link:
 
 ```text
-Login to the dashboard at https://localhost:<port>/login?t=<token>
+Login to the dashboard at https://localhost:17000/login?t=<token>
 Distributed application started. Press Ctrl+C to shut down.
 ```
 
