@@ -2,11 +2,23 @@
 
 namespace Architecture.Tests;
 
-/// <summary>Where a project lives, which tells the tests what it is.</summary>
+/// <summary>Where a project lives under <c>src/</c>, which tells the tests what it is.</summary>
 internal enum ProjectLocation
 {
-    /// <summary><c>src/Core/&lt;project&gt;/</c> - the application itself.</summary>
-    Core,
+    /// <summary><c>src/Aspire/&lt;project&gt;/</c> - the AppHost, which orchestrates the deployables.</summary>
+    Aspire,
+
+    /// <summary><c>src/Shared/&lt;project&gt;/</c> - code every service may build on, such as the contracts.</summary>
+    Shared,
+
+    /// <summary><c>src/Sdk/&lt;project&gt;/</c> - the module SDK.</summary>
+    Sdk,
+
+    /// <summary><c>src/Platform/&lt;Service&gt;/&lt;project&gt;/</c> - a project of a platform service.</summary>
+    Platform,
+
+    /// <summary><c>src/Modules/&lt;Module&gt;/&lt;project&gt;/</c> - a project of a business module.</summary>
+    Modules,
 
     /// <summary><c>src/Tools/&lt;project&gt;/</c> - a development tool.</summary>
     Tools,
@@ -14,9 +26,6 @@ internal enum ProjectLocation
     /// <summary><c>src/Tests/&lt;project&gt;/</c> - a test project.</summary>
     Tests,
 
-    /// <summary><c>src/&lt;project&gt;/</c> - a UI, and therefore a composition root.</summary>
-    Ui,
-
-    /// <summary>Anywhere else, which <c>dotnet.layout</c> does not allow.</summary>
+    /// <summary>Anywhere else, which the layout does not allow.</summary>
     Elsewhere,
 }

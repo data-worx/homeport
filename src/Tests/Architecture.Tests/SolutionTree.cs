@@ -5,8 +5,8 @@ using System.Xml.Linq;
 namespace Architecture.Tests;
 
 /// <summary>
-/// The repository as the tests see it: its root, and every project file under
-/// <c>src/</c>, read once.
+/// The repository as the tests see it: its root, its solution files, and every
+/// project file under <c>src/</c>, read once.
 /// </summary>
 internal static class SolutionTree
 {
@@ -16,12 +16,11 @@ internal static class SolutionTree
 
     internal static readonly IReadOnlyList<ProjectFile> Projects = ReadProjects();
 
-    internal static IEnumerable<string> SolutionFiles(string directory, SearchOption searchOption)
-    {
-        return Directory.EnumerateFiles(directory, "*.slnx", searchOption)
-            .Concat(Directory.EnumerateFiles(directory, "*.sln", searchOption))
-            .Where(path => !IsBuildOutput(path));
-    }
+    /// <summary>
+    /// Every solution file in the root and anywhere under <c>src/</c>, relative to
+    /// the root with <c>/</c> as separator.
+    /// </summary>
+    internal static readonly IReadOnlyList<string> SolutionPaths = ReadSolutionPaths();
 
     /// <summary>
     /// Walks up from the test assembly to the directory holding <c>.git</c>. Not
@@ -54,6 +53,21 @@ internal static class SolutionTree
             .ToList();
     }
 
+    private static List<string> ReadSolutionPaths()
+    {
+        return SolutionFiles(Root, SearchOption.TopDirectoryOnly)
+            .Concat(SolutionFiles(Source, SearchOption.AllDirectories))
+            .Select(path => Path.GetRelativePath(Root, path).Replace('\\', '/'))
+            .ToList();
+    }
+
+    private static IEnumerable<string> SolutionFiles(string directory, SearchOption searchOption)
+    {
+        return Directory.EnumerateFiles(directory, "*.slnx", searchOption)
+            .Concat(Directory.EnumerateFiles(directory, "*.sln", searchOption))
+            .Where(path => !IsBuildOutput(path));
+    }
+
     private static ProjectFile Read(string path)
     {
         var directory = Path.GetRelativePath(Source, Path.GetDirectoryName(path)!).Replace('\\', '/');
@@ -62,31 +76,8 @@ internal static class SolutionTree
         return new ProjectFile(
             Path.GetFileNameWithoutExtension(path),
             directory,
-            LocationOf(directory),
             Includes(document, "ProjectReference").Select(ProjectName).ToList(),
             Includes(document, "PackageReference").ToList());
-    }
-
-    private static ProjectLocation LocationOf(string relativeDirectory)
-    {
-        var segments = relativeDirectory.Split('/');
-        if (segments.Length == 1)
-        {
-            return ProjectLocation.Ui;
-        }
-
-        if (segments.Length != 2)
-        {
-            return ProjectLocation.Elsewhere;
-        }
-
-        return segments[0] switch
-        {
-            "Core" => ProjectLocation.Core,
-            "Tools" => ProjectLocation.Tools,
-            "Tests" => ProjectLocation.Tests,
-            _ => ProjectLocation.Elsewhere,
-        };
     }
 
     /// <summary>
