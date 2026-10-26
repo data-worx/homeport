@@ -8,7 +8,7 @@ set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
-SLN="TODO-set-the-solution-path"
+SLN="Homeport.slnx"
 
 # The project whose `dotnet publish` output is shipped, e.g.
 # "src/Acme.Shell/Acme.Shell.csproj". Set it when the repository ships a

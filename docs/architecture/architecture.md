@@ -13,7 +13,7 @@ binding rules — the dependency direction, who may reference what — live in t
 
 | Project | Role | May depend on |
 |---|---|---|
-| `Architecture.Tests` | Asserts the reference graph and the layout (devkit template, not yet in a solution) | — |
+| `Architecture.Tests` | Asserts the reference graph and the layout (devkit template, solution folder `/Tests/`) | — |
 
 No production project exists yet. The target picture is in
 [vision.md](vision.md); the binding layout is in
@@ -22,6 +22,8 @@ No production project exists yet. The target picture is in
 ## Directory layout
 
 ```text
+Homeport.slnx
+Directory.Packages.props
 src/
   Directory.Build.props
   Tests/
