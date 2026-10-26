@@ -2,7 +2,7 @@
 # The gates that must be green before a commit. Project-owned: devkit-sync
 # never overwrites this file, so adjust the commands to fit the repository.
 #
-# Usage:  bash .devkit/gates.sh [build|test|format|notices|all]
+# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|all]
 #         (no argument means all)
 set -uo pipefail
 
@@ -45,6 +45,29 @@ gate_notices() {
   return "${rc}"
 }
 
+# Regenerates the compose file from the AppHost into a temporary directory and
+# compares it with the committed one, the way the notices gate does. The
+# generated .env holds the variable names only; it is committed as .env.example.
+# To update the committed files after a change to the AppHost:
+#   out="$(mktemp -d)"
+#   dotnet run --project src/Aspire/Homeport.AppHost -- --operation publish \
+#     --step publish --output-path "$(cygpath -w "${out}" 2>/dev/null || echo "${out}")"
+#   cp "${out}/docker-compose.yaml" deploy/compose/
+#   cp "${out}/.env" deploy/compose/.env.example
+gate_compose() {
+  local generated native rc=0
+  generated="$(mktemp -d)"
+  native="$(cygpath -w "${generated}" 2>/dev/null || echo "${generated}")"
+  # The AppHost writes .env with the platform's line endings; compare without them.
+  dotnet run --project src/Aspire/Homeport.AppHost -- --operation publish \
+      --step publish --output-path "${native}" > /dev/null \
+    && diff -u --strip-trailing-cr deploy/compose/docker-compose.yaml "${generated}/docker-compose.yaml" \
+    && diff -u --strip-trailing-cr deploy/compose/.env.example "${generated}/.env" \
+    || rc=1
+  rm -rf "${generated}"
+  return "${rc}"
+}
+
 # Expectation per gate, printed when a gate fails.
 gate_expectation() {
   case "$1" in
@@ -52,12 +75,13 @@ gate_expectation() {
     test)    echo "all tests green" ;;
     format)  echo "no formatting changes needed" ;;
     notices) echo "THIRD-PARTY-NOTICES.md matches what the shipped project publishes" ;;
+    compose) echo "deploy/compose/ matches what the AppHost publishes" ;;
   esac
 }
 
 # --- runner, do not edit below unless you know why ---------------------------
 
-GATES="build test format notices"
+GATES="build test format notices compose"
 
 # A gate returns 77 when it does not apply to this repository; its last line of
 # output says why.

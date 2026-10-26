@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: "docker.io/library/postgres@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    expose:
+      - "5432"
+    networks:
+      - "aspire"
+  rabbitmq:
+    image: "docker.io/library/rabbitmq@sha256:8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75"
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD}"
+    expose:
+      - "5672"
+    networks:
+      - "aspire"
+  valkey:
+    image: "docker.io/valkey/valkey@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd"
+    command:
+      - "-c"
+      - "valkey-server --requirepass $$VALKEY_PASSWORD"
+    entrypoint:
+      - "/bin/sh"
+    environment:
+      VALKEY_PASSWORD: "${VALKEY_PASSWORD}"
+    expose:
+      - "6379"
+    networks:
+      - "aspire"
+  keycloak:
+    image: "quay.io/keycloak/keycloak@sha256:0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4"
+    command:
+      - "start-dev"
+      - "--import-realm"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
+      KC_BOOTSTRAP_ADMIN_PASSWORD: "${KEYCLOAK_PASSWORD}"
+      KC_HEALTH_ENABLED: "true"
+      KC_FEATURES: "opentelemetry"
+    expose:
+      - "8080"
+      - "9000"
+    networks:
+      - "aspire"
+networks:
+  aspire:
+    driver: "bridge"

@@ -9,4 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Nothing yet.
+- Homeport starts locally with its infrastructure — PostgreSQL, RabbitMQ,
+  Valkey and Keycloak — either through the .NET Aspire AppHost or through a
+  Docker Compose file generated from it. Every third-party image is pinned by
+  digest. See [running Homeport locally](docs/operators/running-locally.md).
