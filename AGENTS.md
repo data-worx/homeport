@@ -143,6 +143,10 @@ Security-critical. No exception without an ADR.
 
 ## Gateway
 
+- Modules are reached under `/modules/{moduleId}/{path}`, platform
+  endpoints under `/platform/{path}`. The gateway strips the prefix, and the
+  module id `platform` is reserved. See
+  [ADR-0013](docs/architecture/adr/0013-url-scheme-and-api-versioning.md).
 - The gateway strips every incoming `X-Homeport-*` header.
 - The gateway calls a module with its own short-lived signed token: audience
   the module id, claims tenant, client, subject and scopes. A module trusts
