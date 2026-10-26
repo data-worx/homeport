@@ -44,6 +44,8 @@ holder license your contribution under other terms as well — see
    bash .devkit/gates.sh
    ```
 
+   CI runs the same gates on every pull request.
+
 4. Open a pull request against `main`, titled like a commit
    (`<type>: <summary> (#<issue>)`), with `Closes #<issue>` in the body.
 5. Answer review comments in the pull request. Pull requests are
