@@ -152,9 +152,33 @@ Security-critical. No exception without an ADR.
   the module id, claims tenant, client, subject and scopes. A module trusts
   only that token, validates it against the gateway's JWKS and never talks to
   the identity provider. See ADR-0011.
+- The gateway calls platform services with service tokens, as
+  *Service-to-service* and
+  [ADR-0014](docs/architecture/adr/0014-authentication-between-services.md)
+  prescribe.
 - W3C `traceparent` is propagated to the module.
 - If the registry is unavailable, the gateway keeps serving the last known
   routes.
+
+## Service-to-service
+
+Security-critical. No exception without an ADR. See
+[ADR-0014](docs/architecture/adr/0014-authentication-between-services.md).
+
+- Every call between components — HTTP, registration and messaging — is
+  authenticated as its concrete caller. Reaching the internal network
+  grants nothing.
+- No secret is shared between callers. Tokens are audience-bound and
+  short-lived. A long-lived secret belongs to exactly one caller, serves
+  one purpose and rotates without downtime.
+- In v0.1 only the gateway calls platform services, with a service token it
+  issues with the same key as module tokens: audience the called component,
+  subject `homeport-gateway`, lifetime at most 5 minutes. A service rejects
+  a request without a valid token for its own audience with `401`.
+- Any other caller gets its mechanism through an ADR that meets these
+  rules.
+- Traffic between components is not encrypted by Homeport until mTLS is
+  decided; that is left to the operator's network.
 
 ## Throttling
 
