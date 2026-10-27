@@ -47,6 +47,17 @@ services:
       - "9000"
     networks:
       - "aspire"
+  echo:
+    image: "${ECHO_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${ECHO_PORT}"
+      OTEL_SERVICE_NAME: "homeport-module-echo"
+    expose:
+      - "${ECHO_PORT}"
+    networks:
+      - "aspire"
 networks:
   aspire:
     driver: "bridge"

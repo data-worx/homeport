@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Empty: Echo has no use case beyond returning the request body, which the
+       host does. The module is cut from the start (AGENTS.md, Architecture). -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Homeport.Modules.Echo.Domain\Homeport.Modules.Echo.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
