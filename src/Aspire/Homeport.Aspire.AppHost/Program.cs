@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Shared.ServiceDefaults;
+
 namespace Homeport.Aspire.AppHost;
 
 /// <summary>
@@ -44,7 +46,7 @@ public static class Program
         // follows the observability rule instead.
         builder.AddProject<Projects.Homeport_Modules_Echo_Api>("echo")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-module-echo")
-            .WithHttpHealthCheck("/health/ready");
+            .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
 
         builder.Build().Run();
     }

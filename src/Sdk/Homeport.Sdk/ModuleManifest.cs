@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 
 namespace Homeport.Sdk;
 
@@ -33,7 +34,8 @@ public sealed partial record ModuleManifest(
 
     private const string ReservedId = "platform";
 
-    private static readonly string[] Methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+    private static readonly string[] Methods =
+        [HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Patch, HttpMethods.Delete];
 
     /// <summary>The version of the module contract the module implements.</summary>
     public int ContractVersion => CurrentContractVersion;

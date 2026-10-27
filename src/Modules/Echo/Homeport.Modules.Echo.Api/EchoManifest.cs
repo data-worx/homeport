@@ -21,7 +21,7 @@ internal static class EchoManifest
             Id: "echo",
             Name: "Echo",
             Version: ModuleVersion.Of(typeof(EchoManifest).Assembly),
-            Routes: [new ManifestRoute("POST", EchoPath, InvokeScope, RequestsMeter, Quantity: 1)],
+            Routes: [new ManifestRoute(HttpMethods.Post, EchoPath, InvokeScope, RequestsMeter, Quantity: 1)],
             Scopes: [InvokeScope],
             Meters: [RequestsMeter]);
     }

@@ -23,4 +23,9 @@
     <ProjectReference Include="..\..\Modules\Echo\Homeport.Modules.Echo.Api\Homeport.Modules.Echo.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- A library, not a resource: the AppHost reads its health paths. -->
+    <ProjectReference Include="..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" IsAspireProjectResource="false" />
+  </ItemGroup>
+
 </Project>

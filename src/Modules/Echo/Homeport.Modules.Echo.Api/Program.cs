@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Net.Mime;
 using Homeport.Sdk;
 
 namespace Homeport.Modules.Echo.Api;
@@ -28,7 +29,7 @@ public sealed class Program
         // with #47 ("issue module tokens and check scopes"); it then requires
         // EchoManifest.InvokeScope.
         app.MapPost(EchoManifest.EchoPath, (HttpRequest request) =>
-                Results.Stream(request.Body, request.ContentType ?? "application/octet-stream"))
+                Results.Stream(request.Body, request.ContentType ?? MediaTypeNames.Application.Octet))
             .WithSummary("Returns the request body unchanged.")
             .AllowAnonymous();
 

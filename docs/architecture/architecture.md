@@ -13,7 +13,7 @@ binding rules — the dependency direction, who may reference what — live in t
 
 | Project | Role | May depend on |
 |---|---|---|
-| `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL, RabbitMQ, Valkey, Keycloak and the Echo module, and generates `deploy/compose/` | `Homeport.Modules.Echo.Api` |
+| `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL, RabbitMQ, Valkey, Keycloak and the Echo module, and generates `deploy/compose/` | `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Shared.ServiceDefaults` | What every service sets up the same way: OpenTelemetry over OTLP, health endpoints, service discovery, resilient HTTP clients | nothing |
 | `Homeport.Sdk` | What a .NET module needs to meet the module contract: the manifest, its validation, and the manifest, OpenAPI and health endpoints | `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Modules.Echo.Domain` | Empty: Echo has no business rules | nothing |
