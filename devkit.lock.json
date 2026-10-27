@@ -1,10 +1,10 @@
 {
   "source": "https://github.com/raisr/devkit",
-  "version": { "commit": "dceba58", "date": "2026-10-26" },
+  "version": { "commit": "0d5674e", "date": "2026-10-27" },
   "bootstrappedAt": "2026-10-19",
   "flavors": { "stacks": ["dotnet-core"], "forge": "github" },
   "files": [
-    { "path": "AGENTS.core.md", "from": "core/AGENTS.core.md", "mode": "managed", "hash": "6fa1c8adb37014b57c5098407b38759c011f4a0a" },
+    { "path": "AGENTS.core.md", "from": "core/AGENTS.core.md", "mode": "managed", "hash": "8ae6e5957d89c853904a6ec542f841b92dba39da" },
     { "path": ".gitattributes", "from": "core/gitattributes.block", "mode": "block", "hash": "ae43fabd3c3bc557f11f6b8825fade04ccd4932e", "marker": "devkit:core" },
     { "path": ".editorconfig", "from": "core/editorconfig.block", "mode": "block", "hash": "2c002993f8f9ecb549bff090be1847036c171dc7", "marker": "devkit:core" },
     { "path": ".gitignore", "from": "core/gitignore.block", "mode": "block", "hash": "c82f916f9a1c57f7f7ee55ac949ed0613db652b8", "marker": "devkit:core" },
@@ -26,7 +26,7 @@
     { "path": "AGENTS.dotnet.md", "from": "shared/dotnet/AGENTS.dotnet.md", "mode": "managed", "hash": "2860d6546a1f011a8072ef48a987f0f53b98bb6d" },
     { "path": ".editorconfig", "from": "shared/dotnet/editorconfig.block", "mode": "block", "hash": "06a9f7728ed1aa66dbccd42d57203178b14a5997", "marker": "devkit:shared/dotnet" },
     { "path": ".gitignore", "from": "shared/dotnet/gitignore.block", "mode": "block", "hash": "828a634adefc01e53bf3f9c6999b7cc7fdc6989c", "marker": "devkit:shared/dotnet" },
-    { "path": "AGENTS.dotnet-core.md", "from": "stacks/dotnet-core/AGENTS.dotnet-core.md", "mode": "managed", "hash": "17995e8ff7566fa66267c037aba9ef802bddcee1" },
+    { "path": "AGENTS.dotnet-core.md", "from": "stacks/dotnet-core/AGENTS.dotnet-core.md", "mode": "managed", "hash": "ae2a5337c82baa4c7fa8b914d16dfabb38fcaaf5" },
     { "path": ".editorconfig", "from": "stacks/dotnet-core/editorconfig.block", "mode": "block", "hash": "9f175d04e2b253e5154d6d4dac3320cc4481c244", "marker": "devkit:stack/dotnet-core" },
     { "path": ".devkit/gates.sh", "from": "stacks/dotnet-core/templates/gates.sh", "mode": "template", "hash": "27658814e7c618ea0735b6a30cce24acf7c3cfcc" },
     { "path": "src/Directory.Build.props", "from": "stacks/dotnet-core/templates/Directory.Build.props", "mode": "template", "hash": "a085eac0260783ff4ef91a44450de23fe7dc159d" },
