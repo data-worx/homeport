@@ -40,6 +40,12 @@ public static class Program
             .WithImageSHA256("0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4")
             .PublishAsDockerComposeService((_, service) => service.Command = ["start-dev", "--import-realm"]);
 
+        // Modules. The resource is named after the module id; service.name
+        // follows the observability rule instead.
+        builder.AddProject<Projects.Homeport_Modules_Echo_Api>("echo")
+            .WithEnvironment("OTEL_SERVICE_NAME", "homeport-module-echo")
+            .WithHttpHealthCheck("/health/ready");
+
         builder.Build().Run();
     }
 }

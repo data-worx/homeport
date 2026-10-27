@@ -11,6 +11,12 @@ Arranged by reader. A directory exists once it has its first document.
 |---|---|
 | [`operators/running-locally.md`](operators/running-locally.md) | Starting Homeport on one machine, with the AppHost or with Docker Compose |
 
+## Module developers — building a module on the contract and the SDK
+
+| Document | About |
+|---|---|
+| [`module-developers/declaring-a-manifest.md`](module-developers/declaring-a-manifest.md) | Declaring and serving a module's manifest with `Homeport.Sdk` |
+
 ## Architecture — why Homeport is built the way it is
 
 | Document | About |

@@ -1,0 +1,94 @@
+# Declaring a manifest with the SDK
+
+Every module tells Homeport what it is at
+`GET /.well-known/homeport/manifest`: its id, version, routes, scopes and
+meters. The [module contract](../reference/module-contract/README.md) defines
+the fields. A module written in .NET declares its manifest in code, and the
+SDK, `Homeport.Sdk`, serves it together with the other endpoints the contract
+requires. The Echo module in `src/Modules/Echo/` is the reference.
+
+The SDK is not published as a NuGet package yet; reference the project
+`src/Sdk/Homeport.Sdk` directly.
+
+## Declare the manifest
+
+```csharp
+var manifest = new ModuleManifest(
+    Id: "contracts",
+    Name: "Contracts",
+    Version: ModuleVersion.Of(typeof(Program).Assembly),
+    Routes:
+    [
+        new ManifestRoute("GET", "/v1/contracts", Scope: "contracts.read", Meter: "requests", Quantity: 1),
+        new ManifestRoute("POST", "/v1/contracts/scan", Scope: "contracts.write", Meter: "documents", Quantity: 1),
+    ],
+    Scopes: ["contracts.read", "contracts.write"],
+    Meters: ["requests", "documents"]);
+```
+
+- **`Id`** is the module's stable name. It appears in the URL callers use,
+  `/modules/{id}/…`, in metrics and in `service.name`. Lower-case letters,
+  digits and `-`, starting with a letter; `platform` is reserved.
+- **`Version`** is the module's own SemVer version. `ModuleVersion.Of` reads
+  it from the assembly, so it follows the build's `Version` and carries the
+  commit as build metadata, for example `0.1.0+c1fef1c…`.
+- **`Routes`** lists every endpoint the module serves. A path starts with
+  `/v{major}/`. The scope is what a caller needs, the meter and quantity are
+  what one request counts.
+- **`Scopes`** and **`Meters`** list every scope and meter the routes use.
+
+`contractVersion` and `openApiUrl` are not declared: the SDK sets them to
+the contract version it implements and to the OpenAPI document it serves.
+
+## Serve it
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+builder.AddHomeportModule(manifest);
+
+var app = builder.Build();
+app.MapHomeportModule();
+
+// The module's own endpoints, one per route in the manifest.
+app.MapGet("/v1/contracts", …);
+
+app.Run();
+```
+
+`AddHomeportModule` checks the manifest against the contract and refuses to
+start when it breaks it. The exception lists every problem, for example a
+route whose scope is not in `Scopes`. It also adds the Homeport service
+defaults: OpenTelemetry, health checks and service discovery.
+
+`MapHomeportModule` maps, all of them anonymous:
+
+| Endpoint | Serves |
+|---|---|
+| `GET /.well-known/homeport/manifest` | The manifest |
+| `GET /openapi/v1.json` | The OpenAPI document of the module's endpoints |
+| `GET /health/live` | Whether the process is alive |
+| `GET /health/ready` | Whether the module can take traffic |
+
+## Check it
+
+Run the module and read the manifest back. For Echo, through the AppHost:
+open the dashboard, follow the endpoint of `echo` and append
+`/.well-known/homeport/manifest`. The response looks like this:
+
+```json
+{
+  "id": "echo",
+  "name": "Echo",
+  "version": "0.1.0+c1fef1c…",
+  "routes": [
+    { "method": "POST", "path": "/v1/echo", "scope": "echo.invoke", "meter": "requests", "quantity": 1 }
+  ],
+  "scopes": ["echo.invoke"],
+  "meters": ["requests"],
+  "contractVersion": 0,
+  "openApiUrl": "/openapi/v1.json"
+}
+```
+
+Until the gateway forwards to modules, a module's endpoints are reachable only
+inside the AppHost or compose network, and they do not check a token yet.
