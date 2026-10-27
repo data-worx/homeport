@@ -91,6 +91,10 @@ Conversely: no documentation is written for something that does not exist yet.
   responsibility, open/closed, Liskov substitution, interface segregation,
   dependency inversion. A change that violates one may be rejected in review
   even when it compiles and the tests pass.
+- **No magic strings or numbers.** A literal that carries meaning is a named
+  constant; where the platform already defines one, use it. A literal in a
+  test that states the expected wire format, such as an expected JSON body, is
+  the expectation itself, not a magic value.
 - The editor configuration in the repository root is binding and overrules any
   differing opinion.
 
