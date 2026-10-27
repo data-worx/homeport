@@ -45,6 +45,12 @@ public static class HomeportModuleExtensions
     /// All of them are anonymous on purpose: the registry and the gateway read the
     /// manifest and the OpenAPI document, and container runtimes probe health,
     /// before any token exists. They describe the module, never tenant data.
+    /// <para>
+    /// They are mapped here rather than served by controllers (<c>dotnet-core.web</c>):
+    /// they are contract plumbing a module neither writes nor changes, like the
+    /// framework-mapped endpoints the rule exempts, and a controller would have to
+    /// be pushed into every module as an application part.
+    /// </para>
     /// </remarks>
     public static WebApplication MapHomeportModule(this WebApplication app)
     {

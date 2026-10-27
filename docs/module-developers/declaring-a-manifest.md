@@ -45,14 +45,25 @@ the contract version it implements and to the OpenAPI document it serves.
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 builder.AddHomeportModule(manifest);
+builder.Services.AddControllers();
 
 var app = builder.Build();
 app.MapHomeportModule();
-
-// The module's own endpoints, one per route in the manifest.
-app.MapGet("/v1/contracts", …);
+app.MapControllers();
 
 app.Run();
+```
+
+The module's own endpoints are controllers, one action per route in the
+manifest:
+
+```csharp
+[ApiController]
+public sealed class ContractsController : ControllerBase
+{
+    [HttpGet("/v1/contracts")]
+    public IActionResult List() { … }
+}
 ```
 
 `AddHomeportModule` checks the manifest against the contract and refuses to
