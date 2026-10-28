@@ -29,6 +29,20 @@ internal static class ReferenceRules
     }
 
     /// <summary>
+    /// Project and package references of the project named
+    /// <paramref name="contracts"/>, which may have none.
+    /// </summary>
+    internal static List<string> ContractsReferences(IReadOnlyList<ProjectFile> projects, string contracts)
+    {
+        return projects
+            .Where(project => project.Name == contracts)
+            .SelectMany(project => project.ProjectReferences
+                .Concat(project.PackageReferences)
+                .Select(reference => $"{project.Name} -> {reference}"))
+            .ToList();
+    }
+
+    /// <summary>
     /// References of a service or module project that break the layer rule:
     /// Application may reference its own Domain, Infrastructure its own
     /// Application and Domain, a host its own inner layers. All but Domain may

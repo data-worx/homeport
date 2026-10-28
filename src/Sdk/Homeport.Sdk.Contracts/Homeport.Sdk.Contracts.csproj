@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- BCL only: a Domain project may reference this one
+       (src/Tests/Architecture.Tests/DomainExceptions.cs), so it takes no
+       package and no project reference, and does no I/O. -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

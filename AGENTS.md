@@ -97,7 +97,7 @@ src/
   Aspire/Homeport.Aspire.AppHost
   Shared/Homeport.Shared.ServiceDefaults
   Shared/Homeport.Shared.Authentication
-  Shared/Homeport.Shared.Contracts
+  Sdk/Homeport.Sdk.Contracts
   Sdk/Homeport.Sdk
   Platform/<Service>/Homeport.Platform.<Service>
   Platform/<Service>/Homeport.Platform.<Service>.Domain | .Application | .Infrastructure | .Api [| .Worker]
@@ -114,7 +114,7 @@ src/
   Domain, Application, Infrastructure and a host project that is its
   composition root. Business modules are cut from the start.
 - A service never references another service's projects. Services talk over
-  HTTP or messages; shared types live in `Homeport.Shared.Contracts`.
+  HTTP or messages; shared types live in `Homeport.Sdk.Contracts`.
 - Modules are reachable only through the gateway.
 - A project is named `Homeport`, then every grouping directory between `src/`
   and the project, then its own name, as in the tree above
@@ -133,8 +133,10 @@ src/
 - Tools and tests are unrestricted.
 - `Architecture.Tests` asserts the layout, naming and reference rules above,
   each also against a fixture tree that breaks it.
+- `Homeport.Sdk.Contracts` holds the types the SDK and a Domain both need,
+  such as the result type, and references nothing beyond the BCL.
 - Messages between services (for example `UsageRecorded`) are contracts in
-  `Homeport.Shared.Contracts`. Changing one is a breaking change for every consumer.
+  `Homeport.Sdk.Contracts`. Changing one is a breaking change for every consumer.
 
 Current state: [docs/architecture/architecture.md](docs/architecture/architecture.md).
 
