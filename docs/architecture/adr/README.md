@@ -25,6 +25,7 @@ decision is a new ADR that supersedes the old one, and the old one is marked
 | [0013](0013-url-scheme-and-api-versioning.md) | URL scheme and API versioning | Accepted; URL scheme for module paths superseded by ADR-0015 |
 | [0014](0014-authentication-between-services.md) | Authentication between services | Accepted |
 | [0015](0015-operator-defined-module-groups.md) | Operator-defined module groups | Accepted |
+| [0016](0016-error-responses.md) | Error responses | Accepted |
 
 ## Template
 
