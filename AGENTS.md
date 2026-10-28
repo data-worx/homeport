@@ -96,6 +96,7 @@ Homeport.slnx
 src/
   Aspire/Homeport.Aspire.AppHost
   Shared/Homeport.Shared.ServiceDefaults
+  Shared/Homeport.Shared.Authentication
   Shared/Homeport.Shared.Contracts
   Sdk/Homeport.Sdk
   Platform/<Service>/Homeport.Platform.<Service>
