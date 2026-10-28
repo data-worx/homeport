@@ -9,6 +9,13 @@
     <Project Path="src/Modules/Echo/Homeport.Modules.Echo.Domain/Homeport.Modules.Echo.Domain.csproj" />
     <Project Path="src/Modules/Echo/Homeport.Modules.Echo.Infrastructure/Homeport.Modules.Echo.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Platform/" />
+  <Folder Name="/Platform/Gateway/">
+    <Project Path="src/Platform/Gateway/Homeport.Platform.Gateway.Api/Homeport.Platform.Gateway.Api.csproj" />
+    <Project Path="src/Platform/Gateway/Homeport.Platform.Gateway.Application/Homeport.Platform.Gateway.Application.csproj" />
+    <Project Path="src/Platform/Gateway/Homeport.Platform.Gateway.Domain/Homeport.Platform.Gateway.Domain.csproj" />
+    <Project Path="src/Platform/Gateway/Homeport.Platform.Gateway.Infrastructure/Homeport.Platform.Gateway.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Sdk/">
     <Project Path="src/Sdk/Homeport.Sdk/Homeport.Sdk.csproj" />
   </Folder>
@@ -19,6 +26,7 @@
     <Project Path="src/Tests/Architecture.Tests/Architecture.Tests.csproj" />
     <Project Path="src/Tests/Homeport.Aspire.AppHost.Tests.Integration/Homeport.Aspire.AppHost.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Modules.Echo.Api.Tests.Integration/Homeport.Modules.Echo.Api.Tests.Integration.csproj" />
+    <Project Path="src/Tests/Homeport.Platform.Gateway.Api.Tests.Integration/Homeport.Platform.Gateway.Api.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Sdk.Tests.Integration/Homeport.Sdk.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Sdk.Tests.Unit/Homeport.Sdk.Tests.Unit.csproj" />
     <Project Path="src/Tests/Homeport.Shared.ServiceDefaults.Tests.Integration/Homeport.Shared.ServiceDefaults.Tests.Integration.csproj" />

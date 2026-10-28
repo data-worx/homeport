@@ -92,7 +92,8 @@ open the dashboard, follow the endpoint of `echo` and append
   "name": "Echo",
   "version": "0.1.0+c1fef1c…",
   "routes": [
-    { "method": "POST", "path": "/v1/echo", "scope": "echo.invoke", "meter": "requests", "quantity": 1 }
+    { "method": "POST", "path": "/v1/echo", "scope": "echo.invoke", "meter": "requests", "quantity": 1 },
+    { "method": "GET", "path": "/v1/request", "scope": "echo.invoke", "meter": "requests", "quantity": 1 }
   ],
   "scopes": ["echo.invoke"],
   "meters": ["requests"],
@@ -101,5 +102,7 @@ open the dashboard, follow the endpoint of `echo` and append
 }
 ```
 
-Until the gateway forwards to modules, a module's endpoints are reachable only
-inside the AppHost or compose network, and they do not check a token yet.
+A module is reachable only inside the AppHost or compose network. Callers
+reach it through the gateway under `/modules/{id}/{path}`, today on a route the
+gateway is configured with; registration follows with the registry. A module
+does not check a token yet.

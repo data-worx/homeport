@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\Echo\Homeport.Modules.Echo.Api\Homeport.Modules.Echo.Api.csproj" />
+    <ProjectReference Include="..\..\Platform\Gateway\Homeport.Platform.Gateway.Api\Homeport.Platform.Gateway.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

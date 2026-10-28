@@ -44,9 +44,17 @@ public static class Program
 
         // Modules. The resource is named after the module id; service.name
         // follows the observability rule instead.
-        builder.AddProject<Projects.Homeport_Modules_Echo_Api>("echo")
+        var echo = builder.AddProject<Projects.Homeport_Modules_Echo_Api>("echo")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-module-echo")
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
+
+        // The one service with an external endpoint: modules are reachable only
+        // through it. It finds each module by its resource name.
+        builder.AddProject<Projects.Homeport_Platform_Gateway_Api>("gateway")
+            .WithEnvironment("OTEL_SERVICE_NAME", "homeport-gateway")
+            .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath)
+            .WithExternalHttpEndpoints()
+            .WithReference(echo);
 
         builder.Build().Run();
     }

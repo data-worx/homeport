@@ -18,3 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contract at start-up and serves it with the health endpoints and an OpenAPI
   document. Echo returns whatever it is sent and runs in the AppHost and the
   compose file. See [declaring a manifest](docs/module-developers/declaring-a-manifest.md).
+- The gateway, Homeport's single entry point. A request to
+  `/modules/echo/v1/echo` reaches the Echo module as `/v1/echo`; incoming
+  `X-Homeport-*` headers are removed and `traceparent` is passed on, so a
+  caller can neither impersonate the platform nor lose its trace. The gateway is
+  the only service with an external endpoint; modules stay on the internal
+  network. Echo gains `GET /v1/request`, which shows the headers it received.
+  See [calling a module](docs/api-consumers/calling-a-module.md).
