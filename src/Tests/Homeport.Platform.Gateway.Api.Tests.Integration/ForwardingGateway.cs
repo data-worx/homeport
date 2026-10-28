@@ -36,7 +36,7 @@ public sealed class ForwardingGateway : IAsyncLifetime
         await module.StartAsync();
 
         gateway = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(host => host.UseSetting(EchoEndpointKey, module.Urls.Single()));
+            .WithWebHostBuilder(host => host.WithSigningKey().UseSetting(EchoEndpointKey, module.Urls.Single()));
     }
 
     public async Task DisposeAsync()

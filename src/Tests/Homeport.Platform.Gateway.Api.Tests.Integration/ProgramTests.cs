@@ -2,6 +2,8 @@
 
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Options;
 
 namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 
@@ -59,6 +61,14 @@ public sealed class ProgramTests
             var response = await gateway.CreateClient().GetAsync("/modules/unknown/v1/request");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Does_Not_Start_Without_A_Signing_Key()
+        {
+            await using var unconfigured = new WebApplicationFactory<Program>();
+
+            Assert.Throws<OptionsValidationException>(() => unconfigured.CreateClient());
         }
 
         private async Task<ForwardedRequest> Send(HttpRequestMessage request)

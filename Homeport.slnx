@@ -28,6 +28,7 @@
     <Project Path="src/Tests/Homeport.Aspire.AppHost.Tests.Integration/Homeport.Aspire.AppHost.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Modules.Echo.Api.Tests.Integration/Homeport.Modules.Echo.Api.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Platform.Gateway.Api.Tests.Integration/Homeport.Platform.Gateway.Api.Tests.Integration.csproj" />
+    <Project Path="src/Tests/Homeport.Platform.Gateway.Infrastructure.Tests.Unit/Homeport.Platform.Gateway.Infrastructure.Tests.Unit.csproj" />
     <Project Path="src/Tests/Homeport.Sdk.Tests.Integration/Homeport.Sdk.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Sdk.Tests.Unit/Homeport.Sdk.Tests.Unit.csproj" />
     <Project Path="src/Tests/Homeport.Shared.Authentication.Tests.Integration/Homeport.Shared.Authentication.Tests.Integration.csproj" />
