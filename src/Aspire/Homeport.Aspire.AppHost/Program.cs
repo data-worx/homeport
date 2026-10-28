@@ -48,10 +48,22 @@ public static class Program
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-module-echo")
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
 
+        // The gateway's signing key. A local run generates one and keeps it in
+        // the user secrets; the compose file takes it from the environment. The
+        // additional public key is empty until a rotation needs it.
+        var signingKey = builder.AddParameter("gateway-signing-key", new GeneratedSigningKey(), secret: true, persist: true);
+        var signingKeyId = builder.AddParameter("gateway-signing-key-id", "local");
+        var additionalPublicKey = builder.AddParameter("gateway-additional-public-key", string.Empty);
+        var additionalKeyId = builder.AddParameter("gateway-additional-key-id", string.Empty);
+
         // The one service with an external endpoint: modules are reachable only
         // through it. It finds each module by its resource name.
         builder.AddProject<Projects.Homeport_Platform_Gateway_Api>("gateway")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-gateway")
+            .WithEnvironment("Signing__Key", signingKey)
+            .WithEnvironment("Signing__KeyId", signingKeyId)
+            .WithEnvironment("Signing__AdditionalPublicKey", additionalPublicKey)
+            .WithEnvironment("Signing__AdditionalKeyId", additionalKeyId)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath)
             .WithExternalHttpEndpoints()
             .WithReference(echo);

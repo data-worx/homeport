@@ -89,6 +89,16 @@ public sealed class ProgramTests
             Assert.Equal(traceId, headers.GetProperty("traceparent").GetString()?.Split('-')[1]);
         }
 
+        [Fact]
+        public async Task Publishes_The_Signing_Key_Through_The_Gateway()
+        {
+            var gateway = await Gateway();
+
+            var jwks = JsonDocument.Parse(await gateway.GetStringAsync("/.well-known/jwks.json")).RootElement;
+
+            Assert.Equal("local", Assert.Single(jwks.GetProperty("keys").EnumerateArray()).GetProperty("kid").GetString());
+        }
+
         private async Task<HttpClient> Gateway()
         {
             using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);

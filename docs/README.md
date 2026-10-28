@@ -10,6 +10,7 @@ Arranged by reader. A directory exists once it has its first document.
 | Document | About |
 |---|---|
 | [`operators/running-locally.md`](operators/running-locally.md) | Starting Homeport on one machine, with the AppHost or with Docker Compose |
+| [`operators/signing-key.md`](operators/signing-key.md) | Generating, configuring and rotating the gateway's signing key |
 
 ## Module developers — building a module on the contract and the SDK
 

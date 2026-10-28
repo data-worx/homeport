@@ -49,8 +49,9 @@ the dashboard. Call Echo through it, as
 
 ### Credentials
 
-The AppHost generates the passwords of all four on its first start and keeps
-them in the .NET user secrets of the AppHost project, on your machine only.
+The AppHost generates the passwords of all four, and the gateway's signing
+key, on its first start and keeps them in the .NET user secrets of the AppHost
+project, on your machine only.
 List them from the repository root:
 
 ```bash
@@ -62,10 +63,12 @@ Parameters:valkey-password = …
 Parameters:rabbitmq-password = …
 Parameters:postgres-password = …
 Parameters:keycloak-password = …
+Parameters:gateway-signing-key = -----BEGIN PRIVATE KEY-----…
 ```
 
 The dashboard shows the same values under the parameter resources, masked
-until revealed.
+until revealed. `gateway-signing-key` is the key the gateway signs its tokens
+with, under the key id `local`; see [the gateway's signing key](signing-key.md).
 
 Keycloak's admin console is at <http://localhost:8080/admin>. Sign in as
 `admin` with `keycloak-password`. Keycloak takes the longest of the four to
@@ -93,8 +96,9 @@ The last line of each names its image:
 ```
 
 The compose file reads its settings from `deploy/compose/.env`, which is never
-committed. Create it once with the images and ports, and a random password
-for every `_PASSWORD` variable listed in `.env.example`:
+committed. Create it once with the images and ports, a random password for
+every `_PASSWORD` variable listed in `.env.example`, and a signing key for the
+gateway, as [the gateway's signing key](signing-key.md) describes:
 
 ```bash
 cd deploy/compose
@@ -104,13 +108,17 @@ cd deploy/compose
   sed -n 's/^\([A-Z_]*_PASSWORD\)=$/\1/p' .env.example | while read -r name; do
     printf '%s=%s\n' "$name" "$(openssl rand -hex 24)"
   done
+  printf 'GATEWAY_SIGNING_KEY=%s\n' \
+    "$(openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 | tr -d '\r\n')"
+  printf 'GATEWAY_SIGNING_KEY_ID=local\n'
+  printf 'GATEWAY_ADDITIONAL_PUBLIC_KEY=\nGATEWAY_ADDITIONAL_KEY_ID=\n'
 } > .env
 ```
 
-Check it: every line has a value.
+Check it: every line but the two `GATEWAY_ADDITIONAL_` ones has a value.
 
 ```bash
-grep -c '=.' .env      # prints 8
+grep -c '=.' .env      # prints 10
 ```
 
 Start, then check:
