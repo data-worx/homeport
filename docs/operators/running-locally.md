@@ -5,8 +5,8 @@ which is how Homeport is developed, and through the generated Docker Compose
 file, which is how it is deployed without .NET.
 
 Today both start the infrastructure — PostgreSQL, RabbitMQ, Valkey and
-Keycloak — and the Echo module. Homeport's own services follow with the next
-milestones.
+Keycloak — the gateway and the Echo module. Homeport's other services follow
+with the next milestones.
 
 Keycloak is part of this setup for development and tests only. In a real
 installation the operator brings their own identity provider.
@@ -38,8 +38,12 @@ Distributed application started. Press Ctrl+C to shut down.
 ```
 
 Open the login link. The dashboard lists `postgres`, `rabbitmq`, `valkey`,
-`keycloak` and `echo`; each reaches the state *Healthy* within a minute, longer
-on the first run while the images are pulled.
+`keycloak`, `echo` and `gateway`; each reaches the state *Healthy* within a
+minute, longer on the first run while the images are pulled.
+
+The gateway is the only resource with an external endpoint; its address is in
+the dashboard. Call Echo through it, as
+[calling a module](../api-consumers/calling-a-module.md) describes.
 
 `Ctrl+C` stops everything and removes the containers.
 
@@ -73,27 +77,30 @@ The compose file in [`deploy/compose/`](../../deploy/compose/) is generated
 from the AppHost. Do not edit it; a change belongs in the AppHost, and the
 `compose` gate fails until the file is regenerated.
 
-No image of Homeport's own is published yet, so build the Echo module's image
-locally first, from the repository root:
+No image of Homeport's own is published yet, so build the images of the
+gateway and the Echo module locally first, from the repository root:
 
 ```bash
+dotnet publish src/Platform/Gateway/Homeport.Platform.Gateway.Api -t:PublishContainer
 dotnet publish src/Modules/Echo/Homeport.Modules.Echo.Api -t:PublishContainer
 ```
 
-Its last line names the image:
+The last line of each names its image:
 
 ```text
+… "homeport-platform-gateway-api:latest" …
 … "homeport-modules-echo-api:latest" …
 ```
 
 The compose file reads its settings from `deploy/compose/.env`, which is never
-committed. Create it once with the Echo image and port, and a random password
+committed. Create it once with the images and ports, and a random password
 for every `_PASSWORD` variable listed in `.env.example`:
 
 ```bash
 cd deploy/compose
 {
   printf 'ECHO_IMAGE=homeport-modules-echo-api:latest\nECHO_PORT=8080\n'
+  printf 'GATEWAY_IMAGE=homeport-platform-gateway-api:latest\nGATEWAY_PORT=8080\n'
   sed -n 's/^\([A-Z_]*_PASSWORD\)=$/\1/p' .env.example | while read -r name; do
     printf '%s=%s\n' "$name" "$(openssl rand -hex 24)"
   done
@@ -103,7 +110,7 @@ cd deploy/compose
 Check it: every line has a value.
 
 ```bash
-grep -c '=.' .env      # prints 6
+grep -c '=.' .env      # prints 8
 ```
 
 Start, then check:
@@ -115,19 +122,33 @@ docker compose ps --format '{{.Service}} {{.State}}'
 
 ```text
 echo running
+gateway running
 keycloak running
 postgres running
 rabbitmq running
 valkey running
 ```
 
-The services are reachable only on the compose network; no port is published
-to the host. Stop and remove everything with:
+Only the gateway publishes a port to the host, chosen by Docker on every
+start. Ask for it, then call Echo through it:
+
+```bash
+docker compose port gateway 8080      # prints 0.0.0.0:<port>
+curl -s -X POST -H 'Content-Type: application/json' \
+  -d '{"hello":"Homeport"}' http://localhost:<port>/modules/echo/v1/echo
+```
+
+```json
+{"hello":"Homeport"}
+```
+
+Every other service is reachable only on the compose network. Stop and remove
+everything with:
 
 ```bash
 docker compose down
 ```
 
-After pulling changes to Echo, rebuild its image before starting. When
-`.env.example` gains a variable after an update, add it to `.env` the same way
-before starting.
+After pulling changes to the gateway or Echo, rebuild its image before
+starting. When `.env.example` gains a variable after an update, add it to
+`.env` the same way before starting.

@@ -17,6 +17,12 @@ Arranged by reader. A directory exists once it has its first document.
 |---|---|
 | [`module-developers/declaring-a-manifest.md`](module-developers/declaring-a-manifest.md) | Declaring and serving a module's manifest with `Homeport.Sdk` |
 
+## API consumers — obtaining a token, calling modules, reading usage
+
+| Document | About |
+|---|---|
+| [`api-consumers/calling-a-module.md`](api-consumers/calling-a-module.md) | The URL scheme for calling a module through the gateway |
+
 ## Architecture — why Homeport is built the way it is
 
 | Document | About |

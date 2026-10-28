@@ -58,6 +58,20 @@ services:
       - "${ECHO_PORT}"
     networks:
       - "aspire"
+  gateway:
+    image: "${GATEWAY_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${GATEWAY_PORT}"
+      OTEL_SERVICE_NAME: "homeport-gateway"
+      ECHO_HTTP: "http://echo:${ECHO_PORT}"
+      services__echo__http__0: "http://echo:${ECHO_PORT}"
+      ECHO_HTTPS: "https://echo:${ECHO_PORT}"
+    ports:
+      - "${GATEWAY_PORT}"
+    networks:
+      - "aspire"
 networks:
   aspire:
     driver: "bridge"

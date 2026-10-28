@@ -10,7 +10,10 @@ internal static class EchoManifest
     /// <summary>The route that returns the request body unchanged.</summary>
     internal const string EchoPath = "/v1/echo";
 
-    /// <summary>The scope a caller needs for <see cref="EchoPath"/>.</summary>
+    /// <summary>The route that returns the headers of the request as Echo received it.</summary>
+    internal const string RequestPath = "/v1/request";
+
+    /// <summary>The scope a caller needs for every route of Echo.</summary>
     internal const string InvokeScope = "echo.invoke";
 
     private const string RequestsMeter = "requests";
@@ -21,7 +24,11 @@ internal static class EchoManifest
             Id: "echo",
             Name: "Echo",
             Version: ModuleVersion.Of(typeof(EchoManifest).Assembly),
-            Routes: [new ManifestRoute(HttpMethods.Post, EchoPath, InvokeScope, RequestsMeter, Quantity: 1)],
+            Routes:
+            [
+                new ManifestRoute(HttpMethods.Post, EchoPath, InvokeScope, RequestsMeter, Quantity: 1),
+                new ManifestRoute(HttpMethods.Get, RequestPath, InvokeScope, RequestsMeter, Quantity: 1),
+            ],
             Scopes: [InvokeScope],
             Meters: [RequestsMeter]);
     }
