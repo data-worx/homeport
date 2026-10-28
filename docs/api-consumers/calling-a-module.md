@@ -32,8 +32,8 @@ change appears as a new major version next to the old one — `/v2/…` beside
 
 ## What the gateway changes on the way
 
-- **`X-Homeport-*` headers are removed.** Only the gateway sets them; one you
-  send never reaches the module.
+- **`X-Homeport-*` headers are removed.** They are reserved for Homeport; one
+  you send never reaches the module.
 - **`traceparent` is kept.** Send a W3C `traceparent` and the module's work
   joins your trace.
 - Everything else — method, query, body, content type and your other headers —
