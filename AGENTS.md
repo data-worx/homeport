@@ -198,6 +198,28 @@ Security-critical. No exception without an ADR. See
 - Traffic between components is not encrypted by Homeport until mTLS is
   decided; that is left to the operator's network.
 
+## Error responses
+
+See [ADR-0016](docs/architecture/adr/0016-error-responses.md).
+
+- Every 4xx and 5xx response that leaves Homeport is Problem Details
+  (RFC 9457), media type `application/problem+json`. A module answers every
+  4xx and 5xx that way; the SDK does it by default.
+- `type` is an absolute URI. Homeport's own types live under
+  `https://homeport.data-worx.de/problems/<name>`, each with a reference
+  page. A module uses a prefix of its own.
+- Every error response carries the extension `traceId`, set by the gateway.
+- Validation errors use the type `…/problems/validation`, status 400, and the
+  extension `errors` as `{ "<field path>": ["<message>", …] }`, with field
+  paths in the request's JSON notation (`items[0].name`).
+- `title` and `detail` are English. No localisation.
+- The gateway passes a conforming 4xx through and adds `traceId`. It replaces
+  every non-conforming error body, every 5xx body from a module, and answers
+  its own errors (401, 429, 502, 503, 504, unknown module) with a Problem
+  Details body of its own.
+- A business error is a result value inside a service. The API layer maps it
+  onto a problem type; the domain knows no HTTP status.
+
 ## Throttling
 
 - Two layers, both per tenant and plan: a rate limit (token bucket, requests
