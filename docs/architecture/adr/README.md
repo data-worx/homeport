@@ -22,8 +22,9 @@ decision is a new ADR that supersedes the old one, and the old one is marked
 | [0010](0010-admin-portal.md) | Admin portal | Accepted |
 | [0011](0011-gateway-issued-tokens-for-modules.md) | Gateway-issued tokens for modules | Accepted |
 | [0012](0012-module-registration-keys.md) | Module registration keys | Accepted |
-| [0013](0013-url-scheme-and-api-versioning.md) | URL scheme and API versioning | Accepted |
+| [0013](0013-url-scheme-and-api-versioning.md) | URL scheme and API versioning | Accepted; URL scheme for module paths superseded by ADR-0015 |
 | [0014](0014-authentication-between-services.md) | Authentication between services | Accepted |
+| [0015](0015-operator-defined-module-groups.md) | Operator-defined module groups | Accepted |
 
 ## Template
 

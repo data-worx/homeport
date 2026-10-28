@@ -71,5 +71,6 @@ from asynchronous workers.
 - Period-close webhook
 - Usage reporting from asynchronous workers
 - `Deprecation` and `Sunset` headers for module routes
+- Operator-defined module groups under `/modules/`
 - In-product developer portal: a catalogue of the modules registered in an
   installation, built from their manifests and OpenAPI documents

@@ -1,6 +1,6 @@
 # ADR-0013: URL scheme and API versioning
 
-- Status: Accepted
+- Status: Accepted; URL scheme for module paths superseded by ADR-0015
 - Date: 2026-10-26
 
 ## Context
