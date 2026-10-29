@@ -3,6 +3,7 @@
 using System.Net.Mime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
@@ -18,11 +19,21 @@ namespace Homeport.Modules.Echo.Api.Controllers;
 public sealed class EchoController : ControllerBase
 {
     /// <summary>Returns the request body unchanged, with its content type.</summary>
+    /// <response code="200">The request body.</response>
+    /// <response code="400">The request has no body (<see cref="EchoProblems.EmptyBody"/>).</response>
     [HttpPost(EchoManifest.EchoPath)]
     [AllowAnonymous]
     [EndpointSummary("Returns the request body unchanged.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
     public IActionResult Echo()
     {
+        // A body announced by neither Content-Length nor chunked transfer is absent.
+        if (HttpContext.Features.Get<IHttpRequestBodyDetectionFeature>()?.CanHaveBody != true)
+        {
+            return EchoProblems.EmptyBody.ToResult("POST a body; Echo returns it unchanged.");
+        }
+
         return File(Request.Body, Request.ContentType ?? MediaTypeNames.Application.Octet);
     }
 

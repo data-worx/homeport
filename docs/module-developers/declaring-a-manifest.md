@@ -80,6 +80,9 @@ defaults: OpenTelemetry, health checks and service discovery.
 | `GET /health/live` | Whether the process is alive |
 | `GET /health/ready` | Whether the module can take traffic |
 
+Together they also answer every error as Problem Details; see
+[answering errors](answering-errors.md).
+
 ## Check it
 
 Run the module and read the manifest back. For Echo, through the AppHost:

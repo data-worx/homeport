@@ -76,6 +76,26 @@ next to the old one. The module id `platform` is reserved.
 - The module never talks to the identity provider.
 - W3C `traceparent` is propagated.
 
+## Errors
+
+- A module answers every 4xx and 5xx response as Problem Details
+  (RFC 9457), media type `application/problem+json`. That includes
+  unhandled exceptions and status codes without a body of their own, such
+  as `404` for an unknown path.
+- `type` is an absolute URI. Homeport's own types live under
+  `https://homeport.data-worx.de/problems/<name>` and are listed in
+  [problem types](../problems/README.md). A module defines its own types
+  under a prefix of its own.
+- A request that fails validation is answered with
+  [`validation`](../problems/validation.md): status `400` and the extension
+  `errors`, an object of field path to messages. A field path uses the
+  JSON notation of the request: camelCase, such as `items[0].name`.
+- An unexpected failure is answered with
+  [`internal`](../problems/internal.md), status `500`, and nothing about
+  its cause.
+- `title` and `detail` are English.
+- The extension `traceId` carries the W3C trace id of the request.
+
 ## Metering
 
 - The gateway records one usage event per request, using the meter and

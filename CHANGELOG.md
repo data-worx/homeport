@@ -33,3 +33,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shared building block lets a service accept those tokens and nothing else.
   The AppHost generates a key for local runs; the compose file takes it from
   `.env`. See [the gateway's signing key](docs/operators/signing-key.md).
+- Modules built with the SDK answer every error as Problem Details
+  (`application/problem+json`) with a `traceId`, so a caller handles one
+  error format. An unhandled exception becomes a `500` that reveals nothing
+  of its cause, and an invalid request a `400` that lists each failure by its
+  camelCase field path. A module declares its own problem types and maps
+  business errors onto them. Echo answers a request without a body with a
+  problem type of its own. See [answering errors](docs/module-developers/answering-errors.md)
+  and [problem types](docs/reference/problems/README.md).
