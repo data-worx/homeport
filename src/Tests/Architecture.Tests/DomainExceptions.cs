@@ -13,5 +13,12 @@ namespace Architecture.Tests;
 /// </remarks>
 internal static class DomainExceptions
 {
-    internal static readonly string[] Allowed = [];
+    /// <summary>
+    /// The types a Domain shares with the SDK and the other services. It is an
+    /// exception only because it references nothing itself, which
+    /// <see cref="ReferenceRules.ContractsReferences"/> asserts.
+    /// </summary>
+    internal const string Contracts = "Homeport.Sdk.Contracts";
+
+    internal static readonly string[] Allowed = [Contracts];
 }

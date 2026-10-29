@@ -23,13 +23,13 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Domain", "Homeport.Shared.Contracts"),
-                Fixture.Project("Shared/Homeport.Shared.Contracts"),
+                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Domain", "Homeport.Shared.Authentication"),
+                Fixture.Project("Shared/Homeport.Shared.Authentication"),
             ];
 
             var offenders = ReferenceRules.DomainReferences(projects, []);
 
-            Assert.Equal(["Homeport.Modules.Echo.Domain -> Homeport.Shared.Contracts"], offenders);
+            Assert.Equal(["Homeport.Modules.Echo.Domain -> Homeport.Shared.Authentication"], offenders);
         }
 
         [Fact]
@@ -56,6 +56,41 @@ public sealed class ReferenceTests
             var offenders = ReferenceRules.DomainReferences(projects, ["Acme.Rules"]);
 
             Assert.Empty(offenders);
+        }
+    }
+
+    public sealed class ContractsReferences
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = ReferenceRules.ContractsReferences(SolutionTree.Projects, DomainExceptions.Contracts);
+
+            Assert.Empty(offenders);
+        }
+
+        [Fact]
+        public void Reports_A_Project_Reference()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Sdk/Homeport.Sdk.Contracts", "Homeport.Shared.ServiceDefaults"),
+                Fixture.Project("Shared/Homeport.Shared.ServiceDefaults"),
+            ];
+
+            var offenders = ReferenceRules.ContractsReferences(projects, DomainExceptions.Contracts);
+
+            Assert.Equal(["Homeport.Sdk.Contracts -> Homeport.Shared.ServiceDefaults"], offenders);
+        }
+
+        [Fact]
+        public void Reports_A_Package_Reference()
+        {
+            ProjectFile[] projects = [Fixture.WithPackages("Sdk/Homeport.Sdk.Contracts", "Microsoft.EntityFrameworkCore")];
+
+            var offenders = ReferenceRules.ContractsReferences(projects, DomainExceptions.Contracts);
+
+            Assert.Equal(["Homeport.Sdk.Contracts -> Microsoft.EntityFrameworkCore"], offenders);
         }
     }
 
@@ -137,9 +172,9 @@ public sealed class ReferenceTests
                 Fixture.Project(
                     "Platform/Metering/Homeport.Platform.Metering.Application",
                     "Homeport.Platform.Metering.Domain",
-                    "Homeport.Shared.Contracts"),
+                    "Homeport.Sdk.Contracts"),
                 Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Domain"),
-                Fixture.Project("Shared/Homeport.Shared.Contracts"),
+                Fixture.Project("Sdk/Homeport.Sdk.Contracts"),
             ];
 
             var offenders = ReferenceRules.ReferencesInsideAUnit(projects);
@@ -216,13 +251,13 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Shared/Homeport.Shared.Contracts", "Homeport.Platform.Metering.Domain"),
+                Fixture.Project("Shared/Homeport.Shared.Authentication", "Homeport.Platform.Metering.Domain"),
                 Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Domain"),
             ];
 
             var offenders = ReferenceRules.SharedReferences(projects);
 
-            Assert.Equal(["Homeport.Shared.Contracts -> Homeport.Platform.Metering.Domain"], offenders);
+            Assert.Equal(["Homeport.Shared.Authentication -> Homeport.Platform.Metering.Domain"], offenders);
         }
 
         [Fact]
@@ -244,8 +279,8 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Sdk/Homeport.Sdk", "Homeport.Shared.Contracts"),
-                Fixture.Project("Shared/Homeport.Shared.Contracts"),
+                Fixture.Project("Sdk/Homeport.Sdk", "Homeport.Shared.ServiceDefaults"),
+                Fixture.Project("Shared/Homeport.Shared.ServiceDefaults"),
             ];
 
             var offenders = ReferenceRules.SharedReferences(projects);

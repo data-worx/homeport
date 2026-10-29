@@ -16,7 +16,8 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL, RabbitMQ, Valkey, Keycloak, the gateway and the Echo module, and generates `deploy/compose/` | `Homeport.Platform.Gateway.Api`, `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Shared.ServiceDefaults` | What every service sets up the same way: OpenTelemetry over OTLP, health endpoints, service discovery, resilient HTTP clients | nothing |
 | `Homeport.Shared.Authentication` | Validates the tokens the gateway issues: issuer, audience, expiry and ES256 signature against the gateway's JWKS, and the JWKS wire format both sides share | nothing |
-| `Homeport.Sdk` | What a .NET module needs to meet the module contract: the manifest, its validation, and the manifest, OpenAPI and health endpoints | `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Sdk.Contracts` | The types the SDK and a Domain both need: so far the result type, a value or an error with a business code | nothing |
+| `Homeport.Sdk` | What a .NET module needs to meet the module contract: the manifest, its validation, and the manifest, OpenAPI and health endpoints | `Homeport.Shared.ServiceDefaults`, `Homeport.Sdk.Contracts` |
 | `Homeport.Platform.Gateway.Domain` | Empty: the gateway decides nothing yet | nothing |
 | `Homeport.Platform.Gateway.Application` | Empty: the gateway has no use case beyond forwarding | `Homeport.Platform.Gateway.Domain` |
 | `Homeport.Platform.Gateway.Infrastructure` | Loads and checks the signing key, builds the JWKS and issues service tokens, which an HTTP client attaches to its calls to a platform service | `Homeport.Platform.Gateway.Application`, `Homeport.Shared.Authentication` |
@@ -30,10 +31,9 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Modules.Echo.Api.Tests.Integration` | Runs Echo in memory and asserts its manifest, health, echo and request endpoints | `Homeport.Modules.Echo.Api` |
 | `Homeport.Platform.Gateway.Api.Tests.Integration` | Runs the gateway in memory against a stand-in module and asserts what it forwards, the JWKS it serves and that it does not start without a signing key | `Homeport.Platform.Gateway.Api` |
 | `Homeport.Platform.Gateway.Infrastructure.Tests.Unit` | Asserts the checks on the signing configuration, the service tokens and their renewal | `Homeport.Platform.Gateway.Infrastructure` |
-| `Homeport.Sdk.Tests.Unit` | Asserts the manifest validation and the module version | `Homeport.Shared.Authentication` | Validates the tokens the gateway issues: issuer, audience, expiry and ES256 signature against the gateway's JWKS, and the JWKS wire format both sides share | nothing |
-| `Homeport.Sdk` |
-| `Homeport.Sdk.Tests.Integration` | Runs a module built with the SDK in memory and asserts its endpoints | `Homeport.Shared.Authentication` | Validates the tokens the gateway issues: issuer, audience, expiry and ES256 signature against the gateway's JWKS, and the JWKS wire format both sides share | nothing |
-| `Homeport.Sdk` |
+| `Homeport.Sdk.Contracts.Tests.Unit` | Asserts the result type | `Homeport.Sdk.Contracts` |
+| `Homeport.Sdk.Tests.Unit` | Asserts the manifest validation and the module version | `Homeport.Sdk` |
+| `Homeport.Sdk.Tests.Integration` | Runs a module built with the SDK in memory and asserts its endpoints | `Homeport.Sdk` |
 | `Homeport.Shared.Authentication.Tests.Unit` | Asserts which tokens the validation accepts and rejects, and that the JWKS carries public keys only | `Homeport.Shared.Authentication` |
 | `Homeport.Shared.Authentication.Tests.Integration` | Runs a service that accepts gateway tokens against a stand-in JWKS, including a key published after it was read | `Homeport.Shared.Authentication` |
 | `Homeport.Shared.ServiceDefaults.Tests.Integration` | Asserts the health endpoints outside Development | `Homeport.Shared.ServiceDefaults` |
@@ -67,6 +67,7 @@ src/
       Homeport.Platform.Gateway.Api/
   Sdk/
     Homeport.Sdk/
+    Homeport.Sdk.Contracts/
   Shared/
     Homeport.Shared.Authentication/
     Homeport.Shared.ServiceDefaults/
@@ -76,6 +77,7 @@ src/
     Homeport.Modules.Echo.Api.Tests.Integration/
     Homeport.Platform.Gateway.Api.Tests.Integration/
     Homeport.Platform.Gateway.Infrastructure.Tests.Unit/
+    Homeport.Sdk.Contracts.Tests.Unit/
     Homeport.Sdk.Tests.Integration/
     Homeport.Sdk.Tests.Unit/
     Homeport.Shared.Authentication.Tests.Integration/
@@ -99,3 +101,7 @@ src/
 - Validating gateway tokens lives in `src/Shared/`, not in the gateway: the
   platform services and, through the SDK, the modules validate the same way
   against the same constants, while only the gateway holds a signing key.
+- The types a Domain shares with the SDK and the other services live in
+  `Homeport.Sdk.Contracts`, not in `src/Shared/`: a Domain may reference it
+  because it references nothing beyond the BCL, and it ships with the SDK
+  because the SDK references it.
