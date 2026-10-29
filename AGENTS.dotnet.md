@@ -32,26 +32,56 @@ The concrete cut of `core.architecture`. It describes the target state: a
 repository that has not reached it yet records the gap as a deviation, rather
 than the rule bending to the code.
 
+**The unit of the cut is the stack**: a directory under `src/` holding the
+layers of one application, service or module side by side. A solution with
+one stack calls it `Core`. A solution of several services, or a modular
+monolith, has one stack per service or module, optionally grouped one level
+deep.
+
 ```
 <Name>.slnx
 src/
-  Core/
+  Core/                           one stack ...
+    <Name>.Core.Contracts/
     <Name>.Core.Domain/
     <Name>.Core.Application/
     <Name>.Core.Infrastructure/
+  <Group>/                        ... or several, grouped or not
+    <Stack>/
+      <Name>.<Group>.<Stack>.Domain/
+      <Name>.<Group>.<Stack>.Api/
   <Name>.<Ui>/
+  Shared/
+    <Name>.Shared.Contracts/
+    <Name>.Shared.<Lib>/
+  Sdk/
+    <Name>.Sdk/
   Tools/
     <Name>.Tools.<Tool>/
   Tests/
     Architecture.Tests/
 ```
 
+Within a stack — `<Stack>` below stands for the stack's path, `Core` or
+`<Group>.<Stack>`; a layer named in the table is the stack's own, and Shared
+is everything in `src/Shared/`:
+
+| Project | May reference |
+|---|---|
+| `<Name>.<Stack>.Contracts` — optional | Shared.Contracts; nothing else, not even beyond the BCL |
+| `<Name>.<Stack>.Domain` | Contracts, Shared.Contracts; nothing else beyond the BCL, unless named as an exception |
+| `<Name>.<Stack>.Application` | Domain, Contracts, Shared.Contracts, Shared libraries |
+| `<Name>.<Stack>.Infrastructure[.<Source>]` | Application, Domain, Contracts, Shared, another stack's Contracts |
+| `<Name>.<Stack>.<Host>` — any other project in the stack, such as `.Api` or `.Worker` | its own stack's layers, Shared, the SDK, another stack's Contracts |
+
+Outside the stacks:
+
 | Project | Lives in | May reference |
 |---|---|---|
-| `<Name>.Core.Domain` | `src/Core/` | nothing beyond the BCL, unless named as an exception |
-| `<Name>.Core.Application` | `src/Core/` | Domain |
-| `<Name>.Core.Infrastructure[.<Source>]` | `src/Core/` | Application, Domain |
 | `<Name>.<Ui>` — web, MAUI, WinForms, WPF, console | `src/` directly | anything but another UI |
+| `<Name>.Shared.Contracts` — optional | `src/Shared/` | nothing beyond the BCL, without exception |
+| `<Name>.Shared.<Lib>` — any other name | `src/Shared/` | Shared.Contracts, other Shared libraries, packages; no stack project |
+| `<Name>.Sdk` — at most one | `src/Sdk/` | Shared, packages; no stack project |
 | `<Name>.Tools.<Tool>` — a development tool | `src/Tools/` | anything, when it is a composition root |
 | a test project | `src/Tests/` | whatever it needs to assert something, Infrastructure included |
 
@@ -61,15 +91,46 @@ src/
   so do the `.csproj`, the assembly and the root namespace. A UI directly under
   `src/` has no grouping directory and is `<Name>.<Ui>`. `src/Tests/` is not a
   grouping directory: a test project is named as `dotnet.tests` says.
-- **`src/Core/` holds the application, not its UIs.** A UI is a composition
-  root: it wires Infrastructure to the use cases and holds no business logic.
-  It is meant to be replaceable, and a repository may have several side by
-  side.
-- **A UI never references another UI.** What two of them share belongs in
-  Application.
-- **The solution file lives in the repository root**, not in `src/`. The
-  solution folders `/Core/`, `/Tools/` and `/Tests/` list the same projects as
-  the directories of the same name.
+- **A stack lives in `src/<Stack>/` or `src/<Group>/<Stack>/`**, never deeper.
+  `Shared`, `Sdk`, `Tools` and `Tests` are not stack names, and a stack pack
+  may reserve more.
+- **A stack holds its layers and its hosts, nothing else.** A host — an API, a
+  worker — is the composition root of exactly one stack and holds no business
+  logic. A stack without business rules may be a single host, named
+  `<Name>.<Stack>` without a suffix; when rules arrive, the layers grow next
+  to it and the host takes a suffix.
+- **A UI directly under `src/` composes**: it may wire several stacks, and
+  several UIs may share one stack. It is meant to be replaceable. A UI never
+  references another UI; what two of them share belongs in Application.
+- **A stack reaches another stack only through its Contracts, and only from
+  Infrastructure or a host.** Calling another service is I/O, so Application
+  declares an interface and Infrastructure implements it with the other
+  stack's Contracts. Domain and Application never see another stack.
+- **The solution file lives in the repository root**, not in `src/`. Its
+  solution folders mirror the directories under `src/`.
+- **Contracts is what a stack shares with its callers**: request and response
+  types, messages, and the types both sides need. It exists once there is
+  something to share. It references nothing but Shared.Contracts — no package
+  or framework reference — so every caller can take it without taking anything
+  else. A type that needs ASP.NET, such as `ProblemDetails`, stays in the host
+  or UI, and Contracts describes the wire format with its own types where a
+  caller needs it.
+- **The Domain uses only the shared types from Contracts**, never the wire
+  types. Contracts never references the Domain.
+- **Shared.Contracts holds the types several stacks share**, such as a result
+  type. It is BCL-only and references nothing, and every project may
+  reference it.
+- **A Shared library is code several stacks use**, named freely. Shared holds
+  no Domain and no Application: business logic shared between independently
+  deployed services is the coupling the stacks exist to prevent.
+  Application may reference only a Shared library that runs in-process — the
+  first question of `core.architecture`. One that needs the network, a
+  database or a web framework, such as authentication on ASP.NET, is reached
+  through an interface that Application declares. The tests cannot tell the
+  two apart, so this half of the rule is kept in review.
+- **The SDK is what developers outside the solution take to use its APIs.**
+  It is one project, `<Name>.Sdk`; the types it shares live in
+  Shared.Contracts, not in an SDK contracts project of its own.
 - **A Domain reference beyond the BCL is an exception, and it is written
   down.** It is allowed only when it runs in-process — the first question of
   `core.architecture` — such as existing business logic the domain builds on.
@@ -82,8 +143,8 @@ src/
   `dotnet.tests` allows, and the one project without the `<Name>.` prefix:
   the stack pack ships it as a template, and a template cannot land at a path
   that depends on the solution's name.
-- A separate host project, or Infrastructure split into several projects, is a
-  decision the repository takes and writes into its own `AGENTS.md`.
+- Infrastructure split into several projects is a decision the repository
+  takes and writes into its own `AGENTS.md`.
 
 ## Entry point {#dotnet.entry-point}
 
