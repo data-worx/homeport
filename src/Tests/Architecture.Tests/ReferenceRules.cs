@@ -3,41 +3,50 @@
 namespace Architecture.Tests;
 
 /// <summary>
-/// The reference graph of the <c>dotnet.layout</c> deviation in <c>AGENTS.md</c>:
-/// inside a service the arrow points inwards, services never reference each
-/// other, and only hosts are wired together. Tools and tests are unrestricted.
+/// The reference graph of <c>dotnet.layout</c> as the <i>Architecture</i>
+/// section of <c>AGENTS.md</c> narrows it: inside a service the arrow points
+/// inwards, services never reference each other, and only hosts are wired
+/// together. Tools and tests are unrestricted.
 /// Every rule returns its offenders as <c>project -&gt; reference</c>, so an
 /// empty result means it holds.
 /// </summary>
 internal static class ReferenceRules
 {
     /// <summary>
-    /// Project and package references of a Domain project beyond
-    /// <paramref name="exceptions"/>.
+    /// Project, package and framework references of a Domain project beyond
+    /// <c>Homeport.Shared.Contracts</c> and <paramref name="exceptions"/>.
     /// </summary>
     internal static List<string> DomainReferences(
         IReadOnlyList<ProjectFile> projects,
         IReadOnlyCollection<string> exceptions)
     {
+        var sharedContracts = projects
+            .Where(project => project.IsSharedContracts)
+            .Select(project => project.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
         return projects
             .Where(project => project.Layer == ProjectLayer.Domain)
             .SelectMany(project => project.ProjectReferences
+                .Where(reference => !sharedContracts.Contains(reference))
                 .Concat(project.PackageReferences)
+                .Concat(project.FrameworkReferences)
                 .Except(exceptions)
                 .Select(reference => $"{project.Name} -> {reference}"))
             .ToList();
     }
 
     /// <summary>
-    /// Project and package references of the project named
-    /// <paramref name="contracts"/>, which may have none.
+    /// Project, package and framework references of <c>Homeport.Shared.Contracts</c>,
+    /// which may have none: every project takes it, so it takes nothing with it.
     /// </summary>
-    internal static List<string> ContractsReferences(IReadOnlyList<ProjectFile> projects, string contracts)
+    internal static List<string> SharedContractsReferences(IReadOnlyList<ProjectFile> projects)
     {
         return projects
-            .Where(project => project.Name == contracts)
+            .Where(project => project.IsSharedContracts)
             .SelectMany(project => project.ProjectReferences
                 .Concat(project.PackageReferences)
+                .Concat(project.FrameworkReferences)
                 .Select(reference => $"{project.Name} -> {reference}"))
             .ToList();
     }
@@ -46,8 +55,8 @@ internal static class ReferenceRules
     /// References of a service or module project that break the layer rule:
     /// Application may reference its own Domain, Infrastructure its own
     /// Application and Domain, a host its own inner layers. All but Domain may
-    /// reference <c>src/Shared/</c> and <c>src/Sdk/</c>. References to another
-    /// service are left to <see cref="ReferencesBetweenUnits"/>.
+    /// reference <c>src/Shared/</c>; only a host may reference <c>src/Sdk/</c>.
+    /// References to another service are left to <see cref="ReferencesBetweenUnits"/>.
     /// </summary>
     internal static List<string> ReferencesInsideAUnit(IReadOnlyList<ProjectFile> projects)
     {
@@ -55,7 +64,8 @@ internal static class ReferenceRules
             projects,
             project => project.BelongsToUnit
                 && project.Layer is not (ProjectLayer.Domain or ProjectLayer.Unknown),
-            (project, target) => target.Location is ProjectLocation.Shared or ProjectLocation.Sdk
+            (project, target) => target.Location == ProjectLocation.Shared
+                || (target.Location == ProjectLocation.Sdk && project.IsHost)
                 || (target.BelongsToUnit && !project.SharesUnitWith(target))
                 || (project.SharesUnitWith(target) && MayReference(project.Layer, target.Layer)));
     }
@@ -69,18 +79,21 @@ internal static class ReferenceRules
             (project, target) => !target.BelongsToUnit || project.SharesUnitWith(target));
     }
 
-    /// <summary>References from <c>src/Shared/</c> or <c>src/Sdk/</c> to a service or module.</summary>
+    /// <summary>
+    /// References from <c>src/Shared/</c> or <c>src/Sdk/</c> to anything outside
+    /// <c>src/Shared/</c>.
+    /// </summary>
     internal static List<string> SharedReferences(IReadOnlyList<ProjectFile> projects)
     {
         return Offenders(
             projects,
             project => project.Location is ProjectLocation.Shared or ProjectLocation.Sdk,
-            (_, target) => !target.BelongsToUnit);
+            (_, target) => target.Location == ProjectLocation.Shared);
     }
 
     /// <summary>
-    /// References from <c>src/Aspire/</c> to anything but a host,
-    /// <c>src/Shared/</c> or another Aspire project.
+    /// References from <c>src/Aspire/</c> to anything but a host or a Shared
+    /// library (<c>dotnet-core.aspire</c>).
     /// </summary>
     internal static List<string> AspireReferences(IReadOnlyList<ProjectFile> projects)
     {
@@ -88,7 +101,16 @@ internal static class ReferenceRules
             projects,
             project => project.Location == ProjectLocation.Aspire,
             (_, target) => target.IsHost
-                || target.Location is ProjectLocation.Shared or ProjectLocation.Aspire);
+                || (target.Location == ProjectLocation.Shared && !target.IsSharedContracts));
+    }
+
+    /// <summary>References to the app host from any project but a test (<c>dotnet-core.aspire</c>).</summary>
+    internal static List<string> AppHostReferrers(IReadOnlyList<ProjectFile> projects)
+    {
+        return Offenders(
+            projects,
+            project => project.Location != ProjectLocation.Tests,
+            (_, target) => target.Location != ProjectLocation.Aspire);
     }
 
     /// <summary>
