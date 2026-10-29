@@ -3,12 +3,16 @@
 namespace Architecture.Tests;
 
 /// <summary>
-/// The directory layout of the <c>dotnet.layout</c> deviation in <c>AGENTS.md</c>:
-/// where a project lies, what it is called, and how a service or module is cut.
+/// The directory layout of <c>dotnet.layout</c> as the <i>Architecture</i>
+/// section of <c>AGENTS.md</c> narrows it: where a project lies, what it is
+/// called, and how a service or module is cut.
 /// Every rule returns its offenders, so an empty result means it holds.
 /// </summary>
 internal static class LayoutRules
 {
+    /// <summary>The app host's name after its grouping directory (<c>dotnet-core.aspire</c>).</summary>
+    private const string AppHostSuffix = ".AppHost";
+
     private static readonly ProjectLayer[] Cut =
         [ProjectLayer.Domain, ProjectLayer.Application, ProjectLayer.Infrastructure, ProjectLayer.Api];
 
@@ -46,12 +50,27 @@ internal static class LayoutRules
     /// <c>src/Tests/</c> whose name is not the solution name followed by their
     /// grouping directories: <c>Homeport.Shared[.&lt;Name&gt;]</c>,
     /// <c>Homeport.Platform.&lt;Service&gt;[.&lt;Layer&gt;]</c>,
-    /// <c>Homeport.Modules.&lt;Module&gt;.&lt;Layer&gt;</c>.
+    /// <c>Homeport.Modules.&lt;Module&gt;.&lt;Layer&gt;</c>. <c>src/Sdk/</c> holds
+    /// only <c>Homeport.Sdk</c>, <c>src/Aspire/</c> only <c>Homeport.Aspire.AppHost</c>.
     /// </summary>
     internal static List<string> MisnamedProjects(IEnumerable<ProjectFile> projects)
     {
         return projects
             .Where(project => !IsNamedForItsPlace(project))
+            .Select(project => project.Path)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Projects outside a service or module that carry a layer name, such as
+    /// <c>Homeport.Shared.Billing.Domain</c>: Shared holds no business logic, and
+    /// a layer belongs to the service or module it serves. Tests are left out.
+    /// </summary>
+    internal static List<string> LayersOutsideAUnit(IEnumerable<ProjectFile> projects)
+    {
+        return projects
+            .Where(project => !project.BelongsToUnit && project.Location != ProjectLocation.Tests)
+            .Where(project => project.CarriesLayerName)
             .Select(project => project.Path)
             .ToList();
     }
@@ -102,6 +121,8 @@ internal static class LayoutRules
         {
             ProjectLocation.Platform => project.Layer != ProjectLayer.Unknown,
             ProjectLocation.Modules => project.Layer is not (ProjectLayer.Unknown or ProjectLayer.Single),
+            ProjectLocation.Sdk => project.Name == project.GroupingName,
+            ProjectLocation.Aspire => project.Name == $"{project.GroupingName}{AppHostSuffix}",
             ProjectLocation.Tests or ProjectLocation.Elsewhere => true,
             _ => project.Name == project.GroupingName
                 || project.Name.StartsWith($"{project.GroupingName}.", StringComparison.Ordinal),

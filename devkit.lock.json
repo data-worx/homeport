@@ -36,15 +36,13 @@
     { "path": ".devkit/licenses/Apache-2.0.txt", "from": "stacks/dotnet-core/templates/licenses/Apache-2.0.txt", "mode": "template", "hash": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64" },
     { "path": "src/Tests/Architecture.Tests/Architecture.Tests.csproj", "from": "stacks/dotnet-core/templates/Architecture.Tests/Architecture.Tests.csproj", "mode": "template", "hash": "72dc7dcf73ba81d180eedef48bd56bb866a64a6a" },
     { "path": "src/Tests/Architecture.Tests/DomainExceptions.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/DomainExceptions.cs", "mode": "template", "hash": "4b5020de5a485b7c148df1a9dba4359ac5c3e0c6" },
-    { "path": "src/Tests/Architecture.Tests/LayoutTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/LayoutTests.cs", "mode": "template", "hash": "d643fcefe19cce302e1027933071fe982fe4652d" },
-    { "path": "src/Tests/Architecture.Tests/ProjectFile.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectFile.cs", "mode": "template", "hash": "1999d189c92ea7a81d3f00468d125d470c0cf372" },
-    { "path": "src/Tests/Architecture.Tests/ProjectLocation.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectLocation.cs", "mode": "template", "hash": "b5f2c54f566a3e586ff90aadd613aea92e9f8094" },
-    { "path": "src/Tests/Architecture.Tests/ReferenceTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ReferenceTests.cs", "mode": "template", "hash": "e1e606b40e275cfb517812be0180da333f42c986" },
-    { "path": "src/Tests/Architecture.Tests/SolutionTree.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/SolutionTree.cs", "mode": "template", "hash": "311e54f8e872d9f86ea9f4b7f79239a679ead20d" },
+    { "path": "src/Tests/Architecture.Tests/LayoutTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/LayoutTests.cs", "mode": "template", "hash": "2660492ff94dd144dffb3c67fe73fdb773d2aa4e" },
+    { "path": "src/Tests/Architecture.Tests/ProjectFile.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectFile.cs", "mode": "template", "hash": "36ccca81e9d913f05e1e769397c4aac63b425b48" },
+    { "path": "src/Tests/Architecture.Tests/ProjectLocation.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectLocation.cs", "mode": "template", "hash": "84c780bb9aa3eda22f8d47dafb501c924f41567f" },
+    { "path": "src/Tests/Architecture.Tests/ReferenceTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ReferenceTests.cs", "mode": "template", "hash": "d2bd5b221cf567f32ba7def9db32eb47c987f4a2" },
+    { "path": "src/Tests/Architecture.Tests/SolutionTree.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/SolutionTree.cs", "mode": "template", "hash": "d4e63b976eddedee94ca30cdbeed3e296732c2ca" },
     { "path": "AGENTS.github.md", "from": "forges/github/AGENTS.github.md", "mode": "managed", "hash": "8d8962de643dc0365a82ef5763c1e249b90b7801" },
     { "path": ".devkit/forge.sh", "from": "forges/github/forge.sh", "mode": "managed", "hash": "21ca6807048f1d3425bddce6f972d53dce1bd47b" }
   ],
-  "deviations": [
-    { "slug": "dotnet.layout", "scope": "src/", "reason": "Provisional. The layer cut applies per service: services under src/Platform/<Service>/, modules under src/Modules/<Module>/, plus src/Aspire/, src/Shared/ and src/Sdk/; a service without business rules is a single project. Project names follow the grouping rule of dotnet.layout, such as Homeport.Platform.<Service>.Domain. Revisit with the first service tickets. Recorded in the Deviations table of AGENTS.md.", "decidedAt": "dceba58" }
-  ]
+  "deviations": []
 }

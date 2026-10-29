@@ -135,10 +135,23 @@ public sealed class LayoutTests
             Assert.Equal([$"src/{path}"], offenders);
         }
 
+        [Theory]
+        [InlineData("Sdk/Homeport.Sdk.Testing")]
+        [InlineData("Sdk/Homeport.Sdk.Contracts")]
+        [InlineData("Aspire/Homeport.Aspire.ServiceDefaults")]
+        public void Reports_A_Second_Project_In_Sdk_Or_Aspire(string path)
+        {
+            ProjectFile[] projects = [Fixture.Project(path)];
+
+            var offenders = LayoutRules.MisnamedProjects(projects);
+
+            Assert.Equal([$"src/{path}"], offenders);
+        }
+
         [Fact]
         public void Reports_A_Directory_That_Does_Not_Carry_The_Project_Name()
         {
-            ProjectFile[] projects = [new(Fixture.Solution, "Homeport.Shared.Contracts", "Shared/Contracts", [], [])];
+            ProjectFile[] projects = [new(Fixture.Solution, "Homeport.Shared.Contracts", "Shared/Contracts", [], [], [])];
 
             var offenders = LayoutRules.MisnamedProjects(projects);
 
@@ -153,7 +166,6 @@ public sealed class LayoutTests
         [InlineData("Aspire/Homeport.Aspire.AppHost")]
         [InlineData("Shared/Homeport.Shared.ServiceDefaults")]
         [InlineData("Sdk/Homeport.Sdk")]
-        [InlineData("Sdk/Homeport.Sdk.Testing")]
         [InlineData("Tools/Homeport.Tools.Seed")]
         [InlineData("Tests/Homeport.Platform.Gateway.Tests.Unit")]
         public void Accepts_A_Name_That_Fits(string path)
@@ -161,6 +173,45 @@ public sealed class LayoutTests
             ProjectFile[] projects = [Fixture.Project(path)];
 
             var offenders = LayoutRules.MisnamedProjects(projects);
+
+            Assert.Empty(offenders);
+        }
+    }
+
+    public sealed class LayersOutsideAUnit
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = LayoutRules.LayersOutsideAUnit(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Theory]
+        [InlineData("Shared/Homeport.Shared.Domain")]
+        [InlineData("Shared/Homeport.Shared.Billing.Application")]
+        [InlineData("Shared/Homeport.Shared.Infrastructure.Postgres")]
+        [InlineData("Tools/Homeport.Tools.Seed.Domain")]
+        public void Reports_A_Layer_Outside_A_Service_Or_Module(string path)
+        {
+            ProjectFile[] projects = [Fixture.Project(path)];
+
+            var offenders = LayoutRules.LayersOutsideAUnit(projects);
+
+            Assert.Equal([$"src/{path}"], offenders);
+        }
+
+        [Theory]
+        [InlineData("Shared/Homeport.Shared.Contracts")]
+        [InlineData("Shared/Homeport.Shared.Authentication")]
+        [InlineData("Tests/Homeport.Platform.Gateway.Infrastructure.Tests.Unit")]
+        [InlineData("Platform/Gateway/Homeport.Platform.Gateway.Domain")]
+        public void Accepts_A_Project_That_Is_No_Stray_Layer(string path)
+        {
+            ProjectFile[] projects = [Fixture.Project(path)];
+
+            var offenders = LayoutRules.LayersOutsideAUnit(projects);
 
             Assert.Empty(offenders);
         }

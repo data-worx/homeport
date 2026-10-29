@@ -8,13 +8,21 @@ namespace Architecture.Tests;
 /// <param name="RelativeDirectory">The directory, relative to <c>src/</c>, with <c>/</c> as separator.</param>
 /// <param name="ProjectReferences">The names of the projects it references.</param>
 /// <param name="PackageReferences">The names of the packages it references.</param>
+/// <param name="FrameworkReferences">
+/// The shared frameworks it references, explicitly or through an SDK other than
+/// the plain <c>Microsoft.NET.Sdk</c>.
+/// </param>
 internal sealed record ProjectFile(
     string Solution,
     string Name,
     string RelativeDirectory,
     IReadOnlyList<string> ProjectReferences,
-    IReadOnlyList<string> PackageReferences)
+    IReadOnlyList<string> PackageReferences,
+    IReadOnlyList<string> FrameworkReferences)
 {
+    /// <summary>The layer names a project outside a service or module must not carry.</summary>
+    private static readonly string[] LayerNames = ["Domain", "Application", "Infrastructure"];
+
     internal string Path => $"src/{RelativeDirectory}";
 
     internal string DirectoryName => Segments[^1];
@@ -57,6 +65,19 @@ internal sealed record ProjectFile(
             return suffix is null ? null : Name[..^suffix.Length];
         }
     }
+
+    /// <summary>
+    /// <c>Homeport.Shared.Contracts</c>: the types several services share, which
+    /// every project may reference (<c>dotnet.layout</c>).
+    /// </summary>
+    internal bool IsSharedContracts => Location == ProjectLocation.Shared && Name == $"{GroupingName}.Contracts";
+
+    /// <summary>
+    /// Whether a segment of the name after the grouping directories is a layer
+    /// name, such as <c>Homeport.Shared.Billing.Domain</c>.
+    /// </summary>
+    internal bool CarriesLayerName => Name.StartsWith($"{GroupingName}.", StringComparison.Ordinal)
+        && Name[(GroupingName.Length + 1)..].Split('.').Intersect(LayerNames).Any();
 
     internal bool BelongsToUnit => Location is ProjectLocation.Platform or ProjectLocation.Modules;
 

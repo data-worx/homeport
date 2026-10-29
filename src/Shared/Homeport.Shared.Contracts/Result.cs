@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Homeport.Sdk.Contracts;
+namespace Homeport.Shared.Contracts;
 
 /// <summary>
 /// The outcome of an operation that can fail for a business reason: either a

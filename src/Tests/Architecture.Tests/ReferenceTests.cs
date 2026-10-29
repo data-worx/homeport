@@ -46,6 +46,47 @@ public sealed class ReferenceTests
         }
 
         [Fact]
+        public void Reports_A_Framework_Reference()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.WithFrameworks("Modules/Echo/Homeport.Modules.Echo.Domain", "Microsoft.AspNetCore.App"),
+            ];
+
+            var offenders = ReferenceRules.DomainReferences(projects, []);
+
+            Assert.Equal(["Homeport.Modules.Echo.Domain -> Microsoft.AspNetCore.App"], offenders);
+        }
+
+        [Fact]
+        public void Reports_The_Sdk()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Domain", "Homeport.Sdk"),
+                Fixture.Project("Sdk/Homeport.Sdk"),
+            ];
+
+            var offenders = ReferenceRules.DomainReferences(projects, []);
+
+            Assert.Equal(["Homeport.Modules.Echo.Domain -> Homeport.Sdk"], offenders);
+        }
+
+        [Fact]
+        public void Accepts_The_Shared_Contracts()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Domain", "Homeport.Shared.Contracts"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts"),
+            ];
+
+            var offenders = ReferenceRules.DomainReferences(projects, []);
+
+            Assert.Empty(offenders);
+        }
+
+        [Fact]
         public void Accepts_A_Listed_Exception()
         {
             ProjectFile[] projects =
@@ -59,12 +100,12 @@ public sealed class ReferenceTests
         }
     }
 
-    public sealed class ContractsReferences
+    public sealed class SharedContractsReferences
     {
         [Fact]
         public void Finds_None_In_This_Repository()
         {
-            var offenders = ReferenceRules.ContractsReferences(SolutionTree.Projects, DomainExceptions.Contracts);
+            var offenders = ReferenceRules.SharedContractsReferences(SolutionTree.Projects);
 
             Assert.Empty(offenders);
         }
@@ -74,23 +115,33 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Sdk/Homeport.Sdk.Contracts", "Homeport.Shared.ServiceDefaults"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts", "Homeport.Shared.ServiceDefaults"),
                 Fixture.Project("Shared/Homeport.Shared.ServiceDefaults"),
             ];
 
-            var offenders = ReferenceRules.ContractsReferences(projects, DomainExceptions.Contracts);
+            var offenders = ReferenceRules.SharedContractsReferences(projects);
 
-            Assert.Equal(["Homeport.Sdk.Contracts -> Homeport.Shared.ServiceDefaults"], offenders);
+            Assert.Equal(["Homeport.Shared.Contracts -> Homeport.Shared.ServiceDefaults"], offenders);
         }
 
         [Fact]
         public void Reports_A_Package_Reference()
         {
-            ProjectFile[] projects = [Fixture.WithPackages("Sdk/Homeport.Sdk.Contracts", "Microsoft.EntityFrameworkCore")];
+            ProjectFile[] projects = [Fixture.WithPackages("Shared/Homeport.Shared.Contracts", "Microsoft.EntityFrameworkCore")];
 
-            var offenders = ReferenceRules.ContractsReferences(projects, DomainExceptions.Contracts);
+            var offenders = ReferenceRules.SharedContractsReferences(projects);
 
-            Assert.Equal(["Homeport.Sdk.Contracts -> Microsoft.EntityFrameworkCore"], offenders);
+            Assert.Equal(["Homeport.Shared.Contracts -> Microsoft.EntityFrameworkCore"], offenders);
+        }
+
+        [Fact]
+        public void Reports_A_Framework_Reference()
+        {
+            ProjectFile[] projects = [Fixture.WithFrameworks("Shared/Homeport.Shared.Contracts", "Microsoft.AspNetCore.App")];
+
+            var offenders = ReferenceRules.SharedContractsReferences(projects);
+
+            Assert.Equal(["Homeport.Shared.Contracts -> Microsoft.AspNetCore.App"], offenders);
         }
     }
 
@@ -121,6 +172,22 @@ public sealed class ReferenceTests
             var offenders = ReferenceRules.ReferencesInsideAUnit(projects);
 
             Assert.Equal([$"Homeport.Modules.Echo.{from} -> Homeport.Modules.Echo.{to}"], offenders);
+        }
+
+        [Theory]
+        [InlineData("Application")]
+        [InlineData("Infrastructure")]
+        public void Reports_An_Inner_Layer_Referencing_The_Sdk(string layer)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project($"Modules/Echo/Homeport.Modules.Echo.{layer}", "Homeport.Sdk"),
+                Fixture.Project("Sdk/Homeport.Sdk"),
+            ];
+
+            var offenders = ReferenceRules.ReferencesInsideAUnit(projects);
+
+            Assert.Equal([$"Homeport.Modules.Echo.{layer} -> Homeport.Sdk"], offenders);
         }
 
         [Theory]
@@ -172,9 +239,9 @@ public sealed class ReferenceTests
                 Fixture.Project(
                     "Platform/Metering/Homeport.Platform.Metering.Application",
                     "Homeport.Platform.Metering.Domain",
-                    "Homeport.Sdk.Contracts"),
+                    "Homeport.Shared.Contracts"),
                 Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Domain"),
-                Fixture.Project("Sdk/Homeport.Sdk.Contracts"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts"),
             ];
 
             var offenders = ReferenceRules.ReferencesInsideAUnit(projects);
@@ -274,6 +341,23 @@ public sealed class ReferenceTests
             Assert.Equal(["Homeport.Sdk -> Homeport.Modules.Echo.Api"], offenders);
         }
 
+        [Theory]
+        [InlineData("Shared/Homeport.Shared.Authentication", "Sdk", "Homeport.Sdk")]
+        [InlineData("Shared/Homeport.Shared.Authentication", "Tools", "Homeport.Tools.Seed")]
+        [InlineData("Sdk/Homeport.Sdk", "Aspire", "Homeport.Aspire.AppHost")]
+        public void Reports_A_Reference_Outside_Shared(string from, string directory, string name)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project(from, name),
+                Fixture.Project($"{directory}/{name}"),
+            ];
+
+            var offenders = ReferenceRules.SharedReferences(projects);
+
+            Assert.Equal([$"{from.Split('/')[^1]} -> {name}"], offenders);
+        }
+
         [Fact]
         public void Accepts_The_Sdk_Referencing_Shared()
         {
@@ -304,6 +388,7 @@ public sealed class ReferenceTests
         [InlineData("Platform/Gateway", "Homeport.Platform.Gateway.Application")]
         [InlineData("Modules/Echo", "Homeport.Modules.Echo.Infrastructure")]
         [InlineData("Sdk", "Homeport.Sdk")]
+        [InlineData("Shared", "Homeport.Shared.Contracts")]
         public void Reports_A_Reference_To_Anything_But_A_Host_Or_Shared(string directory, string name)
         {
             ProjectFile[] projects =
@@ -335,6 +420,47 @@ public sealed class ReferenceTests
             ];
 
             var offenders = ReferenceRules.AspireReferences(projects);
+
+            Assert.Empty(offenders);
+        }
+    }
+
+    public sealed class AppHostReferrers
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = ReferenceRules.AppHostReferrers(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Theory]
+        [InlineData("Shared/Homeport.Shared.ServiceDefaults")]
+        [InlineData("Tools/Homeport.Tools.Seed")]
+        public void Reports_A_Production_Project_Referencing_The_App_Host(string path)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project(path, "Homeport.Aspire.AppHost"),
+                Fixture.Project("Aspire/Homeport.Aspire.AppHost"),
+            ];
+
+            var offenders = ReferenceRules.AppHostReferrers(projects);
+
+            Assert.Equal([$"{path.Split('/')[^1]} -> Homeport.Aspire.AppHost"], offenders);
+        }
+
+        [Fact]
+        public void Accepts_A_Test_Referencing_The_App_Host()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Tests/Homeport.Aspire.AppHost.Tests.Integration", "Homeport.Aspire.AppHost"),
+                Fixture.Project("Aspire/Homeport.Aspire.AppHost"),
+            ];
+
+            var offenders = ReferenceRules.AppHostReferrers(projects);
 
             Assert.Empty(offenders);
         }
