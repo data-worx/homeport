@@ -18,7 +18,7 @@ internal static class DomainExceptions
     /// exception only because it references nothing itself, which
     /// <see cref="ReferenceRules.ContractsReferences"/> asserts.
     /// </summary>
-    internal const string Contracts = "Homeport.Sdk.Contracts";
+    internal const string Contracts = "Homeport.Shared.Contracts";
 
     internal static readonly string[] Allowed = [Contracts];
 }

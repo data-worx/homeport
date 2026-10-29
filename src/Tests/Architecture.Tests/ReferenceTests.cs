@@ -74,23 +74,23 @@ public sealed class ReferenceTests
         {
             ProjectFile[] projects =
             [
-                Fixture.Project("Sdk/Homeport.Sdk.Contracts", "Homeport.Shared.ServiceDefaults"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts", "Homeport.Shared.ServiceDefaults"),
                 Fixture.Project("Shared/Homeport.Shared.ServiceDefaults"),
             ];
 
             var offenders = ReferenceRules.ContractsReferences(projects, DomainExceptions.Contracts);
 
-            Assert.Equal(["Homeport.Sdk.Contracts -> Homeport.Shared.ServiceDefaults"], offenders);
+            Assert.Equal(["Homeport.Shared.Contracts -> Homeport.Shared.ServiceDefaults"], offenders);
         }
 
         [Fact]
         public void Reports_A_Package_Reference()
         {
-            ProjectFile[] projects = [Fixture.WithPackages("Sdk/Homeport.Sdk.Contracts", "Microsoft.EntityFrameworkCore")];
+            ProjectFile[] projects = [Fixture.WithPackages("Shared/Homeport.Shared.Contracts", "Microsoft.EntityFrameworkCore")];
 
             var offenders = ReferenceRules.ContractsReferences(projects, DomainExceptions.Contracts);
 
-            Assert.Equal(["Homeport.Sdk.Contracts -> Microsoft.EntityFrameworkCore"], offenders);
+            Assert.Equal(["Homeport.Shared.Contracts -> Microsoft.EntityFrameworkCore"], offenders);
         }
     }
 
@@ -172,9 +172,9 @@ public sealed class ReferenceTests
                 Fixture.Project(
                     "Platform/Metering/Homeport.Platform.Metering.Application",
                     "Homeport.Platform.Metering.Domain",
-                    "Homeport.Sdk.Contracts"),
+                    "Homeport.Shared.Contracts"),
                 Fixture.Project("Platform/Metering/Homeport.Platform.Metering.Domain"),
-                Fixture.Project("Sdk/Homeport.Sdk.Contracts"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts"),
             ];
 
             var offenders = ReferenceRules.ReferencesInsideAUnit(projects);
