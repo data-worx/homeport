@@ -20,6 +20,10 @@ public sealed class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.AddHomeportModule(EchoManifest.Create());
+
+        // Here rather than in the SDK, so the XML docs of the controllers reach
+        // the OpenAPI document.
+        builder.Services.AddOpenApi();
         builder.Services.AddControllers();
 
         var app = builder.Build();

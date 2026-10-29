@@ -3,6 +3,7 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using Homeport.Sdk;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Homeport.Modules.Echo.Api.Tests.Integration;
@@ -95,6 +96,39 @@ public sealed class ProgramTests
         }
 
         [Fact]
+        public async Task Documents_Every_Operation_For_A_Caller()
+        {
+            var document = await OpenApiDocument();
+
+            Assert.Empty(ModuleOpenApi.Validate(document));
+        }
+
+        [Fact]
+        public async Task Takes_The_Summary_From_The_Xml_Doc()
+        {
+            var document = await OpenApiDocument();
+
+            var operation = document.GetProperty("paths").GetProperty("/v1/echo").GetProperty("post");
+            Assert.Equal("Returns the request body unchanged.", operation.GetProperty("summary").GetString());
+        }
+
+        [Theory]
+        [InlineData("401")]
+        [InlineData("403")]
+        [InlineData("429")]
+        [InlineData("500")]
+        public async Task Lists_A_Common_Error_As_Problem_Details_On_Every_Operation(string status)
+        {
+            var document = await OpenApiDocument();
+
+            var operations = document.GetProperty("paths").EnumerateObject().SelectMany(path => path.Value.EnumerateObject()).ToList();
+            Assert.NotEmpty(operations);
+            Assert.All(operations, operation => Assert.True(
+                operation.Value.GetProperty("responses").GetProperty(status).GetProperty("content")
+                    .TryGetProperty("application/problem+json", out _)));
+        }
+
+        [Fact]
         public async Task Returns_The_Received_Headers()
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, "/v1/request");
@@ -116,6 +150,13 @@ public sealed class ProgramTests
 
             var headers = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("headers");
             Assert.False(headers.TryGetProperty("authorization", out _));
+        }
+
+        private async Task<JsonElement> OpenApiDocument()
+        {
+            var document = await echo.CreateClient().GetStringAsync(ModuleManifest.OpenApiPath);
+
+            return JsonDocument.Parse(document).RootElement.Clone();
         }
     }
 }

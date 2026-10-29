@@ -31,6 +31,7 @@ internal static class TestModule
         });
         builder.WebHost.UseTestServer();
         builder.AddHomeportModule(manifest);
+        builder.Services.AddOpenApi();
 
         return builder;
     }

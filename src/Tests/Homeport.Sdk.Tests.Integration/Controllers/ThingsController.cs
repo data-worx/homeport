@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.ComponentModel.DataAnnotations;
+using System.Net.Mime;
 using Homeport.Shared.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Homeport.Sdk.Tests.Integration.Controllers;
@@ -19,8 +21,14 @@ public sealed class ThingsController : ControllerBase
     internal const string CreatePath = "/v1/things";
     internal const string LookupPath = "/v1/things/";
     internal const string MissingName = "missing";
+    internal const string ThrowFailureDescription = "The thing always fails.";
 
     [HttpGet(ThrowPath)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(
+        StatusCodes.Status500InternalServerError,
+        MediaTypeNames.Application.ProblemJson,
+        Description = ThrowFailureDescription)]
     public IActionResult Throw()
     {
         throw new InvalidOperationException(ExceptionMessage);

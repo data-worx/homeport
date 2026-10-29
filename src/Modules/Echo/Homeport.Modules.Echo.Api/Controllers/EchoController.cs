@@ -18,12 +18,17 @@ namespace Homeport.Modules.Echo.Api.Controllers;
 [ApiController]
 public sealed class EchoController : ControllerBase
 {
-    /// <summary>Returns the request body unchanged, with its content type.</summary>
+    // The operation ids of the OpenAPI document. A client generator names its
+    // methods after them, so they stay stable when an action is renamed.
+    private const string EchoOperation = "echo";
+    private const string GetRequestOperation = "getRequest";
+
+    /// <summary>Returns the request body unchanged.</summary>
+    /// <remarks>The response carries the content type of the request.</remarks>
     /// <response code="200">The request body.</response>
-    /// <response code="400">The request has no body (<see cref="EchoProblems.EmptyBody"/>).</response>
-    [HttpPost(EchoManifest.EchoPath)]
+    /// <response code="400">The request has no body.</response>
+    [HttpPost(EchoManifest.EchoPath, Name = EchoOperation)]
     [AllowAnonymous]
-    [EndpointSummary("Returns the request body unchanged.")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
     public IActionResult Echo()
@@ -37,17 +42,16 @@ public sealed class EchoController : ControllerBase
         return File(Request.Body, Request.ContentType ?? MediaTypeNames.Application.Octet);
     }
 
-    /// <summary>
-    /// Returns the headers of the request as Echo received it, so a caller sees
-    /// what the gateway forwards.
-    /// </summary>
+    /// <summary>Returns the headers of the request as Echo received it.</summary>
     /// <remarks>
-    /// <c>Authorization</c> is left out: once the gateway signs module tokens,
-    /// it carries one, and a token is never sent back.
+    /// A caller sees what the gateway forwards. <c>Authorization</c> is left
+    /// out: once the gateway signs module tokens, it carries one, and a token
+    /// is never sent back.
     /// </remarks>
-    [HttpGet(EchoManifest.RequestPath)]
+    /// <response code="200">The headers Echo received.</response>
+    [HttpGet(EchoManifest.RequestPath, Name = GetRequestOperation)]
     [AllowAnonymous]
-    [EndpointSummary("Returns the headers of the request as Echo received it.")]
+    [ProducesResponseType<ReceivedRequest>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     public ActionResult<ReceivedRequest> Received()
     {
         var headers = Request.Headers

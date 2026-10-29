@@ -6,6 +6,7 @@ using Homeport.Shared.ServiceDefaults;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -24,6 +25,12 @@ public static class HomeportModuleExtensions
     /// <see cref="ProblemConventions.TraceIdExtension"/>; an unhandled exception
     /// becomes <see cref="HomeportProblems.Internal"/>, and a controller request
     /// that fails validation becomes <see cref="HomeportProblems.Validation"/>.
+    /// <para>
+    /// Every operation of the OpenAPI document lists the errors every module
+    /// endpoint can answer with. The module calls <c>AddOpenApi</c> itself:
+    /// the XML docs of its controllers reach the document only through a call
+    /// in its own project, where the framework's source generator intercepts it.
+    /// </para>
     /// </remarks>
     /// <exception cref="InvalidOperationException">The manifest breaks the module contract.</exception>
     public static TBuilder AddHomeportModule<TBuilder>(this TBuilder builder, ModuleManifest manifest)
@@ -41,7 +48,7 @@ public static class HomeportModuleExtensions
 
         builder.AddServiceDefaults();
         builder.Services.AddSingleton(manifest);
-        builder.Services.AddOpenApi();
+        builder.Services.ConfigureAll<OpenApiOptions>(options => options.AddOperationTransformer<CommonErrorResponses>());
         AddProblemDetails(builder.Services);
 
         return builder;
