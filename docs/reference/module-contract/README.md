@@ -95,6 +95,9 @@ next to the old one. The module id `platform` is reserved.
   its cause.
 - `title` and `detail` are English.
 - The extension `traceId` carries the W3C trace id of the request.
+- The gateway passes a conforming 4xx through and sets `traceId`. It
+  replaces the body of every 5xx, conforming or not, and of every 4xx that
+  is not Problem Details, so the caller loses the module's `detail`.
 
 ## Metering
 

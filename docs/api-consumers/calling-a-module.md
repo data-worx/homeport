@@ -18,7 +18,9 @@ https://<gateway>/modules/{moduleId}/{path}
 
 The gateway removes `/modules/{moduleId}` and forwards the rest. A request to
 `/modules/echo/v1/echo` reaches Echo as `/v1/echo`. A path that names no
-module is answered with `404`.
+module is answered with `404` and the problem type
+[`unknown-module`](../reference/problems/unknown-module.md); every error is
+Problem Details, see [errors](errors.md).
 
 The module id `platform` is reserved: `/platform/{path}` leads to Homeport's
 own endpoints, never to a module. See
@@ -38,6 +40,8 @@ change appears as a new major version next to the old one — `/v2/…` beside
   joins your trace.
 - Everything else — method, query, body, content type and your other headers —
   is forwarded unchanged.
+- **Error responses are held to one format** on the way back: a 5xx body and
+  a body that is not Problem Details are replaced. See [errors](errors.md).
 
 ## Try it with Echo
 

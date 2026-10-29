@@ -41,3 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   business errors onto them. Echo answers a request without a body with a
   problem type of its own. See [answering errors](docs/module-developers/answering-errors.md)
   and [problem types](docs/reference/problems/README.md).
+- The gateway holds every error response to Problem Details, whichever
+  module answered. A module's Problem Details 4xx passes through with the
+  gateway's `traceId`; any other error body, and the body of every 5xx, is
+  replaced, so no module internals reach the caller. The gateway's own errors
+  carry types of their own — `unknown-module`, `module-unreachable`,
+  `module-unavailable`, `module-timeout` — so a caller can tell them from a
+  module's. See [errors](docs/api-consumers/errors.md).

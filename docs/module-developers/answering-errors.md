@@ -30,6 +30,15 @@ converted to camelCase, which matches the request's JSON as long as the
 module keeps ASP.NET's default JSON naming; `[JsonPropertyName]` is not
 honoured.
 
+## What the gateway does with it
+
+The gateway passes a 4xx in Problem Details through to the caller and sets
+`traceId`. It replaces the body of every 5xx, even one from the SDK, and the
+body of a 4xx in any other format, so a caller never sees a module's
+internals, and never sees its `detail` either. Put what a caller needs to
+act on into a 4xx; a 5xx reaches the caller as `internal` or with the
+default type of its status. See [errors](../api-consumers/errors.md).
+
 ## Declare the module's problem types
 
 A module declares its own problem types in one place, under a URI prefix of
