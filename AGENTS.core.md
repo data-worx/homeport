@@ -132,6 +132,26 @@ Conversely: no documentation is written for something that does not exist yet.
   exception, not the default.
 - No personal data in logs.
 
+## Logging {#core.logging}
+
+Code that can fail in production logs enough to diagnose the failure without
+a debugger. Each level is required when its condition occurs:
+
+| Level | Required when |
+|---|---|
+| Error | An exception is caught at a boundary and not rethrown (global handler, background job, message consumer), or a guarantee is broken: data is lost, a message lands in the dead-letter queue |
+| Warning | A degraded path that carries on: a fallback kicks in, retries are exhausted, an external dependency fails, a request is rejected for a security reason (with the reason, never the credential), configuration falls back to a default |
+| Information | A state change of the process or the system: start with the effective configuration without secrets, registration, a changed routing table, key rotation, the end of a job with counts. Not per request |
+| Debug | Per-request decisions that help a diagnosis: which route, a cache hit, why a 4xx |
+
+- **No log-and-rethrow.** An error is logged once, where it is handled.
+- **No `catch` that swallows.** Every `catch` logs, rethrows or turns the
+  error into a result.
+- **No secrets, tokens, personal data, or request and response bodies in a
+  log.**
+
+How to log is a stack concern, not a rule here.
+
 ## Gates {#core.gates}
 
 Every repository defines the checks that must pass before a commit, and makes

@@ -79,4 +79,8 @@ generated_code = false
 csharp_style_namespace_declarations = file_scoped:warning
 csharp_style_prefer_primary_constructors = true:suggestion
 csharp_style_prefer_switch_expression = true:suggestion
+
+# A log template must be constant: an interpolated one destroys its structure
+# (dotnet-core.logging).
+dotnet_diagnostic.CA2254.severity = warning
 # <<< devkit:stack/dotnet-core <<<
