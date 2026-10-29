@@ -24,6 +24,7 @@ Arranged by reader. A directory exists once it has its first document.
 | Document | About |
 |---|---|
 | [`api-consumers/calling-a-module.md`](api-consumers/calling-a-module.md) | The URL scheme for calling a module through the gateway |
+| [`api-consumers/errors.md`](api-consumers/errors.md) | The error format, and what the gateway does to a module's errors |
 
 ## Architecture — why Homeport is built the way it is
 

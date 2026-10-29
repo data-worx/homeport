@@ -16,12 +16,12 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL, RabbitMQ, Valkey, Keycloak, the gateway and the Echo module, and generates `deploy/compose/` | `Homeport.Platform.Gateway.Api`, `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Shared.ServiceDefaults` | What every service sets up the same way: OpenTelemetry over OTLP, health endpoints, service discovery, resilient HTTP clients | nothing |
 | `Homeport.Shared.Authentication` | Validates the tokens the gateway issues: issuer, audience, expiry and ES256 signature against the gateway's JWKS, and the JWKS wire format both sides share | nothing |
-| `Homeport.Shared.Contracts` | The types several services, the SDK and a Domain share: so far the result type, a value or an error with a business code | nothing |
+| `Homeport.Shared.Contracts` | The types several services, the SDK and a Domain share: so far the result type, a value or an error with a business code, and the constants of the error format | nothing |
 | `Homeport.Sdk` | What a .NET module needs to meet the module contract: the manifest, its validation, the manifest, OpenAPI and health endpoints, and error responses as Problem Details | `Homeport.Shared.ServiceDefaults`, `Homeport.Shared.Contracts` |
 | `Homeport.Platform.Gateway.Domain` | Empty: the gateway decides nothing yet | nothing |
 | `Homeport.Platform.Gateway.Application` | Empty: the gateway has no use case beyond forwarding | `Homeport.Platform.Gateway.Domain` |
 | `Homeport.Platform.Gateway.Infrastructure` | Loads and checks the signing key, builds the JWKS and issues service tokens, which an HTTP client attaches to its calls to a platform service | `Homeport.Platform.Gateway.Application`, `Homeport.Shared.Authentication` |
-| `Homeport.Platform.Gateway.Api` | The one entry point: forwards `/modules/{id}/{path}` with YARP on a static route to Echo, strips `X-Homeport-*` headers, propagates `traceparent` and serves the JWKS at `/.well-known/jwks.json` | `Homeport.Platform.Gateway.Infrastructure`, `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Platform.Gateway.Api` | The one entry point: forwards `/modules/{id}/{path}` with YARP on a static route to Echo, strips `X-Homeport-*` headers, propagates `traceparent`, holds every error response to Problem Details and serves the JWKS at `/.well-known/jwks.json` | `Homeport.Platform.Gateway.Infrastructure`, `Homeport.Shared.Contracts`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Modules.Echo.Domain` | Empty: Echo has no business rules | nothing |
 | `Homeport.Modules.Echo.Application` | Empty: Echo has no use case beyond returning the request body | `Homeport.Modules.Echo.Domain` |
 | `Homeport.Modules.Echo.Infrastructure` | Empty: Echo reaches nothing outside its process | `Homeport.Modules.Echo.Application` |
@@ -29,7 +29,7 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Architecture.Tests` | Asserts the layout, naming and reference rules of `dotnet.layout` as `AGENTS.md` narrows them, each also against a fixture tree that breaks it (solution folder `/Tests/`) | — |
 | `Homeport.Aspire.AppHost.Tests.Integration` | Starts the AppHost, waits for every resource to become healthy, reads Echo's manifest, calls Echo through the gateway and reads the gateway's JWKS end to end; needs Docker | `Homeport.Aspire.AppHost` |
 | `Homeport.Modules.Echo.Api.Tests.Integration` | Runs Echo in memory and asserts its manifest, health, echo and request endpoints | `Homeport.Modules.Echo.Api` |
-| `Homeport.Platform.Gateway.Api.Tests.Integration` | Runs the gateway in memory against a stand-in module and asserts what it forwards, the JWKS it serves and that it does not start without a signing key | `Homeport.Platform.Gateway.Api` |
+| `Homeport.Platform.Gateway.Api.Tests.Integration` | Runs the gateway in memory against a stand-in module and asserts what it forwards, the error responses it answers with, the JWKS it serves and that it does not start without a signing key | `Homeport.Platform.Gateway.Api` |
 | `Homeport.Platform.Gateway.Infrastructure.Tests.Unit` | Asserts the checks on the signing configuration, the service tokens and their renewal | `Homeport.Platform.Gateway.Infrastructure` |
 | `Homeport.Sdk.Tests.Unit` | Asserts the manifest validation, the module version and the problem type rules | `Homeport.Sdk` |
 | `Homeport.Sdk.Tests.Integration` | Runs a module built with the SDK in memory and asserts its endpoints and error responses | `Homeport.Sdk` |

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics;
+using Homeport.Shared.Contracts;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +21,7 @@ public static class HomeportModuleExtensions
     /// <summary>Adds what a module needs, after checking <paramref name="manifest"/> against the contract.</summary>
     /// <remarks>
     /// Every error response becomes Problem Details carrying the
-    /// <see cref="HomeportProblems.TraceIdExtension"/>; an unhandled exception
+    /// <see cref="ProblemConventions.TraceIdExtension"/>; an unhandled exception
     /// becomes <see cref="HomeportProblems.Internal"/>, and a controller request
     /// that fails validation becomes <see cref="HomeportProblems.Validation"/>.
     /// </remarks>
@@ -89,7 +90,7 @@ public static class HomeportModuleExtensions
         // The W3C trace id, rather than ASP.NET's default of the whole traceparent,
         // so a caller can look the trace up by it.
         services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
-            context.ProblemDetails.Extensions[HomeportProblems.TraceIdExtension] =
+            context.ProblemDetails.Extensions[ProblemConventions.TraceIdExtension] =
                 Activity.Current?.TraceId.ToHexString() ?? context.HttpContext.TraceIdentifier);
         services.AddExceptionHandler<InternalErrorHandler>();
 
