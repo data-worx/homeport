@@ -88,16 +88,17 @@ reader it is written for:
 
 ## Architecture
 
-**Provisional** — see the `dotnet.layout` row under *Deviations*. Revisit with
-the first service tickets.
+The stack layout of `dotnet.layout` and `dotnet-core.aspire`: every service
+and every module is a stack, grouped under `src/Platform/` and
+`src/Modules/`. The rules below narrow it.
 
 ```text
 Homeport.slnx
 src/
   Aspire/Homeport.Aspire.AppHost
+  Shared/Homeport.Shared.Contracts
   Shared/Homeport.Shared.ServiceDefaults
   Shared/Homeport.Shared.Authentication
-  Sdk/Homeport.Sdk.Contracts
   Sdk/Homeport.Sdk
   Platform/<Service>/Homeport.Platform.<Service>
   Platform/<Service>/Homeport.Platform.<Service>.Domain | .Application | .Infrastructure | .Api [| .Worker]
@@ -109,12 +110,13 @@ src/
 
 - **One module = one API service plus an optional worker.** Features inside a
   module are components, not services.
-- **The layer rule of `dotnet.layout` applies per service.** A service is one
-  project while it carries no business rules. Once it does, it is cut into
-  Domain, Application, Infrastructure and a host project that is its
-  composition root. Business modules are cut from the start.
-- A service never references another service's projects. Services talk over
-  HTTP or messages; shared types live in `Homeport.Sdk.Contracts`.
+- **A service is one project while it carries no business rules.** Once it
+  does, it is cut into Domain, Application, Infrastructure and a host project
+  that is its composition root. Business modules are cut from the start.
+- A service never references another service's projects, its Contracts
+  included, and no service or module has a Contracts project of its own.
+  Services talk over HTTP or messages; shared types live in
+  `Homeport.Shared.Contracts`.
 - Modules are reachable only through the gateway.
 - A project is named `Homeport`, then every grouping directory between `src/`
   and the project, then its own name, as in the tree above
@@ -122,21 +124,23 @@ src/
   same name. `src/Tests/` is not a grouping directory: a test project is
   named after the project under test (`dotnet.tests`).
 - Inside a service or module the arrow points inwards: Domain references
-  nothing beyond the BCL and the exceptions listed in
-  `src/Tests/Architecture.Tests/DomainExceptions.cs`; Application its own
-  Domain; Infrastructure its own Application and Domain; a host (`.Api`,
-  `.Worker`) its own inner layers. All but Domain may reference
-  `src/Shared/` and `src/Sdk/`.
-- `src/Shared/` and `src/Sdk/` reference no service or module.
-- `src/Aspire/` references hosts and `src/Shared/` only — never an inner
-  layer.
+  `Homeport.Shared.Contracts` and nothing else beyond the BCL but the
+  exceptions listed in `src/Tests/Architecture.Tests/DomainExceptions.cs`;
+  Application its own Domain; Infrastructure its own Application and Domain;
+  a host (`.Api`, `.Worker`) its own inner layers. All but Domain may
+  reference `src/Shared/`; only a host references `src/Sdk/`.
+- `src/Shared/` and `src/Sdk/` reference nothing outside `src/Shared/`.
+- `src/Aspire/` holds only the AppHost, which references hosts and Shared
+  libraries only — never an inner layer. Only tests reference it.
+- `src/Sdk/` holds only `Homeport.Sdk`.
 - Tools and tests are unrestricted.
 - `Architecture.Tests` asserts the layout, naming and reference rules above,
   each also against a fixture tree that breaks it.
-- `Homeport.Sdk.Contracts` holds the types the SDK and a Domain both need,
-  such as the result type, and references nothing beyond the BCL.
+- `Homeport.Shared.Contracts` holds the types several services, the SDK and a
+  Domain share, such as the result type, and references nothing beyond the
+  BCL — no package, framework or project.
 - Messages between services (for example `UsageRecorded`) are contracts in
-  `Homeport.Sdk.Contracts`. Changing one is a breaking change for every consumer.
+  `Homeport.Shared.Contracts`. Changing one is a breaking change for every consumer.
 
 Current state: [docs/architecture/architecture.md](docs/architecture/architecture.md).
 
@@ -306,6 +310,5 @@ Rules from `AGENTS.core.md` or a stack pack that deliberately do not apply here.
 Every row was decided once and is recorded in `devkit.lock.json`, so
 `/devkit-sync` does not ask again until the upstream rule changes.
 
-| Rule | Deviation | Why |
-|---|---|---|
-| `dotnet.layout` | **Provisional.** The layer cut applies per service, not to one application: services under `src/Platform/<Service>/`, modules under `src/Modules/<Module>/`, plus `src/Aspire/`, `src/Shared/` and `src/Sdk/`. A service without business rules is a single project. Project names follow the grouping rule of `dotnet.layout`, such as `Homeport.Platform.<Service>.Domain`. See *Architecture* | Homeport is a set of independently deployable services, not one application. Revisit with the first service tickets |
+None. Homeport follows every shared rule; the *Architecture* section only
+narrows `dotnet.layout`, which needs no deviation.
