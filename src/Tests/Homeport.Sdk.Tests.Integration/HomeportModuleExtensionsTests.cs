@@ -116,6 +116,40 @@ public sealed class HomeportModuleExtensionsTests
             var errors = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("errors");
             Assert.Contains("items[0].name", errors.EnumerateObject().Select(property => property.Name));
         }
+
+        [Theory]
+        [InlineData("401")]
+        [InlineData("403")]
+        [InlineData("429")]
+        [InlineData("500")]
+        public async Task Lists_A_Common_Error_As_Problem_Details_On_Every_Operation(string status)
+        {
+            var paths = await OpenApiPaths();
+
+            var operations = paths.EnumerateObject().SelectMany(path => path.Value.EnumerateObject()).ToList();
+            Assert.NotEmpty(operations);
+            Assert.All(operations, operation => Assert.True(
+                operation.Value.GetProperty("responses").GetProperty(status).GetProperty("content")
+                    .TryGetProperty("application/problem+json", out _)));
+        }
+
+        [Fact]
+        public async Task Keeps_An_Error_The_Action_Declares_Itself()
+        {
+            var paths = await OpenApiPaths();
+
+            var response = paths.GetProperty(ThingsController.ThrowPath).GetProperty("get")
+                .GetProperty("responses").GetProperty("500");
+            Assert.Equal(ThingsController.ThrowFailureDescription, response.GetProperty("description").GetString());
+        }
+
+        private static async Task<JsonElement> OpenApiPaths()
+        {
+            await using var app = await TestModule.StartAsync();
+            var document = await app.GetTestClient().GetStringAsync(ModuleManifest.OpenApiPath);
+
+            return JsonDocument.Parse(document).RootElement.GetProperty("paths").Clone();
+        }
     }
 
     public sealed class MapHomeportModule

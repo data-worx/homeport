@@ -45,6 +45,7 @@ the contract version it implements and to the OpenAPI document it serves.
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 builder.AddHomeportModule(manifest);
+builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -81,7 +82,9 @@ defaults: OpenTelemetry, health checks and service discovery.
 | `GET /health/ready` | Whether the module can take traffic |
 
 Together they also answer every error as Problem Details; see
-[answering errors](answering-errors.md).
+[answering errors](answering-errors.md). `AddOpenApi` is the module's own
+call, so the XML docs of its controllers reach the OpenAPI document; see
+[documenting endpoints](documenting-endpoints.md).
 
 ## Check it
 

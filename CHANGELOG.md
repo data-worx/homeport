@@ -48,3 +48,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   carry types of their own — `unknown-module`, `module-unreachable`,
   `module-unavailable`, `module-timeout` — so a caller can tell them from a
   module's. See [errors](docs/api-consumers/errors.md).
+- A module's OpenAPI document describes its endpoints from the XML docs of
+  its controllers, names every operation, and lists the errors every module
+  endpoint can answer with — `401`, `403`, `429` and `500` — as Problem
+  Details. `ModuleOpenApi.Validate` lets a module's test fail on an operation
+  without a summary, an operation id or a success response. A module now
+  calls `AddOpenApi` itself. See [documenting endpoints](docs/module-developers/documenting-endpoints.md).

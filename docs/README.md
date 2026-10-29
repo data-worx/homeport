@@ -18,6 +18,7 @@ Arranged by reader. A directory exists once it has its first document.
 |---|---|
 | [`module-developers/declaring-a-manifest.md`](module-developers/declaring-a-manifest.md) | Declaring and serving a module's manifest with `Homeport.Sdk` |
 | [`module-developers/answering-errors.md`](module-developers/answering-errors.md) | Answering errors as Problem Details with `Homeport.Sdk` |
+| [`module-developers/documenting-endpoints.md`](module-developers/documenting-endpoints.md) | Documenting a module's endpoints in its OpenAPI document, and checking it in a test |
 
 ## API consumers — obtaining a token, calling modules, reading usage
 

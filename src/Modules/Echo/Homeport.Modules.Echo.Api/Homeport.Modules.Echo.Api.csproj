@@ -4,7 +4,17 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- The XML docs of the controllers become the OpenAPI document
+         (dotnet-core.web); CS1591 stays off, the rule covers endpoints only. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
+
+  <!-- Referenced directly, not only through the SDK: that switches on the
+       source generator that takes the XML docs into the OpenAPI document. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Sdk\Homeport.Sdk\Homeport.Sdk.csproj" />
