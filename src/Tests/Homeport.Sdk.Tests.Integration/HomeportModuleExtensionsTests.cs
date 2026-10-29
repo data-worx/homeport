@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net;
+using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
+using Homeport.Sdk.Tests.Integration.Controllers;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Logging;
 
 namespace Homeport.Sdk.Tests.Integration;
 
@@ -18,6 +22,99 @@ public sealed class HomeportModuleExtensionsTests
             var exception = Assert.Throws<InvalidOperationException>(() => TestModule.CreateBuilder(manifest));
 
             Assert.Contains("Id 'platform' is reserved.", exception.Message);
+        }
+
+        [Fact]
+        public async Task Answers_An_Unhandled_Exception_As_An_Internal_Problem()
+        {
+            await using var app = await TestModule.StartAsync();
+
+            var response = await app.GetTestClient().GetAsync(ThingsController.ThrowPath);
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Equal("https://homeport.data-worx.de/problems/internal", root.GetProperty("type").GetString());
+            Assert.Equal(500, root.GetProperty("status").GetInt32());
+        }
+
+        [Fact]
+        public async Task Answers_A_Problem_With_The_W3C_Trace_Id()
+        {
+            await using var app = await TestModule.StartAsync();
+
+            var response = await app.GetTestClient().GetAsync(ThingsController.ThrowPath);
+
+            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Matches("^[0-9a-f]{32}$", root.GetProperty("traceId").GetString());
+        }
+
+        [Fact]
+        public async Task Leaves_The_Exception_Out_Of_An_Internal_Problem()
+        {
+            await using var app = await TestModule.StartAsync();
+
+            var response = await app.GetTestClient().GetAsync(ThingsController.ThrowPath);
+
+            var body = await response.Content.ReadAsStringAsync();
+            Assert.DoesNotContain("secret-db", body);
+            Assert.DoesNotContain(nameof(InvalidOperationException), body);
+            Assert.Equal(
+                ["status", "title", "traceId", "type"],
+                JsonDocument.Parse(body).RootElement.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal));
+        }
+
+        [Fact]
+        public async Task Logs_An_Unhandled_Exception_Once_At_Error()
+        {
+            using var logs = new CollectingLoggerProvider();
+            await using var app = await TestModule.StartAsync(logs);
+
+            await app.GetTestClient().GetAsync(ThingsController.ThrowPath);
+
+            var logged = Assert.Single(logs.Entries, entry => entry.Exception is not null);
+            Assert.Equal(LogLevel.Error, logged.Level);
+            Assert.Equal(ThingsController.ExceptionMessage, logged.Exception!.Message);
+        }
+
+        [Fact]
+        public async Task Answers_An_Invalid_Request_As_A_Validation_Problem()
+        {
+            await using var app = await TestModule.StartAsync();
+
+            var response = await app.GetTestClient().PostAsJsonAsync(ThingsController.CreatePath, new { name = "box", items = new[] { new { } } });
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Equal("https://homeport.data-worx.de/problems/validation", root.GetProperty("type").GetString());
+            Assert.Equal(400, root.GetProperty("status").GetInt32());
+            Assert.False(string.IsNullOrEmpty(root.GetProperty("traceId").GetString()));
+        }
+
+        [Fact]
+        public async Task Keys_Validation_Errors_By_CamelCase_Field_Path()
+        {
+            await using var app = await TestModule.StartAsync();
+
+            var response = await app.GetTestClient().PostAsJsonAsync(ThingsController.CreatePath, new { items = new[] { new { } } });
+
+            var errors = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("errors");
+            Assert.Equal(
+                ["items[0].name", "name"],
+                errors.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal));
+        }
+
+        [Fact]
+        public async Task Keys_An_Unreadable_Field_By_Its_CamelCase_Field_Path()
+        {
+            await using var app = await TestModule.StartAsync();
+            using var content = new StringContent("""{"name":"box","items":[{"name":7}]}""", Encoding.UTF8, "application/json");
+
+            var response = await app.GetTestClient().PostAsync(ThingsController.CreatePath, content);
+
+            var errors = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("errors");
+            Assert.Contains("items[0].name", errors.EnumerateObject().Select(property => property.Name));
         }
     }
 
@@ -90,6 +187,20 @@ public sealed class HomeportModuleExtensionsTests
             var response = await app.GetTestClient().GetAsync(path);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Answers_An_Unknown_Path_As_A_Problem()
+        {
+            await using var app = await TestModule.StartAsync();
+
+            var response = await app.GetTestClient().GetAsync("/v1/nowhere");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Equal(404, root.GetProperty("status").GetInt32());
+            Assert.False(string.IsNullOrEmpty(root.GetProperty("traceId").GetString()));
         }
     }
 }

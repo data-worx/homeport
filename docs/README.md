@@ -17,6 +17,7 @@ Arranged by reader. A directory exists once it has its first document.
 | Document | About |
 |---|---|
 | [`module-developers/declaring-a-manifest.md`](module-developers/declaring-a-manifest.md) | Declaring and serving a module's manifest with `Homeport.Sdk` |
+| [`module-developers/answering-errors.md`](module-developers/answering-errors.md) | Answering errors as Problem Details with `Homeport.Sdk` |
 
 ## API consumers — obtaining a token, calling modules, reading usage
 
@@ -37,6 +38,7 @@ Arranged by reader. A directory exists once it has its first document.
 | Document | About |
 |---|---|
 | [`reference/module-contract/`](reference/module-contract/README.md) | The language-neutral contract every module implements |
+| [`reference/problems/`](reference/problems/README.md) | Homeport's problem types, one page each |
 
 ## Design
 

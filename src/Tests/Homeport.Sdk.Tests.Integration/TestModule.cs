@@ -2,13 +2,16 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Homeport.Sdk.Tests.Integration;
 
 /// <summary>
 /// A module built with the SDK, in memory and in the <c>Production</c>
-/// environment, so nothing passes only because it runs in Development.
+/// environment, so nothing passes only because it runs in Development. Its
+/// endpoints are the controllers of this assembly.
 /// </summary>
 internal static class TestModule
 {
@@ -32,10 +35,18 @@ internal static class TestModule
         return builder;
     }
 
-    internal static async Task<WebApplication> StartAsync()
+    internal static async Task<WebApplication> StartAsync(ILoggerProvider? logs = null)
     {
-        var app = CreateBuilder(Manifest).Build();
+        var builder = CreateBuilder(Manifest);
+        builder.Services.AddControllers().AddApplicationPart(typeof(TestModule).Assembly);
+        if (logs is not null)
+        {
+            builder.Logging.AddProvider(logs);
+        }
+
+        var app = builder.Build();
         app.MapHomeportModule();
+        app.MapControllers();
         await app.StartAsync();
 
         return app;

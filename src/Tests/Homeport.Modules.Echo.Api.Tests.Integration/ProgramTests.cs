@@ -74,6 +74,27 @@ public sealed class ProgramTests
         }
 
         [Fact]
+        public async Task Answers_A_Request_Without_Body_With_The_Empty_Body_Problem()
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, "/v1/echo");
+
+            var response = await echo.CreateClient().SendAsync(request);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Equal("https://homeport.data-worx.de/modules/echo/problems/empty-body", root.GetProperty("type").GetString());
+        }
+
+        [Fact]
+        public async Task Answers_An_Unknown_Path_As_A_Problem()
+        {
+            var response = await echo.CreateClient().GetAsync("/v1/nowhere");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        }
+
+        [Fact]
         public async Task Returns_The_Received_Headers()
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, "/v1/request");
