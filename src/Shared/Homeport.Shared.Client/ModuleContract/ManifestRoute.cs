@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Homeport.Sdk;
+namespace Homeport.Shared.Client.ModuleContract;
 
 /// <summary>One route a module serves, as the manifest declares it.</summary>
 /// <param name="Method">The HTTP method, upper case.</param>

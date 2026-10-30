@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using Homeport.Sdk;
+using Homeport.Shared.Client.ModuleContract;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Homeport.Modules.Echo.Api.Tests.Integration;

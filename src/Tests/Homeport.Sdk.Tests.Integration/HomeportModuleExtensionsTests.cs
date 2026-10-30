@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Homeport.Sdk.Tests.Integration.Controllers;
+using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Problems;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Text.Json;
+using Homeport.Shared.Client.ModuleContract;
 using Microsoft.AspNetCore.Http;
 
 namespace Homeport.Sdk;
