@@ -145,6 +145,227 @@ public sealed class ReferenceTests
         }
     }
 
+    public sealed class SharedClientReferences
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = ReferenceRules.SharedClientReferences(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Fact]
+        public void Reports_A_Project_Reference()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Shared/Homeport.Shared.Client", "Homeport.Shared.Contracts"),
+                Fixture.Project("Shared/Homeport.Shared.Contracts"),
+            ];
+
+            var offenders = ReferenceRules.SharedClientReferences(projects);
+
+            Assert.Equal(["Homeport.Shared.Client -> Homeport.Shared.Contracts"], offenders);
+        }
+
+        [Fact]
+        public void Reports_A_Package_Reference()
+        {
+            ProjectFile[] projects = [Fixture.WithPackages("Shared/Homeport.Shared.Client", "Newtonsoft.Json")];
+
+            var offenders = ReferenceRules.SharedClientReferences(projects);
+
+            Assert.Equal(["Homeport.Shared.Client -> Newtonsoft.Json"], offenders);
+        }
+
+        [Fact]
+        public void Reports_A_Framework_Reference()
+        {
+            ProjectFile[] projects = [Fixture.WithFrameworks("Shared/Homeport.Shared.Client", "Microsoft.AspNetCore.App")];
+
+            var offenders = ReferenceRules.SharedClientReferences(projects);
+
+            Assert.Equal(["Homeport.Shared.Client -> Microsoft.AspNetCore.App"], offenders);
+        }
+    }
+
+    public sealed class SharedClientReferrers
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = ReferenceRules.SharedClientReferrers(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Theory]
+        [InlineData("Domain")]
+        [InlineData("Infrastructure")]
+        [InlineData("Worker")]
+        public void Reports_A_Layer_That_Never_Sees_Wire_Types(string layer)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project($"Modules/Echo/Homeport.Modules.Echo.{layer}", "Homeport.Shared.Client"),
+                Fixture.Project("Shared/Homeport.Shared.Client"),
+            ];
+
+            var offenders = ReferenceRules.SharedClientReferrers(projects);
+
+            Assert.Equal([$"Homeport.Modules.Echo.{layer} -> Homeport.Shared.Client"], offenders);
+        }
+
+        [Theory]
+        [InlineData("Modules/Echo/Homeport.Modules.Echo.Application")]
+        [InlineData("Modules/Echo/Homeport.Modules.Echo.Api")]
+        [InlineData("Platform/Registry/Homeport.Platform.Registry")]
+        public void Accepts_Application_And_An_Api_Host(string path)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project(path, "Homeport.Shared.Client"),
+                Fixture.Project("Shared/Homeport.Shared.Client"),
+            ];
+
+            var offenders = ReferenceRules.SharedClientReferrers(projects);
+
+            Assert.Empty(offenders);
+        }
+    }
+
+    public sealed class SharedInternalReferrers
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = ReferenceRules.SharedInternalReferrers(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Theory]
+        [InlineData("Modules/Echo/Homeport.Modules.Echo.Domain")]
+        [InlineData("Sdk/Homeport.Sdk")]
+        [InlineData("Shared/Homeport.Shared.Client")]
+        public void Reports_A_Project_That_Is_Shipped_Or_Is_A_Domain(string path)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project(path, "Homeport.Shared.Internal"),
+                Fixture.Project("Shared/Homeport.Shared.Internal"),
+            ];
+
+            var offenders = ReferenceRules.SharedInternalReferrers(projects);
+
+            Assert.Equal([$"{path.Split('/')[^1]} -> Homeport.Shared.Internal"], offenders);
+        }
+
+        [Fact]
+        public void Accepts_Infrastructure()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Infrastructure", "Homeport.Shared.Internal"),
+                Fixture.Project("Shared/Homeport.Shared.Internal"),
+            ];
+
+            var offenders = ReferenceRules.SharedInternalReferrers(projects);
+
+            Assert.Empty(offenders);
+        }
+    }
+
+    public sealed class SdkSharedReferences
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = ReferenceRules.SdkSharedReferences(SolutionTree.Projects, SdkReferences.Allowed);
+
+            Assert.Empty(offenders);
+        }
+
+        [Fact]
+        public void Reports_A_Shared_Project_Not_In_The_List()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Sdk/Homeport.Sdk", "Homeport.Shared.Authentication"),
+                Fixture.Project("Shared/Homeport.Shared.Authentication"),
+            ];
+
+            var offenders = ReferenceRules.SdkSharedReferences(projects, ["Homeport.Shared.Client"]);
+
+            Assert.Equal(["Homeport.Sdk -> Homeport.Shared.Authentication"], offenders);
+        }
+
+        [Fact]
+        public void Accepts_A_Shared_Project_In_The_List()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Sdk/Homeport.Sdk", "Homeport.Shared.Client"),
+                Fixture.Project("Shared/Homeport.Shared.Client"),
+            ];
+
+            var offenders = ReferenceRules.SdkSharedReferences(projects, ["Homeport.Shared.Client"]);
+
+            Assert.Empty(offenders);
+        }
+    }
+
+    public sealed class UntrackedPublicApi
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = ReferenceRules.UntrackedPublicApi(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Fact]
+        public void Reports_The_Sdk()
+        {
+            ProjectFile[] projects = [Fixture.Project("Sdk/Homeport.Sdk")];
+
+            var offenders = ReferenceRules.UntrackedPublicApi(projects);
+
+            Assert.Equal(["Homeport.Sdk"], offenders);
+        }
+
+        [Fact]
+        public void Reports_A_Transitive_Reference()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Sdk/Homeport.Sdk", "Homeport.Shared.ServiceDefaults") with { TracksPublicApi = true },
+                Fixture.Project("Shared/Homeport.Shared.ServiceDefaults", "Homeport.Shared.Telemetry") with { TracksPublicApi = true },
+                Fixture.Project("Shared/Homeport.Shared.Telemetry"),
+            ];
+
+            var offenders = ReferenceRules.UntrackedPublicApi(projects);
+
+            Assert.Equal(["Homeport.Shared.Telemetry"], offenders);
+        }
+
+        [Fact]
+        public void Accepts_A_Project_The_Sdk_Does_Not_Reach()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Sdk/Homeport.Sdk") with { TracksPublicApi = true },
+                Fixture.Project("Shared/Homeport.Shared.Authentication"),
+            ];
+
+            var offenders = ReferenceRules.UntrackedPublicApi(projects);
+
+            Assert.Empty(offenders);
+        }
+    }
+
     public sealed class ReferencesInsideAUnit
     {
         [Fact]

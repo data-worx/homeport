@@ -161,8 +161,8 @@ See [ADR-0018](docs/architecture/adr/0018-where-wire-types-live.md).
 - Domain references neither `Homeport.Shared.Client` nor
   `Homeport.Shared.Internal`. Infrastructure and a `.Worker` do not reference
   `Homeport.Shared.Client`. `Homeport.Sdk` references
-  `Homeport.Shared.Client` and never `Homeport.Shared.Internal`, and only an
-  explicit list of Shared projects.
+  `Homeport.Shared.Client` and never `Homeport.Shared.Internal`, and only the
+  Shared projects listed in `src/Tests/Architecture.Tests/SdkReferences.cs`.
 - No business logic in `src/Shared/`. A rule an external standard defines,
   such as an IBAN check, is a package or a BCL-only `Homeport.Shared.<Topic>`
   that knows no Homeport concept, listed in `DomainExceptions.cs`.

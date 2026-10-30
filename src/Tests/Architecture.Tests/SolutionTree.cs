@@ -13,6 +13,9 @@ internal static class SolutionTree
     /// <summary>The SDK that brings no shared framework beyond the BCL.</summary>
     private const string PlainSdk = "Microsoft.NET.Sdk";
 
+    /// <summary>The property that switches on the public API analyzer.</summary>
+    private const string TrackPublicApi = "TrackPublicApi";
+
     internal static readonly string Root = FindRoot();
 
     internal static readonly string Source = Path.Combine(Root, "src");
@@ -92,7 +95,13 @@ internal static class SolutionTree
             directory,
             Includes(document, "ProjectReference").Select(ProjectName).ToList(),
             Includes(document, "PackageReference").ToList(),
-            Frameworks(document).ToList());
+            Frameworks(document).ToList())
+        {
+            TracksPublicApi = document.Descendants()
+                .Any(node => node.Name.LocalName == TrackPublicApi
+                    && bool.TryParse(node.Value.Trim(), out var tracks)
+                    && tracks),
+        };
     }
 
     /// <summary>

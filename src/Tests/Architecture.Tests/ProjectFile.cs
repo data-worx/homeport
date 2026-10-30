@@ -23,6 +23,12 @@ internal sealed record ProjectFile(
     /// <summary>The layer names a project outside a service or module must not carry.</summary>
     private static readonly string[] LayerNames = ["Domain", "Application", "Infrastructure"];
 
+    /// <summary>
+    /// Whether the project sets <c>TrackPublicApi</c>, which switches on the
+    /// public API analyzer (ADR-0018).
+    /// </summary>
+    internal bool TracksPublicApi { get; init; }
+
     internal string Path => $"src/{RelativeDirectory}";
 
     internal string DirectoryName => Segments[^1];
@@ -71,6 +77,18 @@ internal sealed record ProjectFile(
     /// every project may reference (<c>dotnet.layout</c>).
     /// </summary>
     internal bool IsSharedContracts => Location == ProjectLocation.Shared && Name == $"{GroupingName}.Contracts";
+
+    /// <summary>
+    /// <c>Homeport.Shared.Client</c>: the wire types Homeport ships with the SDK
+    /// (ADR-0018).
+    /// </summary>
+    internal bool IsSharedClient => Location == ProjectLocation.Shared && Name == $"{GroupingName}.Client";
+
+    /// <summary>
+    /// <c>Homeport.Shared.Internal</c>: what services share and Homeport never
+    /// ships (ADR-0018).
+    /// </summary>
+    internal bool IsSharedInternal => Location == ProjectLocation.Shared && Name == $"{GroupingName}.Internal";
 
     /// <summary>
     /// Whether a segment of the name after the grouping directories is a layer
