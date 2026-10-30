@@ -74,3 +74,6 @@ from asynchronous workers.
 - Operator-defined module groups under `/modules/`
 - In-product developer portal: a catalogue of the modules registered in an
   installation, built from their manifests and OpenAPI documents
+- Typed .NET client in `Homeport.Shared.Client`: calls the platform and
+  catalog module APIs and obtains tokens with client credentials
+  ([ADR-0018](docs/architecture/adr/0018-where-wire-types-live.md))

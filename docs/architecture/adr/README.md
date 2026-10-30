@@ -26,6 +26,7 @@ decision is a new ADR that supersedes the old one, and the old one is marked
 | [0014](0014-authentication-between-services.md) | Authentication between services | Accepted |
 | [0015](0015-operator-defined-module-groups.md) | Operator-defined module groups | Accepted |
 | [0016](0016-error-responses.md) | Error responses | Accepted |
+| [0018](0018-where-wire-types-live.md) | Where wire types live | Accepted |
 
 ## Template
 
