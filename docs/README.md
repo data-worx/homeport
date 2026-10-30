@@ -11,6 +11,7 @@ Arranged by reader. A directory exists once it has its first document.
 |---|---|
 | [`operators/running-locally.md`](operators/running-locally.md) | Starting Homeport on one machine, with the AppHost or with Docker Compose |
 | [`operators/signing-key.md`](operators/signing-key.md) | Generating, configuring and rotating the gateway's signing key |
+| [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |
 
 ## Module developers — building a module on the contract and the SDK
 

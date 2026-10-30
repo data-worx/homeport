@@ -3,6 +3,8 @@
 using System.Net;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Homeport.Shared.Authentication.Tests.Integration;
 
@@ -69,6 +71,33 @@ public sealed class GatewayTokenAuthenticationExtensionsTests
             var status = await StatusOnceSettled(service, next.Sign(ValidatingService.Audience));
 
             Assert.Equal(HttpStatusCode.OK, status);
+        }
+
+        [Fact]
+        public async Task Logs_A_Rejected_Token_At_Warning_With_The_Reason_And_Without_The_Token()
+        {
+            await using var service = await ValidatingService.StartAsync(current);
+            var token = current.Sign("homeport-control-plane");
+
+            await Send(service, token);
+
+            var logged = Assert.Single(service.Logs.GetSnapshot(), entry => entry.Category == "Homeport.Shared.Authentication.GatewayTokenEvents");
+            Assert.Equal(LogLevel.Warning, logged.Level);
+            Assert.Contains(nameof(SecurityTokenInvalidAudienceException), logged.Message);
+            Assert.DoesNotContain(token, logged.Message);
+        }
+
+        [Fact]
+        public async Task Logs_A_Failed_Jwks_Retrieval_At_Warning()
+        {
+            await using var service = await ValidatingService.StartAsync(current);
+            service.Fail();
+
+            await Send(service, current.Sign(ValidatingService.Audience));
+
+            Assert.Contains(
+                service.Logs.GetSnapshot(),
+                entry => entry.Category == "Homeport.Shared.Authentication.JsonWebKeySetRetriever" && entry.Level == LogLevel.Warning);
         }
 
         public void Dispose()

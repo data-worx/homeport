@@ -5,13 +5,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace Homeport.Shared.Authentication.Tests.Integration;
 
 /// <summary>
 /// A service that accepts gateway tokens for <see cref="Audience"/>, in memory,
 /// next to a stand-in for the gateway's JWKS on a local port. A test changes
-/// what the JWKS publishes with <see cref="Publish"/>.
+/// what the JWKS publishes with <see cref="Publish"/>, or makes it fail with
+/// <see cref="Fail"/>, and reads what the service logged from <see cref="Logs"/>.
 /// </summary>
 internal sealed class ValidatingService : IAsyncDisposable
 {
@@ -24,10 +27,13 @@ internal sealed class ValidatingService : IAsyncDisposable
 
     private WebApplication? jwks;
     private WebApplication? service;
-    private string document = TestKey.Jwks();
+    private string? document = TestKey.Jwks();
 
-    internal HttpClient CreateClient() =>
-        (service ?? throw new InvalidOperationException("The service has not been started.")).GetTestClient();
+    internal HttpClient CreateClient() => Started.GetTestClient();
+
+    internal FakeLogCollector Logs => Started.Services.GetFakeLogCollector();
+
+    private WebApplication Started => service ?? throw new InvalidOperationException("The service has not been started.");
 
     internal static async Task<ValidatingService> StartAsync(params TestKey[] published)
     {
@@ -42,6 +48,12 @@ internal sealed class ValidatingService : IAsyncDisposable
     internal void Publish(params TestKey[] keys)
     {
         document = TestKey.Jwks(keys);
+    }
+
+    /// <summary>Makes the JWKS answer every request with <c>500</c>.</summary>
+    internal void Fail()
+    {
+        document = null;
     }
 
     public async ValueTask DisposeAsync()
@@ -62,7 +74,16 @@ internal sealed class ValidatingService : IAsyncDisposable
         var builder = WebApplication.CreateSlimBuilder();
         builder.WebHost.UseUrls(LocalAddress);
         jwks = builder.Build();
-        jwks.Run(context => context.Response.WriteAsync(document));
+        jwks.Run(context =>
+        {
+            if (document is null)
+            {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Task.CompletedTask;
+            }
+
+            return context.Response.WriteAsync(document);
+        });
         await jwks.StartAsync();
     }
 
@@ -72,6 +93,7 @@ internal sealed class ValidatingService : IAsyncDisposable
         builder.WebHost.UseTestServer();
         builder.Configuration[$"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}"] =
             $"{jwks!.Urls.Single()}{GatewayTokens.JwksPath}";
+        builder.Logging.AddFakeLogging();
         builder.Services.AddGatewayTokenAuthentication(Audience);
         builder.Services.AddAuthorization();
 

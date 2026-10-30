@@ -21,7 +21,7 @@ internal sealed class CollectingLoggerProvider : ILoggerProvider
     {
     }
 
-    internal sealed record LogEntry(string Category, LogLevel Level, Exception? Exception);
+    internal sealed record LogEntry(string Category, LogLevel Level, string Message, Exception? Exception);
 
     private sealed class CollectingLogger(string category, ConcurrentQueue<LogEntry> entries) : ILogger
     {
@@ -38,7 +38,7 @@ internal sealed class CollectingLoggerProvider : ILoggerProvider
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            entries.Enqueue(new LogEntry(category, logLevel, exception));
+            entries.Enqueue(new LogEntry(category, logLevel, formatter(state, exception), exception));
         }
     }
 }

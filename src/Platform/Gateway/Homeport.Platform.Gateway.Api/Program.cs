@@ -5,7 +5,6 @@ using Homeport.Platform.Gateway.Api.Routing;
 using Homeport.Platform.Gateway.Infrastructure.Signing;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.Extensions.Options;
-using Yarp.ReverseProxy.Transforms;
 
 namespace Homeport.Platform.Gateway.Api;
 
@@ -17,6 +16,8 @@ namespace Homeport.Platform.Gateway.Api;
 /// </summary>
 public sealed class Program
 {
+    private const string NoAdditionalKey = "none";
+
     // Not static, so the integration tests can name it as their entry point.
     private Program()
     {
@@ -34,7 +35,7 @@ public sealed class Program
         builder.Services.AddSingleton<IConfigureOptions<ProblemDetailsOptions>, GatewayProblemDetails>();
         builder.Services.AddReverseProxy()
             .LoadFromMemory(StaticRoutes.Routes, StaticRoutes.Clusters)
-            .AddTransforms(context => context.AddRequestTransform(HomeportHeaders.StripAsync))
+            .AddTransforms<HomeportHeaders>()
             .AddTransforms<ModuleErrors>()
             .AddServiceDiscoveryDestinationResolver();
 
@@ -54,6 +55,25 @@ public sealed class Program
         // the proxy endpoints are framework-mapped, like the health endpoints.
         app.MapReverseProxy();
 
+        LogStart(app);
         app.Run();
+    }
+
+    // Once started, so the signing options have passed validation and the
+    // addresses are bound. Key ids only: the keys are secrets.
+    private static void LogStart(WebApplication app)
+    {
+        app.Lifetime.ApplicationStarted.Register(() =>
+        {
+            var signing = app.Services.GetRequiredService<IOptions<SigningOptions>>().Value;
+            var additionalKeyId = string.IsNullOrWhiteSpace(signing.AdditionalKeyId) ? NoAdditionalKey : signing.AdditionalKeyId;
+
+            app.Logger.LogInformation(
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, modules {ModuleIds}",
+                app.Urls,
+                signing.KeyId,
+                additionalKeyId,
+                StaticRoutes.Routes.Select(route => route.RouteId));
+        });
     }
 }

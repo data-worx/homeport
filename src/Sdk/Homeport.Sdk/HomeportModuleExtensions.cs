@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Homeport.Sdk;
 
@@ -74,6 +75,7 @@ public static class HomeportModuleExtensions
     /// <see cref="HomeportProblems.Internal"/>, and an error status without a
     /// body, such as a <c>404</c> for an unknown path, gets a Problem Details body.
     /// </para>
+    /// <para>Once the module has started, it logs the manifest it serves.</para>
     /// </remarks>
     public static WebApplication MapHomeportModule(this WebApplication app)
     {
@@ -89,7 +91,23 @@ public static class HomeportModuleExtensions
         app.MapOpenApi(ModuleManifest.OpenApiPath)
             .AllowAnonymous();
 
+        LogStart(app);
+
         return app;
+    }
+
+    private static void LogStart(WebApplication app)
+    {
+        var manifest = app.Services.GetRequiredService<ModuleManifest>();
+        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger(typeof(HomeportModuleExtensions));
+
+        app.Lifetime.ApplicationStarted.Register(() => logger.LogInformation(
+            "Module {ModuleId} {Version} started on {Urls}: contract version {ContractVersion}, {RouteCount} routes",
+            manifest.Id,
+            manifest.Version,
+            app.Urls,
+            manifest.ContractVersion,
+            manifest.Routes.Count));
     }
 
     private static void AddProblemDetails(IServiceCollection services)

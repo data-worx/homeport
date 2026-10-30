@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 
@@ -12,7 +14,8 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 /// The gateway in memory, forwarding to a stand-in for Echo on a local port.
 /// The stand-in answers every request with the path and the headers it
 /// received, so a test sees what the gateway forwards, except for the paths
-/// under <see cref="ErrorsPath"/>, which answer with an error.
+/// under <see cref="ErrorsPath"/>, which answer with an error. What the
+/// gateway logs, down to Debug, is read from <see cref="Logs"/>.
 /// </summary>
 public sealed class ForwardingGateway : IAsyncLifetime
 {
@@ -43,7 +46,12 @@ public sealed class ForwardingGateway : IAsyncLifetime
     private WebApplicationFactory<Program>? gateway;
 
     internal HttpClient CreateClient() =>
-        (gateway ?? throw new InvalidOperationException("The gateway has not been started.")).CreateClient();
+        Started.CreateClient();
+
+    internal FakeLogCollector Logs => Started.Services.GetFakeLogCollector();
+
+    private WebApplicationFactory<Program> Started =>
+        gateway ?? throw new InvalidOperationException("The gateway has not been started.");
 
     public async Task InitializeAsync()
     {
@@ -62,7 +70,10 @@ public sealed class ForwardingGateway : IAsyncLifetime
         await module.StartAsync();
 
         gateway = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(host => host.WithSigningKey().UseSetting(EchoEndpointKey, module.Urls.Single()));
+            .WithWebHostBuilder(host => host
+                .WithSigningKey()
+                .UseSetting(EchoEndpointKey, module.Urls.Single())
+                .ConfigureLogging(logging => logging.AddFakeLogging().SetMinimumLevel(LogLevel.Debug)));
     }
 
     public async Task DisposeAsync()

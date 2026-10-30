@@ -7,6 +7,8 @@ using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 
 namespace Homeport.Platform.Gateway.Api.Tests.Integration;
@@ -21,6 +23,10 @@ public sealed class ProgramTests
         private const string ClosedEndpoint = "http://127.0.0.1:1";
 
         private const string ProblemTypePrefix = "https://homeport.data-worx.de/problems/";
+
+        private const string ProgramCategory = "Homeport.Platform.Gateway.Api";
+
+        private const string HomeportHeadersCategory = "Homeport.Platform.Gateway.Api.Routing.HomeportHeaders";
 
         [Fact]
         public async Task Forwards_The_Path_Below_The_Module_Prefix()
@@ -40,6 +46,21 @@ public sealed class ProgramTests
             var forwarded = await Send(request);
 
             Assert.DoesNotContain(forwarded.Headers.Keys, name => name.StartsWith("x-homeport-", StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task Logs_The_Names_Of_Stripped_Headers_At_Debug()
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, "/modules/echo/v1/request");
+            request.Headers.Add("X-Homeport-Subject", "spoofed");
+
+            await Send(request);
+
+            Assert.Contains(
+                gateway.Logs.GetSnapshot(),
+                entry => entry.Category == HomeportHeadersCategory
+                    && entry.Level == LogLevel.Debug
+                    && entry.Message.Contains("X-Homeport-Subject", StringComparison.Ordinal));
         }
 
         [Fact]
@@ -122,6 +143,25 @@ public sealed class ProgramTests
             Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
             Assert.Equal(ProblemTypePrefix + "module-unreachable", problem["type"]?.GetValue<string>());
             Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public void Logs_Its_Start_At_Information_With_The_Key_Ids_And_Without_The_Keys()
+        {
+            using var started = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(host => host
+                    .WithSigningKey()
+                    .WithAdditionalPublicKey()
+                    .ConfigureLogging(logging => logging.AddFakeLogging()));
+
+            using var client = started.CreateClient();
+
+            var logged = Assert.Single(
+                started.Services.GetFakeLogCollector().GetSnapshot(),
+                entry => entry.Category == ProgramCategory && entry.Level == LogLevel.Information);
+            Assert.Contains(SigningSettings.KeyId, logged.Message);
+            Assert.Contains(SigningSettings.AdditionalKeyId, logged.Message);
+            Assert.DoesNotContain("KEY-----", logged.Message);
         }
 
         [Fact]
