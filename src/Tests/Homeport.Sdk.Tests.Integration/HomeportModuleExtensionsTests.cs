@@ -155,6 +155,19 @@ public sealed class HomeportModuleExtensionsTests
     public sealed class MapHomeportModule
     {
         [Fact]
+        public async Task Logs_Its_Start_At_Information_With_The_Manifest()
+        {
+            using var logs = new CollectingLoggerProvider();
+
+            await using var app = await TestModule.StartAsync(logs);
+
+            var logged = Assert.Single(logs.Entries, entry => entry.Category == "Homeport.Sdk.HomeportModuleExtensions");
+            Assert.Equal(LogLevel.Information, logged.Level);
+            Assert.Contains(TestModule.Manifest.Id, logged.Message);
+            Assert.Contains(TestModule.Manifest.Version, logged.Message);
+        }
+
+        [Fact]
         public async Task Serves_The_Manifest_With_Every_Contract_Field()
         {
             await using var app = await TestModule.StartAsync();

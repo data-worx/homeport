@@ -20,6 +20,9 @@ AGENTS.local.md
 *.sln.docstates
 *.env
 
+# An operator's local compose override, as docs/operators/logging.md describes it
+deploy/compose/docker-compose.override.yaml
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

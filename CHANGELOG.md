@@ -54,3 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Details. `ModuleOpenApi.Validate` lets a module's test fail on an operation
   without a summary, an operation id or a success response. A module now
   calls `AddOpenApi` itself. See [documenting endpoints](docs/module-developers/documenting-endpoints.md).
+- The gateway, the SDK and the token validation of the platform services
+  log what an operator needs to diagnose them: each service logs its start
+  with its effective configuration, never a key; a rejected gateway token and
+  a failed retrieval of the gateway's JWKS are warnings. The level is set per
+  category through environment variables. See [logging](docs/operators/logging.md).
