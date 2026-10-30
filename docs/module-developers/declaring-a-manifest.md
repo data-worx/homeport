@@ -10,6 +10,12 @@ requires. The Echo module in `src/Modules/Echo/` is the reference.
 The SDK is not published as a NuGet package yet; reference the project
 `src/Sdk/Homeport.Sdk` directly.
 
+`ModuleManifest` and `ManifestRoute` are types of the module contract, so
+they live in `Homeport.Shared.Client`, namespace
+`Homeport.Shared.Client.ModuleContract`, next to the wire types callers use.
+The SDK references that project, so a module that references the SDK has
+them.
+
 ## Declare the manifest
 
 ```csharp
