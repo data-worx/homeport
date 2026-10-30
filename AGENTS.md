@@ -97,6 +97,8 @@ Homeport.slnx
 src/
   Aspire/Homeport.Aspire.AppHost
   Shared/Homeport.Shared.Contracts
+  Shared/Homeport.Shared.Client
+  Shared/Homeport.Shared.Internal
   Shared/Homeport.Shared.ServiceDefaults
   Shared/Homeport.Shared.Authentication
   Sdk/Homeport.Sdk
@@ -115,8 +117,8 @@ src/
   that is its composition root. Business modules are cut from the start.
 - A service never references another service's projects, its Contracts
   included, and no service or module has a Contracts project of its own.
-  Services talk over HTTP or messages; shared types live in
-  `Homeport.Shared.Contracts`.
+  Services talk over HTTP or messages; shared types live in `src/Shared/`
+  as *Shared types* below prescribes.
 - Modules are reachable only through the gateway.
 - A project is named `Homeport`, then every grouping directory between `src/`
   and the project, then its own name, as in the tree above
@@ -136,13 +138,40 @@ src/
 - Tools and tests are unrestricted.
 - `Architecture.Tests` asserts the layout, naming and reference rules above,
   each also against a fixture tree that breaks it.
-- `Homeport.Shared.Contracts` holds the types several services, the SDK and a
-  Domain share, such as the result type, and references nothing beyond the
-  BCL — no package, framework or project.
-- Messages between services (for example `UsageRecorded`) are contracts in
-  `Homeport.Shared.Contracts`. Changing one is a breaking change for every consumer.
 
 Current state: [docs/architecture/architecture.md](docs/architecture/architecture.md).
+
+### Shared types
+
+See [ADR-0018](docs/architecture/adr/0018-where-wire-types-live.md).
+
+- `Homeport.Shared.Contracts` holds the generic core several components
+  share, such as the result type, and references nothing beyond the BCL — no
+  package, framework or project. It is shipped with the SDK.
+- `Homeport.Shared.Client` holds the request and response types of every
+  endpoint a consumer reaches through the gateway — platform APIs and catalog
+  modules — the types of the module contract, and the Problem Details read
+  model. It references nothing. Namespaces mirror `src/` and the API major
+  version: `Homeport.Shared.Client.Modules.Echo.V1`; `ModuleContract` and
+  `Problems` carry no version.
+- `Homeport.Shared.Internal` holds what services share and Homeport never
+  ships: messages between services (for example `UsageRecorded`),
+  integration events and the like. Changing one is a breaking change for
+  every consumer. The project is created with its first type.
+- Domain references neither `Homeport.Shared.Client` nor
+  `Homeport.Shared.Internal`. Infrastructure and a `.Worker` do not reference
+  `Homeport.Shared.Client`. `Homeport.Sdk` references
+  `Homeport.Shared.Client` and never `Homeport.Shared.Internal`, and only an
+  explicit list of Shared projects.
+- No business logic in `src/Shared/`. A rule an external standard defines,
+  such as an IBAN check, is a package or a BCL-only `Homeport.Shared.<Topic>`
+  that knows no Homeport concept, listed in `DomainExceptions.cs`.
+- `Homeport.Sdk` and every project it references run
+  `Microsoft.CodeAnalysis.PublicApiAnalyzers`; every public member is listed
+  in `PublicAPI.Shipped.txt` or `PublicAPI.Unshipped.txt`.
+- `Homeport.Shared.Client` is published with `Homeport.Sdk`, under the same
+  version.
+- The code follows these rules from #105 on.
 
 ### Module contract
 
