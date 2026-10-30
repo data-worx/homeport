@@ -24,7 +24,7 @@ public sealed class JwksController(SigningKeys keys) : ControllerBase
 {
     /// <summary>The current signing key and, when configured, the additional public key.</summary>
     [HttpGet]
-    public JsonWebKeySetDocument Get()
+    public JsonWebKeySetResponse Get()
     {
         return keys.Jwks;
     }

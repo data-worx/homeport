@@ -38,14 +38,14 @@ public sealed class SigningKeys : IDisposable
             published.Add(PublicJsonWebKey.FromKey(additional, signing.AdditionalKeyId!));
         }
 
-        Jwks = new JsonWebKeySetDocument(published);
+        Jwks = new JsonWebKeySetResponse(published);
     }
 
     /// <summary>What every token the gateway issues is signed with.</summary>
     public SigningCredentials Credentials { get; }
 
     /// <summary>The public keys the gateway publishes, the signing key first.</summary>
-    public JsonWebKeySetDocument Jwks { get; }
+    public JsonWebKeySetResponse Jwks { get; }
 
     public void Dispose()
     {

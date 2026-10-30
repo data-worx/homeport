@@ -1,6 +1,6 @@
 {
   "source": "https://github.com/raisr/devkit",
-  "version": { "commit": "ae178ce", "date": "2026-10-29" },
+  "version": { "commit": "27677c3", "date": "2026-10-30" },
   "bootstrappedAt": "2026-10-19",
   "flavors": { "stacks": ["dotnet-core"], "forge": "github" },
   "files": [
@@ -26,7 +26,7 @@
     { "path": "AGENTS.dotnet.md", "from": "shared/dotnet/AGENTS.dotnet.md", "mode": "managed", "hash": "becc367543c1992be455aba78b32c99c8a442565" },
     { "path": ".editorconfig", "from": "shared/dotnet/editorconfig.block", "mode": "block", "hash": "06a9f7728ed1aa66dbccd42d57203178b14a5997", "marker": "devkit:shared/dotnet" },
     { "path": ".gitignore", "from": "shared/dotnet/gitignore.block", "mode": "block", "hash": "828a634adefc01e53bf3f9c6999b7cc7fdc6989c", "marker": "devkit:shared/dotnet" },
-    { "path": "AGENTS.dotnet-core.md", "from": "stacks/dotnet-core/AGENTS.dotnet-core.md", "mode": "managed", "hash": "61ec9ee6776896bf335e644b84b10bea79880c51" },
+    { "path": "AGENTS.dotnet-core.md", "from": "stacks/dotnet-core/AGENTS.dotnet-core.md", "mode": "managed", "hash": "5336e9577be30edf034872d657d56df1b7cf24d3" },
     { "path": ".editorconfig", "from": "stacks/dotnet-core/editorconfig.block", "mode": "block", "hash": "6d4915be3c278f8a6ffc01f6153eda3f63236449", "marker": "devkit:stack/dotnet-core" },
     { "path": ".devkit/gates.sh", "from": "stacks/dotnet-core/templates/gates.sh", "mode": "template", "hash": "27658814e7c618ea0735b6a30cce24acf7c3cfcc" },
     { "path": "src/Directory.Build.props", "from": "stacks/dotnet-core/templates/Directory.Build.props", "mode": "template", "hash": "a085eac0260783ff4ef91a44450de23fe7dc159d" },

@@ -23,7 +23,7 @@ internal sealed class TestKey(string keyId) : IDisposable
     /// <summary>The JWKS publishing <paramref name="keys"/>, as the gateway serves it.</summary>
     internal static string Jwks(params TestKey[] keys)
     {
-        return JsonSerializer.Serialize(new JsonWebKeySetDocument(
+        return JsonSerializer.Serialize(new JsonWebKeySetResponse(
             keys.Select(published => PublicJsonWebKey.FromKey(published.key, published.KeyId)).ToList()));
     }
 
