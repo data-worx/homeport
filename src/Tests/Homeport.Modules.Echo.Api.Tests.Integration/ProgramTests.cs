@@ -113,6 +113,15 @@ public sealed class ProgramTests
             Assert.Equal("Returns the request body unchanged.", operation.GetProperty("summary").GetString());
         }
 
+        [Fact]
+        public async Task Takes_The_Description_Of_A_Shared_Client_Type_From_Its_Xml_Doc()
+        {
+            var document = await OpenApiDocument();
+
+            var schema = document.GetProperty("components").GetProperty("schemas").GetProperty("ReceivedRequestResponse");
+            Assert.Equal("A request as Echo received it.", schema.GetProperty("description").GetString());
+        }
+
         [Theory]
         [InlineData("401")]
         [InlineData("403")]
