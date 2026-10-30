@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -38,19 +39,21 @@ public static class GatewayTokenAuthenticationExtensions
 
         services.AddOptions<GatewayTokenOptions>().BindConfiguration(GatewayTokenOptions.SectionName);
         services.AddHttpClient(JsonWebKeySetRetriever.ClientName);
+        services.AddSingleton<GatewayTokenEvents>();
 
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-            .Configure<IHttpClientFactory, IOptions<GatewayTokenOptions>>((bearer, clients, gateway) =>
+            .Configure<IHttpClientFactory, IOptions<GatewayTokenOptions>, ILogger<JsonWebKeySetRetriever>>((bearer, clients, gateway, logger) =>
             {
                 bearer.TokenValidationParameters = GatewayTokens.ValidationParameters(audience);
                 bearer.MapInboundClaims = false;
                 bearer.RefreshOnIssuerKeyNotFound = true;
+                bearer.EventsType = typeof(GatewayTokenEvents);
 
                 // Plain HTTP on the internal network: Homeport does not encrypt
                 // traffic between components until mTLS is decided (ADR-0014).
                 bearer.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                     gateway.Value.JwksUri.ToString(),
-                    new JsonWebKeySetRetriever(clients))
+                    new JsonWebKeySetRetriever(clients, logger))
                 {
                     RefreshInterval = RefreshInterval,
                     AutomaticRefreshInterval = AutomaticRefreshInterval,

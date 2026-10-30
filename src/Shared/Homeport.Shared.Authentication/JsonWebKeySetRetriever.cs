@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +16,7 @@ namespace Homeport.Shared.Authentication;
 /// retriever it is handed, so service discovery resolves the gateway's address
 /// and the client follows the service defaults.
 /// </remarks>
-internal sealed class JsonWebKeySetRetriever(IHttpClientFactory clients) : IConfigurationRetriever<OpenIdConnectConfiguration>
+internal sealed class JsonWebKeySetRetriever(IHttpClientFactory clients, ILogger<JsonWebKeySetRetriever> logger) : IConfigurationRetriever<OpenIdConnectConfiguration>
 {
     /// <summary>The named client the JWKS is fetched with.</summary>
     internal const string ClientName = "homeport-gateway-jwks";
@@ -25,15 +26,27 @@ internal sealed class JsonWebKeySetRetriever(IHttpClientFactory clients) : IConf
         IDocumentRetriever retriever,
         CancellationToken cancel)
     {
-        using var client = clients.CreateClient(ClientName);
-        var json = await client.GetStringAsync(new Uri(address), cancel);
-
-        var configuration = new OpenIdConnectConfiguration();
-        foreach (var key in new JsonWebKeySet(json).GetSigningKeys())
+        try
         {
-            configuration.SigningKeys.Add(key);
-        }
+            using var client = clients.CreateClient(ClientName);
+            var json = await client.GetStringAsync(new Uri(address), cancel);
 
-        return configuration;
+            var configuration = new OpenIdConnectConfiguration();
+            foreach (var key in new JsonWebKeySet(json).GetSigningKeys())
+            {
+                configuration.SigningKeys.Add(key);
+            }
+
+            return configuration;
+        }
+        catch (Exception exception) when (!cancel.IsCancellationRequested)
+        {
+            // Logged here and rethrown, an exception to core.logging: the
+            // configuration manager handles the failure, but keeps validating
+            // against the keys it has and writes nothing to ILogger, so a
+            // failed refresh would otherwise go unnoticed.
+            logger.LogWarning(exception, "The gateway's JWKS could not be retrieved from {JwksUri}", address);
+            throw;
+        }
     }
 }
