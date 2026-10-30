@@ -1,0 +1,21 @@
+#nullable enable
+Homeport.Shared.Contracts.Error
+Homeport.Shared.Contracts.Error.<Clone>$() -> Homeport.Shared.Contracts.Error!
+Homeport.Shared.Contracts.Error.Code.get -> string!
+Homeport.Shared.Contracts.Error.Code.init -> void
+Homeport.Shared.Contracts.Error.Deconstruct(out string! Code, out string! Message) -> void
+Homeport.Shared.Contracts.Error.Equals(Homeport.Shared.Contracts.Error? other) -> bool
+Homeport.Shared.Contracts.Error.Error(string! Code, string! Message) -> void
+Homeport.Shared.Contracts.Error.Message.get -> string!
+Homeport.Shared.Contracts.Error.Message.init -> void
+Homeport.Shared.Contracts.Result<TValue>
+Homeport.Shared.Contracts.Result<TValue>.Error.get -> Homeport.Shared.Contracts.Error!
+Homeport.Shared.Contracts.Result<TValue>.IsSuccess.get -> bool
+Homeport.Shared.Contracts.Result<TValue>.Value.get -> TValue
+override Homeport.Shared.Contracts.Error.Equals(object? obj) -> bool
+override Homeport.Shared.Contracts.Error.GetHashCode() -> int
+override Homeport.Shared.Contracts.Error.ToString() -> string!
+static Homeport.Shared.Contracts.Error.operator !=(Homeport.Shared.Contracts.Error? left, Homeport.Shared.Contracts.Error? right) -> bool
+static Homeport.Shared.Contracts.Error.operator ==(Homeport.Shared.Contracts.Error? left, Homeport.Shared.Contracts.Error? right) -> bool
+static Homeport.Shared.Contracts.Result<TValue>.Failure(Homeport.Shared.Contracts.Error! error) -> Homeport.Shared.Contracts.Result<TValue>!
+static Homeport.Shared.Contracts.Result<TValue>.Success(TValue value) -> Homeport.Shared.Contracts.Result<TValue>!

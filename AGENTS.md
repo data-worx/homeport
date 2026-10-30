@@ -168,7 +168,10 @@ See [ADR-0018](docs/architecture/adr/0018-where-wire-types-live.md).
   that knows no Homeport concept, listed in `DomainExceptions.cs`.
 - `Homeport.Sdk` and every project it references run
   `Microsoft.CodeAnalysis.PublicApiAnalyzers`; every public member is listed
-  in `PublicAPI.Shipped.txt` or `PublicAPI.Unshipped.txt`.
+  in `PublicAPI.Shipped.txt` or `PublicAPI.Unshipped.txt`. A project switches
+  it on with `<TrackPublicApi>true</TrackPublicApi>`, and
+  `Directory.Build.targets` adds the analyzer. It flows to no caller, so it
+  is not a reference in the sense of the rules above.
 - `Homeport.Shared.Client` is published with `Homeport.Sdk`, under the same
   version.
 - The code follows these rules from #105 on.

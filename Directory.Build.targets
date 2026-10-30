@@ -1,0 +1,12 @@
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<Project>
+
+  <!-- A project that sets TrackPublicApi lists every public member in
+       PublicAPI.Shipped.txt or PublicAPI.Unshipped.txt (ADR-0018). The
+       analyzer runs at build time and flows to no caller, so it is no
+       reference of the project: it is added here, not in the project file. -->
+  <ItemGroup Condition="'$(TrackPublicApi)' == 'true'">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
