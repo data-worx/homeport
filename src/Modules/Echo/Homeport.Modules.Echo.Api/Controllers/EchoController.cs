@@ -33,6 +33,10 @@ public sealed class EchoController : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
     public IActionResult Echo()
     {
+        // No request or response type, an exception to dotnet-core.web: the
+        // body is returned unchanged, whatever its content type, so it has no
+        // shape to describe.
+
         // A body announced by neither Content-Length nor chunked transfer is absent.
         if (HttpContext.Features.Get<IHttpRequestBodyDetectionFeature>()?.CanHaveBody != true)
         {
@@ -51,13 +55,13 @@ public sealed class EchoController : ControllerBase
     /// <response code="200">The headers Echo received.</response>
     [HttpGet(EchoManifest.RequestPath, Name = GetRequestOperation)]
     [AllowAnonymous]
-    [ProducesResponseType<ReceivedRequest>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
-    public ActionResult<ReceivedRequest> Received()
+    [ProducesResponseType<ReceivedRequestResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    public ActionResult<ReceivedRequestResponse> Received()
     {
         var headers = Request.Headers
             .Where(header => !string.Equals(header.Key, HeaderNames.Authorization, StringComparison.OrdinalIgnoreCase))
             .ToDictionary(header => header.Key.ToLowerInvariant(), header => header.Value.ToString());
 
-        return new ReceivedRequest(headers);
+        return new ReceivedRequestResponse(headers);
     }
 }

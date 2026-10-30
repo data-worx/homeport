@@ -99,6 +99,23 @@ unhandled exceptions and status codes the framework sets without a body. A
 response that hands the client an empty body or an ad-hoc error shape breaks
 this rule.
 
+**API actions take and return dedicated wire types.** An action that takes a
+body takes a dedicated request type; an action that returns a body on success
+returns a dedicated response type. Both are records (`dotnet-core.style`). A
+domain or persistence type never appears in an action's signature, and no type
+serves as both request and response: a wire type that is also a model makes
+every change inside the service a breaking change for its callers.
+
+- A request type is named after the action that takes it:
+  `CreateContractRequest`.
+- A response type is named after what it describes, `ContractResponse`, and is
+  shared by every action that returns the same shape.
+- Query and route parameters stay plain parameters, an action that returns no
+  body has no response type, and error responses are `ProblemDetails` as above.
+
+An exception, such as an endpoint that returns the request it received, is a
+special case and carries a comment where it is declared, saying why.
+
 ## Aspire {#dotnet-core.aspire}
 
 An Aspire app host lives in `src/Aspire/` as `<Name>.Aspire.AppHost`, the one
