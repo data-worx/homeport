@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Homeport.Shared.Client\Homeport.Shared.Client.csproj" />
     <ProjectReference Include="..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Shared\Homeport.Shared.Contracts\Homeport.Shared.Contracts.csproj" />
   </ItemGroup>

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Homeport.Shared.Contracts;
+namespace Homeport.Shared.Client.Problems;
 
 /// <summary>
 /// The parts of Homeport's error format (ADR-0016) that the gateway and the

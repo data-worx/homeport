@@ -3,7 +3,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Mime;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using Homeport.Shared.Client.Problems;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -27,6 +30,12 @@ public sealed class ProgramTests
         private const string ProgramCategory = "Homeport.Platform.Gateway.Api";
 
         private const string HomeportHeadersCategory = "Homeport.Platform.Gateway.Api.Routing.HomeportHeaders";
+
+        // Writes a ProblemResponse back the way the gateway wrote it: absent members stay absent.
+        private static readonly JsonSerializerOptions ClientJson = new(JsonSerializerOptions.Web)
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        };
 
         [Fact]
         public async Task Forwards_The_Path_Below_The_Module_Prefix()
@@ -106,6 +115,17 @@ public sealed class ProgramTests
             Assert.Equal(ForwardingGateway.NotFoundType, problem["type"]?.GetValue<string>());
             Assert.Equal(ForwardingGateway.NotFoundDetail, problem["detail"]?.GetValue<string>());
             Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Answers_A_Problem_A_Client_Reads_Without_Loss()
+        {
+            using var response = await gateway.CreateClient().SendAsync(Traced(ModulePath(ForwardingGateway.NotFoundProblemPath)));
+
+            var body = await ReadProblem(response);
+            var problem = body.Deserialize<ProblemResponse>(JsonSerializerOptions.Web);
+            Assert.Null(problem?.Extensions);
+            Assert.True(JsonNode.DeepEquals(body, JsonSerializer.SerializeToNode(problem, ClientJson)));
         }
 
         [Fact]
