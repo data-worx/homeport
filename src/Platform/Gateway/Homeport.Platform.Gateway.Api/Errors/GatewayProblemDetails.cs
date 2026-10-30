@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 using Homeport.Platform.Gateway.Api.Routing;
-using Homeport.Shared.Contracts;
+using Homeport.Shared.Client.Problems;
 using Microsoft.Extensions.Options;
 using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Model;

@@ -4,7 +4,11 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Homeport.Sdk.Tests.Integration.Controllers;
+using Homeport.Shared.Client.ModuleContract;
+using Homeport.Shared.Client.Problems;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +18,12 @@ public sealed class HomeportModuleExtensionsTests
 {
     public sealed class AddHomeportModule
     {
+        // Writes a ProblemResponse back the way the SDK wrote it: absent members stay absent.
+        private static readonly JsonSerializerOptions ClientJson = new(JsonSerializerOptions.Web)
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        };
+
         [Fact]
         public void Refuses_A_Manifest_That_Breaks_The_Contract()
         {
@@ -90,6 +100,19 @@ public sealed class HomeportModuleExtensionsTests
             Assert.Equal("https://homeport.data-worx.de/problems/validation", root.GetProperty("type").GetString());
             Assert.Equal(400, root.GetProperty("status").GetInt32());
             Assert.False(string.IsNullOrEmpty(root.GetProperty("traceId").GetString()));
+        }
+
+        [Fact]
+        public async Task Answers_A_Validation_Problem_A_Client_Reads_Without_Loss()
+        {
+            await using var app = await TestModule.StartAsync();
+
+            var response = await app.GetTestClient().PostAsJsonAsync(ThingsController.CreatePath, new { items = new[] { new { } } });
+
+            var body = JsonNode.Parse(await response.Content.ReadAsStringAsync());
+            var problem = body.Deserialize<ProblemResponse>(JsonSerializerOptions.Web);
+            Assert.Null(problem?.Extensions);
+            Assert.True(JsonNode.DeepEquals(body, JsonSerializer.SerializeToNode(problem, ClientJson)));
         }
 
         [Fact]

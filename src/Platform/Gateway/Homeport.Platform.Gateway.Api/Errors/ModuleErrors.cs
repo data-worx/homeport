@@ -3,7 +3,7 @@
 using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Homeport.Shared.Contracts;
+using Homeport.Shared.Client.Problems;
 using Yarp.ReverseProxy.Model;
 using Yarp.ReverseProxy.Transforms;
 using Yarp.ReverseProxy.Transforms.Builder;

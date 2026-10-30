@@ -64,3 +64,17 @@ The `type` tells you who produced the error.
 
 Errors ASP.NET answers on its own, such as `405` for a wrong method, carry
 the default type for their status, too.
+
+## Reading an error in .NET
+
+`Homeport.Shared.Client` reads the body as `ProblemResponse`, in the
+namespace `Homeport.Shared.Client.Problems`. It carries every member above,
+`errors` as `Errors`, and any member a module adds in `Extensions`:
+
+```csharp
+var problem = await response.Content.ReadFromJsonAsync<ProblemResponse>();
+```
+
+`ProblemConventions` in the same namespace holds the prefix of Homeport's
+problem types and the names of its extensions. How to reference the project
+is in [calling a module](calling-a-module.md#request-and-response-types-in-net).

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Sdk\Homeport.Sdk\Homeport.Sdk.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Client\Homeport.Shared.Client.csproj" />
     <ProjectReference Include="..\Homeport.Modules.Echo.Infrastructure\Homeport.Modules.Echo.Infrastructure.csproj" />
   </ItemGroup>
 

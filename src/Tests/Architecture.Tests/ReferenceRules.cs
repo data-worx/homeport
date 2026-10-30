@@ -42,12 +42,93 @@ internal static class ReferenceRules
     /// </summary>
     internal static List<string> SharedContractsReferences(IReadOnlyList<ProjectFile> projects)
     {
-        return projects
-            .Where(project => project.IsSharedContracts)
-            .SelectMany(project => project.ProjectReferences
-                .Concat(project.PackageReferences)
-                .Concat(project.FrameworkReferences)
-                .Select(reference => $"{project.Name} -> {reference}"))
+        return AnyReferences(projects, project => project.IsSharedContracts);
+    }
+
+    /// <summary>
+    /// Project, package and framework references of <c>Homeport.Shared.Client</c>,
+    /// which may have none: a caller takes the wire types without taking
+    /// anything else with them (ADR-0018).
+    /// </summary>
+    internal static List<string> SharedClientReferences(IReadOnlyList<ProjectFile> projects)
+    {
+        return AnyReferences(projects, project => project.IsSharedClient);
+    }
+
+    /// <summary>
+    /// References to <c>Homeport.Shared.Client</c> from a service or module
+    /// project other than Application or a host that serves an API: Domain,
+    /// Infrastructure and a Worker never see the wire types (ADR-0018).
+    /// </summary>
+    internal static List<string> SharedClientReferrers(IReadOnlyList<ProjectFile> projects)
+    {
+        return Offenders(
+            projects,
+            project => project.BelongsToUnit,
+            (project, target) => !target.IsSharedClient
+                || project.Layer is ProjectLayer.Application or ProjectLayer.Api or ProjectLayer.Single);
+    }
+
+    /// <summary>
+    /// References to <c>Homeport.Shared.Internal</c> from a Domain, from
+    /// <c>src/Sdk/</c> or from <c>Homeport.Shared.Client</c>: what Homeport
+    /// never ships stays out of what it ships (ADR-0018).
+    /// </summary>
+    internal static List<string> SharedInternalReferrers(IReadOnlyList<ProjectFile> projects)
+    {
+        return Offenders(
+            projects,
+            project => project.Layer == ProjectLayer.Domain
+                || project.Location == ProjectLocation.Sdk
+                || project.IsSharedClient,
+            (_, target) => !target.IsSharedInternal);
+    }
+
+    /// <summary>
+    /// References from <c>src/Sdk/</c> to a Shared project not in
+    /// <paramref name="allowed"/>. A reference outside <c>src/Shared/</c> is
+    /// left to <see cref="SharedReferences"/>.
+    /// </summary>
+    internal static List<string> SdkSharedReferences(
+        IReadOnlyList<ProjectFile> projects,
+        IReadOnlyCollection<string> allowed)
+    {
+        return Offenders(
+            projects,
+            project => project.Location == ProjectLocation.Sdk,
+            (_, target) => target.Location != ProjectLocation.Shared || allowed.Contains(target.Name));
+    }
+
+    /// <summary>
+    /// <c>src/Sdk/</c> and every project it references directly or
+    /// transitively that does not switch on the public API analyzer: all of
+    /// them are shipped, so all of them list their public API (ADR-0018).
+    /// </summary>
+    internal static List<string> UntrackedPublicApi(IReadOnlyList<ProjectFile> projects)
+    {
+        var byName = projects.ToDictionary(project => project.Name);
+        var shipped = new HashSet<string>(StringComparer.Ordinal);
+        var pending = new Queue<ProjectFile>(projects.Where(project => project.Location == ProjectLocation.Sdk));
+
+        while (pending.TryDequeue(out var project))
+        {
+            if (!shipped.Add(project.Name))
+            {
+                continue;
+            }
+
+            foreach (var reference in project.ProjectReferences)
+            {
+                if (byName.TryGetValue(reference, out var target))
+                {
+                    pending.Enqueue(target);
+                }
+            }
+        }
+
+        return shipped
+            .Where(name => !byName[name].TracksPublicApi)
+            .Order(StringComparer.Ordinal)
             .ToList();
     }
 
@@ -125,6 +206,18 @@ internal static class ReferenceRules
             .Where(project => project.Location is not (ProjectLocation.Tools or ProjectLocation.Tests))
             .SelectMany(project => project.ProjectReferences
                 .Where(reference => !names.Contains(reference))
+                .Select(reference => $"{project.Name} -> {reference}"))
+            .ToList();
+    }
+
+    /// <summary>Every project, package and framework reference of a project <paramref name="from"/> selects.</summary>
+    private static List<string> AnyReferences(IReadOnlyList<ProjectFile> projects, Func<ProjectFile, bool> from)
+    {
+        return projects
+            .Where(from)
+            .SelectMany(project => project.ProjectReferences
+                .Concat(project.PackageReferences)
+                .Concat(project.FrameworkReferences)
                 .Select(reference => $"{project.Name} -> {reference}"))
             .ToList();
     }

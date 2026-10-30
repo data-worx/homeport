@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Homeport.Shared.Contracts;
+using Homeport.Shared.Client.Problems;
 
 namespace Homeport.Platform.Gateway.Api.Errors;
 

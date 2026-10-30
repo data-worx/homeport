@@ -21,6 +21,7 @@
   </Folder>
   <Folder Name="/Shared/">
     <Project Path="src/Shared/Homeport.Shared.Authentication/Homeport.Shared.Authentication.csproj" />
+    <Project Path="src/Shared/Homeport.Shared.Client/Homeport.Shared.Client.csproj" />
     <Project Path="src/Shared/Homeport.Shared.Contracts/Homeport.Shared.Contracts.csproj" />
     <Project Path="src/Shared/Homeport.Shared.ServiceDefaults/Homeport.Shared.ServiceDefaults.csproj" />
   </Folder>

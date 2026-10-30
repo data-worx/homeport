@@ -1,0 +1,26 @@
+#nullable enable
+Homeport.Sdk.HomeportModuleExtensions
+Homeport.Sdk.HomeportProblems
+Homeport.Sdk.ModuleOpenApi
+Homeport.Sdk.ModuleVersion
+Homeport.Sdk.ProblemType
+Homeport.Sdk.ProblemType.<Clone>$() -> Homeport.Sdk.ProblemType!
+Homeport.Sdk.ProblemType.Equals(Homeport.Sdk.ProblemType? other) -> bool
+Homeport.Sdk.ProblemType.ProblemType(System.Uri! type, string! title, int status) -> void
+Homeport.Sdk.ProblemType.Status.get -> int
+Homeport.Sdk.ProblemType.Title.get -> string!
+Homeport.Sdk.ProblemType.ToResult(string! detail) -> Microsoft.AspNetCore.Mvc.ActionResult!
+Homeport.Sdk.ProblemType.Type.get -> System.Uri!
+Homeport.Sdk.ResultExtensions
+override Homeport.Sdk.ProblemType.Equals(object? obj) -> bool
+override Homeport.Sdk.ProblemType.GetHashCode() -> int
+override Homeport.Sdk.ProblemType.ToString() -> string!
+static Homeport.Sdk.HomeportModuleExtensions.AddHomeportModule<TBuilder>(this TBuilder builder, Homeport.Shared.Client.ModuleContract.ModuleManifest! manifest) -> TBuilder
+static Homeport.Sdk.HomeportModuleExtensions.MapHomeportModule(this Microsoft.AspNetCore.Builder.WebApplication! app) -> Microsoft.AspNetCore.Builder.WebApplication!
+static Homeport.Sdk.ModuleOpenApi.Validate(System.Text.Json.JsonElement document) -> System.Collections.Generic.IReadOnlyList<string!>!
+static Homeport.Sdk.ModuleVersion.Of(System.Reflection.Assembly! assembly) -> string!
+static Homeport.Sdk.ProblemType.operator !=(Homeport.Sdk.ProblemType? left, Homeport.Sdk.ProblemType? right) -> bool
+static Homeport.Sdk.ProblemType.operator ==(Homeport.Sdk.ProblemType? left, Homeport.Sdk.ProblemType? right) -> bool
+static Homeport.Sdk.ResultExtensions.ToActionResult<TValue>(this Homeport.Shared.Contracts.Result<TValue>! result, System.Func<Homeport.Shared.Contracts.Error!, Homeport.Sdk.ProblemType!>! problemFor) -> Microsoft.AspNetCore.Mvc.ActionResult<TValue>!
+static readonly Homeport.Sdk.HomeportProblems.Internal -> Homeport.Sdk.ProblemType!
+static readonly Homeport.Sdk.HomeportProblems.Validation -> Homeport.Sdk.ProblemType!

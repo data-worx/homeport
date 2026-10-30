@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics;
-using Homeport.Shared.Contracts;
+using Homeport.Shared.Client.ModuleContract;
+using Homeport.Shared.Client.Problems;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -39,7 +40,7 @@ public static class HomeportModuleExtensions
     {
         // A broken manifest is a programming error, so the module refuses to start
         // rather than announce something it does not serve.
-        var problems = manifest.Validate();
+        var problems = ModuleManifestValidator.Validate(manifest);
         if (problems.Count > 0)
         {
             throw new InvalidOperationException(

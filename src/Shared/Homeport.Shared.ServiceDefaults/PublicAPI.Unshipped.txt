@@ -1,0 +1,6 @@
+#nullable enable
+const Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions.LivenessPath = "/health/live" -> string!
+const Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions.ReadinessPath = "/health/ready" -> string!
+Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions
+static Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions.AddServiceDefaults<TBuilder>(this TBuilder builder) -> TBuilder
+static Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions.MapDefaultEndpoints(this Microsoft.AspNetCore.Builder.WebApplication! app) -> Microsoft.AspNetCore.Builder.WebApplication!

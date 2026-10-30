@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Sdk;
+using Homeport.Shared.Client.ModuleContract;
 
 namespace Homeport.Modules.Echo.Api;
 

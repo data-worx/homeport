@@ -54,6 +54,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Details. `ModuleOpenApi.Validate` lets a module's test fail on an operation
   without a summary, an operation id or a success response. A module now
   calls `AddOpenApi` itself. See [documenting endpoints](docs/module-developers/documenting-endpoints.md).
+- `Homeport.Shared.Client` holds the wire types Homeport ships: the module
+  manifest, `ProblemResponse` to read any Homeport error, and the request and
+  response types of the catalog modules, starting with Echo. It references
+  nothing, so a .NET caller takes the types without taking ASP.NET or the
+  SDK, and it is published with the SDK under the same version.
+  `ModuleManifest` and `ManifestRoute` moved there from `Homeport.Sdk`. See
+  [calling a module](docs/api-consumers/calling-a-module.md) and
+  [errors](docs/api-consumers/errors.md).
 - The gateway, the SDK and the token validation of the platform services
   log what an operator needs to diagnose them: each service logs its start
   with its effective configuration, never a key; a rejected gateway token and

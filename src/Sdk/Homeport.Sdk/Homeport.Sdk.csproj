@@ -4,7 +4,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <TrackPublicApi>true</TrackPublicApi>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Homeport.Sdk.Tests.Unit" />
+  </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -15,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Homeport.Shared.Client\Homeport.Shared.Client.csproj" />
     <ProjectReference Include="..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Shared\Homeport.Shared.Contracts\Homeport.Shared.Contracts.csproj" />
   </ItemGroup>

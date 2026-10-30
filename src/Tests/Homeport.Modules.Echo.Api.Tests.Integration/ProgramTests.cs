@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using Homeport.Sdk;
+using Homeport.Shared.Client.ModuleContract;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Homeport.Modules.Echo.Api.Tests.Integration;
@@ -110,6 +111,15 @@ public sealed class ProgramTests
 
             var operation = document.GetProperty("paths").GetProperty("/v1/echo").GetProperty("post");
             Assert.Equal("Returns the request body unchanged.", operation.GetProperty("summary").GetString());
+        }
+
+        [Fact]
+        public async Task Takes_The_Description_Of_A_Shared_Client_Type_From_Its_Xml_Doc()
+        {
+            var document = await OpenApiDocument();
+
+            var schema = document.GetProperty("components").GetProperty("schemas").GetProperty("ReceivedRequestResponse");
+            Assert.Equal("A request as Echo received it.", schema.GetProperty("description").GetString());
         }
 
         [Theory]

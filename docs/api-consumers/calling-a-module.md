@@ -32,6 +32,18 @@ A module keeps a major version of its API backwards compatible. A breaking
 change appears as a new major version next to the old one — `/v2/…` beside
 `/v1/…` — under the same module id, so you move when you are ready.
 
+## Request and response types in .NET
+
+The request and response types of every platform API and every catalog
+module live in `Homeport.Shared.Client`, which references nothing else. The
+namespace names the module and the major version of its API: Echo's
+`GET /v1/request` answers with
+`Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse`.
+
+`Homeport.Shared.Client` is published together with the SDK, under the same
+version. Until it is published as a package, reference the project
+`src/Shared/Homeport.Shared.Client` directly.
+
 ## What the gateway changes on the way
 
 - **`X-Homeport-*` headers are removed.** They are reserved for Homeport; one
