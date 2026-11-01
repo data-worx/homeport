@@ -12,10 +12,10 @@ body.
 
 | Level | Example |
 |---|---|
-| Error | An unhandled exception in a module, answered as `internal` Problem Details |
-| Warning | A rejected gateway token, with the reason; a failed retrieval of the gateway's JWKS; a failed forward to a module; a module error body the gateway replaced |
-| Information | The start of a service, with its effective configuration: the gateway's key ids and modules, a module's id, version and contract version |
-| Debug | Per-request decisions, such as the `X-Homeport-*` headers the gateway stripped from a request |
+| Error | An unhandled exception in a module, answered as `internal` Problem Details; a module the registry refused, with the reasons, before it stops |
+| Warning | A rejected gateway token, with the reason; a failed retrieval of the gateway's JWKS; a failed forward to a module; a module error body the gateway replaced; a rejected registration key; a manifest the registry refused; a registry the gateway or a module cannot reach |
+| Information | The start of a service, with its effective configuration: the gateway's key ids and registry, the registry's module ids, a module's id, version and contract version; a registered instance; changed routes at the gateway |
+| Debug | Per-request decisions, such as the `X-Homeport-*` headers the gateway stripped from a request, or an unchanged route table |
 
 The default level is `Information`, so Debug entries are not written.
 

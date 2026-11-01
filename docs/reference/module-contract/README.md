@@ -38,6 +38,8 @@ next to the old one. The module id `platform` is reserved.
   instance address.
 - It then sends a heartbeat, by default every 10 s. An instance without a
   heartbeat for 30 s (TTL) is removed from routing.
+- When the registry answers a heartbeat with `404`, it no longer knows the
+  instance, and the instance registers again.
 - Registration and every heartbeat carry the module's secret registration
   key as `Authorization: Bearer <key>`. The operator configures the key for
   the module id at the registry. An unknown module id or a wrong key is
@@ -50,10 +52,28 @@ next to the old one. The module id `platform` is reserved.
 - If the registry is unavailable, the gateway keeps serving the last known
   routes.
 
+The two calls, made to the registry directly on the internal network, never
+through the gateway. `{instanceId}` is chosen by the instance, unique per
+running instance, so instances of one module never replace each other.
+
+| Call | Body | Answers |
+|---|---|---|
+| `PUT /instances/{moduleId}/{instanceId}` | `{ "address": "<url>", "manifest": { … } }` | `204` registered; `400` [`validation`](../problems/validation.md); `401` [`unauthorized`](../problems/unauthorized.md); `422` [`invalid-manifest`](../problems/invalid-manifest.md) |
+| `POST /instances/{moduleId}/{instanceId}/heartbeat` | none | `204` renewed; `401` [`unauthorized`](../problems/unauthorized.md); `404` unknown instance, register again |
+
+- `address` is where the gateway reaches the instance, an absolute URL such
+  as `http://echo-1:8080`.
+- `manifest` is the manifest as the module serves it, `contractVersion`
+  included. Its `id` must equal `{moduleId}`.
+- `PUT` is idempotent: registering again under the same `{instanceId}`
+  replaces the registration and renews it.
+
 ## Routing
 
 - Callers reach a module under `/modules/{id}/{path}`. The gateway strips
   `/modules/{id}`; the module sees only `{path}`.
+- The gateway forwards only the routes the manifests declare, by method and
+  path. Any other path below `/modules/{id}` is answered by the gateway.
 - A module's route table is the union of the manifests of its live
   instances. Each route goes only to the instances that declare it.
 - Where instances declare the same route with different attributes, those

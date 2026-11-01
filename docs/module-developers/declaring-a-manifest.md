@@ -73,10 +73,12 @@ public sealed class ContractsController : ControllerBase
 }
 ```
 
-`AddHomeportModule` checks the manifest against the contract and refuses to
-start when it breaks it. The exception lists every problem, for example a
-route whose scope is not in `Scopes`. It also adds the Homeport service
-defaults: OpenTelemetry, health checks and service discovery.
+`AddHomeportModule` adds the Homeport service defaults — OpenTelemetry,
+health checks and service discovery — and registers the module at the
+registry once it has started; see [registering a module](registering-a-module.md).
+The registry checks the manifest against the contract. When it breaks it, the
+module logs every problem, for example a route whose scope is not in
+`Scopes`, and stops.
 
 `MapHomeportModule` maps, all of them anonymous:
 
@@ -115,6 +117,6 @@ open the dashboard, follow the endpoint of `echo` and append
 ```
 
 A module is reachable only inside the AppHost or compose network. Callers
-reach it through the gateway under `/modules/{id}/{path}`, today on a route the
-gateway is configured with; registration follows with the registry. A module
-does not check a token yet.
+reach it through the gateway under `/modules/{id}/{path}`, on the routes it
+registered; see [registering a module](registering-a-module.md). A module does
+not check a token yet.

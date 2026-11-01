@@ -2,9 +2,11 @@
 
 `https://homeport.data-worx.de/problems/unknown-module` — status `404`.
 
-The gateway answered: no module is mounted at the path, so the request never
-reached one. The module id in `/modules/{moduleId}/…` is misspelled, or the
-module is not installed in this Homeport installation.
+The gateway answered: no route matches the path, so the request never
+reached a module. The module id in `/modules/{moduleId}/…` is misspelled, the
+module is not installed in this Homeport installation or has no running
+instance, or the module does not declare the path below its id. The gateway
+routes only the paths a module declares in its manifest.
 
 ```json
 {
@@ -16,5 +18,6 @@ module is not installed in this Homeport installation.
 ```
 
 A `404` from a module itself, such as for a record that does not exist, never
-carries this type. Check the module id against what the operator gave you;
-the same request fails the same way until the module is installed.
+carries this type. Check the module id against what the operator gave you,
+and the path against the module's OpenAPI document; the same request fails
+the same way until the module is installed and running.

@@ -11,6 +11,7 @@ Arranged by reader. A directory exists once it has its first document.
 |---|---|
 | [`operators/running-locally.md`](operators/running-locally.md) | Starting Homeport on one machine, with the AppHost or with Docker Compose |
 | [`operators/signing-key.md`](operators/signing-key.md) | Generating, configuring and rotating the gateway's signing key |
+| [`operators/registry.md`](operators/registry.md) | The registry, the modules' registration keys and what happens while it is down |
 | [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |
 
 ## Module developers — building a module on the contract and the SDK
@@ -18,6 +19,7 @@ Arranged by reader. A directory exists once it has its first document.
 | Document | About |
 |---|---|
 | [`module-developers/declaring-a-manifest.md`](module-developers/declaring-a-manifest.md) | Declaring and serving a module's manifest with `Homeport.Sdk` |
+| [`module-developers/registering-a-module.md`](module-developers/registering-a-module.md) | Registering a module, heartbeats, rolling updates and two major versions side by side |
 | [`module-developers/answering-errors.md`](module-developers/answering-errors.md) | Answering errors as Problem Details with `Homeport.Sdk` |
 | [`module-developers/documenting-endpoints.md`](module-developers/documenting-endpoints.md) | Documenting a module's endpoints in its OpenAPI document, and checking it in a test |
 
