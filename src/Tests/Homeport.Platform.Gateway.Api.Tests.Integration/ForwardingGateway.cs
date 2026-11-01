@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Net;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,18 +12,19 @@ using Microsoft.Extensions.Logging.Testing;
 namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 
 /// <summary>
-/// The gateway in memory, forwarding to a stand-in for Echo on a local port.
-/// The stand-in answers every request with the path and the headers it
-/// received, so a test sees what the gateway forwards, except for the paths
-/// under <see cref="ErrorsPath"/>, which answer with an error. What the
-/// gateway logs, down to Debug, is read from <see cref="Logs"/>.
+/// The gateway in memory, forwarding to a stand-in for Echo on a local port on
+/// the routes a stand-in registry lists. The stand-in module answers every
+/// request with the path and the headers it received, so a test sees what the
+/// gateway forwards, except for the paths under <see cref="ErrorsPath"/>, which
+/// answer with an error. What the gateway logs, down to Debug, is read from
+/// <see cref="Logs"/>.
 /// </summary>
 public sealed class ForwardingGateway : IAsyncLifetime
 {
     private const string LocalAddress = "http://127.0.0.1:0";
 
-    /// <summary>The configuration key service discovery resolves the service "echo" from.</summary>
-    internal const string EchoEndpointKey = "services:echo:http:0";
+    /// <summary>The route the stand-in module answers with what it received.</summary>
+    internal const string RequestPath = "/v1/request";
 
     /// <summary>The paths of the stand-in that answer with an error.</summary>
     internal const string ErrorsPath = "/v1/errors";
@@ -42,13 +44,19 @@ public sealed class ForwardingGateway : IAsyncLifetime
 
     internal const string InternalDetail = "Password=hunter2 rejected by the database.";
 
+    private static readonly TimeSpan RoutesTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan RoutesPoll = TimeSpan.FromMilliseconds(50);
+
     private WebApplication? module;
+    private StandInRegistry? registry;
     private WebApplicationFactory<Program>? gateway;
 
     internal HttpClient CreateClient() =>
         Started.CreateClient();
 
     internal FakeLogCollector Logs => Started.Services.GetFakeLogCollector();
+
+    internal StandInRegistry Registry => registry ?? throw new InvalidOperationException("The registry has not been started.");
 
     private WebApplicationFactory<Program> Started =>
         gateway ?? throw new InvalidOperationException("The gateway has not been started.");
@@ -69,11 +77,28 @@ public sealed class ForwardingGateway : IAsyncLifetime
             context.Request.Headers.ToDictionary(header => header.Key.ToLowerInvariant(), header => header.Value.ToString()))));
         await module.StartAsync();
 
+        registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(
+            module.Urls.Single(), RequestPath, NotFoundProblemPath, InternalProblemPath, HtmlBadRequestPath));
+
         gateway = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(host => host
                 .WithSigningKey()
-                .UseSetting(EchoEndpointKey, module.Urls.Single())
+                .WithRegistry(registry)
                 .ConfigureLogging(logging => logging.AddFakeLogging().SetMinimumLevel(LogLevel.Debug)));
+        await WaitForRoutesAsync(gateway.CreateClient(), "/modules/echo" + RequestPath);
+    }
+
+    /// <summary>
+    /// Waits until the gateway has read its routes from the registry and
+    /// <paramref name="path"/> is no longer unknown to it.
+    /// </summary>
+    internal static async Task WaitForRoutesAsync(HttpClient client, string path)
+    {
+        using var timeout = new CancellationTokenSource(RoutesTimeout);
+        while ((await client.GetAsync(path, timeout.Token)).StatusCode == HttpStatusCode.NotFound)
+        {
+            await Task.Delay(RoutesPoll, timeout.Token);
+        }
     }
 
     public async Task DisposeAsync()
@@ -81,6 +106,11 @@ public sealed class ForwardingGateway : IAsyncLifetime
         if (gateway is not null)
         {
             await gateway.DisposeAsync();
+        }
+
+        if (registry is not null)
+        {
+            await registry.DisposeAsync();
         }
 
         if (module is not null)

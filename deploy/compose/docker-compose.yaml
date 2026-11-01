@@ -47,6 +47,29 @@ services:
       - "9000"
     networks:
       - "aspire"
+  registry:
+    image: "${REGISTRY_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${REGISTRY_PORT}"
+      OTEL_SERVICE_NAME: "homeport-registry"
+      Registry__RegistrationKeys__echo__0: "${ECHO_REGISTRATION_KEY}"
+      ConnectionStrings__valkey: "valkey:6379,password=${VALKEY_PASSWORD}"
+      VALKEY_HOST: "valkey"
+      VALKEY_PORT: "6379"
+      VALKEY_PASSWORD: "${VALKEY_PASSWORD}"
+      VALKEY_URI: "valkey://:${VALKEY_PASSWORD}@valkey:6379"
+      GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
+      services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
+      GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
+    expose:
+      - "${REGISTRY_PORT}"
+    depends_on:
+      valkey:
+        condition: "service_started"
+    networks:
+      - "aspire"
   echo:
     image: "${ECHO_IMAGE}"
     environment:
@@ -54,6 +77,12 @@ services:
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "${ECHO_PORT}"
       OTEL_SERVICE_NAME: "homeport-module-echo"
+      Homeport__Registry__Url: "http://registry"
+      Homeport__Registry__Key: "${ECHO_REGISTRATION_KEY}"
+      REGISTRY_HTTP: "http://registry:${REGISTRY_PORT}"
+      services__registry__http__0: "http://registry:${REGISTRY_PORT}"
+      REGISTRY_HTTPS: "https://registry:${REGISTRY_PORT}"
+      Homeport__Registry__InstanceAddress: "http://echo:${ECHO_PORT}"
     expose:
       - "${ECHO_PORT}"
     networks:
@@ -69,9 +98,9 @@ services:
       Signing__KeyId: "${GATEWAY_SIGNING_KEY_ID}"
       Signing__AdditionalPublicKey: "${GATEWAY_ADDITIONAL_PUBLIC_KEY}"
       Signing__AdditionalKeyId: "${GATEWAY_ADDITIONAL_KEY_ID}"
-      ECHO_HTTP: "http://echo:${ECHO_PORT}"
-      services__echo__http__0: "http://echo:${ECHO_PORT}"
-      ECHO_HTTPS: "https://echo:${ECHO_PORT}"
+      REGISTRY_HTTP: "http://registry:${REGISTRY_PORT}"
+      services__registry__http__0: "http://registry:${REGISTRY_PORT}"
+      REGISTRY_HTTPS: "https://registry:${REGISTRY_PORT}"
     ports:
       - "${GATEWAY_PORT}"
     networks:

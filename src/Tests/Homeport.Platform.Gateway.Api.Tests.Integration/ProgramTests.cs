@@ -154,8 +154,10 @@ public sealed class ProgramTests
         [Fact]
         public async Task Answers_An_Unreachable_Module_As_Module_Unreachable_Problem()
         {
+            await using var registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(ClosedEndpoint, ForwardingGateway.RequestPath));
             await using var unreachable = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithSigningKey().UseSetting(ForwardingGateway.EchoEndpointKey, ClosedEndpoint));
+                .WithWebHostBuilder(host => host.WithSigningKey().WithRegistry(registry));
+            await ForwardingGateway.WaitForRoutesAsync(unreachable.CreateClient(), "/modules/echo/v1/request");
 
             using var response = await unreachable.CreateClient().SendAsync(Traced("/modules/echo/v1/request"));
 
@@ -179,8 +181,8 @@ public sealed class ProgramTests
             var logged = Assert.Single(
                 started.Services.GetFakeLogCollector().GetSnapshot(),
                 entry => entry.Category == ProgramCategory && entry.Level == LogLevel.Information);
-            Assert.Contains(SigningSettings.KeyId, logged.Message);
-            Assert.Contains(SigningSettings.AdditionalKeyId, logged.Message);
+            Assert.Contains(GatewaySettings.KeyId, logged.Message);
+            Assert.Contains(GatewaySettings.AdditionalKeyId, logged.Message);
             Assert.DoesNotContain("KEY-----", logged.Message);
         }
 

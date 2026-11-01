@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Empty: the gateway has no use case beyond forwarding, which the host
-       does. Cut ahead of routing from the registry (#42). -->
+  <!-- Empty: the gateway has no use case beyond forwarding on the registry's
+       routes, which the host does. Cut ahead of throttling (#48). -->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

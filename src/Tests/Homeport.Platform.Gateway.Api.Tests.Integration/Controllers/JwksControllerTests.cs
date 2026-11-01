@@ -20,7 +20,7 @@ public sealed class JwksControllerTests
 
             var keyIds = await KeyIds(gateway);
 
-            Assert.Equal([SigningSettings.KeyId], keyIds);
+            Assert.Equal([GatewaySettings.KeyId], keyIds);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ public sealed class JwksControllerTests
 
             var keyIds = await KeyIds(gateway);
 
-            Assert.Equal([SigningSettings.KeyId, SigningSettings.AdditionalKeyId], keyIds);
+            Assert.Equal([GatewaySettings.KeyId, GatewaySettings.AdditionalKeyId], keyIds);
         }
 
         [Fact]
