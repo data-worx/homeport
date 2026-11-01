@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics;
+using Homeport.Sdk.Registration;
 using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Problems;
 using Homeport.Shared.ServiceDefaults;
@@ -9,8 +10,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Homeport.Sdk;
 
@@ -21,7 +24,7 @@ namespace Homeport.Sdk;
 /// </summary>
 public static class HomeportModuleExtensions
 {
-    /// <summary>Adds what a module needs, after checking <paramref name="manifest"/> against the contract.</summary>
+    /// <summary>Adds what a module needs, including its registration at the registry.</summary>
     /// <remarks>
     /// Every error response becomes Problem Details carrying the
     /// <see cref="ProblemConventions.TraceIdExtension"/>; an unhandled exception
@@ -33,23 +36,20 @@ public static class HomeportModuleExtensions
     /// the XML docs of its controllers reach the document only through a call
     /// in its own project, where the framework's source generator intercepts it.
     /// </para>
+    /// <para>
+    /// Once started, the instance registers at the registry named in
+    /// <c>Homeport:Registry:Url</c> with <c>Homeport:Registry:Key</c> and
+    /// <c>Homeport:Registry:InstanceAddress</c>, and sends a heartbeat every
+    /// 10 s. The registry checks the manifest; when it refuses the
+    /// registration, the module logs why and stops.
+    /// </para>
     /// </remarks>
-    /// <exception cref="InvalidOperationException">The manifest breaks the module contract.</exception>
     public static TBuilder AddHomeportModule<TBuilder>(this TBuilder builder, ModuleManifest manifest)
         where TBuilder : IHostApplicationBuilder
     {
-        // A broken manifest is a programming error, so the module refuses to start
-        // rather than announce something it does not serve.
-        var problems = ModuleManifestValidator.Validate(manifest);
-        if (problems.Count > 0)
-        {
-            throw new InvalidOperationException(
-                $"The manifest of module '{manifest.Id}' breaks the module contract:{Environment.NewLine}"
-                + string.Join(Environment.NewLine, problems));
-        }
-
         builder.AddServiceDefaults();
         builder.Services.AddSingleton(manifest);
+        AddRegistration(builder.Services);
         builder.Services.ConfigureAll<OpenApiOptions>(options => options.AddOperationTransformer<CommonErrorResponses>());
         AddProblemDetails(builder.Services);
 
@@ -109,6 +109,17 @@ public static class HomeportModuleExtensions
             app.Urls,
             manifest.ContractVersion,
             manifest.Routes.Count));
+    }
+
+    private static void AddRegistration(IServiceCollection services)
+    {
+        services.AddOptions<RegistrationOptions>()
+            .BindConfiguration(RegistrationOptions.SectionName)
+            .ValidateOnStart();
+        services.AddSingleton<IValidateOptions<RegistrationOptions>, RegistrationOptionsValidator>();
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddHttpClient(ModuleRegistration.ClientName);
+        services.AddHostedService<ModuleRegistration>();
     }
 
     private static void AddProblemDetails(IServiceCollection services)

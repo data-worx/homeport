@@ -37,9 +37,10 @@ internal static class TestModule
         return builder;
     }
 
-    internal static async Task<WebApplication> StartAsync(ILoggerProvider? logs = null)
+    internal static async Task<WebApplication> StartAsync(ILoggerProvider? logs = null, Action<WebApplicationBuilder>? configure = null)
     {
         var builder = CreateBuilder(Manifest);
+        configure?.Invoke(builder);
         builder.Services.AddControllers().AddApplicationPart(typeof(TestModule).Assembly);
         if (logs is not null)
         {
