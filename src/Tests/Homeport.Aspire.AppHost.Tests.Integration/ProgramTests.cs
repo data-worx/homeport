@@ -21,6 +21,7 @@ public sealed class ProgramTests
         [InlineData("registry")]
         [InlineData("echo")]
         [InlineData("gateway")]
+        [InlineData("control-plane")]
         public async Task Starts_The_Resource_Healthy(string resource)
         {
             using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
@@ -28,6 +29,29 @@ public sealed class ProgramTests
             var state = await appHost.App.ResourceNotifications.WaitForResourceHealthyAsync(resource, timeout.Token);
 
             Assert.Equal(resource, state.Resource.Name);
+        }
+
+        [Fact]
+        public void Starts_The_Control_Plane_Only_After_Migrate_Completed()
+        {
+            var model = appHost.App.Services.GetRequiredService<DistributedApplicationModel>();
+
+            var waits = model.Resources.Single(resource => resource.Name == "control-plane")
+                .Annotations.OfType<WaitAnnotation>()
+                .Select(wait => (wait.Resource.Name, wait.WaitType));
+
+            Assert.Contains(("control-plane-migrate", WaitType.WaitForCompletion), waits);
+        }
+
+        [Fact]
+        public async Task Has_Completed_Migrate_Successfully_Once_The_Control_Plane_Is_Healthy()
+        {
+            using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
+            await appHost.App.ResourceNotifications.WaitForResourceHealthyAsync("control-plane", timeout.Token);
+
+            appHost.App.ResourceNotifications.TryGetCurrentState("control-plane-migrate", out var migrate);
+
+            Assert.Equal((KnownResourceStates.Finished, 0), (migrate?.Snapshot.State?.Text, migrate?.Snapshot.ExitCode));
         }
 
         [Fact]

@@ -13,12 +13,12 @@ binding rules — the dependency direction, who may reference what — live in t
 
 | Project | Role | May depend on |
 |---|---|---|
-| `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL, RabbitMQ, Valkey, Keycloak, the gateway, the registry and the Echo module with its registration key, and generates `deploy/compose/` | `Homeport.Platform.Gateway.Api`, `Homeport.Platform.Registry.Api`, `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL with its init script, RabbitMQ, Valkey, Keycloak, the gateway, the registry, the control plane with its `migrate` step and the Echo module with its registration key, and generates `deploy/compose/` | `Homeport.Platform.Gateway.Api`, `Homeport.Platform.Registry.Api`, `Homeport.Platform.ControlPlane`, `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Shared.ServiceDefaults` | What every service sets up the same way: OpenTelemetry over OTLP, health endpoints, service discovery, resilient HTTP clients | nothing |
 | `Homeport.Shared.Authentication` | Validates the tokens the gateway issues: issuer, audience, expiry and ES256 signature against the gateway's JWKS, and the JWKS wire format both sides share | nothing |
 | `Homeport.Shared.Contracts` | The types several services, the SDK and a Domain share: so far the result type, a value or an error with a business code | nothing |
 | `Homeport.Shared.Client` | The wire types Homeport ships: the manifest and the registration of the module contract, the read model and constants of the error format, and the response of Echo's `GET /v1/request` | nothing |
-| `Homeport.Shared.Internal` | What services share and Homeport never ships: the route table the registry serves the gateway | nothing |
+| `Homeport.Shared.Internal` | What services share and Homeport never ships: the route table the registry serves the gateway and the client lookup of the control plane | nothing |
 | `Homeport.Sdk` | What a .NET module needs to meet the module contract: the manifest, OpenAPI and health endpoints, registration and heartbeats at the registry, error responses as Problem Details, the common errors on every OpenAPI operation and a check of the OpenAPI document | `Homeport.Shared.Client`, `Homeport.Shared.ServiceDefaults`, `Homeport.Shared.Contracts` |
 | `Homeport.Platform.Gateway.Domain` | Empty: the gateway decides nothing yet | nothing |
 | `Homeport.Platform.Gateway.Application` | Empty: the gateway has no use case beyond forwarding | `Homeport.Platform.Gateway.Domain` |
@@ -28,13 +28,15 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Platform.Registry.Application` | Registering an instance, renewing it and building the routes, on a store of instances and a source of keys it declares | `Homeport.Platform.Registry.Domain` |
 | `Homeport.Platform.Registry.Infrastructure` | Keeps the instances in Valkey with a time to live and reads the registration keys from configuration | `Homeport.Platform.Registry.Application` |
 | `Homeport.Platform.Registry.Api` | Serves registration and heartbeat, authenticated by registration key, and the route table, authenticated by a gateway service token | `Homeport.Platform.Registry.Infrastructure`, `Homeport.Shared.Authentication`, `Homeport.Shared.Client`, `Homeport.Shared.Internal`, `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Platform.ControlPlane` | One project, as it carries no business rules yet: keeps tenants, plans and clients in the schema `control_plane` with EF Core, serves `GET /clients/{clientId}` authenticated by a gateway service token, and as `migrate` applies its migrations and seeds one tenant, plan and client | `Homeport.Shared.Authentication`, `Homeport.Shared.Client`, `Homeport.Shared.Internal`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Modules.Echo.Domain` | Empty: Echo has no business rules | nothing |
 | `Homeport.Modules.Echo.Application` | Empty: Echo has no use case beyond returning the request body | `Homeport.Modules.Echo.Domain` |
 | `Homeport.Modules.Echo.Infrastructure` | Empty: Echo reaches nothing outside its process | `Homeport.Modules.Echo.Application` |
 | `Homeport.Modules.Echo.Api` | The reference module: declares its manifest, serves `POST /v1/echo`, declares its problem types and shows the headers it received at `GET /v1/request` | `Homeport.Modules.Echo.Infrastructure`, `Homeport.Sdk`, `Homeport.Shared.Client` |
 | `Architecture.Tests` | Asserts the layout, naming and reference rules of `dotnet.layout` as `AGENTS.md` narrows them, each also against a fixture tree that breaks it (solution folder `/Tests/`) | — |
-| `Homeport.Aspire.AppHost.Tests.Integration` | Starts the AppHost, waits for every resource to become healthy, reads Echo's manifest, calls Echo through the gateway once it has registered, reads the gateway's JWKS, and stops Echo or the registry to assert the routes end to end; needs Docker | `Homeport.Aspire.AppHost` |
+| `Homeport.Aspire.AppHost.Tests.Integration` | Starts the AppHost, waits for every resource to become healthy and for `migrate` to complete before the control plane, reads Echo's manifest, calls Echo through the gateway once it has registered, reads the gateway's JWKS, and stops Echo or the registry to assert the routes end to end; needs Docker | `Homeport.Aspire.AppHost` |
 | `Homeport.Modules.Echo.Api.Tests.Integration` | Runs Echo in memory and asserts its manifest, health, echo and request endpoints and its OpenAPI document, including the descriptions of its `Homeport.Shared.Client` types | `Homeport.Modules.Echo.Api` |
+| `Homeport.Platform.ControlPlane.Tests.Integration` | Runs `migrate` and the control plane against a throwaway PostgreSQL prepared by the init script and asserts the client lookup with its token and error responses, that `migrate` seeds exactly once and fails on an invalid seed, and that the app role has no DDL rights; needs Docker | `Homeport.Platform.ControlPlane` |
 | `Homeport.Platform.Gateway.Api.Tests.Integration` | Runs the gateway in memory against a stand-in module and a stand-in registry and asserts what it forwards on which routes, how it polls the registry, the error responses it answers with, the JWKS it serves, that its errors read as `ProblemResponse` without loss, and that it does not start without a signing key | `Homeport.Platform.Gateway.Api` |
 | `Homeport.Platform.Gateway.Infrastructure.Tests.Unit` | Asserts the checks on the signing configuration, the service tokens and their renewal | `Homeport.Platform.Gateway.Infrastructure` |
 | `Homeport.Platform.Registry.Domain.Tests.Unit` | Asserts the manifest rules, SemVer precedence, how the routes of several instances merge and the key comparison | `Homeport.Platform.Registry.Domain` |
@@ -49,7 +51,7 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Shared.Contracts.Tests.Unit` | Asserts the result type | `Homeport.Shared.Contracts` |
 | `Homeport.Shared.ServiceDefaults.Tests.Integration` | Asserts the health endpoints outside Development | `Homeport.Shared.ServiceDefaults` |
 
-The gateway and the registry are the only platform services so far. The target picture is in
+The gateway, the registry and the control plane are the only platform services so far. The target picture is in
 [vision.md](vision.md); the binding layout is in
 [`AGENTS.md`](../../AGENTS.md#architecture).
 
@@ -61,6 +63,8 @@ Directory.Build.targets   adds the public API analyzer where a project opts in
 Directory.Packages.props
 deploy/
   compose/                generated from the AppHost, never edited
+  postgres/init/          schemas and roles, run once by PostgreSQL
+dotnet-tools.json         dotnet-ef for adding migrations
 src/
   Directory.Build.props
   Aspire/
@@ -72,6 +76,8 @@ src/
       Homeport.Modules.Echo.Infrastructure/
       Homeport.Modules.Echo.Api/
   Platform/
+    ControlPlane/
+      Homeport.Platform.ControlPlane/
     Gateway/
       Homeport.Platform.Gateway.Domain/
       Homeport.Platform.Gateway.Application/
@@ -94,6 +100,7 @@ src/
     Architecture.Tests/
     Homeport.Aspire.AppHost.Tests.Integration/
     Homeport.Modules.Echo.Api.Tests.Integration/
+    Homeport.Platform.ControlPlane.Tests.Integration/
     Homeport.Platform.Gateway.Api.Tests.Integration/
     Homeport.Platform.Gateway.Infrastructure.Tests.Unit/
     Homeport.Platform.Registry.Api.Tests.Integration/
@@ -115,7 +122,8 @@ src/
   own in the sense of `dotnet.layout`, grouped under `src/Platform/` and
   `src/Modules/`
   ([ADR-0003](adr/0003-service-granularity-and-module-contract.md)). A
-  service without business rules may stay a single project. The registry
+  service without business rules may stay a single project, as the control
+  plane does while it only looks clients up. The registry
   has rules of its own — checking a manifest, merging the manifests of the
   live instances — so it is cut into layers; the gateway is cut ahead of
   the rules throttling brings.

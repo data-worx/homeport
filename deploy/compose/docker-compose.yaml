@@ -6,8 +6,16 @@ services:
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "homeport"
+      CONTROL_PLANE_OWNER_PASSWORD: "${CONTROL_PLANE_OWNER_PASSWORD}"
+      CONTROL_PLANE_APP_PASSWORD: "${CONTROL_PLANE_APP_PASSWORD}"
     expose:
       - "5432"
+    volumes:
+      - type: "bind"
+        target: "/docker-entrypoint-initdb.d"
+        source: "${POSTGRES_BINDMOUNT_0}"
+        read_only: true
     networks:
       - "aspire"
   rabbitmq:
@@ -103,6 +111,48 @@ services:
       REGISTRY_HTTPS: "https://registry:${REGISTRY_PORT}"
     ports:
       - "${GATEWAY_PORT}"
+    networks:
+      - "aspire"
+  control-plane-migrate:
+    image: "${CONTROL_PLANE_MIGRATE_IMAGE}"
+    command:
+      - "migrate"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${CONTROL_PLANE_MIGRATE_PORT}"
+      OTEL_SERVICE_NAME: "homeport-control-plane-migrate"
+      ConnectionStrings__control-plane-owner: "Host=postgres;Port=5432;Database=homeport;Username=control_plane_owner;Password=${CONTROL_PLANE_OWNER_PASSWORD}"
+      Seed__TenantId: "${SEED_TENANT_ID}"
+      Seed__TenantName: "${SEED_TENANT_NAME}"
+      Seed__PlanId: "${SEED_PLAN_ID}"
+      Seed__PlanName: "${SEED_PLAN_NAME}"
+      Seed__RequestsPerSecond: "${SEED_PLAN_REQUESTS_PER_SECOND}"
+      Seed__Burst: "${SEED_PLAN_BURST}"
+      Seed__ClientId: "${SEED_CLIENT_ID}"
+    expose:
+      - "${CONTROL_PLANE_MIGRATE_PORT}"
+    depends_on:
+      postgres:
+        condition: "service_started"
+    networks:
+      - "aspire"
+  control-plane:
+    image: "${CONTROL_PLANE_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${CONTROL_PLANE_PORT}"
+      OTEL_SERVICE_NAME: "homeport-control-plane"
+      ConnectionStrings__control-plane: "Host=postgres;Port=5432;Database=homeport;Username=control_plane_app;Password=${CONTROL_PLANE_APP_PASSWORD}"
+      GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
+      services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
+      GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
+    expose:
+      - "${CONTROL_PLANE_PORT}"
+    depends_on:
+      control-plane-migrate:
+        condition: "service_completed_successfully"
     networks:
       - "aspire"
 networks:

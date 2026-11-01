@@ -84,7 +84,12 @@ reader it is written for:
   `Directory.Packages.props`.
 - Use `TimeProvider`, never `DateTime.Now` or `DateTime.UtcNow`.
 - Keep data access provider-neutral. Vendor-specific SQL is allowed only for
-  the row-level security setup.
+  the row-level security setup and for the schema and role setup in
+  `deploy/postgres/init/`.
+- Every service owns one schema in the one Homeport database, with an owner
+  role that runs its migrations and an app role without DDL rights that the
+  service runs as. Migrations run as a one-shot `migrate` command of the
+  service's own image, never at service start.
 
 ## Architecture
 
@@ -187,6 +192,11 @@ and the Echo module **in the same pull request**.
 
 Security-critical. No exception without an ADR.
 
+- A table is either tenant-owned — its rows are a tenant's data — or a
+  platform table the operator owns, such as the control plane's tenants,
+  plans and clients. A platform table has no query filter and no row-level
+  security, even where it names a tenant, as `Clients` does. See
+  [the data model](docs/architecture/data-model.md).
 - Every tenant-owned table has a non-null `TenantId` (uuid).
 - EF Core global query filters on every tenant-owned entity.
   `IgnoreQueryFilters()` only in code paths explicitly marked as platform
