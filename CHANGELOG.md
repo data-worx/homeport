@@ -81,3 +81,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The gateway now forwards only the routes a module declares. See
   [the registry](docs/operators/registry.md) and
   [registering a module](docs/module-developers/registering-a-module.md).
+- The control plane knows the installation's tenants, their plans and their
+  clients, and tells the gateway which tenant and plan a client belongs to,
+  at `GET /clients/{clientId}` behind a gateway service token. In this
+  release it holds one tenant, plan and client, seeded from configuration.
+  Homeport's database is prepared by an init script that gives each service
+  its own schema, an owner role for its migrations and an app role without
+  DDL rights to run as; a one-shot `migrate` step applies the migrations and
+  the seed, and the control plane starts only after it succeeded. See
+  [the control plane](docs/operators/control-plane.md) and
+  [the data model](docs/architecture/data-model.md).
