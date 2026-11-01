@@ -20,8 +20,23 @@ public sealed class Program
     {
     }
 
-    /// <summary>Wires the control plane and runs it.</summary>
-    public static void Main(string[] args)
+    /// <summary>
+    /// Runs the control plane, or with <c>migrate</c> as the first argument
+    /// the <see cref="MigrateCommand"/>.
+    /// </summary>
+    /// <returns>The process exit code.</returns>
+    public static async Task<int> Main(string[] args)
+    {
+        if (args is [MigrateCommand.Name, .. var rest])
+        {
+            return await MigrateCommand.RunAsync(rest);
+        }
+
+        await RunAsync(args);
+        return 0;
+    }
+
+    private static async Task RunAsync(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
@@ -46,6 +61,6 @@ public sealed class Program
         app.MapControllers();
 
         app.Lifetime.ApplicationStarted.Register(() => app.Logger.LogInformation("Control plane started on {Urls}", app.Urls));
-        app.Run();
+        await app.RunAsync();
     }
 }

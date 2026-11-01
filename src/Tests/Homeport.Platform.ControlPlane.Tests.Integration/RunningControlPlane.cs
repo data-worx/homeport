@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using DotNet.Testcontainers.Configurations;
 using Homeport.Platform.ControlPlane.Persistence;
+using Homeport.Platform.ControlPlane.Seeding;
 using Homeport.Shared.Authentication;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,7 +14,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
@@ -23,7 +23,7 @@ namespace Homeport.Platform.ControlPlane.Tests.Integration;
 
 /// <summary>
 /// The control plane in memory, against a throwaway PostgreSQL prepared by
-/// <c>deploy/postgres/init/init-homeport.sh</c> and migrated as the owner role,
+/// <c>deploy/postgres/init/init-homeport.sh</c> and seeded by <c>migrate</c>,
 /// and a stand-in for the gateway's JWKS on a local port. It knows the client
 /// <see cref="ClientId"/> of <see cref="Tenant"/> on <see cref="Plan"/>.
 /// Needs a running Docker.
@@ -71,8 +71,9 @@ public sealed class RunningControlPlane : IAsyncLifetime
 
     internal static Plan Plan { get; } = new() { Id = Guid.Parse("0c9e8b7a-6d5f-4e3c-8b2a-1f0e9d8c7b02"), Name = "Known plan", RequestsPerSecond = 10, Burst = 20 };
 
-    /// <summary>The connection string of the app role, which the service runs as.</summary>
-    internal string AppConnectionString => ConnectionString(AppRole, AppPassword);
+    private string AppConnectionString => ConnectionString(AppRole, AppPassword);
+
+    private string OwnerConnectionString => ConnectionString(OwnerRole, OwnerPassword);
 
     private WebApplicationFactory<Program> Started =>
         controlPlane ?? throw new InvalidOperationException("The control plane has not been started.");
@@ -88,10 +89,23 @@ public sealed class RunningControlPlane : IAsyncLifetime
         return client;
     }
 
+    /// <summary>Runs <paramref name="sql"/> as the app role, which the service runs as.</summary>
+    /// <remarks>For fixed statements only: nothing may be concatenated into them.</remarks>
+    internal async Task<object?> ExecuteScalarAsAppRoleAsync(string sql)
+    {
+        await using var connection = new NpgsqlConnection(AppConnectionString);
+        await connection.OpenAsync();
+        await using var command = new NpgsqlCommand(sql, connection);
+        return await command.ExecuteScalarAsync();
+    }
+
     public async Task InitializeAsync()
     {
         await postgres.StartAsync();
-        await MigrateAndSeedAsync();
+        if (await MigrateAsync() != 0)
+        {
+            throw new InvalidOperationException("migrate failed; its log says why.");
+        }
 
         var builder = WebApplication.CreateSlimBuilder();
         builder.WebHost.UseUrls(LocalAddress);
@@ -122,17 +136,26 @@ public sealed class RunningControlPlane : IAsyncLifetime
         await postgres.DisposeAsync();
     }
 
-    private async Task MigrateAndSeedAsync()
+    /// <summary>
+    /// Runs <c>migrate</c> as the owner role with the seed of this fixture;
+    /// <paramref name="overrides"/> replace single settings, as <c>--Seed:ClientId=</c>.
+    /// </summary>
+    /// <returns>The exit code.</returns>
+    internal Task<int> MigrateAsync(params string[] overrides)
     {
-        var options = new DbContextOptionsBuilder<ControlPlaneDbContext>();
-        ControlPlanePersistenceExtensions.ConfigureNpgsql(options.UseNpgsql(ConnectionString(OwnerRole, OwnerPassword)));
+        string[] args =
+        [
+            $"--ConnectionStrings:{MigrateCommand.OwnerConnectionName}={OwnerConnectionString}",
+            $"--{SeedOptions.SectionName}:{nameof(SeedOptions.TenantId)}={Tenant.Id}",
+            $"--{SeedOptions.SectionName}:{nameof(SeedOptions.TenantName)}={Tenant.Name}",
+            $"--{SeedOptions.SectionName}:{nameof(SeedOptions.PlanId)}={Plan.Id}",
+            $"--{SeedOptions.SectionName}:{nameof(SeedOptions.PlanName)}={Plan.Name}",
+            $"--{SeedOptions.SectionName}:{nameof(SeedOptions.RequestsPerSecond)}={Plan.RequestsPerSecond}",
+            $"--{SeedOptions.SectionName}:{nameof(SeedOptions.Burst)}={Plan.Burst}",
+            $"--{SeedOptions.SectionName}:{nameof(SeedOptions.ClientId)}={ClientId}",
+        ];
 
-        await using var database = new ControlPlaneDbContext(options.Options);
-        await database.Database.MigrateAsync();
-        database.Tenants.Add(new Tenant { Id = Tenant.Id, Name = Tenant.Name });
-        database.Plans.Add(new Plan { Id = Plan.Id, Name = Plan.Name, RequestsPerSecond = Plan.RequestsPerSecond, Burst = Plan.Burst });
-        database.Clients.Add(new Client { ClientId = ClientId, TenantId = Tenant.Id, PlanId = Plan.Id });
-        await database.SaveChangesAsync();
+        return MigrateCommand.RunAsync([.. args, .. overrides]);
     }
 
     private string ConnectionString(string role, string password)
