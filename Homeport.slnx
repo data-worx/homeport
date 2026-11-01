@@ -24,7 +24,6 @@
     <Project Path="src/Platform/Registry/Homeport.Platform.Registry.Application/Homeport.Platform.Registry.Application.csproj" />
     <Project Path="src/Platform/Registry/Homeport.Platform.Registry.Domain/Homeport.Platform.Registry.Domain.csproj" />
     <Project Path="src/Platform/Registry/Homeport.Platform.Registry.Infrastructure/Homeport.Platform.Registry.Infrastructure.csproj" />
-    <Project Path="src/Shared/Homeport.Shared.Internal/Homeport.Shared.Internal.csproj" />
   </Folder>
   <Folder Name="/Sdk/">
     <Project Path="src/Sdk/Homeport.Sdk/Homeport.Sdk.csproj" />
@@ -33,6 +32,7 @@
     <Project Path="src/Shared/Homeport.Shared.Authentication/Homeport.Shared.Authentication.csproj" />
     <Project Path="src/Shared/Homeport.Shared.Client/Homeport.Shared.Client.csproj" />
     <Project Path="src/Shared/Homeport.Shared.Contracts/Homeport.Shared.Contracts.csproj" />
+    <Project Path="src/Shared/Homeport.Shared.Internal/Homeport.Shared.Internal.csproj" />
     <Project Path="src/Shared/Homeport.Shared.ServiceDefaults/Homeport.Shared.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/Tests/">
