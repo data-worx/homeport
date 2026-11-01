@@ -17,7 +17,12 @@ body.
 | Information | The start of a service, with its effective configuration: the gateway's key ids and registry, the registry's module ids, a module's id, version and contract version; a registered instance; changed routes at the gateway |
 | Debug | Per-request decisions, such as the `X-Homeport-*` headers the gateway stripped from a request, or an unchanged route table |
 
-The default level is `Information`, so Debug entries are not written.
+The default level is `Information`, so Debug entries are not written. The
+framework categories that log every request — `Microsoft.AspNetCore`,
+`System.Net.Http.HttpClient` and, at the gateway, `Yarp` — start at
+`Warning`, so a heartbeat or a forwarded request leaves no entry. Each
+service sets them in its `appsettings.json`; the variables below override
+them.
 
 ## Changing the level
 

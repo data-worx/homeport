@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Problems;
+using Microsoft.Extensions.Logging;
 
 namespace Homeport.Platform.Registry.Api.Tests.Integration.Controllers;
 
@@ -114,6 +115,19 @@ public sealed class InstancesControllerTests
             var response = await client.PostAsync(HeartbeatPath("heartbeat-registered"), content: null);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Logs_No_Framework_Information_For_A_Heartbeat()
+        {
+            var client = registry.CreateModuleClient();
+            await client.PutAsJsonAsync(InstancePath("heartbeat-quiet"), Registration);
+
+            await client.PostAsync(HeartbeatPath("heartbeat-quiet"), content: null);
+
+            Assert.DoesNotContain(
+                registry.Logs.GetSnapshot(),
+                entry => entry.Category?.StartsWith("Microsoft.AspNetCore", StringComparison.Ordinal) == true && entry.Level == LogLevel.Information);
         }
 
         [Fact]
