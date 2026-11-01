@@ -29,8 +29,10 @@ gateway replaces, unless a type below applies; see
 | Type | Status | Page |
 |---|---|---|
 | `https://homeport.data-worx.de/problems/internal` | 500 | [internal](internal.md) |
+| `https://homeport.data-worx.de/problems/invalid-manifest` | 422 | [invalid-manifest](invalid-manifest.md) |
 | `https://homeport.data-worx.de/problems/module-timeout` | 504 | [module-timeout](module-timeout.md) |
 | `https://homeport.data-worx.de/problems/module-unavailable` | 503 | [module-unavailable](module-unavailable.md) |
 | `https://homeport.data-worx.de/problems/module-unreachable` | 502 | [module-unreachable](module-unreachable.md) |
+| `https://homeport.data-worx.de/problems/unauthorized` | 401 | [unauthorized](unauthorized.md) |
 | `https://homeport.data-worx.de/problems/unknown-module` | 404 | [unknown-module](unknown-module.md) |
 | `https://homeport.data-worx.de/problems/validation` | 400 | [validation](validation.md) |

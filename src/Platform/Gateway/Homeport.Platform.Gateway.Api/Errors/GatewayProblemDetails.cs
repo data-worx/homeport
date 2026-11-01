@@ -68,7 +68,7 @@ internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logge
         // No endpoint means no route matched: nothing is mounted at the path.
         if (status == StatusCodes.Status404NotFound
             && context.GetEndpoint() is null
-            && context.Request.Path.StartsWithSegments(StaticRoutes.ModulesPrefix))
+            && context.Request.Path.StartsWithSegments(ModuleRoutes.ModulesPrefix))
         {
             return GatewayProblems.UnknownModule;
         }

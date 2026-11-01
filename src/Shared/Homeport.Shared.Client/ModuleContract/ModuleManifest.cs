@@ -29,9 +29,12 @@ public sealed record ModuleManifest(
     /// <summary>The version of the module contract these types describe.</summary>
     public const int CurrentContractVersion = 0;
 
-    /// <summary>The version of the module contract the module implements.</summary>
-    public int ContractVersion => CurrentContractVersion;
+    /// <summary>
+    /// The version of the module contract the module implements;
+    /// <see cref="CurrentContractVersion"/> unless a reader sets what it read.
+    /// </summary>
+    public int ContractVersion { get; init; } = CurrentContractVersion;
 
     /// <summary>Where the module's OpenAPI document is served.</summary>
-    public string OpenApiUrl => OpenApiPath;
+    public string OpenApiUrl { get; init; } = OpenApiPath;
 }

@@ -2,6 +2,8 @@
 const Homeport.Shared.Client.ModuleContract.ModuleManifest.CurrentContractVersion = 0 -> int
 const Homeport.Shared.Client.ModuleContract.ModuleManifest.ManifestPath = "/.well-known/homeport/manifest" -> string!
 const Homeport.Shared.Client.ModuleContract.ModuleManifest.OpenApiPath = "/openapi/v1.json" -> string!
+const Homeport.Shared.Client.ModuleContract.RegistryPaths.Heartbeat = "/instances/{moduleId}/{instanceId}/heartbeat" -> string!
+const Homeport.Shared.Client.ModuleContract.RegistryPaths.Instance = "/instances/{moduleId}/{instanceId}" -> string!
 const Homeport.Shared.Client.Problems.ProblemConventions.ErrorsExtension = "errors" -> string!
 const Homeport.Shared.Client.Problems.ProblemConventions.TraceIdExtension = "traceId" -> string!
 const Homeport.Shared.Client.Problems.ProblemConventions.TypePrefix = "https://homeport.data-worx.de/problems/" -> string!
@@ -23,6 +25,7 @@ Homeport.Shared.Client.ModuleContract.ManifestRoute.Scope.init -> void
 Homeport.Shared.Client.ModuleContract.ModuleManifest
 Homeport.Shared.Client.ModuleContract.ModuleManifest.<Clone>$() -> Homeport.Shared.Client.ModuleContract.ModuleManifest!
 Homeport.Shared.Client.ModuleContract.ModuleManifest.ContractVersion.get -> int
+Homeport.Shared.Client.ModuleContract.ModuleManifest.ContractVersion.init -> void
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Deconstruct(out string! Id, out string! Name, out string! Version, out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.ModuleContract.ManifestRoute!>! Routes, out System.Collections.Generic.IReadOnlyList<string!>! Scopes, out System.Collections.Generic.IReadOnlyList<string!>! Meters) -> void
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Equals(Homeport.Shared.Client.ModuleContract.ModuleManifest? other) -> bool
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Id.get -> string!
@@ -33,12 +36,23 @@ Homeport.Shared.Client.ModuleContract.ModuleManifest.ModuleManifest(string! Id, 
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Name.get -> string!
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Name.init -> void
 Homeport.Shared.Client.ModuleContract.ModuleManifest.OpenApiUrl.get -> string!
+Homeport.Shared.Client.ModuleContract.ModuleManifest.OpenApiUrl.init -> void
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Routes.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.ModuleContract.ManifestRoute!>!
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Routes.init -> void
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Scopes.get -> System.Collections.Generic.IReadOnlyList<string!>!
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Scopes.init -> void
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Version.get -> string!
 Homeport.Shared.Client.ModuleContract.ModuleManifest.Version.init -> void
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.<Clone>$() -> Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest!
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.Address.get -> System.Uri!
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.Address.init -> void
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.Deconstruct(out System.Uri! Address, out Homeport.Shared.Client.ModuleContract.ModuleManifest! Manifest) -> void
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.Equals(Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest? other) -> bool
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.Manifest.get -> Homeport.Shared.Client.ModuleContract.ModuleManifest!
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.Manifest.init -> void
+Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.RegisterInstanceRequest(System.Uri! Address, Homeport.Shared.Client.ModuleContract.ModuleManifest! Manifest) -> void
+Homeport.Shared.Client.ModuleContract.RegistryPaths
 Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse
 Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.<Clone>$() -> Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse!
 Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.Deconstruct(out System.Collections.Generic.IReadOnlyDictionary<string!, string!>! Headers) -> void
@@ -74,6 +88,9 @@ override Homeport.Shared.Client.ModuleContract.ManifestRoute.ToString() -> strin
 override Homeport.Shared.Client.ModuleContract.ModuleManifest.Equals(object? obj) -> bool
 override Homeport.Shared.Client.ModuleContract.ModuleManifest.GetHashCode() -> int
 override Homeport.Shared.Client.ModuleContract.ModuleManifest.ToString() -> string!
+override Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.Equals(object? obj) -> bool
+override Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.GetHashCode() -> int
+override Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.ToString() -> string!
 override Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.Equals(object? obj) -> bool
 override Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.GetHashCode() -> int
 override Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.ToString() -> string!
@@ -84,6 +101,8 @@ static Homeport.Shared.Client.ModuleContract.ManifestRoute.operator !=(Homeport.
 static Homeport.Shared.Client.ModuleContract.ManifestRoute.operator ==(Homeport.Shared.Client.ModuleContract.ManifestRoute? left, Homeport.Shared.Client.ModuleContract.ManifestRoute? right) -> bool
 static Homeport.Shared.Client.ModuleContract.ModuleManifest.operator !=(Homeport.Shared.Client.ModuleContract.ModuleManifest? left, Homeport.Shared.Client.ModuleContract.ModuleManifest? right) -> bool
 static Homeport.Shared.Client.ModuleContract.ModuleManifest.operator ==(Homeport.Shared.Client.ModuleContract.ModuleManifest? left, Homeport.Shared.Client.ModuleContract.ModuleManifest? right) -> bool
+static Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.operator !=(Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest? left, Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest? right) -> bool
+static Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.operator ==(Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest? left, Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest? right) -> bool
 static Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.operator !=(Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? left, Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? right) -> bool
 static Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.operator ==(Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? left, Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? right) -> bool
 static Homeport.Shared.Client.Problems.ProblemResponse.operator !=(Homeport.Shared.Client.Problems.ProblemResponse? left, Homeport.Shared.Client.Problems.ProblemResponse? right) -> bool

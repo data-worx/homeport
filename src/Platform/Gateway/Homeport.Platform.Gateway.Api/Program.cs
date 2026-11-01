@@ -2,6 +2,7 @@
 
 using Homeport.Platform.Gateway.Api.Errors;
 using Homeport.Platform.Gateway.Api.Routing;
+using Homeport.Platform.Gateway.Infrastructure.Registry;
 using Homeport.Platform.Gateway.Infrastructure.Signing;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.Extensions.Options;
@@ -10,7 +11,8 @@ namespace Homeport.Platform.Gateway.Api;
 
 /// <summary>
 /// The gateway: the one entry point of Homeport, which forwards
-/// <c>/modules/{moduleId}/{path}</c> to the module and issues the tokens
+/// <c>/modules/{moduleId}/{path}</c> to the module on the routes the registry
+/// knows, and issues the tokens
 /// Homeport's components trust. Every error it answers with is Problem
 /// Details (ADR-0016).
 /// </summary>
@@ -29,15 +31,16 @@ public sealed class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
         builder.Services.AddGatewaySigning();
+        builder.Services.AddRegistryClient();
         builder.Services.AddControllers();
         builder.Services.AddAuthorization();
         builder.Services.AddProblemDetails();
         builder.Services.AddSingleton<IConfigureOptions<ProblemDetailsOptions>, GatewayProblemDetails>();
         builder.Services.AddReverseProxy()
-            .LoadFromMemory(StaticRoutes.Routes, StaticRoutes.Clusters)
+            .LoadFromMemory([], [])
             .AddTransforms<HomeportHeaders>()
-            .AddTransforms<ModuleErrors>()
-            .AddServiceDiscoveryDestinationResolver();
+            .AddTransforms<ModuleErrors>();
+        builder.Services.AddHostedService<RouteTablePoller>();
 
         var app = builder.Build();
 
@@ -69,11 +72,11 @@ public sealed class Program
             var additionalKeyId = string.IsNullOrWhiteSpace(signing.AdditionalKeyId) ? NoAdditionalKey : signing.AdditionalKeyId;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, modules {ModuleIds}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
-                StaticRoutes.Routes.Select(route => route.RouteId));
+                app.Services.GetRequiredService<IOptions<RegistryOptions>>().Value.Url);
         });
     }
 }

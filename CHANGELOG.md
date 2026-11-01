@@ -14,9 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Docker Compose file generated from it. Every third-party image is pinned by
   digest. See [running Homeport locally](docs/operators/running-locally.md).
 - The module SDK, `Homeport.Sdk`, and the Echo reference module built on it.
-  A module declares its manifest in code; the SDK checks it against the module
-  contract at start-up and serves it with the health endpoints and an OpenAPI
-  document. Echo returns whatever it is sent and runs in the AppHost and the
+  A module declares its manifest in code; the SDK serves it with the health
+  endpoints and an OpenAPI document. Echo returns whatever it is sent and runs in the AppHost and the
   compose file. See [declaring a manifest](docs/module-developers/declaring-a-manifest.md).
 - The gateway, Homeport's single entry point. A request to
   `/modules/echo/v1/echo` reaches the Echo module as `/v1/echo`; incoming
@@ -67,3 +66,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with its effective configuration, never a key; a rejected gateway token and
   a failed retrieval of the gateway's JWKS are warnings. The level is set per
   category through environment variables. See [logging](docs/operators/logging.md).
+- Modules register themselves, and the gateway routes to them live. The new
+  registry keeps every running module instance for 30 s after its last
+  heartbeat, in Valkey; a module built with the SDK registers once it has
+  started and sends a heartbeat every 10 s. The gateway reads the routes from
+  the registry every 5 s, so starting a module makes it reachable and stopping
+  it removes its routes, with no configuration change at the gateway. Each
+  route goes only to the instances that declare it, which allows rolling
+  updates and two major versions side by side; while the registry is down,
+  the gateway keeps the last known routes. A module authenticates with a
+  registration key per module id, of which two can be valid at once for a
+  rotation without downtime; the registry checks the manifest and refuses a
+  broken one with `422` `invalid-manifest`, and the SDK logs why and stops.
+  The gateway now forwards only the routes a module declares. See
+  [the registry](docs/operators/registry.md) and
+  [registering a module](docs/module-developers/registering-a-module.md).

@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Empty: the gateway forwards on static configuration and decides nothing
-       yet. Its rules arrive with routing from the registry (#42) and
-       throttling (#48), so it is cut ahead of them. -->
+  <!-- Empty: the gateway forwards on the routes the registry merged and
+       decides nothing yet. Its rules arrive with throttling (#48), so it is
+       cut ahead of them. -->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

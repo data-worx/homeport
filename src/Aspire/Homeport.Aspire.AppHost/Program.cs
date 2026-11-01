@@ -30,7 +30,7 @@ public static class Program
             .WithImageTag("4.3")
             .WithImageSHA256("8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75");
 
-        builder.AddValkey("valkey")
+        var valkey = builder.AddValkey("valkey")
             .WithImageTag("9.1")
             .WithImageSHA256("418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd");
 
@@ -42,11 +42,29 @@ public static class Program
             .WithImageSHA256("0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4")
             .PublishAsDockerComposeService((_, service) => service.Command = ["start-dev", "--import-realm"]);
 
+        // A registration key per module id (ADR-0012). A local run generates
+        // one and keeps it in the user secrets; the compose file takes it from
+        // the environment.
+        var echoRegistrationKey = builder.AddParameter("echo-registration-key", new GeneratedRegistrationKey(), secret: true, persist: true);
+
+        // Modules register here and the gateway reads their routes from it.
+        var registry = builder.AddProject<Projects.Homeport_Platform_Registry_Api>("registry")
+            .WithEnvironment("OTEL_SERVICE_NAME", "homeport-registry")
+            .WithEnvironment("Registry__RegistrationKeys__echo__0", echoRegistrationKey)
+            .WithReference(valkey)
+            .WaitFor(valkey)
+            .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
+
         // Modules. The resource is named after the module id; service.name
-        // follows the observability rule instead.
+        // follows the observability rule instead. Each instance registers at
+        // the registry with the address the gateway reaches it at.
         var echo = builder.AddProject<Projects.Homeport_Modules_Echo_Api>("echo")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-module-echo")
+            .WithEnvironment("Homeport__Registry__Url", $"{Uri.UriSchemeHttp}://registry")
+            .WithEnvironment("Homeport__Registry__Key", echoRegistrationKey)
+            .WithReference(registry)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
+        echo.WithEnvironment("Homeport__Registry__InstanceAddress", echo.GetEndpoint(Uri.UriSchemeHttp));
 
         // The gateway's signing key. A local run generates one and keeps it in
         // the user secrets; the compose file takes it from the environment. The
@@ -57,8 +75,8 @@ public static class Program
         var additionalKeyId = builder.AddParameter("gateway-additional-key-id", string.Empty);
 
         // The one service with an external endpoint: modules are reachable only
-        // through it. It finds each module by its resource name.
-        builder.AddProject<Projects.Homeport_Platform_Gateway_Api>("gateway")
+        // through it, on the routes it reads from the registry.
+        var gateway = builder.AddProject<Projects.Homeport_Platform_Gateway_Api>("gateway")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-gateway")
             .WithEnvironment("Signing__Key", signingKey)
             .WithEnvironment("Signing__KeyId", signingKeyId)
@@ -66,7 +84,10 @@ public static class Program
             .WithEnvironment("Signing__AdditionalKeyId", additionalKeyId)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath)
             .WithExternalHttpEndpoints()
-            .WithReference(echo);
+            .WithReference(registry);
+
+        // The registry validates the gateway's service tokens against its JWKS.
+        registry.WithReference(gateway);
 
         builder.Build().Run();
     }

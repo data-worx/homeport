@@ -18,6 +18,7 @@ public sealed class ProgramTests
         [InlineData("rabbitmq")]
         [InlineData("valkey")]
         [InlineData("keycloak")]
+        [InlineData("registry")]
         [InlineData("echo")]
         [InlineData("gateway")]
         public async Task Starts_The_Resource_Healthy(string resource)
@@ -99,14 +100,7 @@ public sealed class ProgramTests
             Assert.Equal("local", Assert.Single(jwks.GetProperty("keys").EnumerateArray()).GetProperty("kid").GetString());
         }
 
-        private async Task<HttpClient> Gateway()
-        {
-            using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
-            await appHost.App.ResourceNotifications.WaitForResourceHealthyAsync("echo", timeout.Token);
-            await appHost.App.ResourceNotifications.WaitForResourceHealthyAsync("gateway", timeout.Token);
-
-            return appHost.App.CreateHttpClient("gateway");
-        }
+        private Task<HttpClient> Gateway() => appHost.GatewayRoutingEchoAsync();
 
         private static async Task<JsonElement> ReceivedHeaders(HttpClient gateway, HttpRequestMessage request)
         {

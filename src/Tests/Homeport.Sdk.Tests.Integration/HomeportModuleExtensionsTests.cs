@@ -25,16 +25,6 @@ public sealed class HomeportModuleExtensionsTests
         };
 
         [Fact]
-        public void Refuses_A_Manifest_That_Breaks_The_Contract()
-        {
-            var manifest = TestModule.Manifest with { Id = "platform" };
-
-            var exception = Assert.Throws<InvalidOperationException>(() => TestModule.CreateBuilder(manifest));
-
-            Assert.Contains("Id 'platform' is reserved.", exception.Message);
-        }
-
-        [Fact]
         public async Task Answers_An_Unhandled_Exception_As_An_Internal_Problem()
         {
             await using var app = await TestModule.StartAsync();

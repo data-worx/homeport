@@ -17,8 +17,9 @@ https://<gateway>/modules/{moduleId}/{path}
   `/v1/echo`.
 
 The gateway removes `/modules/{moduleId}` and forwards the rest. A request to
-`/modules/echo/v1/echo` reaches Echo as `/v1/echo`. A path that names no
-module is answered with `404` and the problem type
+`/modules/echo/v1/echo` reaches Echo as `/v1/echo`. Only the routes a module
+declares in its manifest are forwarded. A path that names no module, or a
+route the module does not declare, is answered with `404` and the problem type
 [`unknown-module`](../reference/problems/unknown-module.md); every error is
 Problem Details, see [errors](errors.md).
 

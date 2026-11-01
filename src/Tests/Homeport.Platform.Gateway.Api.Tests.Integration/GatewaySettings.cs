@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 
-/// <summary>The signing configuration the gateway does not start without.</summary>
-internal static class SigningSettings
+/// <summary>The configuration the gateway does not start, or route, without.</summary>
+internal static class GatewaySettings
 {
     internal const string KeyId = "current";
 
@@ -20,6 +20,12 @@ internal static class SigningSettings
         return host
             .UseSetting("Signing:Key", key.ExportPkcs8PrivateKeyPem())
             .UseSetting("Signing:KeyId", KeyId);
+    }
+
+    /// <summary>Reads the routes from <paramref name="registry"/>.</summary>
+    internal static IWebHostBuilder WithRegistry(this IWebHostBuilder host, StandInRegistry registry)
+    {
+        return host.UseSetting("Registry:Url", registry.Url);
     }
 
     /// <summary>A fresh P-256 public key under <see cref="AdditionalKeyId"/>.</summary>
