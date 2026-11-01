@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
@@ -43,6 +45,9 @@ public sealed class RunningRegistry : IAsyncLifetime
 
     private WebApplicationFactory<Program> Started =>
         registry ?? throw new InvalidOperationException("The registry has not been started.");
+
+    /// <summary>What the registry logged.</summary>
+    internal FakeLogCollector Logs => Started.Services.GetFakeLogCollector();
 
     /// <summary>A client without credentials.</summary>
     internal HttpClient CreateClient() => Started.CreateClient();
@@ -88,7 +93,8 @@ public sealed class RunningRegistry : IAsyncLifetime
             .WithWebHostBuilder(host => host
                 .UseSetting($"ConnectionStrings:{RegistryInfrastructureExtensions.ValkeyConnectionName}", valkey.GetConnectionString())
                 .UseSetting($"{RegistrationKeyOptions.SectionName}:{nameof(RegistrationKeyOptions.RegistrationKeys)}:{ModuleId}:0", RegistrationKey)
-                .UseSetting($"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}", $"{jwks.Urls.Single()}{GatewayTokens.JwksPath}"));
+                .UseSetting($"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}", $"{jwks.Urls.Single()}{GatewayTokens.JwksPath}")
+                .ConfigureLogging(logging => logging.AddFakeLogging()));
     }
 
     public async Task DisposeAsync()

@@ -6,6 +6,7 @@ using System.Text.Json;
 using Homeport.Platform.Registry.Application;
 using Homeport.Platform.Registry.Domain.Routing;
 using Homeport.Shared.Internal.Platform.Registry;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -17,7 +18,7 @@ namespace Homeport.Platform.Registry.Api.Controllers;
 /// read them, with a service token for the registry (ADR-0014).
 /// </summary>
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class RoutesController(Registrations registrations) : ControllerBase
 {
     /// <summary>The routes of every module with at least one live instance.</summary>

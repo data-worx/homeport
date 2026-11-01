@@ -32,10 +32,12 @@ public sealed class Program
         builder.AddRegistryInfrastructure();
         builder.Services.AddSingleton<Registrations>();
 
-        // The gateway's service tokens are the default, for the routes; a
-        // module instance authenticates with its registration key instead.
+        // Two schemes and no default: every endpoint names the one it accepts,
+        // so a registration key is never read as a gateway token, nor a token
+        // as a key.
         builder.Services.AddGatewayTokenAuthentication(RegistryService.Audience)
             .AddScheme<AuthenticationSchemeOptions, RegistrationKeyHandler>(RegistrationKeyHandler.SchemeName, configureOptions: null);
+        builder.Services.Configure<AuthenticationOptions>(options => options.DefaultScheme = null);
         builder.Services.AddAuthorization();
         builder.Services.AddControllers();
         builder.Services.AddProblemDetails();

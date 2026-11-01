@@ -37,6 +37,14 @@ public sealed class InstancesControllerTests
         }
 
         [Fact]
+        public async Task Does_Not_Read_The_Registration_Key_As_A_Gateway_Token()
+        {
+            await registry.CreateModuleClient().PutAsJsonAsync(InstancePath("register-not-a-token"), Registration);
+
+            Assert.DoesNotContain(registry.Logs.GetSnapshot(), entry => entry.Category == "Homeport.Shared.Authentication.GatewayTokenEvents");
+        }
+
+        [Fact]
         public async Task Answers_Unauthorized_For_A_Wrong_Key()
         {
             var response = await registry.CreateModuleClient("wrong").PutAsJsonAsync(InstancePath("register-wrong-key"), Registration);
