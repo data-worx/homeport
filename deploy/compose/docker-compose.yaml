@@ -50,9 +50,20 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: "${KEYCLOAK_PASSWORD}"
       KC_HEALTH_ENABLED: "true"
       KC_FEATURES: "opentelemetry"
-    expose:
-      - "8080"
+      HOMEPORT_LOCAL_CLIENT_ID: "${SEED_CLIENT_ID}"
+      HOMEPORT_LOCAL_CLIENT_SECRET: "${LOCAL_CLIENT_SECRET}"
+      HOMEPORT_UNMAPPED_CLIENT_SECRET: "${UNMAPPED_CLIENT_SECRET}"
+      HOMEPORT_AUDIENCE: "homeport"
+      KC_HOSTNAME: "http://localhost:8080"
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+    ports:
+      - "8080:8080"
       - "9000"
+    volumes:
+      - type: "bind"
+        target: "/opt/keycloak/data/import"
+        source: "${KEYCLOAK_BINDMOUNT_0}"
+        read_only: true
     networks:
       - "aspire"
   registry:
@@ -106,9 +117,15 @@ services:
       Signing__KeyId: "${GATEWAY_SIGNING_KEY_ID}"
       Signing__AdditionalPublicKey: "${GATEWAY_ADDITIONAL_PUBLIC_KEY}"
       Signing__AdditionalKeyId: "${GATEWAY_ADDITIONAL_KEY_ID}"
+      ClientAuthentication__Authority: "http://keycloak:8080/realms/homeport"
+      ClientAuthentication__Audience: "homeport"
+      ClientAuthentication__RequireHttpsMetadata: "False"
       REGISTRY_HTTP: "http://registry:${REGISTRY_PORT}"
       services__registry__http__0: "http://registry:${REGISTRY_PORT}"
       REGISTRY_HTTPS: "https://registry:${REGISTRY_PORT}"
+      CONTROL_PLANE_HTTP: "http://control-plane:${CONTROL_PLANE_PORT}"
+      services__control-plane__http__0: "http://control-plane:${CONTROL_PLANE_PORT}"
+      CONTROL_PLANE_HTTPS: "https://control-plane:${CONTROL_PLANE_PORT}"
     ports:
       - "${GATEWAY_PORT}"
     networks:

@@ -16,8 +16,9 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 /// the routes a stand-in registry lists. The stand-in module answers every
 /// request with the path and the headers it received, so a test sees what the
 /// gateway forwards, except for the paths under <see cref="ErrorsPath"/>, which
-/// answer with an error. What the gateway logs, down to Debug, is read from
-/// <see cref="Logs"/>.
+/// answer with an error. Clients authenticate with a stand-in identity
+/// provider and are looked up at a stand-in control plane. What the gateway
+/// logs, down to Debug, is read from <see cref="Logs"/>.
 /// </summary>
 public sealed class ForwardingGateway : IAsyncLifetime
 {
@@ -49,14 +50,25 @@ public sealed class ForwardingGateway : IAsyncLifetime
 
     private WebApplication? module;
     private StandInRegistry? registry;
+    private StandInIdentityProvider? identityProvider;
+    private StandInControlPlane? controlPlane;
     private WebApplicationFactory<Program>? gateway;
 
+    /// <summary>A client of the gateway with a token of a client the control plane knows.</summary>
     internal HttpClient CreateClient() =>
+        Started.CreateClient().WithToken(IdentityProvider.Issue(StandInControlPlane.KnownClientId));
+
+    /// <summary>A client of the gateway without a token.</summary>
+    internal HttpClient CreateAnonymousClient() =>
         Started.CreateClient();
 
     internal FakeLogCollector Logs => Started.Services.GetFakeLogCollector();
 
     internal StandInRegistry Registry => registry ?? throw new InvalidOperationException("The registry has not been started.");
+
+    internal StandInIdentityProvider IdentityProvider => identityProvider ?? throw new InvalidOperationException("The identity provider has not been started.");
+
+    internal StandInControlPlane ControlPlane => controlPlane ?? throw new InvalidOperationException("The control plane has not been started.");
 
     private WebApplicationFactory<Program> Started =>
         gateway ?? throw new InvalidOperationException("The gateway has not been started.");
@@ -79,11 +91,14 @@ public sealed class ForwardingGateway : IAsyncLifetime
 
         registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(
             module.Urls.Single(), RequestPath, NotFoundProblemPath, InternalProblemPath, HtmlBadRequestPath));
+        identityProvider = await StandInIdentityProvider.StartAsync();
+        controlPlane = await StandInControlPlane.StartAsync();
 
         gateway = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(host => host
                 .WithSigningKey()
                 .WithRegistry(registry)
+                .WithClients(identityProvider, controlPlane)
                 .ConfigureLogging(logging => logging.AddFakeLogging().SetMinimumLevel(LogLevel.Debug)));
         await WaitForRoutesAsync(gateway.CreateClient(), "/modules/echo" + RequestPath);
     }
@@ -111,6 +126,16 @@ public sealed class ForwardingGateway : IAsyncLifetime
         if (registry is not null)
         {
             await registry.DisposeAsync();
+        }
+
+        if (identityProvider is not null)
+        {
+            await identityProvider.DisposeAsync();
+        }
+
+        if (controlPlane is not null)
+        {
+            await controlPlane.DisposeAsync();
         }
 
         if (module is not null)

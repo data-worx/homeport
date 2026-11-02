@@ -32,6 +32,8 @@ public sealed class RouteTablePollerTests
         private readonly FakeTimeProvider time = new(TimeProvider.System.GetUtcNow());
         private WebApplication? module;
         private StandInRegistry? registry;
+        private StandInIdentityProvider? identityProvider;
+        private StandInControlPlane? controlPlane;
         private WebApplicationFactory<Program>? gateway;
 
         private StandInRegistry Registry => registry!;
@@ -47,10 +49,13 @@ public sealed class RouteTablePollerTests
             await module.StartAsync();
 
             registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(module.Urls.Single(), ForwardingGateway.RequestPath));
+            identityProvider = await StandInIdentityProvider.StartAsync();
+            controlPlane = await StandInControlPlane.StartAsync();
             gateway = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(host => host
                     .WithSigningKey()
                     .WithRegistry(registry)
+                    .WithClients(identityProvider, controlPlane)
                     .ConfigureLogging(logging => logging.AddFakeLogging())
                     .ConfigureTestServices(services => services.AddSingleton<TimeProvider>(time)));
             await ForwardingGateway.WaitForRoutesAsync(gateway.CreateClient(), EchoPath);
@@ -60,6 +65,8 @@ public sealed class RouteTablePollerTests
         {
             await Gateway.DisposeAsync();
             await Registry.DisposeAsync();
+            await identityProvider!.DisposeAsync();
+            await controlPlane!.DisposeAsync();
             await module!.DisposeAsync();
         }
 
@@ -76,7 +83,7 @@ public sealed class RouteTablePollerTests
         [Fact]
         public async Task Forwards_A_Declared_Route()
         {
-            var response = await Gateway.CreateClient().GetAsync(EchoPath);
+            var response = await Client().GetAsync(EchoPath);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -92,7 +99,7 @@ public sealed class RouteTablePollerTests
         [Fact]
         public async Task Answers_Method_Not_Allowed_As_Problem_For_A_Method_The_Route_Does_Not_Declare()
         {
-            var response = await Gateway.CreateClient().PostAsync(EchoPath, content: null);
+            var response = await Client().PostAsync(EchoPath, content: null);
 
             Assert.Equal(HttpStatusCode.MethodNotAllowed, response.StatusCode);
             Assert.Equal(MediaTypeNames.Application.ProblemJson, response.Content.Headers.ContentType?.MediaType);
@@ -129,8 +136,11 @@ public sealed class RouteTablePollerTests
             await WaitUntil(() => Gateway.Services.GetFakeLogCollector().GetSnapshot()
                 .Any(entry => entry.Category == PollerCategory && entry.Level == LogLevel.Warning));
 
-            Assert.Equal(HttpStatusCode.OK, (await Gateway.CreateClient().GetAsync(EchoPath)).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await Client().GetAsync(EchoPath)).StatusCode);
         }
+
+        private HttpClient Client() =>
+            Gateway.CreateClient().WithToken(identityProvider!.Issue(StandInControlPlane.KnownClientId));
 
         private static Task WaitUntil(Func<bool> condition) => WaitUntil(() => Task.FromResult(condition()));
 
