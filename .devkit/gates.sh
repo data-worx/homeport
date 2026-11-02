@@ -22,8 +22,13 @@ NOTICES_PROJECT=""
 # change. It also promotes the NuGet audit warnings (NU1901-NU1904), so a newly
 # published advisory can turn this red without a code change. That is the
 # intent: a known-vulnerable package is a reason not to commit.
-gate_build()  { dotnet build  "${SLN}" --nologo -warnaserror; }
-gate_test()   { dotnet test   "${SLN}" --nologo; }
+#
+# No MSBuild node outlives a gate, and the test gate builds before it tests
+# rather than while: the end-to-end tests start the whole topology, and next
+# to a solution build and idle build nodes it does not fit a 16 GB machine.
+# The build is incremental, so after the build gate it does nothing.
+gate_build()  { dotnet build  "${SLN}" --nologo -warnaserror -nodeReuse:false; }
+gate_test()   { dotnet build "${SLN}" --nologo -nodeReuse:false && dotnet test "${SLN}" --nologo --no-build -nodeReuse:false; }
 gate_format() { dotnet format "${SLN}" --verify-no-changes; }
 
 # Regenerates the notices into a temporary file and compares it with the
