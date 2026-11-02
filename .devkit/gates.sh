@@ -28,7 +28,24 @@ NOTICES_PROJECT=""
 # to a solution build and idle build nodes it does not fit a 16 GB machine.
 # The build is incremental, so after the build gate it does nothing.
 gate_build()  { dotnet build  "${SLN}" --nologo -warnaserror -nodeReuse:false; }
-gate_test()   { dotnet build "${SLN}" --nologo -nodeReuse:false && dotnet test "${SLN}" --nologo --no-build -nodeReuse:false; }
+#
+# The runner shows only the last lines of a failing gate, which are the
+# summaries of the test projects that finished last, so the test gate repeats
+# every failing test with its message at the end. English output, so the
+# pattern holds on every machine.
+gate_test() {
+  local log rc
+  log="$(mktemp)"
+  dotnet build "${SLN}" --nologo -nodeReuse:false || { rm -f "${log}"; return 1; }
+  DOTNET_CLI_UI_LANGUAGE=en dotnet test "${SLN}" --nologo --no-build -nodeReuse:false 2>&1 | tee "${log}"
+  rc=${PIPESTATUS[0]}
+  if [ "${rc}" -ne 0 ]; then
+    echo "--- failing tests ---"
+    grep -E -A3 '^[[:space:]]+Failed [^!]' "${log}"
+  fi
+  rm -f "${log}"
+  return "${rc}"
+}
 gate_format() { dotnet format "${SLN}" --verify-no-changes; }
 
 # Regenerates the notices into a temporary file and compares it with the
