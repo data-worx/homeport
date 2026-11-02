@@ -2,6 +2,7 @@
 
 Every module is reached through the gateway, the one entry point of a Homeport
 installation. A module has no address of its own that a caller could use.
+Every call carries a bearer token; see [obtaining a token](obtaining-a-token.md).
 
 ## The URL
 
@@ -59,11 +60,13 @@ version. Until it is published as a package, reference the project
 ## Try it with Echo
 
 Echo returns whatever it is sent. With Homeport running locally
-([running Homeport locally](../operators/running-locally.md)), and
-`<gateway>` the gateway's address from there:
+([running Homeport locally](../operators/running-locally.md)), `<gateway>`
+the gateway's address from there and `<access token>` a token as
+[obtaining a token](obtaining-a-token.md) describes:
 
 ```bash
-curl -s -X POST -H 'Content-Type: application/json' \
+curl -s -X POST -H 'Authorization: Bearer <access token>' \
+  -H 'Content-Type: application/json' \
   -d '{"hello":"Homeport"}' http://<gateway>/modules/echo/v1/echo
 ```
 
@@ -73,6 +76,3 @@ curl -s -X POST -H 'Content-Type: application/json' \
 
 `GET /modules/echo/v1/request` answers with the headers Echo received, which
 shows what the gateway forwards.
-
-The gateway does not authenticate callers yet and accepts these calls without
-a token. Client credentials follow before the v0.1 release.

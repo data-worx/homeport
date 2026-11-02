@@ -2,9 +2,12 @@
 
 `https://homeport.data-worx.de/problems/unauthorized` — status `401`.
 
-The request carries no valid credential for the endpoint. Today the registry
-answers with it: a registration or heartbeat with an unknown module id or a
-wrong registration key, and a read of the route table without a valid
+The request carries no valid credential for the endpoint. The gateway
+answers with it for a call to a module without a token, or with one that is
+expired, signed by another issuer or meant for another audience; see
+[obtaining a token](../../api-consumers/obtaining-a-token.md). The registry
+answers with it for a registration or heartbeat with an unknown module id or
+a wrong registration key, and for a read of the route table without a valid
 service token from the gateway.
 
 ```json
@@ -17,6 +20,7 @@ service token from the gateway.
 ```
 
 The body never says which part of the credential was wrong, so it cannot be
-used to guess a key. Check the module id and the key against what the
-operator configured at the registry; the same request fails the same way
-until they match.
+used to guess a key. At the gateway, get a fresh token and check its issuer
+and audience with the operator. At the registry, check the module id and the
+key against what the operator configured; the same request fails the same
+way until they match.

@@ -13,6 +13,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`operators/signing-key.md`](operators/signing-key.md) | Generating, configuring and rotating the gateway's signing key |
 | [`operators/registry.md`](operators/registry.md) | The registry, the modules' registration keys and what happens while it is down |
 | [`operators/control-plane.md`](operators/control-plane.md) | The control plane, preparing its database, the `migrate` step and the seed configuration |
+| [`operators/identity-provider.md`](operators/identity-provider.md) | Connecting the identity provider whose client tokens the gateway accepts, and mapping its clients to tenants |
 | [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |
 
 ## Module developers — building a module on the contract and the SDK
@@ -28,6 +29,7 @@ Arranged by reader. A directory exists once it has its first document.
 
 | Document | About |
 |---|---|
+| [`api-consumers/obtaining-a-token.md`](api-consumers/obtaining-a-token.md) | Getting a client-credentials token and calling a module with it |
 | [`api-consumers/calling-a-module.md`](api-consumers/calling-a-module.md) | The URL scheme for calling a module through the gateway |
 | [`api-consumers/errors.md`](api-consumers/errors.md) | The error format, and what the gateway does to a module's errors |
 
