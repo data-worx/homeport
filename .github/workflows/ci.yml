@@ -17,6 +17,8 @@ permissions:
 jobs:
   gates:
     runs-on: ubuntu-latest
+    # A full run takes about 6 minutes; a hang must not hold a runner for hours.
+    timeout-minutes: 30
     env:
       DOTNET_NOLOGO: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true

@@ -32,13 +32,17 @@ gate_build()  { dotnet build  "${SLN}" --nologo -warnaserror -nodeReuse:false; }
 # The runner shows only the last lines of a failing gate, which are the
 # summaries of the test projects that finished last, so the test gate repeats
 # every failing test with its message at the end. English output, so the
-# pattern holds on every machine.
+# pattern holds on every machine. The output goes to a file, not through a
+# pipe: a child process that outlives the run would keep a pipe open forever.
+# A test that hangs is aborted after 5 minutes and named.
 gate_test() {
   local log rc
   log="$(mktemp)"
   dotnet build "${SLN}" --nologo -nodeReuse:false || { rm -f "${log}"; return 1; }
-  DOTNET_CLI_UI_LANGUAGE=en dotnet test "${SLN}" --nologo --no-build -nodeReuse:false 2>&1 | tee "${log}"
-  rc=${PIPESTATUS[0]}
+  DOTNET_CLI_UI_LANGUAGE=en dotnet test "${SLN}" --nologo --no-build -nodeReuse:false \
+    --blame-hang-timeout 5m --blame-hang-dump-type none > "${log}" 2>&1
+  rc=$?
+  cat "${log}"
   if [ "${rc}" -ne 0 ]; then
     echo "--- failing tests ---"
     grep -E -A3 '^[[:space:]]+Failed [^!]' "${log}"
