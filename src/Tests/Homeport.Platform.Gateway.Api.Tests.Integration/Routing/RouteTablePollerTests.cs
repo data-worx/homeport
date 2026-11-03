@@ -3,6 +3,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mime;
+using Homeport.Platform.Gateway.Api.Routing;
 using Homeport.Shared.Internal.Platform.Registry;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Time.Testing;
@@ -19,6 +21,15 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration.Routing;
 
 public sealed class RouteTablePollerTests
 {
+    /// <remarks>
+    /// The poller runs on a <see cref="FakeTimeProvider"/> the tests advance,
+    /// so a test of the next poll takes milliseconds rather than five seconds.
+    /// Only <see cref="RouteTablePoller"/> gets that clock
+    /// (<see cref="UseTestClockForPoller"/>); the container keeps
+    /// <see cref="TimeProvider.System"/>, because the resilience handler of
+    /// every HTTP client measures its timeouts and retry delays on the
+    /// container's clock (#111).
+    /// </remarks>
     public sealed class ExecuteAsync : IAsyncLifetime
     {
         private const string LocalAddress = "http://127.0.0.1:0";
@@ -57,7 +68,7 @@ public sealed class RouteTablePollerTests
                     .WithRegistry(registry)
                     .WithClients(identityProvider, controlPlane)
                     .ConfigureLogging(logging => logging.AddFakeLogging())
-                    .ConfigureTestServices(services => services.AddSingleton<TimeProvider>(time)));
+                    .ConfigureTestServices(UseTestClockForPoller));
             await ForwardingGateway.WaitForRoutesAsync(gateway.CreateClient(), EchoPath);
         }
 
@@ -142,6 +153,13 @@ public sealed class RouteTablePollerTests
 
         private HttpClient Client() =>
             Gateway.CreateClient().WithToken(identityProvider!.Issue(StandInControlPlane.KnownClientId));
+
+        private void UseTestClockForPoller(IServiceCollection services)
+        {
+            var poller = services.Single(service => service.ImplementationType == typeof(RouteTablePoller));
+            services[services.IndexOf(poller)] = ServiceDescriptor.Singleton<IHostedService>(
+                provider => ActivatorUtilities.CreateInstance<RouteTablePoller>(provider, time));
+        }
 
         private static Task WaitUntil(Func<bool> condition) => WaitUntil(() => Task.FromResult(condition()));
 
