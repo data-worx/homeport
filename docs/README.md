@@ -40,6 +40,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`architecture/vision.md`](architecture/vision.md) | What Homeport is and is not, why it exists, and the target picture |
 | [`architecture/architecture.md`](architecture/architecture.md) | The projects, the directory layout and why they are cut this way |
 | [`architecture/data-model.md`](architecture/data-model.md) | One database with a schema and two roles per service, and tenant-owned versus platform tables |
+| [`architecture/testing.md`](architecture/testing.md) | Why tests control their clocks, wait for signals and keep the end-to-end tests small |
 | [`architecture/adr/`](architecture/adr/README.md) | Architecture decision records |
 
 ## Reference — normative specifications
