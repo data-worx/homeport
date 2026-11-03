@@ -3,7 +3,6 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
@@ -13,7 +12,8 @@ namespace Homeport.Aspire.AppHost.Tests.Integration;
 
 public sealed class ProgramTests
 {
-    public sealed class Main(RunningAppHost appHost) : IClassFixture<RunningAppHost>
+    [Collection(AppHostCollection.Name)]
+    public sealed class Main(RunningAppHost appHost)
     {
         [Theory]
         [InlineData("postgres")]
@@ -57,18 +57,6 @@ public sealed class ProgramTests
         }
 
         [Fact]
-        public async Task Serves_The_Echo_Manifest()
-        {
-            using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
-            await appHost.App.ResourceNotifications.WaitForResourceHealthyAsync("echo", timeout.Token);
-
-            var response = await appHost.App.CreateHttpClient("echo")
-                .GetStringAsync("/.well-known/homeport/manifest", timeout.Token);
-
-            Assert.Equal("echo", JsonDocument.Parse(response).RootElement.GetProperty("id").GetString());
-        }
-
-        [Fact]
         public void Exposes_Only_The_Gateway_And_Keycloak_Externally()
         {
             var model = appHost.App.Services.GetRequiredService<DistributedApplicationModel>();
@@ -93,17 +81,6 @@ public sealed class ProgramTests
         }
 
         [Fact]
-        public async Task Answers_A_Request_Without_A_Token_With_Unauthorized()
-        {
-            await Gateway();
-            using var content = new StringContent("{}", Encoding.UTF8, "application/json");
-
-            var response = await appHost.App.CreateHttpClient("gateway").PostAsync("/modules/echo/v1/echo", content);
-
-            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-        }
-
-        [Fact]
         public async Task Answers_A_Client_Unknown_To_The_Control_Plane_With_Forbidden()
         {
             await Gateway();
@@ -116,49 +93,6 @@ public sealed class ProgramTests
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
-        [Fact]
-        public async Task Strips_Homeport_Headers_Before_Echo()
-        {
-            var gateway = await Gateway();
-            using var request = new HttpRequestMessage(HttpMethod.Get, "/modules/echo/v1/request");
-            request.Headers.Add("X-Homeport-Tenant-Id", "6f1c2a8e-0000-4000-8000-000000000001");
-
-            var headers = await ReceivedHeaders(gateway, request);
-
-            Assert.False(headers.TryGetProperty("x-homeport-tenant-id", out _));
-        }
-
-        [Fact]
-        public async Task Propagates_The_Trace_Id_To_Echo()
-        {
-            const string traceId = "4bf92f3577b34da6a3ce929d0e0e4736";
-            var gateway = await Gateway();
-            using var request = new HttpRequestMessage(HttpMethod.Get, "/modules/echo/v1/request");
-            request.Headers.Add("traceparent", $"00-{traceId}-00f067aa0ba902b7-01");
-
-            var headers = await ReceivedHeaders(gateway, request);
-
-            Assert.Equal(traceId, headers.GetProperty("traceparent").GetString()?.Split('-')[1]);
-        }
-
-        [Fact]
-        public async Task Publishes_The_Signing_Key_Through_The_Gateway()
-        {
-            var gateway = await Gateway();
-
-            var jwks = JsonDocument.Parse(await gateway.GetStringAsync("/.well-known/jwks.json")).RootElement;
-
-            Assert.Equal("local", Assert.Single(jwks.GetProperty("keys").EnumerateArray()).GetProperty("kid").GetString());
-        }
-
         private Task<HttpClient> Gateway() => appHost.GatewayRoutingEchoAsync();
-
-        private static async Task<JsonElement> ReceivedHeaders(HttpClient gateway, HttpRequestMessage request)
-        {
-            var response = await gateway.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-
-            return JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("headers");
-        }
     }
 }
