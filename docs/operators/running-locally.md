@@ -48,9 +48,11 @@ database, and `control-plane` starts only then; see
 registers at the registry once it has started, and the gateway routes to it
 a few seconds later; see [the registry](registry.md).
 
-The gateway is the only resource with an external endpoint; its address is in
-the dashboard. Call Echo through it, as
-[calling a module](../api-consumers/calling-a-module.md) describes.
+The gateway is the only Homeport service with an external endpoint; its
+address is in the dashboard. Keycloak is reachable from the host too, at
+<http://localhost:8080>, so a client can get a token there. Call Echo through
+the gateway with a token, as
+[obtaining a token](../api-consumers/obtaining-a-token.md) describes.
 
 `Ctrl+C` stops everything and removes the containers.
 
@@ -71,6 +73,8 @@ Parameters:valkey-password = …
 Parameters:rabbitmq-password = …
 Parameters:postgres-password = …
 Parameters:keycloak-password = …
+Parameters:local-client-secret = …
+Parameters:unmapped-client-secret = …
 Parameters:gateway-signing-key = -----BEGIN PRIVATE KEY-----…
 Parameters:echo-registration-key = …
 Parameters:control-plane-owner-password = …
@@ -82,7 +86,9 @@ until revealed. `gateway-signing-key` is the key the gateway signs its tokens
 with, under the key id `local`; see [the gateway's signing key](signing-key.md).
 `echo-registration-key` is the key Echo registers with; see
 [the registry](registry.md). The two `control-plane-` passwords belong to the
-database roles the control plane migrates and runs as.
+database roles the control plane migrates and runs as. The two
+`-client-secret` values are the secrets of the Keycloak clients; see
+[connecting an identity provider](identity-provider.md).
 
 The seeded tenant, plan and client are parameters too, with fixed defaults:
 tenant `3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61`, plan
@@ -91,7 +97,9 @@ burst of 20, and the client `local-client`.
 
 Keycloak's admin console is at <http://localhost:8080/admin>. Sign in as
 `admin` with `keycloak-password`. Keycloak takes the longest of the four to
-become healthy, around half a minute.
+become healthy, around half a minute. It imports the realm `homeport` from
+[`deploy/keycloak/realms/`](../../deploy/keycloak/realms/homeport-realm.json)
+on its first start.
 
 ## With Docker Compose
 
@@ -124,7 +132,8 @@ committed. Create it once with the images and ports, a random password for
 every `_PASSWORD` variable listed in `.env.example`, a signing key for the
 gateway, as [the gateway's signing key](signing-key.md) describes, a
 registration key for Echo, as [the registry](registry.md) describes, the
-directory of the database init script, and the seed of
+directories of the database init script and the Keycloak realm, a random
+secret for every `_SECRET` variable, and the seed of
 [the control plane](control-plane.md). `control-plane-migrate` runs from the
 control plane's image:
 
@@ -136,8 +145,8 @@ cd deploy/compose
   printf 'REGISTRY_IMAGE=homeport-platform-registry-api:latest\nREGISTRY_PORT=8080\n'
   printf 'CONTROL_PLANE_IMAGE=homeport-platform-controlplane:latest\nCONTROL_PLANE_PORT=8080\n'
   printf 'CONTROL_PLANE_MIGRATE_IMAGE=homeport-platform-controlplane:latest\nCONTROL_PLANE_MIGRATE_PORT=8080\n'
-  printf 'POSTGRES_BINDMOUNT_0=../postgres/init\n'
-  sed -n 's/^\([A-Z_]*_PASSWORD\)=$/\1/p' .env.example | while read -r name; do
+  printf 'POSTGRES_BINDMOUNT_0=../postgres/init\nKEYCLOAK_BINDMOUNT_0=../keycloak/realms\n'
+  sed -n 's/^\([A-Z_]*_\(PASSWORD\|SECRET\)\)=$/\1/p' .env.example | while read -r name; do
     printf '%s=%s\n' "$name" "$(openssl rand -hex 24)"
   done
   printf 'GATEWAY_SIGNING_KEY=%s\n' \
@@ -154,7 +163,7 @@ cd deploy/compose
 Check it: every line but the two `GATEWAY_ADDITIONAL_` ones has a value.
 
 ```bash
-grep -c '=.' .env      # prints 27
+grep -c '=.' .env      # prints 30
 ```
 
 Start, then check:
@@ -175,14 +184,24 @@ registry running
 valkey running
 ```
 
-Only the gateway publishes a port to the host, chosen by Docker on every
-start. Ask for it, then call Echo through it. Until Echo has registered and
-the gateway has read its routes, a few seconds after the start, the call is
-answered with `404`:
+The gateway publishes a port to the host, chosen by Docker on every start.
+Keycloak publishes `8080`, so a client on the host gets its token there, and
+its management port, chosen by Docker. Get a token for `local-client`, ask
+for the gateway's port, then call Echo through it. Until Echo has registered
+and the gateway has read its routes, a few seconds after the start, the call
+is answered with `404`:
 
 ```bash
+secret="$(sed -n 's/^LOCAL_CLIENT_SECRET=//p' .env)"
+token="$(curl -s \
+  -d grant_type=client_credentials \
+  -d client_id=local-client \
+  -d "client_secret=${secret}" \
+  http://localhost:8080/realms/homeport/protocol/openid-connect/token \
+  | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')"
 docker compose port gateway 8080      # prints 0.0.0.0:<port>
-curl -s -X POST -H 'Content-Type: application/json' \
+curl -s -X POST -H "Authorization: Bearer ${token}" \
+  -H 'Content-Type: application/json' \
   -d '{"hello":"Homeport"}' http://localhost:<port>/modules/echo/v1/echo
 ```
 
@@ -190,7 +209,8 @@ curl -s -X POST -H 'Content-Type: application/json' \
 {"hello":"Homeport"}
 ```
 
-Every other service is reachable only on the compose network. Stop and remove
+Every other service is reachable only on the compose network. The token is
+valid for five minutes; get a new one after that. Stop and remove
 everything with:
 
 ```bash

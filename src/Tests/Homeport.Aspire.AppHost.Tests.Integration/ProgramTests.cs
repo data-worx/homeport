@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Aspire.Hosting;
@@ -67,15 +69,16 @@ public sealed class ProgramTests
         }
 
         [Fact]
-        public void Exposes_Only_The_Gateway_Externally()
+        public void Exposes_Only_The_Gateway_And_Keycloak_Externally()
         {
             var model = appHost.App.Services.GetRequiredService<DistributedApplicationModel>();
 
             var external = model.Resources
                 .Where(resource => resource.Annotations.OfType<EndpointAnnotation>().Any(endpoint => endpoint.IsExternal))
-                .Select(resource => resource.Name);
+                .Select(resource => resource.Name)
+                .Order(StringComparer.Ordinal);
 
-            Assert.Equal("gateway", Assert.Single(external));
+            Assert.Equal(["gateway", "keycloak"], external);
         }
 
         [Fact]
@@ -87,6 +90,30 @@ public sealed class ProgramTests
             var response = await gateway.PostAsync("/modules/echo/v1/echo", content);
 
             Assert.Equal("""{"hello":"Homeport ⚓"}""", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Answers_A_Request_Without_A_Token_With_Unauthorized()
+        {
+            await Gateway();
+            using var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+            var response = await appHost.App.CreateHttpClient("gateway").PostAsync("/modules/echo/v1/echo", content);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Answers_A_Client_Unknown_To_The_Control_Plane_With_Forbidden()
+        {
+            await Gateway();
+            var unmapped = appHost.App.CreateHttpClient("gateway");
+            unmapped.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await appHost.TokenAsync(RunningAppHost.UnmappedClient));
+            using var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+            var response = await unmapped.PostAsync("/modules/echo/v1/echo", content);
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
         [Fact]

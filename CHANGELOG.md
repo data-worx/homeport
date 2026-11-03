@@ -91,3 +91,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the seed, and the control plane starts only after it succeeded. See
   [the control plane](docs/operators/control-plane.md) and
   [the data model](docs/architecture/data-model.md).
+- The gateway authenticates the clients that call modules. A client gets a
+  token from the operator's identity provider with the client-credentials
+  grant; the gateway validates it against the configured authority and
+  audience, reads the client id from a configurable claim (`azp` by default)
+  and asks the control plane which tenant the client belongs to, keeping the
+  answer for a configurable time. No or an invalid token is answered with
+  `401` `unauthorized`, a client the control plane does not know with `403`
+  `unknown-client`, and an unreachable control plane with `503`
+  `control-plane-unavailable`. Module routes are no longer anonymous. For
+  development, Keycloak imports the realm `homeport` with the client the
+  control plane seeds, its secret generated rather than committed, and is
+  reachable from the host at `localhost:8080`. See
+  [obtaining a token](docs/api-consumers/obtaining-a-token.md) and
+  [connecting an identity provider](docs/operators/identity-provider.md).

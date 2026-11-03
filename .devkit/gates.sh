@@ -22,8 +22,34 @@ NOTICES_PROJECT=""
 # change. It also promotes the NuGet audit warnings (NU1901-NU1904), so a newly
 # published advisory can turn this red without a code change. That is the
 # intent: a known-vulnerable package is a reason not to commit.
-gate_build()  { dotnet build  "${SLN}" --nologo -warnaserror; }
-gate_test()   { dotnet test   "${SLN}" --nologo; }
+#
+# No MSBuild node outlives a gate, and the test gate builds before it tests
+# rather than while: the end-to-end tests start the whole topology, and next
+# to a solution build and idle build nodes it does not fit a 16 GB machine.
+# The build is incremental, so after the build gate it does nothing.
+gate_build()  { dotnet build  "${SLN}" --nologo -warnaserror -nodeReuse:false; }
+#
+# The runner shows only the last lines of a failing gate, which are the
+# summaries of the test projects that finished last, so the test gate repeats
+# every failing test with its message at the end. English output, so the
+# pattern holds on every machine. The output goes to a file, not through a
+# pipe: a child process that outlives the run would keep a pipe open forever.
+# A test that hangs is aborted after 5 minutes and named.
+gate_test() {
+  local log rc
+  log="$(mktemp)"
+  dotnet build "${SLN}" --nologo -nodeReuse:false || { rm -f "${log}"; return 1; }
+  DOTNET_CLI_UI_LANGUAGE=en dotnet test "${SLN}" --nologo --no-build -nodeReuse:false \
+    --blame-hang-timeout 5m --blame-hang-dump-type none > "${log}" 2>&1
+  rc=$?
+  cat "${log}"
+  if [ "${rc}" -ne 0 ]; then
+    echo "--- failing tests ---"
+    grep -E -A3 '^[[:space:]]+Failed [^!]' "${log}"
+  fi
+  rm -f "${log}"
+  return "${rc}"
+}
 gate_format() { dotnet format "${SLN}" --verify-no-changes; }
 
 # Regenerates the notices into a temporary file and compares it with the

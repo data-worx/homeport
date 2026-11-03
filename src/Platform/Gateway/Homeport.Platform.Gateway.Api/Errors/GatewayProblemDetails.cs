@@ -2,7 +2,9 @@
 
 using System.Diagnostics;
 using Homeport.Platform.Gateway.Api.Routing;
+using Homeport.Platform.Gateway.Infrastructure.ControlPlane;
 using Homeport.Shared.Client.Problems;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Model;
@@ -63,6 +65,31 @@ internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logge
                 StatusCodes.Status504GatewayTimeout => GatewayProblems.ModuleTimeout,
                 _ => GatewayProblems.ModuleUnreachable,
             };
+        }
+
+        if (context.Features.Get<IExceptionHandlerFeature>()?.Error is ControlPlaneUnavailableException unavailable)
+        {
+            // Logged here, where the failure is answered; the exception
+            // handler's own log is suppressed for it.
+            logger.LogWarning(
+                unavailable,
+                "The control plane could not be asked about the client; answered {StatusCode}",
+                status);
+
+            return GatewayProblems.ControlPlaneUnavailable;
+        }
+
+        // Before the proxy took the request: the gateway refused it itself,
+        // rather than replacing a module's error body.
+        if (context.Features.Get<IReverseProxyFeature>() is null)
+        {
+            switch (status)
+            {
+                case StatusCodes.Status401Unauthorized:
+                    return GatewayProblems.Unauthorized;
+                case StatusCodes.Status403Forbidden:
+                    return GatewayProblems.UnknownClient;
+            }
         }
 
         // No endpoint means no route matched: nothing is mounted at the path.

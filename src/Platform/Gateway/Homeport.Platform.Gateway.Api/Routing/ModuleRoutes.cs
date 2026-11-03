@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Shared.Internal.Platform.Registry;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
@@ -15,9 +16,6 @@ internal static class ModuleRoutes
 {
     /// <summary>The prefix every module is reached under.</summary>
     internal const string ModulesPrefix = "/modules";
-
-    // YARP's name for a route that skips authorization.
-    private const string AnonymousPolicy = "anonymous";
 
     /// <summary>The routes and clusters for <paramref name="table"/>, one cluster per route.</summary>
     internal static (IReadOnlyList<RouteConfig> Routes, IReadOnlyList<ClusterConfig> Clusters) Build(RouteTableResponse table)
@@ -47,10 +45,7 @@ internal static class ModuleRoutes
             RouteId = id,
             ClusterId = id,
             Match = new RouteMatch { Path = prefix + route.Path, Methods = [route.Method] },
-
-            // Anonymous until the gateway authenticates clients, which comes
-            // with #46 ("authenticate clients at the gateway").
-            AuthorizationPolicy = AnonymousPolicy,
+            AuthorizationPolicy = ClientAuthenticationServiceCollectionExtensions.ClientPolicy,
         }
         .WithTransformPathRemovePrefix(prefix);
     }

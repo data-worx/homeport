@@ -40,9 +40,12 @@ The `type` tells you who produced the error.
 
   | Status | Type | Means |
   |---|---|---|
+  | `401` | [`unauthorized`](../reference/problems/unauthorized.md) | No token, or one the gateway does not accept |
+  | `403` | [`unknown-client`](../reference/problems/unknown-client.md) | The client is not mapped to a tenant |
   | `404` | [`unknown-module`](../reference/problems/unknown-module.md) | No module is mounted at the path |
   | `502` | [`module-unreachable`](../reference/problems/module-unreachable.md) | The gateway could not reach the module |
   | `503` | [`module-unavailable`](../reference/problems/module-unavailable.md) | No instance of the module is available |
+  | `503` | [`control-plane-unavailable`](../reference/problems/control-plane-unavailable.md) | The gateway could not look the client up |
   | `504` | [`module-timeout`](../reference/problems/module-timeout.md) | The module did not answer in time |
 
 - **A module** answers with its own types, under a prefix of its own and

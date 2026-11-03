@@ -10,6 +10,24 @@ namespace Homeport.Platform.Gateway.Api.Errors;
 /// </summary>
 internal static class GatewayProblems
 {
+    /// <summary>The request carries no valid client token.</summary>
+    internal static readonly GatewayProblem Unauthorized = new(
+        "unauthorized",
+        "The request is not authenticated.",
+        StatusCodes.Status401Unauthorized);
+
+    /// <summary>The client is authenticated, but the operator has not mapped it to a tenant.</summary>
+    internal static readonly GatewayProblem UnknownClient = new(
+        "unknown-client",
+        "The client is not known to Homeport.",
+        StatusCodes.Status403Forbidden);
+
+    /// <summary>The control plane could not be asked about the client.</summary>
+    internal static readonly GatewayProblem ControlPlaneUnavailable = new(
+        "control-plane-unavailable",
+        "The control plane is not available.",
+        StatusCodes.Status503ServiceUnavailable);
+
     /// <summary>No module is mounted at the path.</summary>
     internal static readonly GatewayProblem UnknownModule = new(
         "unknown-module",

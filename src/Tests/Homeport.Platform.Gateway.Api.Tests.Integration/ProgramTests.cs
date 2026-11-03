@@ -1,18 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Homeport.Shared.Client.Problems;
+using Homeport.Shared.Internal.Platform.ControlPlane;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 
@@ -156,10 +159,12 @@ public sealed class ProgramTests
         {
             await using var registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(ClosedEndpoint, ForwardingGateway.RequestPath));
             await using var unreachable = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithSigningKey().WithRegistry(registry));
+                .WithWebHostBuilder(host => host.WithSigningKey().WithRegistry(registry).WithClients(gateway.IdentityProvider, gateway.ControlPlane));
             await ForwardingGateway.WaitForRoutesAsync(unreachable.CreateClient(), "/modules/echo/v1/request");
 
-            using var response = await unreachable.CreateClient().SendAsync(Traced("/modules/echo/v1/request"));
+            using var response = await unreachable.CreateClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.KnownClientId))
+                .SendAsync(Traced("/modules/echo/v1/request"));
 
             var problem = await ReadProblem(response);
             Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
@@ -174,6 +179,7 @@ public sealed class ProgramTests
                 .WithWebHostBuilder(host => host
                     .WithSigningKey()
                     .WithAdditionalPublicKey()
+                    .WithIdentityProvider(GatewaySettings.UnusedAuthority)
                     .ConfigureLogging(logging => logging.AddFakeLogging()));
 
             using var client = started.CreateClient();
@@ -183,15 +189,110 @@ public sealed class ProgramTests
                 entry => entry.Category == ProgramCategory && entry.Level == LogLevel.Information);
             Assert.Contains(GatewaySettings.KeyId, logged.Message);
             Assert.Contains(GatewaySettings.AdditionalKeyId, logged.Message);
+            Assert.Contains(GatewaySettings.UnusedAuthority, logged.Message);
             Assert.DoesNotContain("KEY-----", logged.Message);
         }
 
         [Fact]
         public async Task Does_Not_Start_Without_A_Signing_Key()
         {
-            await using var unconfigured = new WebApplicationFactory<Program>();
+            await using var unconfigured = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(host => host.WithIdentityProvider(GatewaySettings.UnusedAuthority));
 
             Assert.Throws<OptionsValidationException>(() => unconfigured.CreateClient());
+        }
+
+        [Fact]
+        public async Task Does_Not_Start_Without_An_Identity_Provider()
+        {
+            await using var unconfigured = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(host => host.WithSigningKey());
+
+            Assert.Throws<OptionsValidationException>(() => unconfigured.CreateClient());
+        }
+
+        [Fact]
+        public async Task Answers_A_Request_Without_A_Token_As_Unauthorized_Problem()
+        {
+            using var response = await gateway.CreateAnonymousClient().SendAsync(Traced("/modules/echo/v1/request"));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Equal(ProblemTypePrefix + "unauthorized", problem["type"]?.GetValue<string>());
+            Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Answers_A_Token_Signed_With_An_Unknown_Key_As_Unauthorized()
+        {
+            using var response = await gateway.CreateAnonymousClient()
+                .WithToken(gateway.IdentityProvider.IssueWithForeignKey(StandInControlPlane.KnownClientId))
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Answers_A_Token_For_Another_Audience_As_Unauthorized()
+        {
+            using var response = await gateway.CreateAnonymousClient()
+                .WithToken(gateway.IdentityProvider.IssueForAudience(StandInControlPlane.KnownClientId, "another-api"))
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Answers_A_Client_Unknown_To_The_Control_Plane_As_Unknown_Client_Problem()
+        {
+            using var response = await gateway.CreateAnonymousClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.UnknownClientId))
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal(ProblemTypePrefix + "unknown-client", problem["type"]?.GetValue<string>());
+            Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Answers_A_Token_Without_The_Client_Id_Claim_As_Forbidden()
+        {
+            using var response = await gateway.CreateAnonymousClient()
+                .WithToken(gateway.IdentityProvider.IssueWithoutClientId())
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Asks_The_Control_Plane_With_A_Service_Token_For_It()
+        {
+            await gateway.CreateClient().GetAsync("/modules/echo/v1/request");
+
+            var header = AuthenticationHeaderValue.Parse(gateway.ControlPlane.Authorizations[0]);
+            Assert.Equal([ControlPlaneService.Audience], new JsonWebToken(header.Parameter).Audiences);
+        }
+
+        [Fact]
+        public async Task Answers_An_Unreachable_Control_Plane_As_Control_Plane_Unavailable_Problem()
+        {
+            await using var unreachable = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(host => host
+                    .WithSigningKey()
+                    .WithRegistry(gateway.Registry)
+                    .WithIdentityProvider(gateway.IdentityProvider.Issuer)
+                    .UseSetting("ControlPlane:Url", ClosedEndpoint));
+            await ForwardingGateway.WaitForRoutesAsync(unreachable.CreateClient(), "/modules/echo/v1/request");
+
+            using var response = await unreachable.CreateClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.KnownClientId))
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+            Assert.Equal(ProblemTypePrefix + "control-plane-unavailable", problem["type"]?.GetValue<string>());
+            Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
         }
 
         private static string ModulePath(string path) => "/modules/echo" + path;

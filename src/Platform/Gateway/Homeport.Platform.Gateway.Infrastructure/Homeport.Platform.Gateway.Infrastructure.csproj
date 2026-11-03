@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!-- The gateway's signing key, the service tokens it issues with it and the
-       registry client. The Valkey counters (#48) land here too. -->
+       registry and control plane clients. The Valkey counters (#48) land here too. -->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

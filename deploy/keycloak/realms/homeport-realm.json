@@ -1,0 +1,84 @@
+{
+  "realm": "homeport",
+  "enabled": true,
+  "clientScopes": [
+    {
+      "name": "echo.invoke",
+      "description": "Call the Echo module",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
+      "name": "usage.read",
+      "description": "Read the usage of the client's tenant",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "${HOMEPORT_LOCAL_CLIENT_ID}",
+      "name": "Local client",
+      "description": "The client the control plane seeds for the local tenant",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${HOMEPORT_LOCAL_CLIENT_SECRET}",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "fullScopeAllowed": false,
+      "defaultClientScopes": ["echo.invoke", "usage.read"],
+      "optionalClientScopes": [],
+      "protocolMappers": [
+        {
+          "name": "homeport-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "${HOMEPORT_AUDIENCE}",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "unmapped-client",
+      "name": "Unmapped client",
+      "description": "A client the control plane does not know, for the tests that expect 403",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${HOMEPORT_UNMAPPED_CLIENT_SECRET}",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "fullScopeAllowed": false,
+      "defaultClientScopes": ["echo.invoke"],
+      "optionalClientScopes": [],
+      "protocolMappers": [
+        {
+          "name": "homeport-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "${HOMEPORT_AUDIENCE}",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ]
+}
