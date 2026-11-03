@@ -29,6 +29,9 @@ internal sealed class StandInRegistry : IAsyncDisposable
 
     internal string RefusalBody { get; set; } = "{}";
 
+    /// <summary>When set, registrations are answered only once it completes.</summary>
+    internal Task? RegisterHeld { get; set; }
+
     internal Uri Url => new(app?.Urls.Single() ?? throw new InvalidOperationException("The stand-in has not been started."));
 
     internal IReadOnlyList<Received> Requests => [.. received];
@@ -75,6 +78,11 @@ internal sealed class StandInRegistry : IAsyncDisposable
 
         if (HttpMethods.IsPut(context.Request.Method))
         {
+            if (RegisterHeld is not null)
+            {
+                await RegisterHeld.WaitAsync(context.RequestAborted);
+            }
+
             context.Response.StatusCode = RegisterStatus;
             if (RegisterStatus >= StatusCodes.Status400BadRequest)
             {

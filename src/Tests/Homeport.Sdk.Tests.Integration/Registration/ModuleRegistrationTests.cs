@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Text.Json;
+using Homeport.Sdk.Registration;
 using Homeport.Shared.Client.ModuleContract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,26 @@ namespace Homeport.Sdk.Tests.Integration.Registration;
 
 public sealed class ModuleRegistrationTests
 {
+    /// <remarks>
+    /// <para>
+    /// The heartbeat runs on a <see cref="FakeTimeProvider"/> the tests
+    /// advance, so a test of two heartbeats takes milliseconds rather than
+    /// twenty seconds. Only <see cref="ModuleRegistration"/> gets that clock
+    /// (<see cref="UseTestClockForRegistration"/>); the container keeps
+    /// <see cref="TimeProvider.System"/>.
+    /// </para>
+    /// <para>
+    /// The reason is the standard resilience handler that
+    /// <c>Homeport.Shared.ServiceDefaults</c> adds to every HTTP client, the
+    /// registry client included. It takes its clock from the container and
+    /// measures attempt timeouts, retry delays and the wait for in-flight
+    /// calls on disposal on it. On the test's clock, advancing to the next
+    /// heartbeat timed out a call still in flight, and its retry then waited
+    /// for a clock nobody advanced again; disposing the module waited the same
+    /// way. The tests hung or failed now and then, depending on whether a
+    /// response was still on its way (#111).
+    /// </para>
+    /// </remarks>
     public sealed class ExecuteAsync : IAsyncLifetime
     {
         private const string Section = "Homeport:Registry";
@@ -43,7 +64,7 @@ public sealed class ModuleRegistrationTests
         [Fact]
         public async Task Registers_Once_Started_With_Its_Key_Address_And_Manifest()
         {
-            await using var app = await StartAsync();
+            await using var module = await StartAsync();
 
             var registration = Assert.Single(await Registry.WaitForAsync(HttpMethods.Put));
 
@@ -58,7 +79,7 @@ public sealed class ModuleRegistrationTests
         [Fact]
         public async Task Sends_A_Heartbeat_For_The_Same_Instance_Every_Ten_Seconds()
         {
-            await using var app = await StartAsync();
+            await using var module = await StartAsync();
             var registration = Assert.Single(await Registry.WaitForAsync(HttpMethods.Put));
 
             time.Advance(TimeSpan.FromSeconds(10));
@@ -73,7 +94,7 @@ public sealed class ModuleRegistrationTests
         [Fact]
         public async Task Registers_Again_When_The_Registry_No_Longer_Knows_The_Instance()
         {
-            await using var app = await StartAsync();
+            await using var module = await StartAsync();
             await Registry.WaitForAsync(HttpMethods.Put);
             Registry.HeartbeatStatus = StatusCodes.Status404NotFound;
 
@@ -93,9 +114,9 @@ public sealed class ModuleRegistrationTests
 
             try
             {
-                await using var app = await StartAsync();
+                await using var module = await StartAsync();
 
-                await WaitForStopAsync(app);
+                await WaitForStopAsync(module.App);
 
                 var error = Assert.Single(logs.Entries, entry => entry.Level == LogLevel.Error);
                 Assert.Contains("contractVersion: Contract version 99 is not supported; supported versions: 0.", error.Message);
@@ -115,9 +136,9 @@ public sealed class ModuleRegistrationTests
 
             try
             {
-                await using var app = await StartAsync();
+                await using var module = await StartAsync();
 
-                await WaitForStopAsync(app);
+                await WaitForStopAsync(module.App);
 
                 Assert.Contains(logs.Entries, entry => entry.Level == LogLevel.Error && entry.Message.Contains("401", StringComparison.Ordinal));
             }
@@ -128,11 +149,31 @@ public sealed class ModuleRegistrationTests
         }
 
         [Fact]
+        public async Task Shuts_Down_While_A_Registration_Is_Unanswered()
+        {
+            var answer = new TaskCompletionSource();
+            Registry.RegisterHeld = answer.Task;
+            var module = await StartAsync();
+            await Registry.WaitForAsync(HttpMethods.Put);
+
+            try
+            {
+                await module.DisposeAsync().AsTask().WaitAsync(StopTimeout);
+            }
+            finally
+            {
+                answer.SetResult();
+            }
+        }
+
+        [Fact]
         public async Task Does_Not_Register_And_Warns_Without_A_Registry_Url()
         {
             await using var app = await TestModule.StartAsync(logs);
 
-            Assert.Contains(logs.Entries, entry => entry.Level == LogLevel.Warning && entry.Message.Contains("does not register", StringComparison.Ordinal));
+            var warning = await logs.WaitForAsync(entry => entry.Level == LogLevel.Warning);
+
+            Assert.Contains("does not register", warning.Message, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -154,15 +195,40 @@ public sealed class ModuleRegistrationTests
             await stopped.Task.WaitAsync(StopTimeout);
         }
 
-        private Task<WebApplication> StartAsync()
+        private async Task<RunningModule> StartAsync()
         {
-            return TestModule.StartAsync(logs, builder =>
+            return new RunningModule(await TestModule.StartAsync(logs, builder =>
             {
                 builder.Configuration[$"{Section}:Url"] = Registry.Url.ToString();
                 builder.Configuration[$"{Section}:Key"] = Key;
                 builder.Configuration[$"{Section}:InstanceAddress"] = InstanceAddress.ToString();
-                builder.Services.AddSingleton<TimeProvider>(time);
-            });
+                UseTestClockForRegistration(builder.Services);
+            }));
+        }
+
+        // Gives the test's clock to the registration alone, in the place the SDK
+        // registered it. See the remarks on this class for why not to the container.
+        private void UseTestClockForRegistration(IServiceCollection services)
+        {
+            var registration = services.Single(service => service.ImplementationType == typeof(ModuleRegistration));
+            services[services.IndexOf(registration)] = ServiceDescriptor.Singleton<IHostedService>(
+                provider => ActivatorUtilities.CreateInstance<ModuleRegistration>(provider, time));
+        }
+
+        // Stops the module before disposing it, as the host does in production.
+        // Disposed while running, the module disposes the resilience pipeline of
+        // its registry client with a call still in flight, and the pipeline waits
+        // up to 30 s for that call to finish
+        // (Shuts_Down_While_A_Registration_Is_Unanswered).
+        private sealed class RunningModule(WebApplication app) : IAsyncDisposable
+        {
+            internal WebApplication App => app;
+
+            public async ValueTask DisposeAsync()
+            {
+                await app.StopAsync();
+                await app.DisposeAsync();
+            }
         }
     }
 }
