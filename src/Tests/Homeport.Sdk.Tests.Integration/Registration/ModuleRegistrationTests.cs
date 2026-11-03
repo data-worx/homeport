@@ -43,7 +43,7 @@ public sealed class ModuleRegistrationTests
         [Fact]
         public async Task Registers_Once_Started_With_Its_Key_Address_And_Manifest()
         {
-            await using var app = await StartAsync();
+            await using var module = await StartAsync();
 
             var registration = Assert.Single(await Registry.WaitForAsync(HttpMethods.Put));
 
@@ -58,7 +58,7 @@ public sealed class ModuleRegistrationTests
         [Fact]
         public async Task Sends_A_Heartbeat_For_The_Same_Instance_Every_Ten_Seconds()
         {
-            await using var app = await StartAsync();
+            await using var module = await StartAsync();
             var registration = Assert.Single(await Registry.WaitForAsync(HttpMethods.Put));
 
             time.Advance(TimeSpan.FromSeconds(10));
@@ -73,7 +73,7 @@ public sealed class ModuleRegistrationTests
         [Fact]
         public async Task Registers_Again_When_The_Registry_No_Longer_Knows_The_Instance()
         {
-            await using var app = await StartAsync();
+            await using var module = await StartAsync();
             await Registry.WaitForAsync(HttpMethods.Put);
             Registry.HeartbeatStatus = StatusCodes.Status404NotFound;
 
@@ -93,9 +93,9 @@ public sealed class ModuleRegistrationTests
 
             try
             {
-                await using var app = await StartAsync();
+                await using var module = await StartAsync();
 
-                await WaitForStopAsync(app);
+                await WaitForStopAsync(module.App);
 
                 var error = Assert.Single(logs.Entries, entry => entry.Level == LogLevel.Error);
                 Assert.Contains("contractVersion: Contract version 99 is not supported; supported versions: 0.", error.Message);
@@ -115,15 +115,33 @@ public sealed class ModuleRegistrationTests
 
             try
             {
-                await using var app = await StartAsync();
+                await using var module = await StartAsync();
 
-                await WaitForStopAsync(app);
+                await WaitForStopAsync(module.App);
 
                 Assert.Contains(logs.Entries, entry => entry.Level == LogLevel.Error && entry.Message.Contains("401", StringComparison.Ordinal));
             }
             finally
             {
                 Environment.ExitCode = 0;
+            }
+        }
+
+        [Fact]
+        public async Task Shuts_Down_While_A_Registration_Is_Unanswered()
+        {
+            var answer = new TaskCompletionSource();
+            Registry.RegisterHeld = answer.Task;
+            var module = await StartAsync();
+            await Registry.WaitForAsync(HttpMethods.Put);
+
+            try
+            {
+                await module.DisposeAsync().AsTask().WaitAsync(StopTimeout);
+            }
+            finally
+            {
+                answer.SetResult();
             }
         }
 
@@ -154,15 +172,30 @@ public sealed class ModuleRegistrationTests
             await stopped.Task.WaitAsync(StopTimeout);
         }
 
-        private Task<WebApplication> StartAsync()
+        private async Task<RunningModule> StartAsync()
         {
-            return TestModule.StartAsync(logs, builder =>
+            return new RunningModule(await TestModule.StartAsync(logs, builder =>
             {
                 builder.Configuration[$"{Section}:Url"] = Registry.Url.ToString();
                 builder.Configuration[$"{Section}:Key"] = Key;
                 builder.Configuration[$"{Section}:InstanceAddress"] = InstanceAddress.ToString();
                 builder.Services.AddSingleton<TimeProvider>(time);
-            });
+            }));
+        }
+
+        // Stops the module before disposing it, as the host does in production.
+        // Disposed while running, the module disposes the resilience pipeline of
+        // its registry client with a call still in flight, and the pipeline waits
+        // for that call on the test's clock, which nobody advances any more.
+        private sealed class RunningModule(WebApplication app) : IAsyncDisposable
+        {
+            internal WebApplication App => app;
+
+            public async ValueTask DisposeAsync()
+            {
+                await app.StopAsync();
+                await app.DisposeAsync();
+            }
         }
     }
 }
