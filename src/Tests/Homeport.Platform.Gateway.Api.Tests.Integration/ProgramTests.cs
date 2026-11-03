@@ -34,6 +34,9 @@ public sealed class ProgramTests
 
         private const string HomeportHeadersCategory = "Homeport.Platform.Gateway.Api.Routing.HomeportHeaders";
 
+        private static readonly TimeSpan LogTimeout = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan LogPoll = TimeSpan.FromMilliseconds(20);
+
         // Writes a ProblemResponse back the way the gateway wrote it: absent members stay absent.
         private static readonly JsonSerializerOptions ClientJson = new(JsonSerializerOptions.Web)
         {
@@ -173,7 +176,7 @@ public sealed class ProgramTests
         }
 
         [Fact]
-        public void Logs_Its_Start_At_Information_With_The_Key_Ids_And_Without_The_Keys()
+        public async Task Logs_Its_Start_At_Information_With_The_Key_Ids_And_Without_The_Keys()
         {
             using var started = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(host => host
@@ -184,9 +187,7 @@ public sealed class ProgramTests
 
             using var client = started.CreateClient();
 
-            var logged = Assert.Single(
-                started.Services.GetFakeLogCollector().GetSnapshot(),
-                entry => entry.Category == ProgramCategory && entry.Level == LogLevel.Information);
+            var logged = await StartLogAsync(started.Services.GetFakeLogCollector());
             Assert.Contains(GatewaySettings.KeyId, logged.Message);
             Assert.Contains(GatewaySettings.AdditionalKeyId, logged.Message);
             Assert.Contains(GatewaySettings.UnusedAuthority, logged.Message);
@@ -296,6 +297,22 @@ public sealed class ProgramTests
         }
 
         private static string ModulePath(string path) => "/modules/echo" + path;
+
+        // The gateway logs its start once the host has started, which may be
+        // after the first client was created.
+        private static async Task<FakeLogRecord> StartLogAsync(FakeLogCollector logs)
+        {
+            using var timeout = new CancellationTokenSource(LogTimeout);
+            while (!logs.GetSnapshot().Any(IsStartLog))
+            {
+                await Task.Delay(LogPoll, timeout.Token);
+            }
+
+            return Assert.Single(logs.GetSnapshot(), IsStartLog);
+        }
+
+        private static bool IsStartLog(FakeLogRecord entry) =>
+            entry.Category == ProgramCategory && entry.Level == LogLevel.Information;
 
         private static HttpRequestMessage Traced(string path)
         {
