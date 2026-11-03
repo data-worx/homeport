@@ -79,6 +79,7 @@ internal sealed class StandInIdentityProvider : IAsyncDisposable
     {
         if (app is not null)
         {
+            await app.StopAsync();
             await app.DisposeAsync();
         }
 

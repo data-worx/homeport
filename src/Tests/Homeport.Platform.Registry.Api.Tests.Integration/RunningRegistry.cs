@@ -106,6 +106,7 @@ public sealed class RunningRegistry : IAsyncLifetime
 
         if (jwks is not null)
         {
+            await jwks.StopAsync();
             await jwks.DisposeAsync();
         }
 

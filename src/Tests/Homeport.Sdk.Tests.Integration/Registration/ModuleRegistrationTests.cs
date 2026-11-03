@@ -154,7 +154,7 @@ public sealed class ModuleRegistrationTests
             var answer = new TaskCompletionSource();
             Registry.RegisterHeld = answer.Task;
             var module = await StartAsync();
-            await Registry.WaitForAsync(HttpMethods.Put);
+            await Registry.HeldRegistrationReceived.WaitAsync(StopTimeout);
 
             try
             {

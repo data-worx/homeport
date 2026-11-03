@@ -270,7 +270,7 @@ public sealed class ProgramTests
         {
             await gateway.CreateClient().GetAsync("/modules/echo/v1/request");
 
-            var header = AuthenticationHeaderValue.Parse(gateway.ControlPlane.Authorizations[0]);
+            var header = AuthenticationHeaderValue.Parse((await gateway.ControlPlane.WaitForAsync())[0]);
             Assert.Equal([ControlPlaneService.Audience], new JsonWebToken(header.Parameter).Audiences);
         }
 

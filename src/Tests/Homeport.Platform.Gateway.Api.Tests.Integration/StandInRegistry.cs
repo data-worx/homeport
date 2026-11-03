@@ -15,11 +15,13 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 /// A stand-in for the registry on a local port. It serves <see cref="Table"/>
 /// at <c>GET /routes</c> with an <c>ETag</c>, answers <c>304</c> for that
 /// <c>ETag</c>, or <see cref="FailureStatus"/> when set, and records the
-/// headers of every request.
+/// headers of every request once it has answered it.
 /// </summary>
 internal sealed class StandInRegistry : IAsyncDisposable
 {
     private const string LocalAddress = "http://127.0.0.1:0";
+    private static readonly TimeSpan WaitTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan WaitPoll = TimeSpan.FromMilliseconds(20);
 
     private readonly ConcurrentQueue<Received> received = new();
     private WebApplication? app;
@@ -32,6 +34,18 @@ internal sealed class StandInRegistry : IAsyncDisposable
     internal string Url => app?.Urls.Single() ?? throw new InvalidOperationException("The stand-in has not been started.");
 
     internal IReadOnlyList<Received> Requests => [.. received];
+
+    /// <summary>Waits until the stand-in has answered <paramref name="count"/> requests.</summary>
+    internal async Task<IReadOnlyList<Received>> WaitForAsync(int count = 1)
+    {
+        using var timeout = new CancellationTokenSource(WaitTimeout);
+        while (received.Count < count)
+        {
+            await Task.Delay(WaitPoll, timeout.Token);
+        }
+
+        return Requests;
+    }
 
     /// <summary>A table with Echo serving <paramref name="paths"/> on GET at <paramref name="address"/>.</summary>
     internal static RouteTableResponse EchoTable(string address, params string[] paths)
@@ -60,13 +74,19 @@ internal sealed class StandInRegistry : IAsyncDisposable
     {
         if (app is not null)
         {
+            await app.StopAsync();
             await app.DisposeAsync();
         }
     }
 
     private IResult Answer(HttpContext context)
     {
-        received.Enqueue(new Received(context.Request.Headers.Authorization.ToString(), context.Request.Headers.IfNoneMatch.ToString()));
+        var request = new Received(context.Request.Headers.Authorization.ToString(), context.Request.Headers.IfNoneMatch.ToString());
+        context.Response.OnCompleted(() =>
+        {
+            received.Enqueue(request);
+            return Task.CompletedTask;
+        });
 
         if (FailureStatus is { } status)
         {

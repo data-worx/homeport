@@ -67,13 +67,14 @@ public sealed class RouteTablePollerTests
             await Registry.DisposeAsync();
             await identityProvider!.DisposeAsync();
             await controlPlane!.DisposeAsync();
-            await module!.DisposeAsync();
+            await module!.StopAsync();
+            await module.DisposeAsync();
         }
 
         [Fact]
-        public void Reads_The_Routes_With_A_Service_Token_For_The_Registry()
+        public async Task Reads_The_Routes_With_A_Service_Token_For_The_Registry()
         {
-            var header = AuthenticationHeaderValue.Parse(Registry.Requests[0].Authorization);
+            var header = AuthenticationHeaderValue.Parse((await Registry.WaitForAsync())[0].Authorization);
 
             var token = new JsonWebToken(header.Parameter);
 

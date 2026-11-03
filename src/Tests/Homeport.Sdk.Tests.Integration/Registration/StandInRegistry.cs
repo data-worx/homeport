@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Http;
 namespace Homeport.Sdk.Tests.Integration.Registration;
 
 /// <summary>
-/// A stand-in for the registry on a local port. It records every request and
-/// answers registrations with <see cref="RegisterStatus"/> and heartbeats with
+/// A stand-in for the registry on a local port. It records every request once
+/// it has answered it, and answers registrations with <see cref="RegisterStatus"/> and heartbeats with
 /// <see cref="HeartbeatStatus"/>; a refused registration carries
 /// <see cref="RefusalBody"/>.
 /// </summary>
@@ -21,6 +21,7 @@ internal sealed class StandInRegistry : IAsyncDisposable
     private static readonly TimeSpan WaitPoll = TimeSpan.FromMilliseconds(20);
 
     private readonly ConcurrentQueue<Received> received = new();
+    private readonly TaskCompletionSource heldRegistrationReceived = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private WebApplication? app;
 
     internal int RegisterStatus { get; set; } = StatusCodes.Status204NoContent;
@@ -31,6 +32,9 @@ internal sealed class StandInRegistry : IAsyncDisposable
 
     /// <summary>When set, registrations are answered only once it completes.</summary>
     internal Task? RegisterHeld { get; set; }
+
+    /// <summary>Completes once a registration arrived that <see cref="RegisterHeld"/> holds unanswered.</summary>
+    internal Task HeldRegistrationReceived => heldRegistrationReceived.Task;
 
     internal Uri Url => new(app?.Urls.Single() ?? throw new InvalidOperationException("The stand-in has not been started."));
 
@@ -64,6 +68,7 @@ internal sealed class StandInRegistry : IAsyncDisposable
     {
         if (app is not null)
         {
+            await app.StopAsync();
             await app.DisposeAsync();
         }
     }
@@ -74,12 +79,18 @@ internal sealed class StandInRegistry : IAsyncDisposable
     {
         using var reader = new StreamReader(context.Request.Body);
         var body = await reader.ReadToEndAsync();
-        received.Enqueue(new Received(context.Request.Method, context.Request.Path, context.Request.Headers.Authorization.ToString(), body));
+        var request = new Received(context.Request.Method, context.Request.Path, context.Request.Headers.Authorization.ToString(), body);
+        context.Response.OnCompleted(() =>
+        {
+            received.Enqueue(request);
+            return Task.CompletedTask;
+        });
 
         if (HttpMethods.IsPut(context.Request.Method))
         {
             if (RegisterHeld is not null)
             {
+                heldRegistrationReceived.TrySetResult();
                 await RegisterHeld.WaitAsync(context.RequestAborted);
             }
 
