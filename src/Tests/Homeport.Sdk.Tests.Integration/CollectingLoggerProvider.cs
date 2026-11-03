@@ -8,9 +8,29 @@ namespace Homeport.Sdk.Tests.Integration;
 /// <summary>Collects every log entry the module writes, so a test can assert on them.</summary>
 internal sealed class CollectingLoggerProvider : ILoggerProvider
 {
+    private static readonly TimeSpan WaitTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan WaitPoll = TimeSpan.FromMilliseconds(20);
+
     private readonly ConcurrentQueue<LogEntry> _entries = new();
 
     internal IReadOnlyList<LogEntry> Entries => [.. _entries];
+
+    /// <summary>
+    /// Waits until an entry matches <paramref name="match"/>. A background
+    /// service logs on its own schedule: since .NET 10 all of its
+    /// <c>ExecuteAsync</c> runs on a background thread, so the host can have
+    /// started before the first line is logged.
+    /// </summary>
+    internal async Task<LogEntry> WaitForAsync(Func<LogEntry, bool> match)
+    {
+        using var timeout = new CancellationTokenSource(WaitTimeout);
+        while (!_entries.Any(match))
+        {
+            await Task.Delay(WaitPoll, timeout.Token);
+        }
+
+        return _entries.First(match);
+    }
 
     public ILogger CreateLogger(string categoryName)
     {
