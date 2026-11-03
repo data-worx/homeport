@@ -297,6 +297,27 @@ See [ADR-0016](docs/architecture/adr/0016-error-responses.md).
 - No high-cardinality metric labels: no request ids, trace ids or user input.
 - One trace spans gateway → module → RabbitMQ → metering.
 
+## Tests
+
+A test that passes or fails depending on timing is a broken test. See
+[docs/architecture/testing.md](docs/architecture/testing.md).
+
+- A fake clock goes only to the component under test. It is never
+  registered as `TimeProvider` in a host or container, where HTTP clients,
+  resilience and hosting pick it up too. No test waits for real time to
+  pass.
+- An asynchronous assertion waits for a signal, or polls with a timeout. No
+  fixed `Task.Delay` stands in for a wait.
+- A stand-in for another component records a request only after it has
+  answered it, so a test that saw the request never tears down a response
+  still on its way.
+- Every test host is stopped before it is disposed.
+- The end-to-end tests in `Homeport.Aspire.AppHost.Tests.Integration` show
+  only what the running AppHost alone can show — resources start healthy,
+  start order, what is exposed, and that the components are wired to each
+  other — on one stack shared by the whole run. A behaviour of one component
+  is tested in that component's tests.
+
 ## Licensing and dependencies
 
 - Every source file starts with `SPDX-License-Identifier: AGPL-3.0-or-later`

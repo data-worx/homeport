@@ -99,7 +99,7 @@ public sealed class RunningAppHost : IAsyncLifetime
     /// status <paramref name="expected"/> accepts, and returns that status, or
     /// the last one once <paramref name="within"/> has passed.
     /// </summary>
-    internal static async Task<HttpStatusCode> StatusOnceAsync(
+    private static async Task<HttpStatusCode> StatusOnceAsync(
         HttpClient gateway,
         Func<HttpStatusCode, bool> expected,
         TimeSpan within)
@@ -146,6 +146,7 @@ public sealed class RunningAppHost : IAsyncLifetime
     {
         if (app is not null)
         {
+            await app.StopAsync();
             await app.DisposeAsync();
         }
     }

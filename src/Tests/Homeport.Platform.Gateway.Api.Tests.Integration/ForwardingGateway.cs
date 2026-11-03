@@ -140,6 +140,7 @@ public sealed class ForwardingGateway : IAsyncLifetime
 
         if (module is not null)
         {
+            await module.StopAsync();
             await module.DisposeAsync();
         }
     }

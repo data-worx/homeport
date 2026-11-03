@@ -29,6 +29,13 @@ public sealed class ValkeyContainer : IAsyncLifetime
         }
     }
 
+    /// <summary>The remaining lifetime of the one key Valkey holds.</summary>
+    internal async Task<TimeSpan?> TimeToLiveAsync()
+    {
+        var key = Connection.GetServers().SelectMany(server => server.Keys()).Single();
+        return await Connection.GetDatabase().KeyTimeToLiveAsync(key);
+    }
+
     public async Task InitializeAsync()
     {
         await container.StartAsync();

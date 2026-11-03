@@ -129,6 +129,7 @@ public sealed class RunningControlPlane : IAsyncLifetime
 
         if (jwks is not null)
         {
+            await jwks.StopAsync();
             await jwks.DisposeAsync();
         }
 

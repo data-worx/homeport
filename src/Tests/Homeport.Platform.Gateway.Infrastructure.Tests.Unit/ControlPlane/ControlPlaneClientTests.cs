@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using Homeport.Platform.Gateway.Infrastructure.ControlPlane;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Options;
 
 namespace Homeport.Platform.Gateway.Infrastructure.Tests.Unit.ControlPlane;
@@ -22,6 +23,10 @@ public sealed class ControlPlaneClientTests
 
     public sealed class FindAsync
     {
+        private static readonly TimeSpan CacheLifetime = TimeSpan.FromMinutes(1);
+
+        private readonly SteppingClock clock = new();
+
         [Fact]
         public async Task Returns_The_Client_The_Control_Plane_Knows()
         {
@@ -82,10 +87,10 @@ public sealed class ControlPlaneClientTests
         public async Task Asks_The_Control_Plane_Again_Once_The_Cache_Lifetime_Has_Passed()
         {
             var controlPlane = new StandInControlPlane();
-            var client = Client(controlPlane, TimeSpan.FromTicks(1));
+            var client = Client(controlPlane, CacheLifetime);
 
             await client.FindAsync(KnownClientId, CancellationToken.None);
-            await Task.Delay(TimeSpan.FromMilliseconds(10));
+            clock.UtcNow += CacheLifetime;
             await client.FindAsync(KnownClientId, CancellationToken.None);
 
             Assert.Equal(2, controlPlane.Paths.Count);
@@ -123,7 +128,7 @@ public sealed class ControlPlaneClientTests
             Assert.Equal(["/clients/a%2Fb%20c"], controlPlane.Paths);
         }
 
-        private static ControlPlaneClient Client(StandInControlPlane controlPlane, TimeSpan? cacheLifetime = null)
+        private ControlPlaneClient Client(StandInControlPlane controlPlane, TimeSpan? cacheLifetime = null)
         {
             var options = new ControlPlaneOptions { Url = new Uri("http://control-plane") };
             if (cacheLifetime is { } lifetime)
@@ -133,9 +138,15 @@ public sealed class ControlPlaneClientTests
 
             return new ControlPlaneClient(
                 new SingleClientFactory(controlPlane, options.Url),
-                new MemoryCache(new MemoryCacheOptions()),
+                new MemoryCache(new MemoryCacheOptions { Clock = clock }),
                 Options.Create(options));
         }
+    }
+
+    // The clock of the cache, which the tests move on by hand.
+    private sealed class SteppingClock : ISystemClock
+    {
+        public DateTimeOffset UtcNow { get; set; } = TimeProvider.System.GetUtcNow();
     }
 
     // Knows KnownClient, answers 404 for every other client, or FailureStatus when set.

@@ -60,11 +60,13 @@ internal sealed class ValidatingService : IAsyncDisposable
     {
         if (service is not null)
         {
+            await service.StopAsync();
             await service.DisposeAsync();
         }
 
         if (jwks is not null)
         {
+            await jwks.StopAsync();
             await jwks.DisposeAsync();
         }
     }

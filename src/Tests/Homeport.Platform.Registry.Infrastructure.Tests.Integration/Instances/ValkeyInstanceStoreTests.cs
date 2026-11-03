@@ -10,7 +10,6 @@ public sealed class ValkeyInstanceStoreTests : IClassFixture<ValkeyContainer>, I
 {
     private static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan ShortLifetime = TimeSpan.FromMilliseconds(500);
-    private static readonly TimeSpan PastShortLifetime = TimeSpan.FromMilliseconds(1500);
 
     private static readonly Instance Echo = new(
         "instance-1",
@@ -62,25 +61,24 @@ public sealed class ValkeyInstanceStoreTests : IClassFixture<ValkeyContainer>, I
     }
 
     [Fact]
-    public async Task Drops_An_Instance_Once_Its_Lifetime_Has_Passed()
+    public async Task Lets_Valkey_Expire_An_Instance_After_Its_Lifetime()
     {
         await store.SaveAsync(Echo, ShortLifetime, CancellationToken.None);
 
-        await Task.Delay(PastShortLifetime);
+        var left = await valkey.TimeToLiveAsync();
 
-        Assert.Empty(await store.ListAsync(CancellationToken.None));
+        Assert.InRange(left.GetValueOrDefault(), TimeSpan.FromTicks(1), ShortLifetime);
     }
 
     [Fact]
-    public async Task Keeps_A_Renewed_Instance_Past_Its_First_Lifetime()
+    public async Task Extends_The_Lifetime_Of_A_Renewed_Instance()
     {
         await store.SaveAsync(Echo, ShortLifetime, CancellationToken.None);
 
         var renewed = await store.RenewAsync(Echo.Manifest.Id, Echo.InstanceId, Lifetime, CancellationToken.None);
-        await Task.Delay(PastShortLifetime);
 
         Assert.True(renewed);
-        Assert.Single(await store.ListAsync(CancellationToken.None));
+        Assert.True(await valkey.TimeToLiveAsync() > ShortLifetime);
     }
 
     [Fact]
