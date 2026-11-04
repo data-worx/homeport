@@ -29,7 +29,7 @@ public sealed class ModuleTokenIssuer(SigningKeys keys, IOptions<ModuleTokenOpti
             Audience = caller.ModuleId,
             Claims = new Dictionary<string, object>
             {
-                [JwtRegisteredClaimNames.Sub] = caller.Subject,
+                [GatewayTokens.SubjectClaim] = caller.Subject,
                 [GatewayTokens.TenantIdClaim] = caller.TenantId.ToString(),
                 [GatewayTokens.ClientIdClaim] = caller.ClientId,
                 [GatewayTokens.ScopeClaim] = string.Join(GatewayTokens.ScopeSeparator, caller.Scopes),

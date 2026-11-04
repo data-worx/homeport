@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Homeport.Shared.Authentication;
@@ -17,6 +18,9 @@ public static class GatewayTokens
 
     /// <summary>The subject of a service token: the gateway calling as itself.</summary>
     public const string GatewaySubject = "homeport-gateway";
+
+    /// <summary>The claim of a module token that carries the subject of the client's token.</summary>
+    public const string SubjectClaim = JwtRegisteredClaimNames.Sub;
 
     /// <summary>The claim of a module token that carries the caller's tenant id.</summary>
     public const string TenantIdClaim = "tenant_id";

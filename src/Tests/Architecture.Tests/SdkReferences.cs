@@ -10,6 +10,7 @@ internal static class SdkReferences
 {
     internal static readonly string[] Allowed =
     [
+        "Homeport.Shared.Authentication",
         "Homeport.Shared.Client",
         "Homeport.Shared.Contracts",
         "Homeport.Shared.ServiceDefaults",

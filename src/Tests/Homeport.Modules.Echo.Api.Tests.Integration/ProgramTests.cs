@@ -88,11 +88,11 @@ public sealed class ProgramTests
         }
 
         [Fact]
-        public async Task Answers_An_Unknown_Path_As_A_Problem()
+        public async Task Answers_An_Unknown_Path_Without_A_Token_As_An_Unauthorized_Problem()
         {
             var response = await echo.CreateClient().GetAsync("/v1/nowhere");
 
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         }
 
