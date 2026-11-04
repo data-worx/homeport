@@ -10,8 +10,9 @@ namespace Homeport.Platform.Gateway.Infrastructure.Signing;
 public static class SigningServiceCollectionExtensions
 {
     /// <summary>
-    /// Binds <see cref="SigningOptions"/> and checks them at start-up, so the
-    /// gateway does not start without a usable signing key.
+    /// Binds <see cref="SigningOptions"/> and <see cref="ModuleTokenOptions"/>
+    /// and checks them at start-up, so the gateway does not start without a
+    /// usable signing key.
     /// </summary>
     public static IServiceCollection AddGatewaySigning(this IServiceCollection services)
     {
@@ -19,8 +20,13 @@ public static class SigningServiceCollectionExtensions
             .BindConfiguration(SigningOptions.SectionName)
             .ValidateOnStart();
         services.AddSingleton<IValidateOptions<SigningOptions>, SigningOptionsValidator>();
+        services.AddOptions<ModuleTokenOptions>()
+            .BindConfiguration(ModuleTokenOptions.SectionName)
+            .ValidateOnStart();
+        services.AddSingleton<IValidateOptions<ModuleTokenOptions>, ModuleTokenOptionsValidator>();
         services.AddSingleton<SigningKeys>();
         services.AddSingleton<ServiceTokenIssuer>();
+        services.AddSingleton<ModuleTokenIssuer>();
         services.TryAddSingleton(TimeProvider.System);
 
         return services;

@@ -18,6 +18,18 @@ public static class GatewayTokens
     /// <summary>The subject of a service token: the gateway calling as itself.</summary>
     public const string GatewaySubject = "homeport-gateway";
 
+    /// <summary>The claim of a module token that carries the caller's tenant id.</summary>
+    public const string TenantIdClaim = "tenant_id";
+
+    /// <summary>The claim of a module token that carries the caller's client id (RFC 9068).</summary>
+    public const string ClientIdClaim = "client_id";
+
+    /// <summary>The claim of a module token that carries the caller's scopes, space-delimited (RFC 9068).</summary>
+    public const string ScopeClaim = "scope";
+
+    /// <summary>The separator of the scopes in <see cref="ScopeClaim"/>.</summary>
+    public const char ScopeSeparator = ' ';
+
     /// <summary>ES256, the one algorithm the gateway signs with and a validator accepts.</summary>
     public const string SigningAlgorithm = SecurityAlgorithms.EcdsaSha256;
 

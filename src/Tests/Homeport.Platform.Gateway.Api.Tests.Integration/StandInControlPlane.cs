@@ -23,9 +23,12 @@ internal sealed class StandInControlPlane : IAsyncDisposable
     private static readonly TimeSpan WaitTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan WaitPoll = TimeSpan.FromMilliseconds(20);
 
+    /// <summary>The tenant <see cref="KnownClientId"/> acts for.</summary>
+    internal static readonly Guid KnownTenantId = Guid.Parse("3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61");
+
     private static readonly ClientResponse KnownClient = new(
         KnownClientId,
-        Guid.Parse("3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61"),
+        KnownTenantId,
         new PlanResponse(Guid.Parse("8a2e4c6d-1f3b-4a5c-9d7e-0b1c2d3e4f50"), 10, 20));
 
     private readonly ConcurrentQueue<string> authorizations = new();

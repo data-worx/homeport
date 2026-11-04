@@ -11,6 +11,9 @@ public sealed class ClientAuthenticationOptions
     /// <summary>The claim most providers carry the client id in.</summary>
     public const string DefaultClientIdClaim = "azp";
 
+    /// <summary>The claim most providers carry the granted scopes in, space-delimited.</summary>
+    public const string DefaultScopeClaim = "scope";
+
     /// <summary>
     /// The issuer of the tokens. Its OpenID Connect metadata, at
     /// <c>.well-known/openid-configuration</c> below it, names the signing keys.
@@ -25,6 +28,12 @@ public sealed class ClientAuthenticationOptions
     /// Providers differ: <c>azp</c>, <c>client_id</c>, <c>appid</c>.
     /// </summary>
     public string ClientIdClaim { get; set; } = DefaultClientIdClaim;
+
+    /// <summary>
+    /// The claim that carries the scopes granted to the client, space-delimited
+    /// or one claim per scope. Providers differ: <c>scope</c>, <c>scp</c>.
+    /// </summary>
+    public string ScopeClaim { get; set; } = DefaultScopeClaim;
 
     /// <summary>
     /// Whether the metadata must be fetched over HTTPS. Only a development
