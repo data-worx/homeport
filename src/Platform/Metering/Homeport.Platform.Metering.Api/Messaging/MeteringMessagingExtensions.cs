@@ -40,8 +40,11 @@ internal static class MeteringMessagingExtensions
             // message's scope resolves the store instead.
             options.CodeGeneration.AlwaysUseServiceLocationFor<IUsageStore>();
 
+            // No reply queue: metering answers no requests, and its broker
+            // user may declare only its own queues.
             options.UseRabbitMq(new Uri(connectionString))
                 .AutoProvision()
+                .DisableSystemRequestReplyQueueDeclaration()
                 .DeclareExchange(UsageMessaging.Exchange, exchange =>
                 {
                     exchange.ExchangeType = ExchangeType.Fanout;

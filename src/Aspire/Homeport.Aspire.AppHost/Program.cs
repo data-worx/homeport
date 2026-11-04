@@ -18,6 +18,7 @@ public static class Program
 
     // Relative to the AppHost project: the scripts and the realm live with the deployment.
     private const string InitFiles = "../../../deploy/postgres/init";
+    private const string RabbitMqInitFiles = "../../../deploy/rabbitmq/init";
     private const string Realms = "../../../deploy/keycloak/realms";
 
     // The realm in deploy/keycloak/realms/ and the audience its clients' tokens carry.
@@ -27,6 +28,9 @@ public static class Program
     // Keycloak's port on the host, fixed so its issuer is the same for a
     // client on the host and for the gateway on the compose network.
     private const int KeycloakPort = 8080;
+
+    // Where the broker's init script is mounted, which starts it with a user per service.
+    private const string RabbitMqInitDirectory = "/homeport-init";
 
     /// <summary>Declares every resource and runs or publishes them.</summary>
     public static void Main(string[] args)
@@ -59,9 +63,19 @@ public static class Program
             .WithInitFiles(InitFiles);
         var postgresEndpoint = postgres.Resource.PrimaryEndpoint;
 
+        // One broker; its init script gives each service a user of its own
+        // (ADR-0014), with a password generated like the database's.
+        var gatewayRabbitMqPassword = builder.AddParameter("gateway-rabbitmq-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
+        var meteringRabbitMqPassword = builder.AddParameter("metering-rabbitmq-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var rabbitMq = builder.AddRabbitMQ("rabbitmq")
             .WithImageTag("4.3")
-            .WithImageSHA256("8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75");
+            .WithImageSHA256("8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75")
+            .WithEnvironment("GATEWAY_RABBITMQ_PASSWORD", gatewayRabbitMqPassword)
+            .WithEnvironment("METERING_RABBITMQ_PASSWORD", meteringRabbitMqPassword)
+            .WithBindMount(RabbitMqInitFiles, RabbitMqInitDirectory, isReadOnly: true)
+            .WithEntrypoint("bash")
+            .WithArgs($"{RabbitMqInitDirectory}/init-homeport.sh", "rabbitmq-server");
+        var rabbitMqEndpoint = rabbitMq.Resource.PrimaryEndpoint;
 
         var valkey = builder.AddValkey("valkey")
             .WithImageTag("9.1")
@@ -137,7 +151,7 @@ public static class Program
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath)
             .WithExternalHttpEndpoints()
             .WithReference(registry)
-            .WithReference(rabbitMq)
+            .WithEnvironment("ConnectionStrings__rabbitmq", BrokerConnectionString(rabbitMqEndpoint, "gateway", gatewayRabbitMqPassword))
             .WaitFor(rabbitMq);
 
         // The registry validates the gateway's service tokens against its JWKS,
@@ -171,6 +185,23 @@ public static class Program
         // The gateway looks clients up at the control plane.
         gateway.WithReference(controlPlane);
 
+        // Metering: `migrate` applies its migrations as the owner role; the
+        // service starts after it completed, runs as the app role and
+        // consumes the gateway's usage events with a broker user of its own.
+        var meteringMigrate = builder.AddProject<Projects.Homeport_Platform_Metering_Api>("metering-migrate")
+            .WithArgs("migrate")
+            .WithEnvironment("OTEL_SERVICE_NAME", "homeport-metering-migrate")
+            .WithEnvironment("ConnectionStrings__metering-owner", ConnectionString(postgresEndpoint, "metering_owner", meteringOwnerPassword))
+            .WaitFor(postgres);
+
+        builder.AddProject<Projects.Homeport_Platform_Metering_Api>("metering")
+            .WithEnvironment("OTEL_SERVICE_NAME", "homeport-metering")
+            .WithEnvironment("ConnectionStrings__metering", ConnectionString(postgresEndpoint, "metering_app", meteringAppPassword))
+            .WithEnvironment("ConnectionStrings__rabbitmq", BrokerConnectionString(rabbitMqEndpoint, "metering", meteringRabbitMqPassword))
+            .WaitForCompletion(meteringMigrate)
+            .WaitFor(rabbitMq)
+            .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
+
         builder.Build().Run();
     }
 
@@ -180,5 +211,13 @@ public static class Program
     {
         return ReferenceExpression.Create(
             $"Host={postgres.Property(EndpointProperty.Host)};Port={postgres.Property(EndpointProperty.Port)};Database={Database};Username={role};Password={password}");
+    }
+
+    // A service's connection to the broker as its own user, built from the
+    // broker's endpoint like the database connections.
+    private static ReferenceExpression BrokerConnectionString(EndpointReference rabbitMq, string user, IResourceBuilder<ParameterResource> password)
+    {
+        return ReferenceExpression.Create(
+            $"amqp://{user}:{password}@{rabbitMq.Property(EndpointProperty.Host)}:{rabbitMq.Property(EndpointProperty.Port)}");
     }
 }

@@ -22,11 +22,23 @@ services:
       - "aspire"
   rabbitmq:
     image: "docker.io/library/rabbitmq@sha256:8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75"
+    command:
+      - "/homeport-init/init-homeport.sh"
+      - "rabbitmq-server"
+    entrypoint:
+      - "bash"
     environment:
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD}"
+      GATEWAY_RABBITMQ_PASSWORD: "${GATEWAY_RABBITMQ_PASSWORD}"
+      METERING_RABBITMQ_PASSWORD: "${METERING_RABBITMQ_PASSWORD}"
     expose:
       - "5672"
+    volumes:
+      - type: "bind"
+        target: "/homeport-init"
+        source: "${RABBITMQ_BINDMOUNT_0}"
+        read_only: true
     networks:
       - "aspire"
   valkey:
@@ -128,12 +140,7 @@ services:
       REGISTRY_HTTP: "http://registry:${REGISTRY_PORT}"
       services__registry__http__0: "http://registry:${REGISTRY_PORT}"
       REGISTRY_HTTPS: "https://registry:${REGISTRY_PORT}"
-      ConnectionStrings__rabbitmq: "amqp://guest:${RABBITMQ_PASSWORD}@rabbitmq:5672"
-      RABBITMQ_HOST: "rabbitmq"
-      RABBITMQ_PORT: "5672"
-      RABBITMQ_USERNAME: "guest"
-      RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD}"
-      RABBITMQ_URI: "amqp://guest:${RABBITMQ_PASSWORD}@rabbitmq:5672"
+      ConnectionStrings__rabbitmq: "amqp://gateway:${GATEWAY_RABBITMQ_PASSWORD}@rabbitmq:5672"
       CONTROL_PLANE_HTTP: "http://control-plane:${CONTROL_PLANE_PORT}"
       services__control-plane__http__0: "http://control-plane:${CONTROL_PLANE_PORT}"
       CONTROL_PLANE_HTTPS: "https://control-plane:${CONTROL_PLANE_PORT}"
@@ -184,6 +191,41 @@ services:
     depends_on:
       control-plane-migrate:
         condition: "service_completed_successfully"
+    networks:
+      - "aspire"
+  metering-migrate:
+    image: "${METERING_MIGRATE_IMAGE}"
+    command:
+      - "migrate"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${METERING_MIGRATE_PORT}"
+      OTEL_SERVICE_NAME: "homeport-metering-migrate"
+      ConnectionStrings__metering-owner: "Host=postgres;Port=5432;Database=homeport;Username=metering_owner;Password=${METERING_OWNER_PASSWORD}"
+    expose:
+      - "${METERING_MIGRATE_PORT}"
+    depends_on:
+      postgres:
+        condition: "service_started"
+    networks:
+      - "aspire"
+  metering:
+    image: "${METERING_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${METERING_PORT}"
+      OTEL_SERVICE_NAME: "homeport-metering"
+      ConnectionStrings__metering: "Host=postgres;Port=5432;Database=homeport;Username=metering_app;Password=${METERING_APP_PASSWORD}"
+      ConnectionStrings__rabbitmq: "amqp://metering:${METERING_RABBITMQ_PASSWORD}@rabbitmq:5672"
+    expose:
+      - "${METERING_PORT}"
+    depends_on:
+      metering-migrate:
+        condition: "service_completed_successfully"
+      rabbitmq:
+        condition: "service_started"
     networks:
       - "aspire"
 networks:
