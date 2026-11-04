@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Metering.Infrastructure.Persistence;
 using Homeport.Shared.ServiceDefaults;
 
 namespace Homeport.Platform.Metering.Api;
@@ -15,11 +16,27 @@ public sealed class Program
     {
     }
 
-    /// <summary>Wires metering and runs it.</summary>
-    public static void Main(string[] args)
+    /// <summary>
+    /// Runs metering, or with <c>migrate</c> as the first argument the
+    /// <see cref="MigrateCommand"/>.
+    /// </summary>
+    /// <returns>The process exit code.</returns>
+    public static async Task<int> Main(string[] args)
+    {
+        if (args is [MigrateCommand.Name, .. var rest])
+        {
+            return await MigrateCommand.RunAsync(rest);
+        }
+
+        await RunAsync(args);
+        return 0;
+    }
+
+    private static async Task RunAsync(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
+        builder.AddMeteringPersistence(MeteringPersistenceExtensions.AppConnectionName);
         builder.Services.AddProblemDetails();
 
         var app = builder.Build();
@@ -31,6 +48,7 @@ public sealed class Program
 
         app.MapDefaultEndpoints();
 
-        app.Run();
+        app.Lifetime.ApplicationStarted.Register(() => app.Logger.LogInformation("Metering started on {Urls}", app.Urls));
+        await app.RunAsync();
     }
 }

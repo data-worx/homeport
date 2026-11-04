@@ -60,6 +60,9 @@ public sealed class RunningControlPlane : IAsyncLifetime
         .WithDatabase(Database)
         .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", AppPassword)
+        // The script prepares every service's schema; this fixture uses only its own.
+        .WithEnvironment("METERING_OWNER_PASSWORD", OwnerPassword)
+        .WithEnvironment("METERING_APP_PASSWORD", AppPassword)
         .WithResourceMapping(new FileInfo(Path.Combine(AppContext.BaseDirectory, InitScript)), InitDirectory, fileMode: Executable)
         .Build();
 

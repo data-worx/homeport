@@ -32,3 +32,4 @@ SQL
 }
 
 create_service_schema control_plane "${CONTROL_PLANE_OWNER_PASSWORD:?}" "${CONTROL_PLANE_APP_PASSWORD:?}"
+create_service_schema metering "${METERING_OWNER_PASSWORD:?}" "${METERING_APP_PASSWORD:?}"

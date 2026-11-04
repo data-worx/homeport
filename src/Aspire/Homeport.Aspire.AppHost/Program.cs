@@ -45,6 +45,8 @@ public static class Program
         // run as; the passwords are generated like the server's own.
         var controlPlaneOwnerPassword = builder.AddParameter("control-plane-owner-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var controlPlaneAppPassword = builder.AddParameter("control-plane-app-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
+        var meteringOwnerPassword = builder.AddParameter("metering-owner-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
+        var meteringAppPassword = builder.AddParameter("metering-app-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
 
         var postgres = builder.AddPostgres("postgres")
             .WithImageTag("18.3")
@@ -52,6 +54,8 @@ public static class Program
             .WithEnvironment("POSTGRES_DB", Database)
             .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", controlPlaneOwnerPassword)
             .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", controlPlaneAppPassword)
+            .WithEnvironment("METERING_OWNER_PASSWORD", meteringOwnerPassword)
+            .WithEnvironment("METERING_APP_PASSWORD", meteringAppPassword)
             .WithInitFiles(InitFiles);
         var postgresEndpoint = postgres.Resource.PrimaryEndpoint;
 

@@ -1,0 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+namespace Homeport.Platform.Metering.Infrastructure.Tests.Integration;
+
+/// <summary>One <see cref="MeteringDatabase"/> for every test class that names it: none of them changes its rows.</summary>
+[CollectionDefinition(MeteringDatabase.Collection)]
+public sealed class MeteringDatabaseCollection : ICollectionFixture<MeteringDatabase>;
