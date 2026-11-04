@@ -128,11 +128,20 @@ services:
       REGISTRY_HTTP: "http://registry:${REGISTRY_PORT}"
       services__registry__http__0: "http://registry:${REGISTRY_PORT}"
       REGISTRY_HTTPS: "https://registry:${REGISTRY_PORT}"
+      ConnectionStrings__rabbitmq: "amqp://guest:${RABBITMQ_PASSWORD}@rabbitmq:5672"
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_USERNAME: "guest"
+      RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD}"
+      RABBITMQ_URI: "amqp://guest:${RABBITMQ_PASSWORD}@rabbitmq:5672"
       CONTROL_PLANE_HTTP: "http://control-plane:${CONTROL_PLANE_PORT}"
       services__control-plane__http__0: "http://control-plane:${CONTROL_PLANE_PORT}"
       CONTROL_PLANE_HTTPS: "https://control-plane:${CONTROL_PLANE_PORT}"
     ports:
       - "${GATEWAY_PORT}"
+    depends_on:
+      rabbitmq:
+        condition: "service_started"
     networks:
       - "aspire"
   control-plane-migrate:

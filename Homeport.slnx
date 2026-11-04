@@ -47,6 +47,7 @@
     <Project Path="src/Tests/Homeport.Modules.Echo.Api.Tests.Integration/Homeport.Modules.Echo.Api.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Platform.ControlPlane.Tests.Integration/Homeport.Platform.ControlPlane.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Platform.Gateway.Api.Tests.Integration/Homeport.Platform.Gateway.Api.Tests.Integration.csproj" />
+    <Project Path="src/Tests/Homeport.Platform.Gateway.Infrastructure.Tests.Integration/Homeport.Platform.Gateway.Infrastructure.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Platform.Gateway.Infrastructure.Tests.Unit/Homeport.Platform.Gateway.Infrastructure.Tests.Unit.csproj" />
     <Project Path="src/Tests/Homeport.Platform.Metering.Api.Tests.Integration/Homeport.Platform.Metering.Api.Tests.Integration.csproj" />
     <Project Path="src/Tests/Homeport.Platform.Metering.Application.Tests.Unit/Homeport.Platform.Metering.Application.Tests.Unit.csproj" />

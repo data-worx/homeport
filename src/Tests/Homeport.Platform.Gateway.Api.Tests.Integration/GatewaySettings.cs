@@ -2,7 +2,11 @@
 
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using Homeport.Platform.Gateway.Infrastructure.Usage;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Wolverine;
 
 namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 
@@ -18,6 +22,18 @@ internal static class GatewaySettings
     /// token: the metadata is fetched with the first token only.
     /// </summary>
     internal const string UnusedAuthority = "http://127.0.0.1:1/";
+
+    // A broker nothing listens on: the gateway's transports are stubbed, and
+    // what it publishes is tracked rather than sent.
+    private const string UnusedBroker = "amqp://guest:guest@127.0.0.1:1/";
+
+    /// <summary>Publishes usage events to Wolverine's stub transports instead of a broker.</summary>
+    internal static IWebHostBuilder WithUsage(this IWebHostBuilder host)
+    {
+        return host
+            .UseSetting($"ConnectionStrings:{UsageServiceCollectionExtensions.ConnectionName}", UnusedBroker)
+            .ConfigureTestServices(services => services.DisableAllExternalWolverineTransports());
+    }
 
     /// <summary>A fresh P-256 signing key under <see cref="KeyId"/>.</summary>
     internal static IWebHostBuilder WithSigningKey(this IWebHostBuilder host)

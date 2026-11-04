@@ -59,7 +59,7 @@ public static class Program
             .WithInitFiles(InitFiles);
         var postgresEndpoint = postgres.Resource.PrimaryEndpoint;
 
-        builder.AddRabbitMQ("rabbitmq")
+        var rabbitMq = builder.AddRabbitMQ("rabbitmq")
             .WithImageTag("4.3")
             .WithImageSHA256("8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75");
 
@@ -136,7 +136,9 @@ public static class Program
             .WithEnvironment("ClientAuthentication__RequireHttpsMetadata", bool.FalseString)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath)
             .WithExternalHttpEndpoints()
-            .WithReference(registry);
+            .WithReference(registry)
+            .WithReference(rabbitMq)
+            .WaitFor(rabbitMq);
 
         // The registry validates the gateway's service tokens against its JWKS,
         // and Echo its module tokens.
