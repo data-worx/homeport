@@ -80,7 +80,8 @@ The registry checks the manifest against the contract. When it breaks it, the
 module logs every problem, for example a route whose scope is not in
 `Scopes`, and stops.
 
-`MapHomeportModule` maps, all of them anonymous:
+`MapHomeportModule` maps, all of them anonymous — every other endpoint needs
+the gateway's module token; see [the module token](module-token.md):
 
 | Endpoint | Serves |
 |---|---|
@@ -107,7 +108,8 @@ open the dashboard, follow the endpoint of `echo` and append
   "version": "0.1.0+c1fef1c…",
   "routes": [
     { "method": "POST", "path": "/v1/echo", "scope": "echo.invoke", "meter": "requests", "quantity": 1 },
-    { "method": "GET", "path": "/v1/request", "scope": "echo.invoke", "meter": "requests", "quantity": 1 }
+    { "method": "GET", "path": "/v1/request", "scope": "echo.invoke", "meter": "requests", "quantity": 1 },
+    { "method": "GET", "path": "/v1/caller", "scope": "echo.invoke", "meter": "requests", "quantity": 1 }
   ],
   "scopes": ["echo.invoke"],
   "meters": ["requests"],
@@ -118,5 +120,6 @@ open the dashboard, follow the endpoint of `echo` and append
 
 A module is reachable only inside the AppHost or compose network. Callers
 reach it through the gateway under `/modules/{id}/{path}`, on the routes it
-registered; see [registering a module](registering-a-module.md). A module does
-not check a token yet.
+registered; see [registering a module](registering-a-module.md). The gateway
+lets a request through only when the caller's token grants the route's
+`scope`.

@@ -75,4 +75,6 @@ curl -s -X POST -H 'Authorization: Bearer <access token>' \
 ```
 
 `GET /modules/echo/v1/request` answers with the headers Echo received, which
-shows what the gateway forwards.
+shows what the gateway forwards, and `GET /modules/echo/v1/caller` with the
+tenant, client, subject and scopes the gateway's module token names. The
+token needs the scope `echo.invoke`.
