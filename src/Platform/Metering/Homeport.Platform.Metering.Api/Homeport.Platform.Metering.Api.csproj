@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Homeport.Platform.Metering.Api.Tests.Integration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WolverineFx.RabbitMQ" />
+    <!-- Compiles the handlers Wolverine generates at start-up. -->
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Internal\Homeport.Shared.Internal.csproj" />
     <ProjectReference Include="..\..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Homeport.Platform.Metering.Infrastructure\Homeport.Platform.Metering.Infrastructure.csproj" />
   </ItemGroup>

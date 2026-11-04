@@ -26,6 +26,10 @@ public static class ServiceDefaultsExtensions
 
     private const string LiveTag = "live";
 
+    // The activity source and meter Wolverine reports through, so one trace
+    // spans gateway, broker and metering.
+    private const string Wolverine = "Wolverine";
+
     /// <summary>Adds the service defaults to a host.</summary>
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
@@ -74,11 +78,12 @@ public static class ServiceDefaultsExtensions
 
         var telemetry = builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics => metrics
+                .AddMeter(builder.Environment.ApplicationName, Wolverine)
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
                 .AddRuntimeInstrumentation())
             .WithTracing(tracing => tracing
-                .AddSource(builder.Environment.ApplicationName)
+                .AddSource(builder.Environment.ApplicationName, Wolverine)
                 .AddAspNetCoreInstrumentation(aspNetCore =>
                     aspNetCore.Filter = context => !context.Request.Path.StartsWithSegments("/health"))
                 .AddHttpClientInstrumentation());

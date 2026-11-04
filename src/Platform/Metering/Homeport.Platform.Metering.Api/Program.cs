@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Metering.Api.Messaging;
+using Homeport.Platform.Metering.Application;
 using Homeport.Platform.Metering.Infrastructure.Persistence;
 using Homeport.Shared.ServiceDefaults;
 
@@ -37,6 +39,8 @@ public sealed class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
         builder.AddMeteringPersistence(MeteringPersistenceExtensions.AppConnectionName);
+        builder.Services.AddScoped<UsageRecording>();
+        builder.AddMeteringMessaging();
         builder.Services.AddProblemDetails();
 
         var app = builder.Build();

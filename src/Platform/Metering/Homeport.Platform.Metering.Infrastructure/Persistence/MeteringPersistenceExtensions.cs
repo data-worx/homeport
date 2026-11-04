@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Metering.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,7 @@ public static class MeteringPersistenceExtensions
         builder.Services.AddDbContext<MeteringDbContext>((services, options) => ConfigureNpgsql(options.UseNpgsql(connectionString))
             .AddInterceptors(services.GetRequiredService<TenantSessionInterceptor>()));
         builder.EnrichNpgsqlDbContext<MeteringDbContext>();
+        builder.Services.AddScoped<IUsageStore, UsageStore>();
 
         return builder;
     }
