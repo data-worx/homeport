@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics;
+using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Api.Routing;
 using Homeport.Platform.Gateway.Infrastructure.ControlPlane;
 using Homeport.Shared.Client.Problems;
+using Homeport.Shared.Internal.Platform.ControlPlane;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using Yarp.ReverseProxy.Forwarder;
@@ -87,6 +89,11 @@ internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logge
             {
                 case StatusCodes.Status401Unauthorized:
                     return GatewayProblems.Unauthorized;
+                // A client the control plane knows was refused for its scope only.
+                case StatusCodes.Status403Forbidden
+                    when context.Features.Get<ClientResponse>() is not null
+                    && context.Features.Get<MissingScope>() is not null:
+                    return GatewayProblems.InsufficientScope;
                 case StatusCodes.Status403Forbidden:
                     return GatewayProblems.UnknownClient;
             }

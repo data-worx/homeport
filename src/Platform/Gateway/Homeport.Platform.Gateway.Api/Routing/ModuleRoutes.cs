@@ -20,6 +20,9 @@ internal static class ModuleRoutes
     /// <summary>The route metadata that names the module a route goes to.</summary>
     internal const string ModuleIdMetadata = "ModuleId";
 
+    /// <summary>The route metadata that names the scope a caller needs for a route.</summary>
+    internal const string ScopeMetadata = "Scope";
+
     /// <summary>The routes and clusters for <paramref name="table"/>, one cluster per route.</summary>
     internal static (IReadOnlyList<RouteConfig> Routes, IReadOnlyList<ClusterConfig> Clusters) Build(RouteTableResponse table)
     {
@@ -52,6 +55,7 @@ internal static class ModuleRoutes
             Metadata = new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 [ModuleIdMetadata] = moduleId,
+                [ScopeMetadata] = route.Scope,
             },
         }
         .WithTransformPathRemovePrefix(prefix);

@@ -279,6 +279,30 @@ public sealed class ProgramTests
         }
 
         [Fact]
+        public async Task Answers_A_Client_Without_The_Route_Scope_As_Insufficient_Scope_Problem()
+        {
+            using var response = await gateway.CreateAnonymousClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.KnownClientId, scopes: "usage.read"))
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal(ProblemTypePrefix + "insufficient-scope", problem["type"]?.GetValue<string>());
+            Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Answers_An_Unknown_Client_Without_The_Route_Scope_As_Unknown_Client_Problem()
+        {
+            using var response = await gateway.CreateAnonymousClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.UnknownClientId, scopes: "usage.read"))
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(ProblemTypePrefix + "unknown-client", problem["type"]?.GetValue<string>());
+        }
+
+        [Fact]
         public async Task Answers_A_Token_Without_The_Client_Id_Claim_As_Forbidden()
         {
             using var response = await gateway.CreateAnonymousClient()
