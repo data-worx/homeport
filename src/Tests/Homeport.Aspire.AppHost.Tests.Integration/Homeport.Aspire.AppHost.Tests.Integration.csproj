@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Aspire\Homeport.Aspire.AppHost\Homeport.Aspire.AppHost.csproj" />
+    <ProjectReference Include="..\..\Shared\Homeport.Shared.Client\Homeport.Shared.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

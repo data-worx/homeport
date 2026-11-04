@@ -147,9 +147,13 @@ public static class HomeportModuleExtensions
             .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
         foreach (var scope in manifest.Scopes)
         {
+            // Every requirement is evaluated, so the scope is not read from an
+            // anonymous caller, who fails the first one and is challenged.
             authorization.AddPolicy(scope, policy => policy
                 .RequireAuthenticatedUser()
-                .RequireAssertion(context => HomeportCaller.From(context.User).HasScope(scope)));
+                .RequireAssertion(context =>
+                    context.User.Identity?.IsAuthenticated == true
+                    && HomeportCaller.From(context.User).HasScope(scope)));
         }
     }
 

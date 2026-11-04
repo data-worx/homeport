@@ -36,8 +36,8 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "fullScopeAllowed": false,
-      "defaultClientScopes": ["echo.invoke", "usage.read"],
-      "optionalClientScopes": [],
+      "defaultClientScopes": ["usage.read"],
+      "optionalClientScopes": ["echo.invoke"],
       "protocolMappers": [
         {
           "name": "homeport-audience",

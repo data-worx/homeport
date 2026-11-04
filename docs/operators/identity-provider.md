@@ -64,7 +64,8 @@ The AppHost imports the realm in
   `usage.read`;
 - the client the control plane seeds (`local-client` by default, the
   parameter `seed-client-id`), confidential, with only the client-credentials
-  grant, both scopes and the audience `homeport`;
+  grant, the audience `homeport`, `usage.read` by default and `echo.invoke`
+  only when the token request asks for it with `scope=echo.invoke`;
 - the client `unmapped-client`, which the control plane does not know, for
   the tests that expect `403`.
 

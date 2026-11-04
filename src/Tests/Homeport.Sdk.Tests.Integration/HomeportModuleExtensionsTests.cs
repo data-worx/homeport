@@ -108,6 +108,17 @@ public sealed class HomeportModuleExtensionsTests
         }
 
         [Fact]
+        public async Task Answers_A_Request_Without_A_Token_To_A_Scoped_Endpoint_As_Unauthorized()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await app.GetTestClient().GetAsync(CallerController.ScopedPath);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
         public async Task Lets_A_Caller_With_The_Scope_Of_The_Endpoint_In()
         {
             await using var gateway = await StandInGateway.StartAsync();
