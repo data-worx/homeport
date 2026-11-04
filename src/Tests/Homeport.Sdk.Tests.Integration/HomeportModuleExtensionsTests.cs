@@ -25,6 +25,111 @@ public sealed class HomeportModuleExtensionsTests
         };
 
         [Fact]
+        public async Task Answers_A_Request_Without_A_Token_As_An_Unauthorized_Problem()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await app.GetTestClient().GetAsync(CallerController.CallerPath);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        }
+
+        [Fact]
+        public async Task Accepts_A_Module_Token_For_The_Module()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await TestModule.GetAsync(app, CallerController.CallerPath, gateway.Issue("things", TestModule.WriteScope));
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Rejects_A_Token_For_Another_Audience()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await TestModule.GetAsync(app, CallerController.CallerPath, gateway.Issue("echo", TestModule.WriteScope));
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Rejects_An_Expired_Token()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await TestModule.GetAsync(app, CallerController.CallerPath, gateway.Issue("things", TestModule.WriteScope, expiresIn: TimeSpan.FromMinutes(-1)));
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Rejects_A_Token_Signed_With_An_Unknown_Key()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await TestModule.GetAsync(app, CallerController.CallerPath, StandInGateway.IssueWithForeignKey("things", TestModule.WriteScope));
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Exposes_Tenant_Client_Subject_And_Scopes_Of_The_Token()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await TestModule.GetAsync(app, CallerController.CallerPath, gateway.Issue("things", "things.write things.read"));
+
+            var caller = await response.Content.ReadFromJsonAsync<HomeportCaller>();
+            Assert.Equal(Guid.Parse(StandInGateway.TenantId), caller?.TenantId);
+            Assert.Equal(StandInGateway.ClientId, caller?.ClientId);
+            Assert.Equal(StandInGateway.Subject, caller?.Subject);
+            Assert.Equal(["things.write", "things.read"], caller?.Scopes);
+        }
+
+        [Fact]
+        public async Task Answers_A_Caller_Without_The_Scope_Of_The_Endpoint_As_A_Forbidden_Problem()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await TestModule.GetAsync(app, CallerController.ScopedPath, gateway.Issue("things", "things.read"));
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        }
+
+        [Fact]
+        public async Task Answers_A_Request_Without_A_Token_To_A_Scoped_Endpoint_As_Unauthorized()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await app.GetTestClient().GetAsync(CallerController.ScopedPath);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Lets_A_Caller_With_The_Scope_Of_The_Endpoint_In()
+        {
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
+
+            var response = await TestModule.GetAsync(app, CallerController.ScopedPath, gateway.Issue("things", TestModule.WriteScope));
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
         public async Task Answers_An_Unhandled_Exception_As_An_Internal_Problem()
         {
             await using var app = await TestModule.StartAsync();
@@ -252,15 +357,26 @@ public sealed class HomeportModuleExtensionsTests
         [Fact]
         public async Task Answers_An_Unknown_Path_As_A_Problem()
         {
-            await using var app = await TestModule.StartAsync();
+            await using var gateway = await StandInGateway.StartAsync();
+            await using var app = await TestModule.StartAsync(gateway);
 
-            var response = await app.GetTestClient().GetAsync("/v1/nowhere");
+            var response = await TestModule.GetAsync(app, "/v1/nowhere", gateway.Issue("things", TestModule.WriteScope));
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
             var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
             Assert.Equal(404, root.GetProperty("status").GetInt32());
             Assert.False(string.IsNullOrEmpty(root.GetProperty("traceId").GetString()));
+        }
+
+        [Fact]
+        public async Task Answers_An_Unknown_Path_Without_A_Token_As_Unauthorized()
+        {
+            await using var app = await TestModule.StartAsync();
+
+            var response = await app.GetTestClient().GetAsync("/v1/nowhere");
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
     }
 }

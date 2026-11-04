@@ -1,4 +1,18 @@
 #nullable enable
+Homeport.Sdk.HomeportCaller
+Homeport.Sdk.HomeportCaller.<Clone>$() -> Homeport.Sdk.HomeportCaller!
+Homeport.Sdk.HomeportCaller.ClientId.get -> string!
+Homeport.Sdk.HomeportCaller.ClientId.init -> void
+Homeport.Sdk.HomeportCaller.Deconstruct(out System.Guid TenantId, out string! ClientId, out string! Subject, out System.Collections.Generic.IReadOnlyList<string!>! Scopes) -> void
+Homeport.Sdk.HomeportCaller.Equals(Homeport.Sdk.HomeportCaller? other) -> bool
+Homeport.Sdk.HomeportCaller.HasScope(string! scope) -> bool
+Homeport.Sdk.HomeportCaller.HomeportCaller(System.Guid TenantId, string! ClientId, string! Subject, System.Collections.Generic.IReadOnlyList<string!>! Scopes) -> void
+Homeport.Sdk.HomeportCaller.Scopes.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Homeport.Sdk.HomeportCaller.Scopes.init -> void
+Homeport.Sdk.HomeportCaller.Subject.get -> string!
+Homeport.Sdk.HomeportCaller.Subject.init -> void
+Homeport.Sdk.HomeportCaller.TenantId.get -> System.Guid
+Homeport.Sdk.HomeportCaller.TenantId.init -> void
 Homeport.Sdk.HomeportModuleExtensions
 Homeport.Sdk.HomeportProblems
 Homeport.Sdk.ModuleOpenApi
@@ -12,9 +26,15 @@ Homeport.Sdk.ProblemType.Title.get -> string!
 Homeport.Sdk.ProblemType.ToResult(string! detail) -> Microsoft.AspNetCore.Mvc.ActionResult!
 Homeport.Sdk.ProblemType.Type.get -> System.Uri!
 Homeport.Sdk.ResultExtensions
+override Homeport.Sdk.HomeportCaller.Equals(object? obj) -> bool
+override Homeport.Sdk.HomeportCaller.GetHashCode() -> int
+override Homeport.Sdk.HomeportCaller.ToString() -> string!
 override Homeport.Sdk.ProblemType.Equals(object? obj) -> bool
 override Homeport.Sdk.ProblemType.GetHashCode() -> int
 override Homeport.Sdk.ProblemType.ToString() -> string!
+static Homeport.Sdk.HomeportCaller.From(System.Security.Claims.ClaimsPrincipal! user) -> Homeport.Sdk.HomeportCaller!
+static Homeport.Sdk.HomeportCaller.operator !=(Homeport.Sdk.HomeportCaller? left, Homeport.Sdk.HomeportCaller? right) -> bool
+static Homeport.Sdk.HomeportCaller.operator ==(Homeport.Sdk.HomeportCaller? left, Homeport.Sdk.HomeportCaller? right) -> bool
 static Homeport.Sdk.HomeportModuleExtensions.AddHomeportModule<TBuilder>(this TBuilder builder, Homeport.Shared.Client.ModuleContract.ModuleManifest! manifest) -> TBuilder
 static Homeport.Sdk.HomeportModuleExtensions.MapHomeportModule(this Microsoft.AspNetCore.Builder.WebApplication! app) -> Microsoft.AspNetCore.Builder.WebApplication!
 static Homeport.Sdk.ModuleOpenApi.Validate(System.Text.Json.JsonElement document) -> System.Collections.Generic.IReadOnlyList<string!>!

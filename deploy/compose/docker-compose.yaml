@@ -102,6 +102,9 @@ services:
       services__registry__http__0: "http://registry:${REGISTRY_PORT}"
       REGISTRY_HTTPS: "https://registry:${REGISTRY_PORT}"
       Homeport__Registry__InstanceAddress: "http://echo:${ECHO_PORT}"
+      GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
+      services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
+      GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
     expose:
       - "${ECHO_PORT}"
     networks:

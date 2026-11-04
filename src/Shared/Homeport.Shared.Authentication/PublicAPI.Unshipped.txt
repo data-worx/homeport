@@ -1,0 +1,59 @@
+#nullable enable
+Homeport.Shared.Authentication.GatewayTokenAuthenticationExtensions
+Homeport.Shared.Authentication.GatewayTokenOptions
+Homeport.Shared.Authentication.GatewayTokenOptions.GatewayTokenOptions() -> void
+Homeport.Shared.Authentication.GatewayTokenOptions.JwksUri.get -> System.Uri!
+Homeport.Shared.Authentication.GatewayTokenOptions.JwksUri.set -> void
+Homeport.Shared.Authentication.GatewayTokens
+Homeport.Shared.Authentication.JsonWebKeySetResponse
+Homeport.Shared.Authentication.JsonWebKeySetResponse.<Clone>$() -> Homeport.Shared.Authentication.JsonWebKeySetResponse!
+Homeport.Shared.Authentication.JsonWebKeySetResponse.Deconstruct(out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Authentication.PublicJsonWebKey!>! Keys) -> void
+Homeport.Shared.Authentication.JsonWebKeySetResponse.Equals(Homeport.Shared.Authentication.JsonWebKeySetResponse? other) -> bool
+Homeport.Shared.Authentication.JsonWebKeySetResponse.JsonWebKeySetResponse(System.Collections.Generic.IReadOnlyList<Homeport.Shared.Authentication.PublicJsonWebKey!>! Keys) -> void
+Homeport.Shared.Authentication.JsonWebKeySetResponse.Keys.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Authentication.PublicJsonWebKey!>!
+Homeport.Shared.Authentication.JsonWebKeySetResponse.Keys.init -> void
+Homeport.Shared.Authentication.PublicJsonWebKey
+Homeport.Shared.Authentication.PublicJsonWebKey.<Clone>$() -> Homeport.Shared.Authentication.PublicJsonWebKey!
+Homeport.Shared.Authentication.PublicJsonWebKey.Alg.get -> string!
+Homeport.Shared.Authentication.PublicJsonWebKey.Alg.init -> void
+Homeport.Shared.Authentication.PublicJsonWebKey.Crv.get -> string!
+Homeport.Shared.Authentication.PublicJsonWebKey.Crv.init -> void
+Homeport.Shared.Authentication.PublicJsonWebKey.Deconstruct(out string! Kty, out string! Use, out string! Alg, out string! Kid, out string! Crv, out string! X, out string! Y) -> void
+Homeport.Shared.Authentication.PublicJsonWebKey.Equals(Homeport.Shared.Authentication.PublicJsonWebKey? other) -> bool
+Homeport.Shared.Authentication.PublicJsonWebKey.Kid.get -> string!
+Homeport.Shared.Authentication.PublicJsonWebKey.Kid.init -> void
+Homeport.Shared.Authentication.PublicJsonWebKey.Kty.get -> string!
+Homeport.Shared.Authentication.PublicJsonWebKey.Kty.init -> void
+Homeport.Shared.Authentication.PublicJsonWebKey.PublicJsonWebKey(string! Kty, string! Use, string! Alg, string! Kid, string! Crv, string! X, string! Y) -> void
+Homeport.Shared.Authentication.PublicJsonWebKey.Use.get -> string!
+Homeport.Shared.Authentication.PublicJsonWebKey.Use.init -> void
+Homeport.Shared.Authentication.PublicJsonWebKey.X.get -> string!
+Homeport.Shared.Authentication.PublicJsonWebKey.X.init -> void
+Homeport.Shared.Authentication.PublicJsonWebKey.Y.get -> string!
+Homeport.Shared.Authentication.PublicJsonWebKey.Y.init -> void
+const Homeport.Shared.Authentication.GatewayTokenOptions.GatewayServiceName = "gateway" -> string!
+const Homeport.Shared.Authentication.GatewayTokenOptions.SectionName = "GatewayTokens" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.ClientIdClaim = "client_id" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.GatewaySubject = "homeport-gateway" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.Issuer = "homeport-gateway" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.JwksPath = "/.well-known/jwks.json" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.ScopeClaim = "scope" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.ScopeSeparator = ' ' -> char
+const Homeport.Shared.Authentication.GatewayTokens.SigningAlgorithm = "ES256" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.SubjectClaim = "sub" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.TenantIdClaim = "tenant_id" -> string!
+override Homeport.Shared.Authentication.JsonWebKeySetResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Authentication.JsonWebKeySetResponse.GetHashCode() -> int
+override Homeport.Shared.Authentication.JsonWebKeySetResponse.ToString() -> string!
+override Homeport.Shared.Authentication.PublicJsonWebKey.Equals(object? obj) -> bool
+override Homeport.Shared.Authentication.PublicJsonWebKey.GetHashCode() -> int
+override Homeport.Shared.Authentication.PublicJsonWebKey.ToString() -> string!
+static Homeport.Shared.Authentication.GatewayTokenAuthenticationExtensions.AddGatewayTokenAuthentication(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, string! audience) -> Microsoft.AspNetCore.Authentication.AuthenticationBuilder!
+static Homeport.Shared.Authentication.GatewayTokens.ValidationParameters(string! audience, System.Collections.Generic.IEnumerable<Microsoft.IdentityModel.Tokens.SecurityKey!>? signingKeys = null) -> Microsoft.IdentityModel.Tokens.TokenValidationParameters!
+static Homeport.Shared.Authentication.JsonWebKeySetResponse.operator !=(Homeport.Shared.Authentication.JsonWebKeySetResponse? left, Homeport.Shared.Authentication.JsonWebKeySetResponse? right) -> bool
+static Homeport.Shared.Authentication.JsonWebKeySetResponse.operator ==(Homeport.Shared.Authentication.JsonWebKeySetResponse? left, Homeport.Shared.Authentication.JsonWebKeySetResponse? right) -> bool
+static Homeport.Shared.Authentication.PublicJsonWebKey.FromKey(System.Security.Cryptography.ECDsa! key, string! keyId) -> Homeport.Shared.Authentication.PublicJsonWebKey!
+static Homeport.Shared.Authentication.PublicJsonWebKey.operator !=(Homeport.Shared.Authentication.PublicJsonWebKey? left, Homeport.Shared.Authentication.PublicJsonWebKey? right) -> bool
+static Homeport.Shared.Authentication.PublicJsonWebKey.operator ==(Homeport.Shared.Authentication.PublicJsonWebKey? left, Homeport.Shared.Authentication.PublicJsonWebKey? right) -> bool
+static readonly Homeport.Shared.Authentication.GatewayTokens.ClockSkew -> System.TimeSpan
+static readonly Homeport.Shared.Authentication.GatewayTokens.MaximumLifetime -> System.TimeSpan

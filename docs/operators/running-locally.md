@@ -18,6 +18,8 @@ installation the operator brings their own identity provider.
 - For the AppHost: the .NET 10 SDK, and a trusted development certificate
   (`dotnet dev-certs https --trust`, once per machine)
 - For Compose: a shell with `openssl` — on Windows, Git Bash
+- On Windows: Smart App Control switched off; see
+  [Smart App Control](#smart-app-control)
 
 ## With the AppHost
 
@@ -197,6 +199,7 @@ token="$(curl -s \
   -d grant_type=client_credentials \
   -d client_id=local-client \
   -d "client_secret=${secret}" \
+  -d scope=echo.invoke \
   http://localhost:8080/realms/homeport/protocol/openid-connect/token \
   | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')"
 docker compose port gateway 8080      # prints 0.0.0.0:<port>
@@ -220,3 +223,34 @@ docker compose down
 After pulling changes to the gateway, the registry or Echo, rebuild its image
 before starting. When `.env.example` gains a variable after an update, add it to
 `.env` the same way before starting.
+
+## Smart App Control
+
+On Windows 11, Smart App Control blocks every DLL that is neither signed nor
+known to Microsoft, and a build of Homeport loads several, its own included.
+A service then fails at start, or a test project finds no tests, with:
+
+```text
+System.IO.FileLoadException: Could not load file or assembly '…\Npgsql.OpenTelemetry.dll'.
+Eine Anwendungssteuerungsrichtlinie hat diese Datei blockiert. (0x800711C7)
+```
+
+In English the message reads "An Application Control policy has blocked this
+file". Check whether Smart App Control is on, in PowerShell:
+
+```powershell
+Get-ItemPropertyValue 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' VerifiedAndReputablePolicyState
+```
+
+`1` means it is on, `2` that it only evaluates, `0` that it is off. While it
+evaluates, Windows may switch it on by itself. The block is logged in the
+event log `Microsoft-Windows-CodeIntegrity/Operational` with the ids `3033`
+and `3077`, naming the DLL.
+
+Smart App Control knows no exception for a file or a folder: on a machine
+that builds Homeport it has to be off. Switch it off under Windows Security →
+App & browser control → Smart App Control settings. Since the cumulative
+update KB5083769 of April 2026 it can be switched on again in the same place,
+although the dialog may still warn that only a reinstall can; on older builds
+the warning holds. Another application control policy, such as one your
+organisation sets through WDAC, needs an exception from whoever manages it.

@@ -5,13 +5,12 @@ using System.Text;
 using System.Text.Json;
 using Homeport.Sdk;
 using Homeport.Shared.Client.ModuleContract;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Homeport.Modules.Echo.Api.Tests.Integration;
 
 public sealed class ProgramTests
 {
-    public sealed class Main(WebApplicationFactory<Program> echo) : IClassFixture<WebApplicationFactory<Program>>
+    public sealed class Main(EchoBehindGateway echo) : IClassFixture<EchoBehindGateway>
     {
         [Fact]
         public async Task Serves_A_Manifest_With_Contract_Version_0()
@@ -45,6 +44,17 @@ public sealed class ProgramTests
                 root.GetProperty("routes")[1].GetRawText());
         }
 
+        [Fact]
+        public async Task Declares_The_Caller_Route_With_Its_Scope_And_Meter()
+        {
+            var response = await echo.CreateClient().GetStringAsync("/.well-known/homeport/manifest");
+
+            var root = JsonDocument.Parse(response).RootElement;
+            Assert.Equal(
+                """{"method":"GET","path":"/v1/caller","scope":"echo.invoke","meter":"requests","quantity":1}""",
+                root.GetProperty("routes")[2].GetRawText());
+        }
+
         [Theory]
         [InlineData("/health/live")]
         [InlineData("/health/ready")]
@@ -73,6 +83,38 @@ public sealed class ProgramTests
             var response = await echo.CreateClient().PostAsync("/v1/echo", content);
 
             Assert.Equal("text/plain; charset=utf-8", response.Content.Headers.ContentType?.ToString());
+        }
+
+        [Fact]
+        public async Task Answers_A_Request_Without_A_Token_As_An_Unauthorized_Problem()
+        {
+            using var content = new StringContent("hello", Encoding.UTF8, "text/plain");
+
+            var response = await echo.CreateAnonymousClient().PostAsync("/v1/echo", content);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        }
+
+        [Fact]
+        public async Task Answers_A_Caller_Without_Echo_Invoke_As_A_Forbidden_Problem()
+        {
+            using var content = new StringContent("hello", Encoding.UTF8, "text/plain");
+
+            var response = await echo.CreateClient(scopes: "usage.read").PostAsync("/v1/echo", content);
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        }
+
+        [Fact]
+        public async Task Returns_The_Caller_The_Module_Token_Names()
+        {
+            var response = await echo.CreateClient("echo.invoke usage.read").GetStringAsync("/v1/caller");
+
+            Assert.Equal(
+                $$"""{"tenantId":"{{StandInGateway.TenantId}}","clientId":"{{StandInGateway.ClientId}}","subject":"{{StandInGateway.Subject}}","scopes":["echo.invoke","usage.read"]}""",
+                response);
         }
 
         [Fact]
@@ -153,10 +195,7 @@ public sealed class ProgramTests
         [Fact]
         public async Task Leaves_Out_The_Authorization_Header()
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, "/v1/request");
-            request.Headers.Add("Authorization", "Bearer secret");
-
-            var response = await echo.CreateClient().SendAsync(request);
+            var response = await echo.CreateClient().GetAsync("/v1/request");
 
             var headers = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("headers");
             Assert.False(headers.TryGetProperty("authorization", out _));

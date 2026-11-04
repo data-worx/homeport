@@ -51,6 +51,7 @@ public sealed class Program
         builder.Services.AddReverseProxy()
             .LoadFromMemory([], [])
             .AddTransforms<HomeportHeaders>()
+            .AddTransforms<ModuleTokens>()
             .AddTransforms<ModuleErrors>();
         builder.Services.AddHostedService<RouteTablePoller>();
 
@@ -85,9 +86,10 @@ public sealed class Program
             var additionalKeyId = string.IsNullOrWhiteSpace(signing.AdditionalKeyId) ? NoAdditionalKey : signing.AdditionalKeyId;
             var clients = app.Services.GetRequiredService<IOptions<ClientAuthenticationOptions>>().Value;
             var controlPlane = app.Services.GetRequiredService<IOptions<ControlPlaneOptions>>().Value;
+            var moduleTokens = app.Services.GetRequiredService<IOptions<ModuleTokenOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
@@ -95,8 +97,10 @@ public sealed class Program
                 clients.Authority,
                 clients.Audience,
                 clients.ClientIdClaim,
+                clients.ScopeClaim,
                 controlPlane.Url,
-                controlPlane.ClientCacheLifetime);
+                controlPlane.ClientCacheLifetime,
+                moduleTokens.Lifetime);
         });
     }
 }

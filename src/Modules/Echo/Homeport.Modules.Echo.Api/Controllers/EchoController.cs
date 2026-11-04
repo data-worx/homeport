@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net.Mime;
+using Homeport.Sdk;
 using Homeport.Shared.Client.Modules.Echo.V1;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,26 +11,22 @@ using Microsoft.Net.Http.Headers;
 
 namespace Homeport.Modules.Echo.Api.Controllers;
 
-/// <summary>Returns whatever it is sent.</summary>
-/// <remarks>
-/// Anonymous until the module validates the gateway's token, which comes
-/// with #47 ("issue module tokens and check scopes"); it then requires
-/// <see cref="EchoManifest.InvokeScope"/>.
-/// </remarks>
+/// <summary>Returns whatever it is sent. Every action requires <see cref="EchoManifest.InvokeScope"/>.</summary>
 [ApiController]
+[Authorize(Policy = EchoManifest.InvokeScope)]
 public sealed class EchoController : ControllerBase
 {
     // The operation ids of the OpenAPI document. A client generator names its
     // methods after them, so they stay stable when an action is renamed.
     private const string EchoOperation = "echo";
     private const string GetRequestOperation = "getRequest";
+    private const string GetCallerOperation = "getCaller";
 
     /// <summary>Returns the request body unchanged.</summary>
     /// <remarks>The response carries the content type of the request.</remarks>
     /// <response code="200">The request body.</response>
     /// <response code="400">The request has no body.</response>
     [HttpPost(EchoManifest.EchoPath, Name = EchoOperation)]
-    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
     public IActionResult Echo()
@@ -50,12 +47,11 @@ public sealed class EchoController : ControllerBase
     /// <summary>Returns the headers of the request as Echo received it.</summary>
     /// <remarks>
     /// A caller sees what the gateway forwards. <c>Authorization</c> is left
-    /// out: once the gateway signs module tokens, it carries one, and a token
-    /// is never sent back.
+    /// out: it carries the gateway's module token, and a token is never sent
+    /// back.
     /// </remarks>
     /// <response code="200">The headers Echo received.</response>
     [HttpGet(EchoManifest.RequestPath, Name = GetRequestOperation)]
-    [AllowAnonymous]
     [ProducesResponseType<ReceivedRequestResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     public ActionResult<ReceivedRequestResponse> Received()
     {
@@ -64,5 +60,16 @@ public sealed class EchoController : ControllerBase
             .ToDictionary(header => header.Key.ToLowerInvariant(), header => header.Value.ToString());
 
         return new ReceivedRequestResponse(headers);
+    }
+
+    /// <summary>Returns who called, as the gateway's module token names the caller.</summary>
+    /// <response code="200">The tenant, client, subject and scopes of the caller.</response>
+    [HttpGet(EchoManifest.CallerPath, Name = GetCallerOperation)]
+    [ProducesResponseType<CallerResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    public ActionResult<CallerResponse> Caller()
+    {
+        var caller = HomeportCaller.From(User);
+
+        return new CallerResponse(caller.TenantId, caller.ClientId, caller.Subject, caller.Scopes);
     }
 }

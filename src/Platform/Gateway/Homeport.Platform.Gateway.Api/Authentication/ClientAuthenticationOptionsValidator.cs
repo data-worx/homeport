@@ -26,6 +26,11 @@ internal sealed class ClientAuthenticationOptionsValidator : IValidateOptions<Cl
             failures.Add($"{ClientAuthenticationOptions.SectionName}:{nameof(options.ClientIdClaim)} must name the claim that carries the client id.");
         }
 
+        if (string.IsNullOrWhiteSpace(options.ScopeClaim))
+        {
+            failures.Add($"{ClientAuthenticationOptions.SectionName}:{nameof(options.ScopeClaim)} must name the claim that carries the scopes.");
+        }
+
         return failures.Count == 0 ? ValidateOptionsResult.Success : ValidateOptionsResult.Fail(failures);
     }
 }

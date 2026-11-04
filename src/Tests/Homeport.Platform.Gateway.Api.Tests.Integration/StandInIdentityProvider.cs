@@ -21,6 +21,13 @@ internal sealed class StandInIdentityProvider : IAsyncDisposable
 
     internal const string ClientIdClaim = "azp";
 
+    /// <summary>The scopes every token grants unless a test asks for others.</summary>
+    internal const string DefaultScopes = "echo.invoke usage.read";
+
+    private const string ScopeClaim = "scope";
+
+    private const string SubjectPrefix = "service-account-";
+
     private const string LocalAddress = "http://127.0.0.1:0";
 
     private const string MetadataPath = "/.well-known/openid-configuration";
@@ -50,11 +57,18 @@ internal sealed class StandInIdentityProvider : IAsyncDisposable
         return provider;
     }
 
-    /// <summary>A token of <paramref name="clientId"/> for <see cref="Audience"/>, signed with this provider's key.</summary>
-    internal string Issue(string clientId)
+    /// <summary>
+    /// A token of <paramref name="clientId"/> for <see cref="Audience"/>, signed
+    /// with this provider's key, with the subject <see cref="SubjectOf"/> and
+    /// <paramref name="scopes"/>.
+    /// </summary>
+    internal string Issue(string clientId, string scopes = DefaultScopes)
     {
-        return Sign(clientId, Issuer, Audience, new ECDsaSecurityKey(key) { KeyId = KeyId });
+        return Sign(clientId, Issuer, Audience, new ECDsaSecurityKey(key) { KeyId = KeyId }, scopes);
     }
+
+    /// <summary>The subject of the tokens of <paramref name="clientId"/>.</summary>
+    internal static string SubjectOf(string clientId) => SubjectPrefix + clientId;
 
     /// <summary>A token like <see cref="Issue"/>, but signed with a key the provider does not publish.</summary>
     internal string IssueWithForeignKey(string clientId)
@@ -86,13 +100,14 @@ internal sealed class StandInIdentityProvider : IAsyncDisposable
         key.Dispose();
     }
 
-    private static string Sign(string? clientId, string issuer, string audience, ECDsaSecurityKey signingKey)
+    private static string Sign(string? clientId, string issuer, string audience, ECDsaSecurityKey signingKey, string scopes = DefaultScopes)
     {
         var now = TimeProvider.System.GetUtcNow().UtcDateTime;
-        var claims = new ClaimsIdentity();
+        var claims = new ClaimsIdentity([new Claim(ScopeClaim, scopes)]);
         if (clientId is not null)
         {
             claims.AddClaim(new Claim(ClientIdClaim, clientId));
+            claims.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, SubjectOf(clientId)));
         }
 
         return new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor

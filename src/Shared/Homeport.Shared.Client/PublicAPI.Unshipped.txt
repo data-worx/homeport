@@ -107,3 +107,21 @@ static Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.operator !
 static Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.operator ==(Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? left, Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? right) -> bool
 static Homeport.Shared.Client.Problems.ProblemResponse.operator !=(Homeport.Shared.Client.Problems.ProblemResponse? left, Homeport.Shared.Client.Problems.ProblemResponse? right) -> bool
 static Homeport.Shared.Client.Problems.ProblemResponse.operator ==(Homeport.Shared.Client.Problems.ProblemResponse? left, Homeport.Shared.Client.Problems.ProblemResponse? right) -> bool
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.<Clone>$() -> Homeport.Shared.Client.Modules.Echo.V1.CallerResponse!
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.CallerResponse(System.Guid TenantId, string! ClientId, string! Subject, System.Collections.Generic.IReadOnlyList<string!>! Scopes) -> void
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.ClientId.get -> string!
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.ClientId.init -> void
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.Deconstruct(out System.Guid TenantId, out string! ClientId, out string! Subject, out System.Collections.Generic.IReadOnlyList<string!>! Scopes) -> void
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.Equals(Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? other) -> bool
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.Scopes.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.Scopes.init -> void
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.Subject.get -> string!
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.Subject.init -> void
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.TenantId.get -> System.Guid
+Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.TenantId.init -> void
+override Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.ToString() -> string!
+static Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.operator !=(Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? left, Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? right) -> bool
+static Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.operator ==(Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? left, Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? right) -> bool

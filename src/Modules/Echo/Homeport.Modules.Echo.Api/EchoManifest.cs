@@ -14,6 +14,9 @@ internal static class EchoManifest
     /// <summary>The route that returns the headers of the request as Echo received it.</summary>
     internal const string RequestPath = "/v1/request";
 
+    /// <summary>The route that returns who called, as the module token names the caller.</summary>
+    internal const string CallerPath = "/v1/caller";
+
     /// <summary>The scope a caller needs for every route of Echo.</summary>
     internal const string InvokeScope = "echo.invoke";
 
@@ -29,6 +32,7 @@ internal static class EchoManifest
             [
                 new ManifestRoute(HttpMethods.Post, EchoPath, InvokeScope, RequestsMeter, Quantity: 1),
                 new ManifestRoute(HttpMethods.Get, RequestPath, InvokeScope, RequestsMeter, Quantity: 1),
+                new ManifestRoute(HttpMethods.Get, CallerPath, InvokeScope, RequestsMeter, Quantity: 1),
             ],
             Scopes: [InvokeScope],
             Meters: [RequestsMeter]);

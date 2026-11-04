@@ -12,6 +12,10 @@ with the OAuth 2.0 client-credentials grant, and send it to the gateway.
   Homeport.
 - **The audience or scope** that makes the identity provider issue a token
   for Homeport, if it needs one.
+- **The scopes your client may get.** Every route of a module requires one
+  scope, which the module's manifest names, such as `echo.invoke`. Some
+  providers grant a client its scopes by default; others issue a scope only
+  when the token request asks for it with `scope`.
 
 ## Getting the token
 
@@ -43,6 +47,7 @@ The gateway checks the token on every call:
 |---|---|---|
 | `401` | [`unauthorized`](../reference/problems/unauthorized.md) | No token, or one that is expired, signed by another issuer or meant for another audience |
 | `403` | [`unknown-client`](../reference/problems/unknown-client.md) | The token is valid, but its client is not mapped to a tenant |
+| `403` | [`insufficient-scope`](../reference/problems/insufficient-scope.md) | The client is known, but the token lacks the scope the route requires |
 | `503` | [`control-plane-unavailable`](../reference/problems/control-plane-unavailable.md) | The gateway could not look the client up; retry later |
 
 A `401` or `403` from the gateway means the request never reached the module.
@@ -51,7 +56,8 @@ A `401` or `403` from the gateway means the request never reached the module.
 
 With Homeport running locally ([running Homeport locally](../operators/running-locally.md)),
 Keycloak plays the identity provider. Its realm `homeport` has the client
-`local-client`, which the control plane maps to the local tenant. Its secret
+`local-client`, which the control plane maps to the local tenant. It gets
+`echo.invoke` only when the token request asks for it. Its secret
 is the AppHost parameter `local-client-secret`; with Docker Compose it is
 `LOCAL_CLIENT_SECRET` in `deploy/compose/.env`.
 
@@ -65,6 +71,7 @@ token="$(curl -s \
   -d grant_type=client_credentials \
   -d client_id=local-client \
   -d "client_secret=${secret}" \
+  -d scope=echo.invoke \
   http://localhost:8080/realms/homeport/protocol/openid-connect/token \
   | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')"
 curl -s -X POST \
@@ -78,4 +85,5 @@ curl -s -X POST \
 {"hello":"Homeport"}
 ```
 
-The same call without the `Authorization` header is answered with `401`.
+The same call without the `Authorization` header is answered with `401`,
+and with a token requested without `scope=echo.invoke` with `403`.

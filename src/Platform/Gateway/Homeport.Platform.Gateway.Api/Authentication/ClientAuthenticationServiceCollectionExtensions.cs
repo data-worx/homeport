@@ -10,7 +10,10 @@ namespace Homeport.Platform.Gateway.Api.Authentication;
 /// <summary>Wires how the gateway authenticates the clients that call modules (ADR-0006).</summary>
 internal static class ClientAuthenticationServiceCollectionExtensions
 {
-    /// <summary>The policy every module route requires: a valid token of a client the control plane knows.</summary>
+    /// <summary>
+    /// The policy every module route requires: a valid token of a client the
+    /// control plane knows, granting the scope the route declares.
+    /// </summary>
     internal const string ClientPolicy = "client";
 
     /// <summary>
@@ -27,6 +30,7 @@ internal static class ClientAuthenticationServiceCollectionExtensions
         services.AddSingleton<IValidateOptions<ClientAuthenticationOptions>, ClientAuthenticationOptionsValidator>();
         services.AddSingleton<ClientTokenEvents>();
         services.AddSingleton<IAuthorizationHandler, KnownClientHandler>();
+        services.AddSingleton<IAuthorizationHandler, RouteScopeHandler>();
 
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
             .Configure<IOptions<ClientAuthenticationOptions>>((bearer, client) =>
@@ -42,7 +46,7 @@ internal static class ClientAuthenticationServiceCollectionExtensions
         services.AddAuthorizationBuilder()
             .AddPolicy(ClientPolicy, policy => policy
                 .RequireAuthenticatedUser()
-                .AddRequirements(new KnownClientRequirement()));
+                .AddRequirements(new KnownClientRequirement(), new RouteScopeRequirement()));
 
         return services;
     }

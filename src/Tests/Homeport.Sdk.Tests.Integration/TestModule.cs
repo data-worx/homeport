@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Net.Http.Headers;
 using Homeport.Shared.Client.ModuleContract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
@@ -16,12 +17,14 @@ namespace Homeport.Sdk.Tests.Integration;
 /// </summary>
 internal static class TestModule
 {
+    internal const string WriteScope = "things.write";
+
     internal static readonly ModuleManifest Manifest = new(
         Id: "things",
         Name: "Things",
         Version: "1.2.3",
-        Routes: [new ManifestRoute("POST", "/v1/things", "things.write", "requests", 2)],
-        Scopes: ["things.write"],
+        Routes: [new ManifestRoute("POST", "/v1/things", WriteScope, "requests", 2)],
+        Scopes: [WriteScope],
         Meters: ["requests"]);
 
     internal static WebApplicationBuilder CreateBuilder(ModuleManifest manifest)
@@ -35,6 +38,21 @@ internal static class TestModule
         builder.Services.AddOpenApi();
 
         return builder;
+    }
+
+    /// <summary>The module, accepting the module tokens of <paramref name="gateway"/>.</summary>
+    internal static Task<WebApplication> StartAsync(StandInGateway gateway)
+    {
+        return StartAsync(configure: builder => builder.Configuration["GatewayTokens:JwksUri"] = gateway.JwksUri);
+    }
+
+    /// <summary>Sends a GET to <paramref name="path"/> of <paramref name="app"/> with <paramref name="token"/>.</summary>
+    internal static Task<HttpResponseMessage> GetAsync(WebApplication app, string path, string token)
+    {
+        var client = app.GetTestClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        return client.GetAsync(path);
     }
 
     internal static async Task<WebApplication> StartAsync(ILoggerProvider? logs = null, Action<WebApplicationBuilder>? configure = null)

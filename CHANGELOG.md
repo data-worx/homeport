@@ -105,3 +105,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reachable from the host at `localhost:8080`. See
   [obtaining a token](docs/api-consumers/obtaining-a-token.md) and
   [connecting an identity provider](docs/operators/identity-provider.md).
+- Modules trust the gateway's token and nothing else. For every request it
+  forwards, the gateway replaces the client's token with a short-lived token
+  of its own — audience the module id, claims tenant, client, subject and
+  scopes, 60 s by default — so the client's credential never reaches a module
+  and reaching the internal network no longer lets anyone act as a tenant.
+  The gateway also checks the scope each route declares in the manifest and
+  answers a token without it with `403` `insufficient-scope`. Modules built
+  with the SDK reject every request without a valid module token with `401`,
+  get a policy per scope of the manifest and read the caller with
+  `HomeportCaller`. Echo now requires `echo.invoke` and gains `GET /v1/caller`;
+  the local Keycloak client gets `echo.invoke` only when the token request
+  asks for it. See [the module token](docs/module-developers/module-token.md)
+  and [connecting an identity provider](docs/operators/identity-provider.md).

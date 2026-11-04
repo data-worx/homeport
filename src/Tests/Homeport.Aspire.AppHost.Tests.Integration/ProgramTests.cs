@@ -2,10 +2,12 @@
 
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
+using Homeport.Shared.Client.Modules.Echo.V1;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Homeport.Aspire.AppHost.Tests.Integration;
@@ -91,6 +93,53 @@ public sealed class ProgramTests
             var response = await unmapped.PostAsync("/modules/echo/v1/echo", content);
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Reaches_Echo_With_A_Module_Token_For_The_Seeded_Tenant_And_Client()
+        {
+            var gateway = await Gateway();
+
+            var caller = await gateway.GetFromJsonAsync<CallerResponse>("/modules/echo/v1/caller");
+
+            Assert.Equal(Guid.Parse("3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61"), caller?.TenantId);
+            Assert.Equal(RunningAppHost.SeededClient.ClientId, caller?.ClientId);
+        }
+
+        [Fact]
+        public async Task Answers_A_Request_Sent_To_Echo_Without_The_Gateway_With_Unauthorized()
+        {
+            await Gateway();
+            var echo = appHost.App.CreateHttpClient("echo");
+            using var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+            var response = await echo.PostAsync("/v1/echo", content);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Answers_A_Client_Without_Echo_Invoke_With_Forbidden()
+        {
+            await Gateway();
+            var unscoped = appHost.App.CreateHttpClient("gateway");
+            unscoped.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await appHost.TokenAsync(RunningAppHost.SeededClient));
+            using var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+            var response = await unscoped.PostAsync("/modules/echo/v1/echo", content);
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Passes_No_Header_With_The_Identity_Provider_Token_To_Echo()
+        {
+            var gateway = await Gateway();
+            var token = gateway.DefaultRequestHeaders.Authorization!.Parameter!;
+
+            var received = await gateway.GetFromJsonAsync<ReceivedRequestResponse>(RunningAppHost.EchoRequestPath);
+
+            Assert.DoesNotContain(received!.Headers.Values, value => value.Contains(token, StringComparison.Ordinal));
         }
 
         private Task<HttpClient> Gateway() => appHost.GatewayRoutingEchoAsync();

@@ -86,11 +86,24 @@ running instance, so instances of one module never replace each other.
 - Modules are reachable only through the gateway, on the internal network.
 - The gateway strips every incoming `X-Homeport-*` header.
 - Every request carries a short-lived token signed by the gateway, as a bearer
-  token in `Authorization`:
-  - audience: the module `id`
-  - claims: tenant, client, subject and scopes
+  token in `Authorization`. The caller's own token never reaches the module.
+  The module token is a JWT signed with ES256, with these claims:
+
+  | Claim | Value |
+  |---|---|
+  | `iss` | `homeport-gateway` |
+  | `aud` | The module `id` |
+  | `sub` | The subject of the caller's token; the client id where it has none |
+  | `tenant_id` | The tenant the client acts for, a UUID |
+  | `client_id` | The client id as the identity provider issued it |
+  | `scope` | The scopes the caller's token grants, space-delimited |
+  | `iat`, `nbf`, `exp` | Issued, valid from, expires; 60 s by default, at most 5 minutes |
+
+- The gateway forwards a request only when the caller's token grants the
+  `scope` its route declares; it answers every other with `403`.
 - The module validates the token against the gateway's JWKS, served at
-  `/.well-known/jwks.json`, and rejects a request without a valid token.
+  `/.well-known/jwks.json`, and rejects a request without a valid token
+  with `401`, except on the manifest, OpenAPI and health endpoints.
   The token is the only identity source the module may trust; it authorises
   per endpoint from the claims.
 - The module never talks to the identity provider.

@@ -79,6 +79,28 @@ public sealed class ProgramTests
         }
 
         [Fact]
+        public async Task Replaces_The_Client_Token_With_A_Module_Token()
+        {
+            var forwarded = await gateway.CreateClient().GetFromJsonAsync<ForwardedRequest>("/modules/echo/v1/request");
+
+            var token = new JsonWebToken(AuthenticationHeaderValue.Parse(forwarded!.Headers["authorization"]).Parameter);
+            Assert.Equal("homeport-gateway", token.Issuer);
+            Assert.Equal(["echo"], token.Audiences);
+        }
+
+        [Fact]
+        public async Task Names_Tenant_Client_Subject_And_Scopes_In_The_Module_Token()
+        {
+            var forwarded = await gateway.CreateClient().GetFromJsonAsync<ForwardedRequest>("/modules/echo/v1/request");
+
+            var token = new JsonWebToken(AuthenticationHeaderValue.Parse(forwarded!.Headers["authorization"]).Parameter);
+            Assert.Equal(StandInControlPlane.KnownTenantId.ToString(), token.GetClaim("tenant_id").Value);
+            Assert.Equal(StandInControlPlane.KnownClientId, token.GetClaim("client_id").Value);
+            Assert.Equal(StandInIdentityProvider.SubjectOf(StandInControlPlane.KnownClientId), token.Subject);
+            Assert.Equal(StandInIdentityProvider.DefaultScopes, token.GetClaim("scope").Value);
+        }
+
+        [Fact]
         public async Task Keeps_Other_Headers()
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, "/modules/echo/v1/request");
@@ -254,6 +276,30 @@ public sealed class ProgramTests
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
             Assert.Equal(ProblemTypePrefix + "unknown-client", problem["type"]?.GetValue<string>());
             Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Answers_A_Client_Without_The_Route_Scope_As_Insufficient_Scope_Problem()
+        {
+            using var response = await gateway.CreateAnonymousClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.KnownClientId, scopes: "usage.read"))
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal(ProblemTypePrefix + "insufficient-scope", problem["type"]?.GetValue<string>());
+            Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Answers_An_Unknown_Client_Without_The_Route_Scope_As_Unknown_Client_Problem()
+        {
+            using var response = await gateway.CreateAnonymousClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.UnknownClientId, scopes: "usage.read"))
+                .SendAsync(Traced("/modules/echo/v1/request"));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(ProblemTypePrefix + "unknown-client", problem["type"]?.GetValue<string>());
         }
 
         [Fact]

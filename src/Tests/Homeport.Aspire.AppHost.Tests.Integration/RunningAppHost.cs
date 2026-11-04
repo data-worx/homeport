@@ -30,6 +30,9 @@ public sealed class RunningAppHost : IAsyncLifetime
     /// <summary>A Keycloak client the control plane does not know.</summary>
     internal static readonly KeycloakClient UnmappedClient = new("unmapped-client", "unmapped-client-secret");
 
+    /// <summary>The scope Echo's routes require, which the seeded client gets only on request.</summary>
+    internal const string EchoInvokeScope = "echo.invoke";
+
     private const string TokenPath = "/realms/homeport/protocol/openid-connect/token";
 
     /// <summary>
@@ -51,7 +54,8 @@ public sealed class RunningAppHost : IAsyncLifetime
         app ?? throw new InvalidOperationException("The AppHost has not been started.");
 
     /// <summary>
-    /// A client of the gateway with a token of <see cref="SeededClient"/>, once
+    /// A client of the gateway with a token of <see cref="SeededClient"/>
+    /// granting <see cref="EchoInvokeScope"/>, once
     /// Echo, the gateway, Keycloak and the control plane are healthy and the
     /// gateway routes to Echo.
     /// </summary>
@@ -64,14 +68,18 @@ public sealed class RunningAppHost : IAsyncLifetime
         await App.ResourceNotifications.WaitForResourceHealthyAsync("control-plane", timeout.Token);
 
         var gateway = App.CreateHttpClient("gateway");
-        gateway.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await TokenAsync(SeededClient));
+        gateway.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await TokenAsync(SeededClient, EchoInvokeScope));
         await StatusOnceAsync(gateway, status => status != HttpStatusCode.NotFound, RouteTimeout);
 
         return gateway;
     }
 
-    /// <summary>An access token of <paramref name="client"/> from Keycloak, by the client-credentials grant.</summary>
-    internal async Task<string> TokenAsync(KeycloakClient client)
+    /// <summary>
+    /// An access token of <paramref name="client"/> from Keycloak, by the
+    /// client-credentials grant, asking for <paramref name="scope"/> on top of
+    /// the client's default scopes.
+    /// </summary>
+    internal async Task<string> TokenAsync(KeycloakClient client, string? scope = null)
     {
         using var timeout = new CancellationTokenSource(StartTimeout);
         var secret = await App.Services.GetRequiredService<DistributedApplicationModel>().Resources
@@ -80,12 +88,18 @@ public sealed class RunningAppHost : IAsyncLifetime
             .GetValueAsync(timeout.Token);
 
         using var keycloak = App.CreateHttpClient("keycloak");
-        using var request = new FormUrlEncodedContent(new Dictionary<string, string>
+        var form = new Dictionary<string, string>
         {
             ["grant_type"] = "client_credentials",
             ["client_id"] = client.ClientId,
             ["client_secret"] = secret ?? string.Empty,
-        });
+        };
+        if (scope is not null)
+        {
+            form["scope"] = scope;
+        }
+
+        using var request = new FormUrlEncodedContent(form);
         using var response = await keycloak.PostAsync(TokenPath, request, timeout.Token);
         response.EnsureSuccessStatusCode();
 

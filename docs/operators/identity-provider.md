@@ -12,7 +12,12 @@ For every call to a module the gateway
    audience and expiry. Anything else is answered with `401`;
 2. reads the client id from the token and asks the control plane which
    tenant and plan the client belongs to. A client the control plane does
-   not know is answered with `403`.
+   not know is answered with `403`;
+3. checks that the token grants the scope the route declares in the
+   module's manifest. A token without it is answered with `403`;
+4. forwards the request with a token of its own in place of the client's
+   ([ADR-0011](../architecture/adr/0011-gateway-issued-tokens-for-modules.md)).
+   The client's token never reaches the module.
 
 Keycloak in the AppHost and the compose file is for development and tests
 only. Connect your own provider in production.
@@ -24,12 +29,21 @@ only. Connect your own provider in production.
 | `ClientAuthentication:Authority` | `ClientAuthentication__Authority` | — | The issuer of the tokens. The gateway reads the provider's metadata at `<authority>/.well-known/openid-configuration` and its signing keys from there |
 | `ClientAuthentication:Audience` | `ClientAuthentication__Audience` | — | The audience a token must carry. Configure the provider to issue it to Homeport's clients |
 | `ClientAuthentication:ClientIdClaim` | `ClientAuthentication__ClientIdClaim` | `azp` | The claim that carries the client id. Keycloak uses `azp` (and `client_id`); Entra ID uses `azp` in v2 tokens and `appid` in v1 tokens |
+| `ClientAuthentication:ScopeClaim` | `ClientAuthentication__ScopeClaim` | `scope` | The claim that carries the granted scopes, space-delimited or one claim per scope. Keycloak uses `scope`; Entra ID uses `scp` for delegated and `roles` for application permissions |
 | `ClientAuthentication:RequireHttpsMetadata` | `ClientAuthentication__RequireHttpsMetadata` | `true` | Whether the metadata must be fetched over HTTPS. Turn it off only for a development provider without TLS |
 | `ControlPlane:ClientCacheLifetime` | `ControlPlane__ClientCacheLifetime` | `00:01:00` | How long the gateway remembers which tenant a client belongs to, and that a client is unknown |
+| `ModuleTokens:Lifetime` | `ModuleTokens__Lifetime` | `00:01:00` | How long the token the gateway sends a module lives. At most `00:05:00`; the gateway does not start with a longer one |
 
 The gateway does not start without an authority and an audience. Its start
 is logged at Information with the authority, the audience, the client id
-claim and the cache lifetime.
+and scope claims, the cache lifetime and the module token lifetime.
+
+## Scopes
+
+Every route of a module requires one scope, named in the module's manifest
+under `scopes`; Echo's is `echo.invoke`. Create each scope of every module
+you run at your provider, and grant a client the scopes of the routes it may
+call. Homeport does not create them for you.
 
 ## Mapping clients to tenants
 
@@ -52,8 +66,9 @@ and the gateway logs a warning.
 ## What is logged
 
 At Warning, without the token: a rejected token with the reason (the type of
-the validation failure), a token without the client id claim, and a client
-the control plane does not know, with its client id.
+the validation failure), a token without the client id claim, a client the
+control plane does not know, with its client id, and a token without the
+scope of its route, with the scope and the path.
 
 ## Keycloak in development
 
@@ -64,7 +79,8 @@ The AppHost imports the realm in
   `usage.read`;
 - the client the control plane seeds (`local-client` by default, the
   parameter `seed-client-id`), confidential, with only the client-credentials
-  grant, both scopes and the audience `homeport`;
+  grant, the audience `homeport`, `usage.read` by default and `echo.invoke`
+  only when the token request asks for it with `scope=echo.invoke`;
 - the client `unmapped-client`, which the control plane does not know, for
   the tests that expect `403`.
 

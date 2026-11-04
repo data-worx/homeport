@@ -22,6 +22,12 @@ internal static class GatewayProblems
         "The client is not known to Homeport.",
         StatusCodes.Status403Forbidden);
 
+    /// <summary>The client is known, but its token lacks the scope the route declares.</summary>
+    internal static readonly GatewayProblem InsufficientScope = new(
+        "insufficient-scope",
+        "The client's token lacks the scope this route requires.",
+        StatusCodes.Status403Forbidden);
+
     /// <summary>The control plane could not be asked about the client.</summary>
     internal static readonly GatewayProblem ControlPlaneUnavailable = new(
         "control-plane-unavailable",

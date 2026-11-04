@@ -134,8 +134,10 @@ public static class Program
             .WithExternalHttpEndpoints()
             .WithReference(registry);
 
-        // The registry validates the gateway's service tokens against its JWKS.
+        // The registry validates the gateway's service tokens against its JWKS,
+        // and Echo its module tokens.
         registry.WithReference(gateway);
+        echo.WithReference(gateway);
 
         // The control plane: `migrate` applies its migrations as the owner role
         // and seeds one tenant, plan and client; the service starts after it

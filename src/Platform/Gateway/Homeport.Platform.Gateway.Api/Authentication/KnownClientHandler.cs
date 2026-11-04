@@ -9,7 +9,8 @@ namespace Homeport.Platform.Gateway.Api.Authentication;
 /// <summary>
 /// Looks the client of an authenticated request up at the control plane. A
 /// client it does not know fails the requirement, which the gateway answers
-/// with <c>403</c>.
+/// with <c>403</c>. A known client is set as a feature of the request, as the
+/// control plane answered it.
 /// </summary>
 /// <remarks>
 /// A control plane that cannot be asked throws
@@ -40,14 +41,17 @@ internal sealed class KnownClientHandler(
             return;
         }
 
-        var cancellationToken = (context.Resource as HttpContext)?.RequestAborted ?? CancellationToken.None;
-        if (await controlPlane.FindAsync(clientId, cancellationToken) is null)
+        var httpContext = context.Resource as HttpContext;
+        var client = await controlPlane.FindAsync(clientId, httpContext?.RequestAborted ?? CancellationToken.None);
+        if (client is null)
         {
             logger.LogWarning("Client {ClientId} is unknown to the control plane and was refused", clientId);
             context.Fail();
             return;
         }
 
+        // Kept for the module token, which names the client's tenant.
+        httpContext?.Features.Set(client);
         context.Succeed(requirement);
     }
 }
