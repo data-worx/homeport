@@ -26,6 +26,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`module-developers/registering-a-module.md`](module-developers/registering-a-module.md) | Registering a module, heartbeats, rolling updates and two major versions side by side |
 | [`module-developers/module-token.md`](module-developers/module-token.md) | Validating the gateway's module token, requiring a scope per endpoint and reading the caller with `Homeport.Sdk` |
 | [`module-developers/answering-errors.md`](module-developers/answering-errors.md) | Answering errors as Problem Details with `Homeport.Sdk` |
+| [`module-developers/reporting-usage.md`](module-developers/reporting-usage.md) | Reporting how much a request counts with `Homeport.Sdk`, and what the gateway does with the report |
 | [`module-developers/documenting-endpoints.md`](module-developers/documenting-endpoints.md) | Documenting a module's endpoints in its OpenAPI document, and checking it in a test |
 
 ## API consumers — obtaining a token, calling modules, reading usage

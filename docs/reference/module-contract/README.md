@@ -137,4 +137,9 @@ running instance, so instances of one module never replace each other.
 - The gateway records one usage event per request, using the meter and
   quantity of the matched route.
 - A module may report a different quantity with the response header
-  `X-Homeport-Usage: <meter>=<quantity>`.
+  `X-Homeport-Usage: <meter>=<quantity>`, at most one per response. The
+  meter is the one the matched route declares, compared exactly; the
+  quantity is a positive integer in decimal digits, without sign.
+- The gateway removes `X-Homeport-Usage` before the response reaches the
+  caller. A report that breaks a rule above is ignored, and the route's
+  quantity applies.

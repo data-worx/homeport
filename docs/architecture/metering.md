@@ -11,7 +11,8 @@ run it is in [the operators' page](../operators/metering.md).
 1. The gateway forwards a request to a module and answers the client. Then
    it publishes one `UsageRecorded`: a new `eventId`, the tenant and client,
    the module, the **route template** from the manifest (`/v1/orders/{id}`,
-   never the concrete path), the route's meter and quantity, the status the
+   never the concrete path), the route's meter and quantity — or the
+   quantity the module reported for that meter — the status the
    client got, the duration and the trace id.
 2. Wolverine sends it to the fanout exchange `homeport.usage` in RabbitMQ.
 3. RabbitMQ routes it to the durable queue `homeport.metering.usage`.
@@ -22,7 +23,12 @@ run it is in [the operators' page](../operators/metering.md).
 A request the gateway refuses before it reaches a module — `401`, `403`, an
 unknown module — publishes nothing: there is no module request to count and,
 for an unauthenticated one, no tenant to count it for. Every request that
-reaches a module counts with its route's quantity, whatever the status.
+reaches a module counts with its route's quantity, or the one the module
+reported, whatever the status. The gateway takes the report out of the
+module's response while it forwards the headers, before the caller sees
+them, and checks it against the route in its Domain; a report it rejects
+falls back to the route's quantity, so a module's mistake changes how much is
+counted, never whether.
 
 ## What is guaranteed
 

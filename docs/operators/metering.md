@@ -119,6 +119,7 @@ export of usage follows.
 |---|---|---|
 | `homeport.metering.events` | metering | Consumed events; `homeport.metering.outcome` is `recorded` or `duplicate` |
 | `homeport.gateway.usage.dropped` | gateway | Events that never reached the broker; `homeport.gateway.usage.reason` is `retries_exhausted` or `not_published` |
+| `homeport.gateway.usage.rejected` | gateway | Quantities a module reported that were rejected for the route's quantity; `homeport.gateway.usage.reason` is `usage.malformed`, `usage.undeclared-meter` or `usage.invalid-quantity` |
 
 The gateway and metering may start before RabbitMQ accepts connections.
 Wolverine then retries, up to 20 times, and logs each failed attempt at
@@ -126,7 +127,10 @@ Error under `Wolverine.Runtime.WolverineRuntime` as
 `Error trying to start message broker rabbitmq on Attempt 1 of 20`. That is
 not a failure of the service; one that gives up stops.
 
-The gateway logs a dropped event at Warning with its event id, and
+The gateway logs a rejected quantity at Warning with the module, route and
+reason: the module reports usage wrongly and needs fixing, while its requests
+are still counted with the route's quantity. It logs a dropped event at
+Warning with its event id, and
 Wolverine logs every failed send at Error under
 `Wolverine.Transports.Sending`. Metering logs a duplicate at Debug. A
 message metering could not record after its retries stays in
