@@ -31,11 +31,19 @@ forge_issue_list_open() {
     -q '.[] | "\(.number)|\(.labels | map(.name) | join(","))|\(.title)"'
 }
 
-# forge_issue_create <title> <label> <body file> [assignee] -> issue URL
-# The assignee is left off when it is empty, so the issue stays unassigned.
+# forge_issue_create <title> <label> <body file> [assignee] [milestone]
+#   -> issue URL
+# Either is left off when it is empty, so the issue stays unassigned or without
+# a milestone. A milestone without an assignee passes "" as the fourth argument.
 forge_issue_create() {
   gh issue create --title "$1" --label "$2" --body-file "$3" \
-    ${4:+--assignee "$4"}
+    ${4:+--assignee "$4"} ${5:+--milestone "$5"}
+}
+
+# forge_milestones_list -> one open milestone title per line. gh has no
+# milestone command, so this goes through the REST API.
+forge_milestones_list() {
+  gh api --paginate "repos/{owner}/{repo}/milestones?state=open" -q '.[].title'
 }
 
 # forge_issue_view <number> -> "#<n> [<state>] <title>   labels=<a,b>"

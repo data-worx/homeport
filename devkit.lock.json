@@ -1,6 +1,6 @@
 {
   "source": "https://github.com/raisr/devkit",
-  "version": { "commit": "27677c3", "date": "2026-10-30" },
+  "version": { "commit": "df69d59", "date": "2026-11-05" },
   "bootstrappedAt": "2026-10-19",
   "flavors": { "stacks": ["dotnet-core"], "forge": "github" },
   "files": [
@@ -10,8 +10,8 @@
     { "path": ".gitignore", "from": "core/gitignore.block", "mode": "block", "hash": "c82f916f9a1c57f7f7ee55ac949ed0613db652b8", "marker": "devkit:core" },
     { "path": ".claude/skills/commit-message/SKILL.md", "from": "core/skills/commit-message/SKILL.md", "mode": "managed", "hash": "03c47cf906778cfdedaac834644bcefa81d1a58b" },
     { "path": ".claude/skills/commit-message/collect.sh", "from": "core/skills/commit-message/collect.sh", "mode": "managed", "hash": "5b1f3188b10aec8afdddd5788a46f7b749b15768" },
-    { "path": ".claude/skills/create-issue/SKILL.md", "from": "core/skills/create-issue/SKILL.md", "mode": "managed", "hash": "d17beb50d31891d24aba8b8f089505b10615c0b5" },
-    { "path": ".claude/skills/create-issue/context.sh", "from": "core/skills/create-issue/context.sh", "mode": "managed", "hash": "73696038236609737f68c2b57b05466200a226d8" },
+    { "path": ".claude/skills/create-issue/SKILL.md", "from": "core/skills/create-issue/SKILL.md", "mode": "managed", "hash": "c5d0e36cd1446755bccf8af7283c422077782ca6" },
+    { "path": ".claude/skills/create-issue/context.sh", "from": "core/skills/create-issue/context.sh", "mode": "managed", "hash": "ded3af16487f6d73f3f194e8bd8e2ee98b9a61ba" },
     { "path": ".claude/skills/devkit-sync/SKILL.md", "from": "core/skills/devkit-sync/SKILL.md", "mode": "managed", "hash": "4b6b3b61c2e5ebc12d9f4e3d5362f411e7d3d0b6" },
     { "path": ".claude/skills/devkit-sync/collect.sh", "from": "core/skills/devkit-sync/collect.sh", "mode": "managed", "hash": "efaef9b8fa461de31fee558e8276fa6a2ff4f0b4" },
     { "path": ".claude/skills/implement-feature/SKILL.md", "from": "core/skills/implement-feature/SKILL.md", "mode": "managed", "hash": "9a8c6b96aaa43daf288a3cfc1f951e121b260d0e" },
@@ -37,12 +37,12 @@
     { "path": "src/Tests/Architecture.Tests/Architecture.Tests.csproj", "from": "stacks/dotnet-core/templates/Architecture.Tests/Architecture.Tests.csproj", "mode": "template", "hash": "72dc7dcf73ba81d180eedef48bd56bb866a64a6a" },
     { "path": "src/Tests/Architecture.Tests/DomainExceptions.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/DomainExceptions.cs", "mode": "template", "hash": "4b5020de5a485b7c148df1a9dba4359ac5c3e0c6" },
     { "path": "src/Tests/Architecture.Tests/LayoutTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/LayoutTests.cs", "mode": "template", "hash": "2660492ff94dd144dffb3c67fe73fdb773d2aa4e" },
-    { "path": "src/Tests/Architecture.Tests/ProjectFile.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectFile.cs", "mode": "template", "hash": "36ccca81e9d913f05e1e769397c4aac63b425b48" },
+    { "path": "src/Tests/Architecture.Tests/ProjectFile.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectFile.cs", "mode": "template", "hash": "13bd347712cac8fba03a6c9a3cbf6dcc57ad5487" },
     { "path": "src/Tests/Architecture.Tests/ProjectLocation.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ProjectLocation.cs", "mode": "template", "hash": "84c780bb9aa3eda22f8d47dafb501c924f41567f" },
     { "path": "src/Tests/Architecture.Tests/ReferenceTests.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/ReferenceTests.cs", "mode": "template", "hash": "d2bd5b221cf567f32ba7def9db32eb47c987f4a2" },
     { "path": "src/Tests/Architecture.Tests/SolutionTree.cs", "from": "stacks/dotnet-core/templates/Architecture.Tests/SolutionTree.cs", "mode": "template", "hash": "d4e63b976eddedee94ca30cdbeed3e296732c2ca" },
-    { "path": "AGENTS.github.md", "from": "forges/github/AGENTS.github.md", "mode": "managed", "hash": "8d8962de643dc0365a82ef5763c1e249b90b7801" },
-    { "path": ".devkit/forge.sh", "from": "forges/github/forge.sh", "mode": "managed", "hash": "21ca6807048f1d3425bddce6f972d53dce1bd47b" }
+    { "path": "AGENTS.github.md", "from": "forges/github/AGENTS.github.md", "mode": "managed", "hash": "2e7f333332f4691702c33ec46d156d998fc618e9" },
+    { "path": ".devkit/forge.sh", "from": "forges/github/forge.sh", "mode": "managed", "hash": "5efc7771b7bb46460847940a24f95ab3f0d635d8" }
   ],
   "deviations": []
 }

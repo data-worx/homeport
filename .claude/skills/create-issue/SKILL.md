@@ -22,7 +22,8 @@ bash .claude/skills/create-issue/context.sh
 
 You get the forge and workflow mode, who a new ticket is assigned to, that the
 CLI is authenticated and against which project, which of the six type labels
-exist, and the open tickets so a near-duplicate can be spotted before filing.
+exist, the open milestones, and the open tickets so a near-duplicate can be
+spotted before filing.
 
 Under `WORKFLOW: light` a ticket is not required. Say so once, and ask whether
 the user wants one anyway — sometimes they do, and that is fine.
@@ -64,6 +65,11 @@ blocked lists the first, never the second. A blocker in this repository is its
 number; one elsewhere is `<owner>/<repo>#<n>` (`<group>/<project>#<n>` on
 GitLab). None is a valid answer.
 
+Ask for the **milestone** too, unless the user already named one. It is one of
+the titles `context.sh` listed, spelled exactly as listed — a title that does
+not exist fails the filing. None is a valid answer and the default; never pick
+one because it looks current.
+
 ## 3. Present and wait
 
 Show the full title and body in the chat, and below them the blockers:
@@ -72,8 +78,9 @@ Show the full title and body in the chat, and below them the blockers:
 |---|---|
 | #12 | feat: add the export endpoint |
 
-or the line *Blocked by: none*. Create nothing on less than a clear yes. If the
-user wants changes, redraft and show again.
+or the line *Blocked by: none*. Then the line *Milestone: <title>*, or
+*Milestone: none*. Create nothing on less than a clear yes. If the user wants
+changes, redraft and show again.
 
 ## 4. File it
 
@@ -81,13 +88,16 @@ Write the approved body to a temporary file, then:
 
 ```bash
 . .devkit/config.sh && . .devkit/forge.sh
-forge_issue_create "<type>: <summary>" "<type>" /path/to/body.md [<assignee>]
+forge_issue_create "<type>: <summary>" "<type>" /path/to/body.md [<assignee>] [<milestone>]
 ```
 
 The fourth argument is the `ISSUE_ASSIGNEE` that `context.sh` printed. When it
 printed `none`, leave the argument off: the ticket stays unassigned, as
 `forge.issues` prescribes. It is `DEVKIT_ASSIGN_ISSUES` in `.devkit/config.sh`
 that turns assignment on, never a guess made while filing.
+
+The fifth argument is the approved milestone title. Without one, leave it off;
+with one but no assignee, pass `""` as the fourth.
 
 Then set each approved blocker on the new ticket:
 
@@ -109,6 +119,7 @@ If a type label is missing, `context.sh` said so. Create it with
 ## 5. Report back
 
 - the ticket number and its URL
+- the milestone it was filed under, if any
 - each blocker that was set, and any that was only linked as related or failed
 - the branch name to use: `fix/<n>-<slug>` for a `fix` ticket, otherwise
   `feature/<n>-<slug>`

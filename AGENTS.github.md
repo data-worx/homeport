@@ -93,6 +93,8 @@ Plus the external-system signature from `core.signature`.
   asked for. A repository asks for an assignee once, with
   `DEVKIT_ASSIGN_ISSUES=yes` in `.devkit/config.sh`; every new ticket then goes
   to `DEVKIT_ASSIGNEE`.
+- A milestone is set when it is named while the ticket is drafted, never
+  chosen on the drafter's own judgement. It is set at filing, not added later.
 - Check the open issues for a near-duplicate before filing.
 - Dependencies are part of filing: every ticket that must be done first is set
   as a native *blocked by* link right after the issue is created. Only the
