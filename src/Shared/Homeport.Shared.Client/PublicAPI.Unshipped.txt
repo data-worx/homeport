@@ -127,3 +127,27 @@ override Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.GetHashCode() -> 
 override Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.ToString() -> string!
 static Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.operator !=(Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? left, Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? right) -> bool
 static Homeport.Shared.Client.Modules.Echo.V1.CallerResponse.operator ==(Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? left, Homeport.Shared.Client.Modules.Echo.V1.CallerResponse? right) -> bool
+Homeport.Shared.Client.Modules.Echo.V1.BatchResponse
+Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.<Clone>$() -> Homeport.Shared.Client.Modules.Echo.V1.BatchResponse!
+Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.BatchResponse(System.Collections.Generic.IReadOnlyList<System.Text.Json.JsonElement>! Items) -> void
+Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.Deconstruct(out System.Collections.Generic.IReadOnlyList<System.Text.Json.JsonElement>! Items) -> void
+Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.Equals(Homeport.Shared.Client.Modules.Echo.V1.BatchResponse? other) -> bool
+Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.Items.get -> System.Collections.Generic.IReadOnlyList<System.Text.Json.JsonElement>!
+Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.Items.init -> void
+Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest
+Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.<Clone>$() -> Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest!
+Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.Deconstruct(out System.Collections.Generic.IReadOnlyList<System.Text.Json.JsonElement>! Items) -> void
+Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.EchoBatchRequest(System.Collections.Generic.IReadOnlyList<System.Text.Json.JsonElement>! Items) -> void
+Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.Equals(Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? other) -> bool
+Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.Items.get -> System.Collections.Generic.IReadOnlyList<System.Text.Json.JsonElement>!
+Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.Items.init -> void
+override Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.ToString() -> string!
+override Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.ToString() -> string!
+static Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.operator !=(Homeport.Shared.Client.Modules.Echo.V1.BatchResponse? left, Homeport.Shared.Client.Modules.Echo.V1.BatchResponse? right) -> bool
+static Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.operator ==(Homeport.Shared.Client.Modules.Echo.V1.BatchResponse? left, Homeport.Shared.Client.Modules.Echo.V1.BatchResponse? right) -> bool
+static Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.operator !=(Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? left, Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? right) -> bool
+static Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.operator ==(Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? left, Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? right) -> bool

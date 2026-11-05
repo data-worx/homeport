@@ -11,6 +11,12 @@ internal static class EchoManifest
     /// <summary>The route that returns the request body unchanged.</summary>
     internal const string EchoPath = "/v1/echo";
 
+    /// <summary>The route that returns a batch of items unchanged and counts one per item.</summary>
+    internal const string BatchPath = "/v1/echo/batch";
+
+    /// <summary>The meter a batch is counted in, one per item.</summary>
+    internal const string ItemsMeter = "items";
+
     /// <summary>The route that returns the headers of the request as Echo received it.</summary>
     internal const string RequestPath = "/v1/request";
 
@@ -33,8 +39,9 @@ internal static class EchoManifest
                 new ManifestRoute(HttpMethods.Post, EchoPath, InvokeScope, RequestsMeter, Quantity: 1),
                 new ManifestRoute(HttpMethods.Get, RequestPath, InvokeScope, RequestsMeter, Quantity: 1),
                 new ManifestRoute(HttpMethods.Get, CallerPath, InvokeScope, RequestsMeter, Quantity: 1),
+                new ManifestRoute(HttpMethods.Post, BatchPath, InvokeScope, ItemsMeter, Quantity: 1),
             ],
             Scopes: [InvokeScope],
-            Meters: [RequestsMeter]);
+            Meters: [RequestsMeter, ItemsMeter]);
     }
 }

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net.Mime;
+using System.Text.Json;
+using Homeport.Modules.Echo.Application.Batches;
 using Homeport.Sdk;
 using Homeport.Shared.Client.Modules.Echo.V1;
 using Microsoft.AspNetCore.Authorization;
@@ -14,11 +16,12 @@ namespace Homeport.Modules.Echo.Api.Controllers;
 /// <summary>Returns whatever it is sent. Every action requires <see cref="EchoManifest.InvokeScope"/>.</summary>
 [ApiController]
 [Authorize(Policy = EchoManifest.InvokeScope)]
-public sealed class EchoController : ControllerBase
+public sealed class EchoController(BatchEchoing batches) : ControllerBase
 {
     // The operation ids of the OpenAPI document. A client generator names its
     // methods after them, so they stay stable when an action is renamed.
     private const string EchoOperation = "echo";
+    private const string EchoBatchOperation = "echoBatch";
     private const string GetRequestOperation = "getRequest";
     private const string GetCallerOperation = "getCaller";
 
@@ -42,6 +45,30 @@ public sealed class EchoController : ControllerBase
         }
 
         return File(Request.Body, Request.ContentType ?? MediaTypeNames.Application.Octet);
+    }
+
+    /// <summary>Returns a batch of items unchanged.</summary>
+    /// <remarks>
+    /// The request counts one in the meter <c>items</c> per item, which Echo
+    /// reports to the gateway.
+    /// </remarks>
+    /// <param name="request">The items to return.</param>
+    /// <response code="200">The items, in the order they were sent.</response>
+    /// <response code="400">The batch has no item, or the request is not a batch.</response>
+    [HttpPost(EchoManifest.BatchPath, Name = EchoBatchOperation)]
+    [ProducesResponseType<BatchResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
+    public ActionResult<BatchResponse> EchoBatch(EchoBatchRequest request)
+    {
+        var batch = batches.Echo<JsonElement>(request.Items);
+        if (!batch.IsSuccess)
+        {
+            return EchoProblems.For(batch.Error).ToResult(batch.Error.Message);
+        }
+
+        Response.ReportUsage(EchoManifest.ItemsMeter, batch.Value.Quantity);
+
+        return new BatchResponse(batch.Value.Items);
     }
 
     /// <summary>Returns the headers of the request as Echo received it.</summary>

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Modules.Echo.Application.Batches;
 using Homeport.Sdk;
 
 namespace Homeport.Modules.Echo.Api;
@@ -25,6 +26,7 @@ public sealed class Program
         // the OpenAPI document.
         builder.Services.AddOpenApi();
         builder.Services.AddControllers();
+        builder.Services.AddScoped<BatchEchoing>();
 
         var app = builder.Build();
         app.MapHomeportModule();

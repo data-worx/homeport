@@ -8,6 +8,7 @@ using System.Text;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
+using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Modules.Echo.V1;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,8 @@ public sealed class ProgramTests
     [Collection(AppHostCollection.Name)]
     public sealed class Main(RunningAppHost appHost)
     {
+        private const string BatchPath = "/modules/echo/v1/echo/batch";
+
         [Theory]
         [InlineData("postgres")]
         [InlineData("rabbitmq")]
@@ -145,6 +148,35 @@ public sealed class ProgramTests
 
             var usage = await appHost.MeteredAsync(traceId);
             Assert.Equal((1, usage.EventsInHour, usage.EventsOnDay), (usage.Quantity, usage.Hourly, usage.Daily));
+        }
+
+        [Fact]
+        public async Task Counts_A_Batch_Of_Five_Items_As_Five_In_The_Items_Usage()
+        {
+            var gateway = await Gateway();
+            var traceId = ActivityTraceId.CreateRandom().ToHexString();
+            using var request = new HttpRequestMessage(HttpMethod.Post, BatchPath)
+            {
+                Content = new StringContent("""{"items":[1,2,3,4,5]}""", Encoding.UTF8, "application/json"),
+            };
+            request.Headers.Add("traceparent", $"00-{traceId}-00f067aa0ba902b7-01");
+
+            using var response = await gateway.SendAsync(request);
+
+            var usage = await appHost.MeteredAsync(traceId);
+            Assert.Equal((5, usage.EventsInHour, usage.EventsOnDay), (usage.Quantity, usage.Hourly, usage.Daily));
+        }
+
+        [Fact]
+        public async Task Removes_The_Usage_Report_Of_Echo_Before_The_Caller_Sees_It()
+        {
+            var gateway = await Gateway();
+            using var content = new StringContent("""{"items":[1,2,3]}""", Encoding.UTF8, "application/json");
+
+            using var response = await gateway.PostAsync(BatchPath, content);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.False(response.Headers.Contains(ModuleHeaders.Usage));
         }
 
         [Fact]
