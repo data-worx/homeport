@@ -152,3 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Allow` header for a wrong method and `404` for an unknown path or module,
   and so learned which paths a module serves and which methods each accepts.
   A caller with a valid token still gets `404` and `405`.
+- The gateway ignores `X-Forwarded-For` and `X-Forwarded-Proto` unless they
+  come from a reverse proxy the operator trusts, configured under
+  `TrustedProxies`. Before, the compose file let the gateway take them from
+  any caller, who could so pass as another address or as having called over
+  HTTPS. See [running behind a reverse proxy](docs/operators/reverse-proxy.md).
