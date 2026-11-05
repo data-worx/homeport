@@ -2,6 +2,7 @@
 # Gathers the context needed to draft a new ticket:
 #   - that the forge CLI is authenticated, and which project it will file against
 #   - the conventional-commit type labels that exist (title prefix == label)
+#   - the open milestones, so one is picked by its exact title
 #   - the open tickets, so a near-duplicate can be spotted before filing
 #
 # Usage: bash .claude/skills/create-issue/context.sh
@@ -49,6 +50,15 @@ if [ -n "${missing}" ]; then
   echo "  MISSING:${missing}"
   echo "  create one with: forge_label_create <name> <hex colour> <description>"
   echo "  (source .devkit/forge.sh first)"
+fi
+
+echo
+echo "=== open milestones (pick one by its exact title, or none) ==="
+milestones="$(forge_milestones_list || true)"
+if [ -n "${milestones}" ]; then
+  printf '%s\n' "${milestones}" | sed 's/^/  /'
+else
+  echo "  none"
 fi
 
 echo
