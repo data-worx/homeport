@@ -51,6 +51,21 @@ public sealed class ProgramTests
             Assert.Contains(($"{service}-migrate", WaitType.WaitForCompletion), waits);
         }
 
+        // A migrate resource serves no HTTP. An endpoint of its own would
+        // share the port of the service's launch profile with the service.
+        [Theory]
+        [InlineData("control-plane-migrate")]
+        [InlineData("metering-migrate")]
+        public void Gives_The_Migrate_Resource_No_Endpoint(string migrate)
+        {
+            var model = appHost.App.Services.GetRequiredService<DistributedApplicationModel>();
+
+            var endpoints = model.Resources.Single(resource => resource.Name == migrate)
+                .Annotations.OfType<EndpointAnnotation>();
+
+            Assert.Empty(endpoints);
+        }
+
         [Fact]
         public async Task Has_Completed_Migrate_Successfully_Once_The_Control_Plane_Is_Healthy()
         {

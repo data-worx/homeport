@@ -139,3 +139,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the ASP.NET Core development certificate is trusted. Before, a trusted
   certificate moved Keycloak to HTTPS, so no client got a token and every
   call through the gateway was answered with `401`.
+- The control plane and metering answer on `localhost:5300` and
+  `localhost:5400` in a local AppHost run. Before, their `migrate` resources
+  claimed the same ports and left a dead proxy on them once they finished,
+  so the dashboard showed the services unhealthy and the gateway answered
+  `503 control-plane-unavailable`.

@@ -167,7 +167,7 @@ public static class Program
         // The control plane: `migrate` applies its migrations as the owner role
         // and seeds one tenant, plan and client; the service starts after it
         // completed and runs as the app role.
-        var controlPlaneMigrate = builder.AddProject<Projects.Homeport_Platform_ControlPlane>("control-plane-migrate")
+        var controlPlaneMigrate = builder.AddProject<Projects.Homeport_Platform_ControlPlane>("control-plane-migrate", launchProfileName: null)
             .WithArgs("migrate")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-control-plane-migrate")
             .WithEnvironment("ConnectionStrings__control-plane-owner", ConnectionString(postgresEndpoint, "control_plane_owner", controlPlaneOwnerPassword))
@@ -193,7 +193,7 @@ public static class Program
         // Metering: `migrate` applies its migrations as the owner role; the
         // service starts after it completed, runs as the app role and
         // consumes the gateway's usage events with a broker user of its own.
-        var meteringMigrate = builder.AddProject<Projects.Homeport_Platform_Metering_Api>("metering-migrate")
+        var meteringMigrate = builder.AddProject<Projects.Homeport_Platform_Metering_Api>("metering-migrate", launchProfileName: null)
             .WithArgs("migrate")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-metering-migrate")
             .WithEnvironment("ConnectionStrings__metering-owner", ConnectionString(postgresEndpoint, "metering_owner", meteringOwnerPassword))
