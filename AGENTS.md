@@ -225,6 +225,17 @@ Security-critical. No exception without an ADR.
 - W3C `traceparent` is propagated to the module.
 - If the registry is unavailable, the gateway keeps serving the last known
   routes.
+- The gateway serves the consolidated API docs at `/platform/docs` with
+  Scalar, its assets served by the gateway, never from a CDN: one document
+  per module plus one for the platform. A module's document shows exactly
+  the routes in the routing table, each from the instance with the highest
+  `version` that declares it, with servers and paths rewritten to the public
+  path. The last known documents are kept while the registry is
+  unavailable. See
+  [ADR-0017](docs/architecture/adr/0017-consolidated-api-docs.md).
+- `Gateway:Docs:Enabled` switches the docs on, by default only in
+  Development. They are anonymous; an authenticated view needs a new ADR.
+  *Try it* takes a pasted bearer token, never a client secret.
 
 ## Service-to-service
 
