@@ -6,7 +6,8 @@ The gateway answered: no route matches the path, so the request never
 reached a module. The module id in `/modules/{moduleId}/…` is misspelled, the
 module is not installed in this Homeport installation or has no running
 instance, or the module does not declare the path below its id. The gateway
-routes only the paths a module declares in its manifest.
+routes only the paths a module declares in its manifest. A caller without a
+valid token gets [`unauthorized`](unauthorized.md) instead.
 
 ```json
 {

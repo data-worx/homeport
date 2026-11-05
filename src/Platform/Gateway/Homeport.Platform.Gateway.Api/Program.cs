@@ -68,6 +68,7 @@ public sealed class Program
 
         app.MapDefaultEndpoints();
         app.UseAuthentication();
+        app.UseMiddleware<ModuleRequestChallenge>();
         app.UseAuthorization();
         app.MapControllers();
 
