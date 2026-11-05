@@ -2,6 +2,7 @@
 
 using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Api.Errors;
+using Homeport.Platform.Gateway.Api.Proxies;
 using Homeport.Platform.Gateway.Api.Routing;
 using Homeport.Platform.Gateway.Api.Usage;
 using Homeport.Platform.Gateway.Infrastructure.ControlPlane;
@@ -22,7 +23,7 @@ namespace Homeport.Platform.Gateway.Api;
 /// </summary>
 public sealed class Program
 {
-    private const string NoAdditionalKey = "none";
+    private const string None = "none";
 
     // Not static, so the integration tests can name it as their entry point.
     private Program()
@@ -34,6 +35,7 @@ public sealed class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
+        builder.Services.AddTrustedProxies();
         builder.Services.AddGatewaySigning();
         builder.Services.AddRegistryClient();
         builder.Services.AddControlPlaneClient();
@@ -59,6 +61,10 @@ public sealed class Program
         builder.Services.AddHostedService<RouteTablePoller>();
 
         var app = builder.Build();
+
+        // First, so everything after it sees the caller's address and scheme
+        // as a trusted proxy reports them, and nobody else can.
+        app.UseForwardedHeaders();
 
         // In front of everything else: an exception, and an error status without
         // a body - an unknown module, a failed forward, a dropped module body -
@@ -95,14 +101,15 @@ public sealed class Program
         app.Lifetime.ApplicationStarted.Register(() =>
         {
             var signing = app.Services.GetRequiredService<IOptions<SigningOptions>>().Value;
-            var additionalKeyId = string.IsNullOrWhiteSpace(signing.AdditionalKeyId) ? NoAdditionalKey : signing.AdditionalKeyId;
+            var additionalKeyId = string.IsNullOrWhiteSpace(signing.AdditionalKeyId) ? None : signing.AdditionalKeyId;
             var clients = app.Services.GetRequiredService<IOptions<ClientAuthenticationOptions>>().Value;
             var controlPlane = app.Services.GetRequiredService<IOptions<ControlPlaneOptions>>().Value;
             var moduleTokens = app.Services.GetRequiredService<IOptions<ModuleTokenOptions>>().Value;
             var usage = app.Services.GetRequiredService<IOptions<UsageOptions>>().Value;
+            var proxies = app.Services.GetRequiredService<IOptions<TrustedProxiesOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
@@ -114,7 +121,9 @@ public sealed class Program
                 controlPlane.Url,
                 controlPlane.ClientCacheLifetime,
                 moduleTokens.Lifetime,
-                usage.EffectiveRetryDelays);
+                usage.EffectiveRetryDelays,
+                proxies.Proxies.Count == 0 ? None : string.Join(", ", proxies.Proxies),
+                proxies.Networks.Count == 0 ? None : string.Join(", ", proxies.Networks));
         });
     }
 }

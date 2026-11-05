@@ -143,8 +143,11 @@ public static class Program
 
         // The one service with an external endpoint: modules are reachable only
         // through it, on the routes it reads from the registry, for clients with
-        // a token from Keycloak that the control plane knows.
+        // a token from Keycloak that the control plane knows. It applies
+        // forwarded headers only from the proxies an operator configures, so
+        // it does not take Aspire's publish default of trusting every caller.
         var gateway = builder.AddProject<Projects.Homeport_Platform_Gateway_Api>("gateway")
+            .DisableForwardedHeaders()
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-gateway")
             .WithEnvironment("Signing__Key", signingKey)
             .WithEnvironment("Signing__KeyId", signingKeyId)

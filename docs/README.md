@@ -14,6 +14,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`operators/registry.md`](operators/registry.md) | The registry, the modules' registration keys and what happens while it is down |
 | [`operators/control-plane.md`](operators/control-plane.md) | The control plane, preparing its database, the `migrate` step and the seed configuration |
 | [`operators/metering.md`](operators/metering.md) | Metering, preparing its database and the broker users, what may be lost, retention, its configuration and metrics |
+| [`operators/reverse-proxy.md`](operators/reverse-proxy.md) | Running the gateway behind a reverse proxy, and which proxies' forwarded headers it trusts |
 | [`operators/identity-provider.md`](operators/identity-provider.md) | Connecting the identity provider whose client tokens the gateway accepts, and mapping its clients to tenants |
 | [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |
 
