@@ -7,6 +7,7 @@ using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Problems;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Microsoft.AspNetCore.Hosting;
@@ -76,6 +77,15 @@ public sealed class ProgramTests
                 entry => entry.Category == HomeportHeadersCategory
                     && entry.Level == LogLevel.Debug
                     && entry.Message.Contains("X-Homeport-Subject", StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task Removes_The_Usage_Report_From_The_Response()
+        {
+            using var response = await gateway.CreateClient().GetAsync(
+                $"/modules/echo{ForwardingGateway.UsagePath}?{ForwardingGateway.ReportQuery}=requests%3D5");
+
+            Assert.False(response.Headers.Contains(ModuleHeaders.Usage));
         }
 
         [Fact]

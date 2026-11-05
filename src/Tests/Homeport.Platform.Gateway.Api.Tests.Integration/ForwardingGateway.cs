@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net.Mime;
+using Homeport.Shared.Client.ModuleContract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +18,8 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 /// the routes a stand-in registry lists. The stand-in module answers every
 /// request with the path and the headers it received, so a test sees what the
 /// gateway forwards, except for the paths under <see cref="ErrorsPath"/>, which
-/// answer with an error. Clients authenticate with a stand-in identity
+/// answer with an error, and <see cref="UsagePath"/>, which reports usage.
+/// Clients authenticate with a stand-in identity
 /// provider and are looked up at a stand-in control plane. What the gateway
 /// logs, down to Debug, is read from <see cref="Logs"/>, and the messages it
 /// publishes are tracked through <see cref="Host"/>.
@@ -28,6 +30,12 @@ public sealed class ForwardingGateway : IAsyncLifetime
 
     /// <summary>The route the stand-in module answers with what it received.</summary>
     internal const string RequestPath = "/v1/request";
+
+    /// <summary>The route the stand-in module answers with the usage report given in <see cref="ReportQuery"/>.</summary>
+    internal const string UsagePath = "/v1/usage";
+
+    /// <summary>The query parameter whose value the stand-in reports as its usage.</summary>
+    internal const string ReportQuery = "report";
 
     /// <summary>The paths of the stand-in that answer with an error.</summary>
     internal const string ErrorsPath = "/v1/errors";
@@ -92,13 +100,18 @@ public sealed class ForwardingGateway : IAsyncLifetime
             detail: InternalDetail, statusCode: StatusCodes.Status500InternalServerError));
         module.MapGet(HtmlBadRequestPath, () => Results.Content(
             "<html><body>Bad request</body></html>", MediaTypeNames.Text.Html, statusCode: StatusCodes.Status400BadRequest));
+        module.MapGet(UsagePath, (HttpContext context) =>
+        {
+            context.Response.Headers[ModuleHeaders.Usage] = context.Request.Query[ReportQuery];
+            return Results.NoContent();
+        });
         module.MapFallback(context => context.Response.WriteAsJsonAsync(new ForwardedRequest(
             context.Request.Path,
             context.Request.Headers.ToDictionary(header => header.Key.ToLowerInvariant(), header => header.Value.ToString()))));
         await module.StartAsync();
 
         registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(
-            module.Urls.Single(), RequestPath, NotFoundProblemPath, InternalProblemPath, HtmlBadRequestPath));
+            module.Urls.Single(), RequestPath, UsagePath, NotFoundProblemPath, InternalProblemPath, HtmlBadRequestPath));
         identityProvider = await StandInIdentityProvider.StartAsync();
         controlPlane = await StandInControlPlane.StartAsync();
 

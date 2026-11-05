@@ -2,6 +2,7 @@
 const Homeport.Shared.Client.ModuleContract.ModuleManifest.CurrentContractVersion = 0 -> int
 const Homeport.Shared.Client.ModuleContract.ModuleManifest.ManifestPath = "/.well-known/homeport/manifest" -> string!
 const Homeport.Shared.Client.ModuleContract.ModuleManifest.OpenApiPath = "/openapi/v1.json" -> string!
+const Homeport.Shared.Client.ModuleContract.ModuleHeaders.Usage = "X-Homeport-Usage" -> string!
 const Homeport.Shared.Client.ModuleContract.RegistryPaths.Heartbeat = "/instances/{moduleId}/{instanceId}/heartbeat" -> string!
 const Homeport.Shared.Client.ModuleContract.RegistryPaths.Instance = "/instances/{moduleId}/{instanceId}" -> string!
 const Homeport.Shared.Client.Problems.ProblemConventions.ErrorsExtension = "errors" -> string!
@@ -22,6 +23,7 @@ Homeport.Shared.Client.ModuleContract.ManifestRoute.Quantity.get -> int
 Homeport.Shared.Client.ModuleContract.ManifestRoute.Quantity.init -> void
 Homeport.Shared.Client.ModuleContract.ManifestRoute.Scope.get -> string!
 Homeport.Shared.Client.ModuleContract.ManifestRoute.Scope.init -> void
+Homeport.Shared.Client.ModuleContract.ModuleHeaders
 Homeport.Shared.Client.ModuleContract.ModuleManifest
 Homeport.Shared.Client.ModuleContract.ModuleManifest.<Clone>$() -> Homeport.Shared.Client.ModuleContract.ModuleManifest!
 Homeport.Shared.Client.ModuleContract.ModuleManifest.ContractVersion.get -> int
