@@ -15,6 +15,7 @@ Homeport.Sdk.HomeportCaller.TenantId.get -> System.Guid
 Homeport.Sdk.HomeportCaller.TenantId.init -> void
 Homeport.Sdk.HomeportModuleExtensions
 Homeport.Sdk.HomeportProblems
+Homeport.Sdk.HomeportUsage
 Homeport.Sdk.ModuleOpenApi
 Homeport.Sdk.ModuleVersion
 Homeport.Sdk.ProblemType
@@ -37,6 +38,7 @@ static Homeport.Sdk.HomeportCaller.operator !=(Homeport.Sdk.HomeportCaller? left
 static Homeport.Sdk.HomeportCaller.operator ==(Homeport.Sdk.HomeportCaller? left, Homeport.Sdk.HomeportCaller? right) -> bool
 static Homeport.Sdk.HomeportModuleExtensions.AddHomeportModule<TBuilder>(this TBuilder builder, Homeport.Shared.Client.ModuleContract.ModuleManifest! manifest) -> TBuilder
 static Homeport.Sdk.HomeportModuleExtensions.MapHomeportModule(this Microsoft.AspNetCore.Builder.WebApplication! app) -> Microsoft.AspNetCore.Builder.WebApplication!
+static Homeport.Sdk.HomeportUsage.ReportUsage(this Microsoft.AspNetCore.Http.HttpResponse! response, string! meter, int quantity) -> void
 static Homeport.Sdk.ModuleOpenApi.Validate(System.Text.Json.JsonElement document) -> System.Collections.Generic.IReadOnlyList<string!>!
 static Homeport.Sdk.ModuleVersion.Of(System.Reflection.Assembly! assembly) -> string!
 static Homeport.Sdk.ProblemType.operator !=(Homeport.Sdk.ProblemType? left, Homeport.Sdk.ProblemType? right) -> bool
