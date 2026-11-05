@@ -184,8 +184,13 @@ public sealed class ProgramTests
         {
             await using var registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(ClosedEndpoint, ForwardingGateway.RequestPath));
             await using var unreachable = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithUsage().WithSigningKey().WithRegistry(registry).WithClients(gateway.IdentityProvider, gateway.ControlPlane));
-            await ForwardingGateway.WaitForRoutesAsync(unreachable.CreateClient(), "/modules/echo/v1/request");
+                .WithWebHostBuilder(host => host
+                    .WithUsage()
+                    .WithSigningKey()
+                    .WithRegistry(registry)
+                    .WithClients(gateway.IdentityProvider, gateway.ControlPlane)
+                    .ConfigureLogging(logging => logging.AddFakeLogging()));
+            await ForwardingGateway.WaitForRoutesAsync(unreachable);
 
             using var response = await unreachable.CreateClient()
                 .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.KnownClientId))
@@ -331,8 +336,9 @@ public sealed class ProgramTests
                     .WithSigningKey()
                     .WithRegistry(gateway.Registry)
                     .WithIdentityProvider(gateway.IdentityProvider.Issuer)
-                    .UseSetting("ControlPlane:Url", ClosedEndpoint));
-            await ForwardingGateway.WaitForRoutesAsync(unreachable.CreateClient(), "/modules/echo/v1/request");
+                    .UseSetting("ControlPlane:Url", ClosedEndpoint)
+                    .ConfigureLogging(logging => logging.AddFakeLogging()));
+            await ForwardingGateway.WaitForRoutesAsync(unreachable);
 
             using var response = await unreachable.CreateClient()
                 .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.KnownClientId))

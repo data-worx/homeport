@@ -70,7 +70,7 @@ public sealed class RouteTablePollerTests
                     .WithClients(identityProvider, controlPlane)
                     .ConfigureLogging(logging => logging.AddFakeLogging())
                     .ConfigureTestServices(UseTestClockForPoller));
-            await ForwardingGateway.WaitForRoutesAsync(gateway.CreateClient(), EchoPath);
+            await ForwardingGateway.WaitForRoutesAsync(Gateway);
         }
 
         public async Task DisposeAsync()
@@ -104,7 +104,7 @@ public sealed class RouteTablePollerTests
         [Fact]
         public async Task Answers_Not_Found_For_A_Path_The_Module_Does_Not_Declare()
         {
-            var response = await Gateway.CreateClient().GetAsync("/modules/echo/v1/undeclared");
+            var response = await Client().GetAsync("/modules/echo/v1/undeclared");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -135,9 +135,9 @@ public sealed class RouteTablePollerTests
             Registry.Table = new RouteTableResponse([]);
 
             time.Advance(PollInterval);
-            await WaitUntil(async () => (await Gateway.CreateClient().GetAsync(EchoPath)).StatusCode == HttpStatusCode.NotFound);
+            await WaitUntil(async () => (await Client().GetAsync(EchoPath)).StatusCode == HttpStatusCode.NotFound);
 
-            Assert.Equal(HttpStatusCode.NotFound, (await Gateway.CreateClient().GetAsync(EchoPath)).StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, (await Client().GetAsync(EchoPath)).StatusCode);
         }
 
         [Fact]

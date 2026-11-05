@@ -144,3 +144,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   claimed the same ports and left a dead proxy on them once they finished,
   so the dashboard showed the services unhealthy and the gateway answered
   `503 control-plane-unavailable`.
+
+### Security
+
+- The gateway answers every request under `/modules/` without a valid token
+  with `401`, before it routes. Before, an anonymous caller got `405` with an
+  `Allow` header for a wrong method and `404` for an unknown path or module,
+  and so learned which paths a module serves and which methods each accepts.
+  A caller with a valid token still gets `404` and `405`.

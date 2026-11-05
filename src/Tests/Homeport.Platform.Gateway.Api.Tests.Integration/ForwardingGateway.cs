@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Net;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -47,6 +46,9 @@ public sealed class ForwardingGateway : IAsyncLifetime
     internal const string NotFoundDetail = "No order 42.";
 
     internal const string InternalDetail = "Password=hunter2 rejected by the database.";
+
+    // Logs at Information only when the routes changed.
+    private const string PollerCategory = "Homeport.Platform.Gateway.Api.Routing.RouteTablePoller";
 
     private static readonly TimeSpan RoutesTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan RoutesPoll = TimeSpan.FromMilliseconds(50);
@@ -107,17 +109,21 @@ public sealed class ForwardingGateway : IAsyncLifetime
                 .WithRegistry(registry)
                 .WithClients(identityProvider, controlPlane)
                 .ConfigureLogging(logging => logging.AddFakeLogging().SetMinimumLevel(LogLevel.Debug)));
-        await WaitForRoutesAsync(gateway.CreateClient(), "/modules/echo" + RequestPath);
+        await WaitForRoutesAsync(gateway);
     }
 
     /// <summary>
-    /// Waits until the gateway has read its routes from the registry and
-    /// <paramref name="path"/> is no longer unknown to it.
+    /// Waits until <paramref name="gateway"/> has read its routes from the
+    /// registry, which its poller logs once they are in place. A request cannot
+    /// tell: without a token every module path is answered with <c>401</c>,
+    /// routes or not, and with one the gateway asks the control plane, which a
+    /// test may have made unreachable. The gateway logs through fake logging.
     /// </summary>
-    internal static async Task WaitForRoutesAsync(HttpClient client, string path)
+    internal static async Task WaitForRoutesAsync(WebApplicationFactory<Program> gateway)
     {
+        var logs = gateway.Services.GetFakeLogCollector();
         using var timeout = new CancellationTokenSource(RoutesTimeout);
-        while ((await client.GetAsync(path, timeout.Token)).StatusCode == HttpStatusCode.NotFound)
+        while (!logs.GetSnapshot().Any(entry => entry.Category == PollerCategory && entry.Level == LogLevel.Information))
         {
             await Task.Delay(RoutesPoll, timeout.Token);
         }

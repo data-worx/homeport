@@ -69,6 +69,11 @@ The `type` tells you who produced the error.
 Errors ASP.NET answers on its own, such as `405` for a wrong method, carry
 the default type for their status, too.
 
+Without a valid token, every path under `/modules/` is answered with
+[`unauthorized`](../reference/problems/unauthorized.md), whatever the
+method: `unknown-module` and `405` reach only a caller the gateway has
+authenticated.
+
 ## Reading an error in .NET
 
 `Homeport.Shared.Client` reads the body as `ProblemResponse`, in the
