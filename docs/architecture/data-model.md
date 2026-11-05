@@ -13,6 +13,7 @@ stores data owns one schema in it and nothing outside it:
 | Service | Schema | Tables |
 |---|---|---|
 | Control plane | `control_plane` | `Tenants`, `Plans`, `Clients`, and EF Core's `__EFMigrationsHistory` |
+| Metering | `metering` | `UsageEvents`, `UsageHourly`, `UsageDaily`, and EF Core's `__EFMigrationsHistory` |
 
 Each schema comes with two roles, which
 [`deploy/postgres/init/init-homeport.sh`](../../deploy/postgres/init/init-homeport.sh)
@@ -45,7 +46,8 @@ A table is one of two kinds:
   `TenantId`, and two independent layers keep tenants apart: EF Core global
   query filters, and PostgreSQL row-level security driven by the session
   setting `homeport.tenant_id`. If one layer has a bug, the other still
-  holds. No tenant-owned table exists yet; the first comes with metering.
+  holds. Metering's three tables are the tenant-owned tables so far; see
+  [Row-level security](#row-level-security) below.
 - **Platform tables.** The operator's own configuration of the installation:
   which tenants exist, which plans, which clients belong to which tenant. No
   tenant reads them, and the services that read them — the gateway, through
@@ -56,3 +58,21 @@ A table is one of two kinds:
 The distinction is made per table, by asking whose data its rows are. A
 table whose rows a tenant created is tenant-owned, even if the operator also
 reads it.
+
+## Row-level security
+
+Every tenant-owned table has the policy `tenant_isolation`, created by a
+migration: a row is visible, and may be written, only when its `TenantId`
+equals the session setting `homeport.tenant_id`. An empty or missing setting
+matches no row, so a connection that names no tenant reads nothing and
+writes nothing.
+
+The service sets the setting on every connection it opens, through an EF
+Core interceptor, to the tenant its current unit of work is for, and the
+query filters read the same tenant. Metering works for the tenant of the
+event it records. The policies bind the app role; PostgreSQL exempts a
+table's owner, so `migrate` is not held to them.
+
+Every feature that touches tenant data has a cross-tenant leakage test:
+with tenant A set, no query returns a row of tenant B, through EF Core with
+and without the query filters and through raw SQL as the app role.

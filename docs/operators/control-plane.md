@@ -12,7 +12,7 @@ see [the data model](../architecture/data-model.md).
 
 The database needs a schema and two roles per service before anything
 starts. [`deploy/postgres/init/init-homeport.sh`](../../deploy/postgres/init/init-homeport.sh)
-creates them:
+creates them, the control plane's and [metering's](metering.md#preparing-the-database):
 
 | Role | Used by | Rights | Password from |
 |---|---|---|---|
@@ -21,16 +21,18 @@ creates them:
 
 The AppHost and the compose file mount the script into the PostgreSQL
 container, which runs it **once, when it initialises an empty data
-directory**. The AppHost generates both passwords and keeps them in its user
+directory**. The AppHost generates the passwords and keeps them in its user
 secrets; the compose file takes them from `.env`.
 
 Against a PostgreSQL server of your own, create the database and run the
-script once as a superuser:
+script once as a superuser, with every service's passwords:
 
 ```bash
 export POSTGRES_USER=postgres POSTGRES_DB=homeport PGHOST=<host> PGPASSWORD=<superuser password>
 export CONTROL_PLANE_OWNER_PASSWORD="$(openssl rand -hex 24)"
 export CONTROL_PLANE_APP_PASSWORD="$(openssl rand -hex 24)"
+export METERING_OWNER_PASSWORD="$(openssl rand -hex 24)"
+export METERING_APP_PASSWORD="$(openssl rand -hex 24)"
 createdb --username "${POSTGRES_USER}" "${POSTGRES_DB}"
 bash deploy/postgres/init/init-homeport.sh
 ```

@@ -13,32 +13,41 @@ binding rules — the dependency direction, who may reference what — live in t
 
 | Project | Role | May depend on |
 |---|---|---|
-| `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL with its init script, RabbitMQ, Valkey, Keycloak, the gateway, the registry, the control plane with its `migrate` step and the Echo module with its registration key, imports the Keycloak realm with generated client secrets, and generates `deploy/compose/` | `Homeport.Platform.Gateway.Api`, `Homeport.Platform.Registry.Api`, `Homeport.Platform.ControlPlane`, `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
-| `Homeport.Shared.ServiceDefaults` | What every service sets up the same way: OpenTelemetry over OTLP, health endpoints, service discovery, resilient HTTP clients | nothing |
+| `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL with its init script, RabbitMQ with its init script and a user per service, Valkey, Keycloak, the gateway, the registry, the control plane and metering with their `migrate` steps and the Echo module with its registration key, imports the Keycloak realm with generated client secrets, and generates `deploy/compose/` | `Homeport.Platform.Gateway.Api`, `Homeport.Platform.Registry.Api`, `Homeport.Platform.ControlPlane`, `Homeport.Platform.Metering.Api`, `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Shared.ServiceDefaults` | What every service sets up the same way: OpenTelemetry over OTLP, including the service's own meter and Wolverine's traces and metrics, health endpoints, service discovery, resilient HTTP clients | nothing |
 | `Homeport.Shared.Authentication` | Validates the tokens the gateway issues: issuer, audience, expiry and ES256 signature against the gateway's JWKS, and the JWKS wire format and the module token's claim names both sides share; ships with the SDK | nothing |
 | `Homeport.Shared.Contracts` | The types several services, the SDK and a Domain share: so far the result type, a value or an error with a business code | nothing |
 | `Homeport.Shared.Client` | The wire types Homeport ships: the manifest and the registration of the module contract, the read model and constants of the error format, and the responses of Echo's `GET /v1/request` and `GET /v1/caller` | nothing |
-| `Homeport.Shared.Internal` | What services share and Homeport never ships: the route table the registry serves the gateway and the client lookup of the control plane | nothing |
+| `Homeport.Shared.Internal` | What services share and Homeport never ships: the route table the registry serves the gateway, the client lookup of the control plane, and `UsageRecorded` with the exchange and queue it travels through | nothing |
 | `Homeport.Sdk` | What a .NET module needs to meet the module contract: the manifest, OpenAPI and health endpoints, registration and heartbeats at the registry, the module token on every other endpoint with a policy per scope and the caller it names, error responses as Problem Details, the common errors on every OpenAPI operation and a check of the OpenAPI document | `Homeport.Shared.Authentication`, `Homeport.Shared.Client`, `Homeport.Shared.ServiceDefaults`, `Homeport.Shared.Contracts` |
 | `Homeport.Platform.Gateway.Domain` | Empty: the gateway decides nothing yet | nothing |
 | `Homeport.Platform.Gateway.Application` | Empty: the gateway has no use case beyond forwarding | `Homeport.Platform.Gateway.Domain` |
-| `Homeport.Platform.Gateway.Infrastructure` | Loads and checks the signing key, builds the JWKS and issues service tokens, which an HTTP client attaches to its calls to a platform service, and module tokens; reads the route table from the registry; looks clients up at the control plane and keeps each answer for a configurable time | `Homeport.Platform.Gateway.Application`, `Homeport.Shared.Authentication`, `Homeport.Shared.Internal` |
-| `Homeport.Platform.Gateway.Api` | The one entry point: polls the registry for the routes and forwards `/modules/{id}/{path}` with YARP on them to clients with a valid token of the operator's identity provider that the control plane knows and that grants the route's scope, replaces the client's token with a module token, strips `X-Homeport-*` headers, propagates `traceparent`, holds every error response to Problem Details and serves the JWKS at `/.well-known/jwks.json` | `Homeport.Platform.Gateway.Infrastructure`, `Homeport.Shared.Client`, `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Platform.Gateway.Infrastructure` | Loads and checks the signing key, builds the JWKS and issues service tokens, which an HTTP client attaches to its calls to a platform service, and module tokens; reads the route table from the registry; looks clients up at the control plane and keeps each answer for a configurable time; publishes usage events through Wolverine to RabbitMQ, retries a failed send and counts one it drops | `Homeport.Platform.Gateway.Application`, `Homeport.Shared.Authentication`, `Homeport.Shared.Internal` |
+| `Homeport.Platform.Gateway.Api` | The one entry point: polls the registry for the routes and forwards `/modules/{id}/{path}` with YARP on them to clients with a valid token of the operator's identity provider that the control plane knows and that grants the route's scope, replaces the client's token with a module token, strips `X-Homeport-*` headers, propagates `traceparent`, publishes a usage event for every request it forwards, holds every error response to Problem Details and serves the JWKS at `/.well-known/jwks.json` | `Homeport.Platform.Gateway.Infrastructure`, `Homeport.Shared.Client`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Platform.Registry.Domain` | The rules of registration: the manifest against the module contract, the supported contract versions, SemVer precedence, merging the routes of the live instances and comparing registration keys | nothing |
 | `Homeport.Platform.Registry.Application` | Registering an instance, renewing it and building the routes, on a store of instances and a source of keys it declares | `Homeport.Platform.Registry.Domain` |
 | `Homeport.Platform.Registry.Infrastructure` | Keeps the instances in Valkey with a time to live and reads the registration keys from configuration | `Homeport.Platform.Registry.Application` |
 | `Homeport.Platform.Registry.Api` | Serves registration and heartbeat, authenticated by registration key, and the route table, authenticated by a gateway service token | `Homeport.Platform.Registry.Infrastructure`, `Homeport.Shared.Authentication`, `Homeport.Shared.Client`, `Homeport.Shared.Internal`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Platform.ControlPlane` | One project, as it carries no business rules yet: keeps tenants, plans and clients in the schema `control_plane` with EF Core, serves `GET /clients/{clientId}` authenticated by a gateway service token, and as `migrate` applies its migrations and seeds one tenant, plan and client | `Homeport.Shared.Authentication`, `Homeport.Shared.Client`, `Homeport.Shared.Internal`, `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Platform.Metering.Domain` | The usage event, its hourly and daily aggregates, and the rule that buckets usage by the UTC hour and day | nothing |
+| `Homeport.Platform.Metering.Application` | Recording an event once and adding it to its aggregates, on a store it declares | `Homeport.Platform.Metering.Domain` |
+| `Homeport.Platform.Metering.Infrastructure` | Keeps the events and aggregates in the schema `metering` with EF Core, filtered to one tenant by query filters and row-level security, records an event in one transaction that a duplicate leaves unchanged, and holds the migrations | `Homeport.Platform.Metering.Application` |
+| `Homeport.Platform.Metering.Api` | Consumes `UsageRecorded` from RabbitMQ through Wolverine, acknowledging it only once recorded, counts consumed events in `homeport.metering.events`, and as `migrate` applies its migrations | `Homeport.Platform.Metering.Infrastructure`, `Homeport.Shared.Internal`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Modules.Echo.Domain` | Empty: Echo has no business rules | nothing |
 | `Homeport.Modules.Echo.Application` | Empty: Echo has no use case beyond returning the request body | `Homeport.Modules.Echo.Domain` |
 | `Homeport.Modules.Echo.Infrastructure` | Empty: Echo reaches nothing outside its process | `Homeport.Modules.Echo.Application` |
 | `Homeport.Modules.Echo.Api` | The reference module: declares its manifest, serves `POST /v1/echo` to callers with `echo.invoke`, declares its problem types, shows the headers it received at `GET /v1/request` and the caller the module token names at `GET /v1/caller` | `Homeport.Modules.Echo.Infrastructure`, `Homeport.Sdk`, `Homeport.Shared.Client` |
 | `Architecture.Tests` | Asserts the layout, naming and reference rules of `dotnet.layout` as `AGENTS.md` narrows them, each also against a fixture tree that breaks it (solution folder `/Tests/`) | — |
-| `Homeport.Aspire.AppHost.Tests.Integration` | Starts the AppHost, waits for every resource to become healthy and for `migrate` to complete before the control plane, reads Echo's manifest, gets tokens from Keycloak and calls Echo through the gateway with and without a token, without `echo.invoke` and as a client the control plane does not know, reads the tenant and client Echo's module token names, calls Echo directly without a token, reads the gateway's JWKS, and stops Echo or the registry to assert the routes end to end; needs Docker | `Homeport.Aspire.AppHost` |
+| `Homeport.Aspire.AppHost.Tests.Integration` | Starts the AppHost, waits for every resource to become healthy and for `migrate` to complete before the control plane, reads Echo's manifest, gets tokens from Keycloak and calls Echo through the gateway with and without a token, without `echo.invoke` and as a client the control plane does not know, reads the tenant and client Echo's module token names, calls Echo directly without a token, reads the gateway's JWKS, reads the usage metering aggregated for a call to Echo, and stops Echo or the registry to assert the routes end to end; needs Docker | `Homeport.Aspire.AppHost` |
 | `Homeport.Modules.Echo.Api.Tests.Integration` | Runs Echo in memory behind a stand-in gateway's JWKS and asserts its manifest, health, echo, request and caller endpoints with and without a module token and scope, and its OpenAPI document, including the descriptions of its `Homeport.Shared.Client` types | `Homeport.Modules.Echo.Api` |
 | `Homeport.Platform.ControlPlane.Tests.Integration` | Runs `migrate` and the control plane against a throwaway PostgreSQL prepared by the init script and asserts the client lookup with its token and error responses, that `migrate` seeds exactly once and fails on an invalid seed, and that the app role has no DDL rights; needs Docker | `Homeport.Platform.ControlPlane` |
-| `Homeport.Platform.Gateway.Api.Tests.Integration` | Runs the gateway in memory against a stand-in module, registry, identity provider and control plane and asserts which tokens, clients and scopes it accepts, the module token it forwards, what it forwards on which routes, how it polls the registry, the error responses it answers with, the JWKS it serves, that its errors read as `ProblemResponse` without loss, and that it does not start without a signing key or an identity provider | `Homeport.Platform.Gateway.Api` |
-| `Homeport.Platform.Gateway.Infrastructure.Tests.Unit` | Asserts the checks on the signing and module token configuration, the service tokens and their renewal, the module tokens, and the cached client lookup at the control plane | `Homeport.Platform.Gateway.Infrastructure` |
+| `Homeport.Platform.Gateway.Api.Tests.Integration` | Runs the gateway in memory against a stand-in module, registry, identity provider and control plane and asserts which tokens, clients and scopes it accepts, the module token it forwards, what it forwards on which routes, how it polls the registry, the error responses it answers with, the JWKS it serves, the usage events it publishes, that its errors read as `ProblemResponse` without loss, and that it does not start without a signing key or an identity provider | `Homeport.Platform.Gateway.Api` |
+| `Homeport.Platform.Gateway.Infrastructure.Tests.Unit` | Asserts the checks on the signing and module token configuration, the service tokens and their renewal, the module tokens, the cached client lookup at the control plane, and the retry delays of usage events | `Homeport.Platform.Gateway.Infrastructure` |
+| `Homeport.Platform.Gateway.Infrastructure.Tests.Integration` | Publishes usage events to a throwaway RabbitMQ and asserts that they arrive and that one the broker does not take is counted as dropped; needs Docker | `Homeport.Platform.Gateway.Infrastructure` |
+| `Homeport.Platform.Metering.Domain.Tests.Unit` | Asserts the UTC hour and day buckets, either side of midnight, and what an event adds to its aggregates | `Homeport.Platform.Metering.Domain` |
+| `Homeport.Platform.Metering.Application.Tests.Unit` | Asserts that recording hands the store the event with its increments and reports a duplicate | `Homeport.Platform.Metering.Application` |
+| `Homeport.Platform.Metering.Infrastructure.Tests.Integration` | Asserts recording and duplicates in a throwaway PostgreSQL prepared by the init script, and the cross-tenant leakage tests through EF Core and raw SQL as the app role; needs Docker | `Homeport.Platform.Metering.Infrastructure` |
+| `Homeport.Platform.Metering.Api.Tests.Integration` | Runs `migrate` and metering against a throwaway PostgreSQL and RabbitMQ and asserts that a published event is aggregated, that one delivered twice counts once, and what `homeport.metering.events` counts; needs Docker | `Homeport.Platform.Metering.Api` |
 | `Homeport.Platform.Registry.Domain.Tests.Unit` | Asserts the manifest rules, SemVer precedence, how the routes of several instances merge and the key comparison | `Homeport.Platform.Registry.Domain` |
 | `Homeport.Platform.Registry.Application.Tests.Unit` | Asserts registering, renewing and building the routes on an in-memory store | `Homeport.Platform.Registry.Application` |
 | `Homeport.Platform.Registry.Infrastructure.Tests.Unit` | Asserts the checks on the configured registration keys | `Homeport.Platform.Registry.Infrastructure` |
@@ -51,7 +60,7 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Shared.Contracts.Tests.Unit` | Asserts the result type | `Homeport.Shared.Contracts` |
 | `Homeport.Shared.ServiceDefaults.Tests.Integration` | Asserts the health endpoints outside Development | `Homeport.Shared.ServiceDefaults` |
 
-The gateway, the registry and the control plane are the only platform services so far. The target picture is in
+The gateway, the registry, the control plane and metering are the only platform services so far. The target picture is in
 [vision.md](vision.md); the binding layout is in
 [`AGENTS.md`](../../AGENTS.md#architecture).
 
@@ -64,6 +73,7 @@ Directory.Packages.props
 deploy/
   compose/                generated from the AppHost, never edited
   postgres/init/          schemas and roles, run once by PostgreSQL
+  rabbitmq/init/          a broker user per service, written on every start
 dotnet-tools.json         dotnet-ef for adding migrations
 src/
   Directory.Build.props
@@ -83,6 +93,11 @@ src/
       Homeport.Platform.Gateway.Application/
       Homeport.Platform.Gateway.Infrastructure/
       Homeport.Platform.Gateway.Api/
+    Metering/
+      Homeport.Platform.Metering.Domain/
+      Homeport.Platform.Metering.Application/
+      Homeport.Platform.Metering.Infrastructure/
+      Homeport.Platform.Metering.Api/
     Registry/
       Homeport.Platform.Registry.Domain/
       Homeport.Platform.Registry.Application/
@@ -102,7 +117,12 @@ src/
     Homeport.Modules.Echo.Api.Tests.Integration/
     Homeport.Platform.ControlPlane.Tests.Integration/
     Homeport.Platform.Gateway.Api.Tests.Integration/
+    Homeport.Platform.Gateway.Infrastructure.Tests.Integration/
     Homeport.Platform.Gateway.Infrastructure.Tests.Unit/
+    Homeport.Platform.Metering.Api.Tests.Integration/
+    Homeport.Platform.Metering.Application.Tests.Unit/
+    Homeport.Platform.Metering.Domain.Tests.Unit/
+    Homeport.Platform.Metering.Infrastructure.Tests.Integration/
     Homeport.Platform.Registry.Api.Tests.Integration/
     Homeport.Platform.Registry.Application.Tests.Unit/
     Homeport.Platform.Registry.Domain.Tests.Unit/
@@ -126,7 +146,8 @@ src/
   plane does while it only looks clients up. The registry
   has rules of its own — checking a manifest, merging the manifests of the
   live instances — so it is cut into layers; the gateway is cut ahead of
-  the rules throttling brings.
+  the rules throttling brings. Metering is cut from the start: bucketing
+  usage and counting each event once are business rules.
 - A business module is cut from the start, even when a layer is still empty,
   as in Echo. The cut is the shape every module takes, and Echo is the
   module others copy.
@@ -142,7 +163,8 @@ src/
   because the SDK references it.
 - The route table the registry serves the gateway lives in
   `Homeport.Shared.Internal`: both services need it, no caller outside
-  Homeport ever does, so it is never shipped.
+  Homeport ever does, so it is never shipped. `UsageRecorded` lives there
+  for the same reason: the gateway publishes it and metering consumes it.
 - The registry's domain is the single source of the manifest rules. A
   module learns about a broken manifest from the registry's answer, so the
   rules cannot drift between the SDK and the registry, and a module in
