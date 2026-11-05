@@ -157,9 +157,9 @@ cd deploy/compose
   printf 'GATEWAY_IMAGE=homeport-platform-gateway-api:latest\nGATEWAY_PORT=8080\n'
   printf 'REGISTRY_IMAGE=homeport-platform-registry-api:latest\nREGISTRY_PORT=8080\n'
   printf 'CONTROL_PLANE_IMAGE=homeport-platform-controlplane:latest\nCONTROL_PLANE_PORT=8080\n'
-  printf 'CONTROL_PLANE_MIGRATE_IMAGE=homeport-platform-controlplane:latest\nCONTROL_PLANE_MIGRATE_PORT=8080\n'
+  printf 'CONTROL_PLANE_MIGRATE_IMAGE=homeport-platform-controlplane:latest\n'
   printf 'METERING_IMAGE=homeport-platform-metering-api:latest\nMETERING_PORT=8080\n'
-  printf 'METERING_MIGRATE_IMAGE=homeport-platform-metering-api:latest\nMETERING_MIGRATE_PORT=8080\n'
+  printf 'METERING_MIGRATE_IMAGE=homeport-platform-metering-api:latest\n'
   printf 'POSTGRES_BINDMOUNT_0=../postgres/init\nKEYCLOAK_BINDMOUNT_0=../keycloak/realms\n'
   printf 'RABBITMQ_BINDMOUNT_0=../rabbitmq/init\n'
   sed -n 's/^\([A-Z_]*_\(PASSWORD\|SECRET\)\)=$/\1/p' .env.example | while read -r name; do
