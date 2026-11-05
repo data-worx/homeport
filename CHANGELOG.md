@@ -132,3 +132,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   creates; the database init script and the compose `.env` gain metering's
   passwords. See [metering](docs/operators/metering.md) and
   [how metering works](docs/architecture/metering.md).
+
+### Fixed
+
+- Keycloak in the AppHost serves plain HTTP on `localhost:8080` even where
+  the ASP.NET Core development certificate is trusted. Before, a trusted
+  certificate moved Keycloak to HTTPS, so no client got a token and every
+  call through the gateway was answered with `401`.

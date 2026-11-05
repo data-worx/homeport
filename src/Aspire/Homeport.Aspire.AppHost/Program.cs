@@ -88,7 +88,9 @@ public static class Program
         // know; their secrets are generated and never written into the realm file.
         // Keycloak is reachable from the host, where clients ask it for tokens.
         // Its issuer is always the host address, while the gateway fetches the
-        // metadata and keys over the network it shares with it.
+        // metadata and keys over the network it shares with it. It serves plain
+        // HTTP even where the developer certificate is trusted, which would
+        // otherwise move it to HTTPS and leave the HTTP address unanswered.
         var seedClientId = builder.AddParameter("seed-client-id", "local-client");
         var keycloakHostAddress = $"{Uri.UriSchemeHttp}://localhost:{KeycloakPort}";
         var keycloak = builder.AddKeycloak("keycloak", port: KeycloakPort)
@@ -103,6 +105,9 @@ public static class Program
             .WithEnvironment("KC_HOSTNAME_BACKCHANNEL_DYNAMIC", bool.TrueString.ToLowerInvariant())
             .WithExternalHttpEndpoints()
             .PublishAsDockerComposeService((_, service) => service.Command = ["start-dev", "--import-realm"]);
+#pragma warning disable ASPIRECERTIFICATES001 // Experimental in Aspire, and the only way to keep the integration off HTTPS.
+        keycloak.WithoutHttpsCertificate();
+#pragma warning restore ASPIRECERTIFICATES001
 
         // A registration key per module id (ADR-0012). A local run generates
         // one and keeps it in the user secrets; the compose file takes it from

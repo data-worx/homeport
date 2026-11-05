@@ -75,6 +75,23 @@ public sealed class ProgramTests
             Assert.Equal(["gateway", "keycloak"], external);
         }
 
+        // Whether the developer certificate is trusted differs between machines,
+        // so the model is asserted rather than the listener Keycloak opens. The
+        // annotation is experimental in Aspire and the only place that says so.
+        [Fact]
+        public void Serves_Keycloak_Without_An_Https_Certificate()
+        {
+            var model = appHost.App.Services.GetRequiredService<DistributedApplicationModel>();
+
+#pragma warning disable ASPIRECERTIFICATES001
+            var certificates = model.Resources.Single(resource => resource.Name == "keycloak")
+                .Annotations.OfType<HttpsCertificateAnnotation>()
+                .Select(annotation => (annotation.Certificate, annotation.UseDeveloperCertificate));
+#pragma warning restore ASPIRECERTIFICATES001
+
+            Assert.Equal([(null, false)], certificates);
+        }
+
         [Fact]
         public async Task Returns_The_Body_Echo_Received_Through_The_Gateway()
         {
