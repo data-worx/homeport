@@ -57,6 +57,7 @@ public sealed class Program
             .LoadFromMemory([], [])
             .AddTransforms<HomeportHeaders>()
             .AddTransforms<ModuleTokens>()
+            .AddTransforms<UsageReports>()
             .AddTransforms<ModuleErrors>();
         builder.Services.AddHostedService<RouteTablePoller>();
 

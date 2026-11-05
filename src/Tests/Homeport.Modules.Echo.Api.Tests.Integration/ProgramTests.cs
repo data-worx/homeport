@@ -55,6 +55,61 @@ public sealed class ProgramTests
                 root.GetProperty("routes")[2].GetRawText());
         }
 
+        [Fact]
+        public async Task Declares_The_Batch_Route_With_The_Items_Meter()
+        {
+            var response = await echo.CreateClient().GetStringAsync("/.well-known/homeport/manifest");
+
+            var root = JsonDocument.Parse(response).RootElement;
+            Assert.Equal(
+                """{"method":"POST","path":"/v1/echo/batch","scope":"echo.invoke","meter":"items","quantity":1}""",
+                root.GetProperty("routes")[3].GetRawText());
+        }
+
+        [Fact]
+        public async Task Returns_The_Items_Of_A_Batch_Unchanged()
+        {
+            using var content = new StringContent("""{"items":[1,"two",{"three":3}]}""", Encoding.UTF8, "application/json");
+
+            var response = await echo.CreateClient().PostAsync("/v1/echo/batch", content);
+
+            Assert.Equal("""{"items":[1,"two",{"three":3}]}""", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Reports_One_Item_Per_Item_Of_A_Batch()
+        {
+            using var content = new StringContent("""{"items":[1,2,3]}""", Encoding.UTF8, "application/json");
+
+            var response = await echo.CreateClient().PostAsync("/v1/echo/batch", content);
+
+            Assert.Equal(["items=3"], response.Headers.GetValues(ModuleHeaders.Usage));
+        }
+
+        [Fact]
+        public async Task Answers_An_Empty_Batch_With_The_Empty_Batch_Problem()
+        {
+            using var content = new StringContent("""{"items":[]}""", Encoding.UTF8, "application/json");
+
+            var response = await echo.CreateClient().PostAsync("/v1/echo/batch", content);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Equal("https://homeport.data-worx.de/modules/echo/problems/empty-batch", root.GetProperty("type").GetString());
+        }
+
+        [Fact]
+        public async Task Answers_A_Batch_Without_Items_With_A_Validation_Problem()
+        {
+            using var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+            var response = await echo.CreateClient().PostAsync("/v1/echo/batch", content);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Equal("https://homeport.data-worx.de/problems/validation", root.GetProperty("type").GetString());
+        }
+
         [Theory]
         [InlineData("/health/live")]
         [InlineData("/health/ready")]

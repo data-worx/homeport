@@ -132,6 +132,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   creates; the database init script and the compose `.env` gain metering's
   passwords. See [metering](docs/operators/metering.md) and
   [how metering works](docs/architecture/metering.md).
+- A module can report how much a request counts with the response header
+  `X-Homeport-Usage: <meter>=<quantity>`, so a batch or a large document is
+  not metered like a single call. The gateway removes the header before the
+  caller sees it. A report in a meter the route does not declare, or with a
+  quantity that is not a positive integer, falls back to the route's
+  quantity, is logged at Warning and counted in
+  `homeport.gateway.usage.rejected`. `Homeport.Sdk` reports with
+  `Response.ReportUsage(meter, quantity)`. Echo gains
+  `POST /v1/echo/batch`, which counts one in the meter `items` per item. See
+  [reporting usage](docs/module-developers/reporting-usage.md).
 
 ### Fixed
 

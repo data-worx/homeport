@@ -3,6 +3,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using Homeport.Platform.Gateway.Api.Routing;
+using Homeport.Platform.Gateway.Domain.Usage;
 using Homeport.Platform.Gateway.Infrastructure.Usage;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Homeport.Shared.Internal.Platform.Metering;
@@ -16,9 +17,10 @@ namespace Homeport.Platform.Gateway.Api.Usage;
 /// whatever the status. Part of the proxy pipeline, so it sees only requests
 /// of a known client on a module's route; one the gateway refuses before -
 /// <c>401</c>, <c>403</c>, an unknown module - is not a module request and
-/// is not counted.
+/// is not counted. The quantity is the route's default, unless the module
+/// reported one that <see cref="ReportedUsage"/> accepts.
 /// </summary>
-internal sealed class UsageEvents(RequestDelegate next, TimeProvider time)
+internal sealed class UsageEvents(RequestDelegate next, TimeProvider time, UsageMetrics metrics, ILogger<UsageEvents> logger)
 {
     public async Task InvokeAsync(HttpContext context, UsagePublisher publisher)
     {
@@ -39,9 +41,37 @@ internal sealed class UsageEvents(RequestDelegate next, TimeProvider time)
             route[ModuleRoutes.ModuleIdMetadata],
             route[ModuleRoutes.PathMetadata],
             route[ModuleRoutes.MeterMetadata],
-            int.Parse(route[ModuleRoutes.QuantityMetadata], CultureInfo.InvariantCulture),
+            Quantity(context, route),
             context.Response.StatusCode,
             (long)time.GetElapsedTime(started).TotalMilliseconds,
             Activity.Current?.TraceId.ToHexString() ?? context.TraceIdentifier));
+    }
+
+    private int Quantity(HttpContext context, IReadOnlyDictionary<string, string> route)
+    {
+        var meter = route[ModuleRoutes.MeterMetadata];
+        var fallback = int.Parse(route[ModuleRoutes.QuantityMetadata], CultureInfo.InvariantCulture);
+        if (context.Features.Get<UsageReport>() is not { } report)
+        {
+            return fallback;
+        }
+
+        var reported = ReportedUsage.QuantityOf(report.Value, meter);
+        if (reported.IsSuccess)
+        {
+            return reported.Value;
+        }
+
+        logger.LogWarning(
+            "Module {ModuleId} reported a quantity of {Meter} on {Route} that was rejected ({Reason}: {Message}); counted {Quantity} instead",
+            route[ModuleRoutes.ModuleIdMetadata],
+            meter,
+            route[ModuleRoutes.PathMetadata],
+            reported.Error.Code,
+            reported.Error.Message,
+            fallback);
+        metrics.Rejected(reported.Error.Code);
+
+        return fallback;
     }
 }
