@@ -7,6 +7,7 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Homeport.Aspire.AppHost.Tests.Integration;
 
@@ -47,6 +48,34 @@ public sealed class RunningAppHost : IAsyncLifetime
     // gateway's connection and never answers, so a forward hangs rather than
     // failing. A request that takes longer counts as not answered yet.
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(3);
+
+    /// <summary>The tenant the control plane seeds, as the AppHost's parameter names it.</summary>
+    internal static readonly Guid SeededTenantId = Guid.Parse("3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61");
+
+    /// <summary>How long metering may take to record an event: the gateway publishes it once it answered.</summary>
+    internal static readonly TimeSpan MeteringTimeout = TimeSpan.FromSeconds(30);
+
+    private static readonly TimeSpan MeteringPoll = TimeSpan.FromMilliseconds(250);
+
+    // In one statement, so the event and the aggregates come from the same
+    // snapshot; metering writes them in one transaction.
+    private const string UsageOfTraceSql = """
+        SELECT e."Quantity",
+               coalesce((SELECT h."Quantity" FROM metering."UsageHourly" h
+                         WHERE h."TenantId" = e."TenantId" AND h."ModuleId" = e."ModuleId" AND h."Meter" = e."Meter"
+                           AND h."Hour" = date_trunc('hour', e."OccurredAt", 'UTC')), 0),
+               (SELECT sum(o."Quantity") FROM metering."UsageEvents" o
+                WHERE o."TenantId" = e."TenantId" AND o."ModuleId" = e."ModuleId" AND o."Meter" = e."Meter"
+                  AND date_trunc('hour', o."OccurredAt", 'UTC') = date_trunc('hour', e."OccurredAt", 'UTC')),
+               coalesce((SELECT d."Quantity" FROM metering."UsageDaily" d
+                         WHERE d."TenantId" = e."TenantId" AND d."ModuleId" = e."ModuleId" AND d."Meter" = e."Meter"
+                           AND d."Day" = (e."OccurredAt" AT TIME ZONE 'UTC')::date), 0),
+               (SELECT sum(o."Quantity") FROM metering."UsageEvents" o
+                WHERE o."TenantId" = e."TenantId" AND o."ModuleId" = e."ModuleId" AND o."Meter" = e."Meter"
+                  AND (o."OccurredAt" AT TIME ZONE 'UTC')::date = (e."OccurredAt" AT TIME ZONE 'UTC')::date)
+        FROM metering."UsageEvents" e
+        WHERE e."TraceId" = @trace
+        """;
 
     private DistributedApplication? app;
 
@@ -141,6 +170,66 @@ public sealed class RunningAppHost : IAsyncLifetime
             return null;
         }
     }
+
+    /// <summary>
+    /// Waits until metering has recorded the request traced as
+    /// <paramref name="traceId"/>, and returns its quantity with the hourly and
+    /// daily aggregate of its bucket and the sum of every event in that bucket.
+    /// Read as metering's app role for <see cref="SeededTenantId"/>.
+    /// </summary>
+    internal async Task<MeteredUsage> MeteredAsync(string traceId)
+    {
+        using var timeout = new CancellationTokenSource(MeteringTimeout);
+        await using var connection = await MeteringConnectionAsync(timeout.Token);
+
+        while (true)
+        {
+            await using (var query = new NpgsqlCommand(UsageOfTraceSql, connection))
+            {
+                query.Parameters.AddWithValue("trace", traceId);
+                await using var reader = await query.ExecuteReaderAsync(timeout.Token);
+                if (await reader.ReadAsync(timeout.Token))
+                {
+                    return new MeteredUsage(reader.GetInt32(0), reader.GetInt64(1), reader.GetInt64(2), reader.GetInt64(3), reader.GetInt64(4));
+                }
+            }
+
+            await Task.Delay(MeteringPoll, timeout.Token);
+        }
+    }
+
+    private async Task<NpgsqlConnection> MeteringConnectionAsync(CancellationToken cancellationToken)
+    {
+        var password = await App.Services.GetRequiredService<DistributedApplicationModel>().Resources
+            .OfType<ParameterResource>()
+            .Single(parameter => parameter.Name == "metering-app-password")
+            .GetValueAsync(cancellationToken);
+        var postgres = App.GetEndpoint("postgres", "tcp");
+
+        var connection = new NpgsqlConnection(new NpgsqlConnectionStringBuilder
+        {
+            Host = postgres.Host,
+            Port = postgres.Port,
+            Database = "homeport",
+            Username = "metering_app",
+            Password = password,
+        }.ConnectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        await using var set = new NpgsqlCommand("SELECT set_config('homeport.tenant_id', @tenant, false)", connection);
+        set.Parameters.AddWithValue("tenant", SeededTenantId.ToString());
+        await set.ExecuteNonQueryAsync(cancellationToken);
+
+        return connection;
+    }
+
+    /// <summary>What metering recorded for one request, and the aggregates of its bucket.</summary>
+    /// <param name="Quantity">The quantity of the request's event.</param>
+    /// <param name="Hourly">The hourly aggregate of its hour.</param>
+    /// <param name="EventsInHour">The sum of the quantities of every event in that hour.</param>
+    /// <param name="Daily">The daily aggregate of its day.</param>
+    /// <param name="EventsOnDay">The sum of the quantities of every event on that day.</param>
+    internal sealed record MeteredUsage(int Quantity, long Hourly, long EventsInHour, long Daily, long EventsOnDay);
 
     /// <summary>A client in the Keycloak realm.</summary>
     /// <param name="ClientId">The client id, as the token carries it in <c>azp</c>.</param>

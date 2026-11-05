@@ -1,13 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- The gateway's signing key, the service tokens it issues with it and the
-       registry and control plane clients. The Valkey counters (#48) land here too. -->
+  <!-- The gateway's signing key, the service tokens it issues with it, the
+       registry and control plane clients and the publishing of usage events.
+       The Valkey counters (#48) land here too. -->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WolverineFx.RabbitMQ" />
+    <!-- Compiles the code Wolverine generates at start-up. -->
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Authentication\Homeport.Shared.Authentication.csproj" />

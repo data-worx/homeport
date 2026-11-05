@@ -118,3 +118,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the local Keycloak client gets `echo.invoke` only when the token request
   asks for it. See [the module token](docs/module-developers/module-token.md)
   and [connecting an identity provider](docs/operators/identity-provider.md).
+- Homeport meters usage. Every request the gateway forwards to a module
+  becomes a usage event — tenant, client, module, the route template, its
+  meter and quantity, status, duration and trace id — which the new metering
+  service adds to an hourly and a daily aggregate per tenant, module and
+  meter, in UTC. An event delivered twice counts once. Events and aggregates
+  are the first tenant-owned data, kept apart per tenant by query filters
+  and PostgreSQL row-level security. Without an outbox, an event can be lost
+  between the gateway and RabbitMQ: one the broker does not take within the
+  gateway's retries is counted in `homeport.gateway.usage.dropped`. Raw
+  events have no retention yet. The gateway and metering connect to
+  RabbitMQ with a user of their own each, which the broker's new init script
+  creates; the database init script and the compose `.env` gain metering's
+  passwords. See [metering](docs/operators/metering.md) and
+  [how metering works](docs/architecture/metering.md).

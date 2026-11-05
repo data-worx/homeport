@@ -64,6 +64,7 @@ public sealed class RouteTablePollerTests
             controlPlane = await StandInControlPlane.StartAsync();
             gateway = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(host => host
+                    .WithUsage()
                     .WithSigningKey()
                     .WithRegistry(registry)
                     .WithClients(identityProvider, controlPlane)

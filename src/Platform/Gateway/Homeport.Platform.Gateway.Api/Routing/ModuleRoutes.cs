@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Globalization;
 using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Shared.Internal.Platform.Registry;
 using Yarp.ReverseProxy.Configuration;
@@ -22,6 +23,15 @@ internal static class ModuleRoutes
 
     /// <summary>The route metadata that names the scope a caller needs for a route.</summary>
     internal const string ScopeMetadata = "Scope";
+
+    /// <summary>The route metadata that holds the route template from the manifest.</summary>
+    internal const string PathMetadata = "Path";
+
+    /// <summary>The route metadata that names the meter a request is counted in.</summary>
+    internal const string MeterMetadata = "Meter";
+
+    /// <summary>The route metadata that holds how much one request counts.</summary>
+    internal const string QuantityMetadata = "Quantity";
 
     /// <summary>The routes and clusters for <paramref name="table"/>, one cluster per route.</summary>
     internal static (IReadOnlyList<RouteConfig> Routes, IReadOnlyList<ClusterConfig> Clusters) Build(RouteTableResponse table)
@@ -56,6 +66,9 @@ internal static class ModuleRoutes
             {
                 [ModuleIdMetadata] = moduleId,
                 [ScopeMetadata] = route.Scope,
+                [PathMetadata] = route.Path,
+                [MeterMetadata] = route.Meter,
+                [QuantityMetadata] = route.Quantity.ToString(CultureInfo.InvariantCulture),
             },
         }
         .WithTransformPathRemovePrefix(prefix);

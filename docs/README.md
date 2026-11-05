@@ -13,6 +13,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`operators/signing-key.md`](operators/signing-key.md) | Generating, configuring and rotating the gateway's signing key |
 | [`operators/registry.md`](operators/registry.md) | The registry, the modules' registration keys and what happens while it is down |
 | [`operators/control-plane.md`](operators/control-plane.md) | The control plane, preparing its database, the `migrate` step and the seed configuration |
+| [`operators/metering.md`](operators/metering.md) | Metering, preparing its database and the broker users, what may be lost, retention, its configuration and metrics |
 | [`operators/identity-provider.md`](operators/identity-provider.md) | Connecting the identity provider whose client tokens the gateway accepts, and mapping its clients to tenants |
 | [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |
 
@@ -40,7 +41,8 @@ Arranged by reader. A directory exists once it has its first document.
 |---|---|
 | [`architecture/vision.md`](architecture/vision.md) | What Homeport is and is not, why it exists, and the target picture |
 | [`architecture/architecture.md`](architecture/architecture.md) | The projects, the directory layout and why they are cut this way |
-| [`architecture/data-model.md`](architecture/data-model.md) | One database with a schema and two roles per service, and tenant-owned versus platform tables |
+| [`architecture/data-model.md`](architecture/data-model.md) | One database with a schema and two roles per service, tenant-owned versus platform tables, and row-level security |
+| [`architecture/metering.md`](architecture/metering.md) | How a request becomes usage, what is delivered and counted exactly once, and why there is no outbox |
 | [`architecture/testing.md`](architecture/testing.md) | Why tests control their clocks, wait for signals and keep the end-to-end tests small |
 | [`architecture/adr/`](architecture/adr/README.md) | Architecture decision records |
 

@@ -3,9 +3,11 @@
 using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Api.Errors;
 using Homeport.Platform.Gateway.Api.Routing;
+using Homeport.Platform.Gateway.Api.Usage;
 using Homeport.Platform.Gateway.Infrastructure.ControlPlane;
 using Homeport.Platform.Gateway.Infrastructure.Registry;
 using Homeport.Platform.Gateway.Infrastructure.Signing;
+using Homeport.Platform.Gateway.Infrastructure.Usage;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.Extensions.Options;
 
@@ -36,6 +38,7 @@ public sealed class Program
         builder.Services.AddRegistryClient();
         builder.Services.AddControlPlaneClient();
         builder.Services.AddClientAuthentication();
+        builder.AddUsagePublishing();
         builder.Services.AddControllers();
         builder.Services.AddProblemDetails();
         builder.Services.Configure<ExceptionHandlerOptions>(options =>
@@ -70,7 +73,15 @@ public sealed class Program
 
         // Mapped by YARP rather than served by a controller (dotnet-core.web):
         // the proxy endpoints are framework-mapped, like the health endpoints.
-        app.MapReverseProxy();
+        // Usage is recorded around YARP's own steps, which a custom pipeline
+        // has to name.
+        app.MapReverseProxy(proxy =>
+        {
+            proxy.UseMiddleware<UsageEvents>();
+            proxy.UseSessionAffinity();
+            proxy.UseLoadBalancing();
+            proxy.UsePassiveHealthChecks();
+        });
 
         LogStart(app);
         app.Run();
@@ -87,9 +98,10 @@ public sealed class Program
             var clients = app.Services.GetRequiredService<IOptions<ClientAuthenticationOptions>>().Value;
             var controlPlane = app.Services.GetRequiredService<IOptions<ControlPlaneOptions>>().Value;
             var moduleTokens = app.Services.GetRequiredService<IOptions<ModuleTokenOptions>>().Value;
+            var usage = app.Services.GetRequiredService<IOptions<UsageOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
@@ -100,7 +112,8 @@ public sealed class Program
                 clients.ScopeClaim,
                 controlPlane.Url,
                 controlPlane.ClientCacheLifetime,
-                moduleTokens.Lifetime);
+                moduleTokens.Lifetime,
+                usage.EffectiveRetryDelays);
         });
     }
 }

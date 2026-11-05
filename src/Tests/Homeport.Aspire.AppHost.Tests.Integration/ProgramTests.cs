@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -26,6 +27,7 @@ public sealed class ProgramTests
         [InlineData("echo")]
         [InlineData("gateway")]
         [InlineData("control-plane")]
+        [InlineData("metering")]
         public async Task Starts_The_Resource_Healthy(string resource)
         {
             using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
@@ -35,16 +37,18 @@ public sealed class ProgramTests
             Assert.Equal(resource, state.Resource.Name);
         }
 
-        [Fact]
-        public void Starts_The_Control_Plane_Only_After_Migrate_Completed()
+        [Theory]
+        [InlineData("control-plane")]
+        [InlineData("metering")]
+        public void Starts_The_Service_Only_After_Its_Migrate_Completed(string service)
         {
             var model = appHost.App.Services.GetRequiredService<DistributedApplicationModel>();
 
-            var waits = model.Resources.Single(resource => resource.Name == "control-plane")
+            var waits = model.Resources.Single(resource => resource.Name == service)
                 .Annotations.OfType<WaitAnnotation>()
                 .Select(wait => (wait.Resource.Name, wait.WaitType));
 
-            Assert.Contains(("control-plane-migrate", WaitType.WaitForCompletion), waits);
+            Assert.Contains(($"{service}-migrate", WaitType.WaitForCompletion), waits);
         }
 
         [Fact]
@@ -95,6 +99,22 @@ public sealed class ProgramTests
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
+        // The aggregates are compared with the events of their bucket, which
+        // the other tests' calls to Echo add to as well.
+        [Fact]
+        public async Task Counts_A_Call_To_Echo_In_The_Seeded_Tenants_Hourly_And_Daily_Usage()
+        {
+            var gateway = await Gateway();
+            var traceId = ActivityTraceId.CreateRandom().ToHexString();
+            using var request = new HttpRequestMessage(HttpMethod.Get, RunningAppHost.EchoRequestPath);
+            request.Headers.Add("traceparent", $"00-{traceId}-00f067aa0ba902b7-01");
+
+            using var response = await gateway.SendAsync(request);
+
+            var usage = await appHost.MeteredAsync(traceId);
+            Assert.Equal((1, usage.EventsInHour, usage.EventsOnDay), (usage.Quantity, usage.Hourly, usage.Daily));
+        }
+
         [Fact]
         public async Task Reaches_Echo_With_A_Module_Token_For_The_Seeded_Tenant_And_Client()
         {
@@ -102,7 +122,7 @@ public sealed class ProgramTests
 
             var caller = await gateway.GetFromJsonAsync<CallerResponse>("/modules/echo/v1/caller");
 
-            Assert.Equal(Guid.Parse("3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61"), caller?.TenantId);
+            Assert.Equal(RunningAppHost.SeededTenantId, caller?.TenantId);
             Assert.Equal(RunningAppHost.SeededClient.ClientId, caller?.ClientId);
         }
 

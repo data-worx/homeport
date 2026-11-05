@@ -184,7 +184,7 @@ public sealed class ProgramTests
         {
             await using var registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(ClosedEndpoint, ForwardingGateway.RequestPath));
             await using var unreachable = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithSigningKey().WithRegistry(registry).WithClients(gateway.IdentityProvider, gateway.ControlPlane));
+                .WithWebHostBuilder(host => host.WithUsage().WithSigningKey().WithRegistry(registry).WithClients(gateway.IdentityProvider, gateway.ControlPlane));
             await ForwardingGateway.WaitForRoutesAsync(unreachable.CreateClient(), "/modules/echo/v1/request");
 
             using var response = await unreachable.CreateClient()
@@ -202,6 +202,7 @@ public sealed class ProgramTests
         {
             using var started = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(host => host
+                    .WithUsage()
                     .WithSigningKey()
                     .WithAdditionalPublicKey()
                     .WithIdentityProvider(GatewaySettings.UnusedAuthority)
@@ -220,7 +221,7 @@ public sealed class ProgramTests
         public async Task Does_Not_Start_Without_A_Signing_Key()
         {
             await using var unconfigured = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithIdentityProvider(GatewaySettings.UnusedAuthority));
+                .WithWebHostBuilder(host => host.WithUsage().WithIdentityProvider(GatewaySettings.UnusedAuthority));
 
             Assert.Throws<OptionsValidationException>(() => unconfigured.CreateClient());
         }
@@ -229,7 +230,7 @@ public sealed class ProgramTests
         public async Task Does_Not_Start_Without_An_Identity_Provider()
         {
             await using var unconfigured = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithSigningKey());
+                .WithWebHostBuilder(host => host.WithUsage().WithSigningKey());
 
             Assert.Throws<OptionsValidationException>(() => unconfigured.CreateClient());
         }
@@ -326,6 +327,7 @@ public sealed class ProgramTests
         {
             await using var unreachable = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(host => host
+                    .WithUsage()
                     .WithSigningKey()
                     .WithRegistry(gateway.Registry)
                     .WithIdentityProvider(gateway.IdentityProvider.Issuer)

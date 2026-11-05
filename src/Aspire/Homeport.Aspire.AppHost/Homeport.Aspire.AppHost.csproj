@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\Modules\Echo\Homeport.Modules.Echo.Api\Homeport.Modules.Echo.Api.csproj" />
     <ProjectReference Include="..\..\Platform\ControlPlane\Homeport.Platform.ControlPlane\Homeport.Platform.ControlPlane.csproj" />
     <ProjectReference Include="..\..\Platform\Gateway\Homeport.Platform.Gateway.Api\Homeport.Platform.Gateway.Api.csproj" />
+    <ProjectReference Include="..\..\Platform\Metering\Homeport.Platform.Metering.Api\Homeport.Platform.Metering.Api.csproj" />
     <ProjectReference Include="..\..\Platform\Registry\Homeport.Platform.Registry.Api\Homeport.Platform.Registry.Api.csproj" />
   </ItemGroup>
 
