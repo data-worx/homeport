@@ -32,6 +32,10 @@ public static class Program
     // Where the broker's init script is mounted, which starts it with a user per service.
     private const string RabbitMqInitDirectory = "/homeport-init";
 
+    // Where the gateway serves the consolidated API docs, and the link the dashboard shows for them.
+    private const string ApiDocsPath = "/platform/docs";
+    private const string ApiDocsDisplayText = "API docs";
+
     /// <summary>Declares every resource and runs or publishes them.</summary>
     public static void Main(string[] args)
     {
@@ -158,6 +162,14 @@ public static class Program
             .WithEnvironment("ClientAuthentication__RequireHttpsMetadata", bool.FalseString)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath)
             .WithExternalHttpEndpoints()
+
+            // The consolidated API docs, which the gateway serves in a local
+            // run (ADR-0017), one click away in the dashboard.
+            .WithUrlForEndpoint(Uri.UriSchemeHttp, endpoint => new ResourceUrlAnnotation
+            {
+                Url = endpoint.Url + ApiDocsPath,
+                DisplayText = ApiDocsDisplayText,
+            })
             .WithReference(registry)
             .WithEnvironment("ConnectionStrings__rabbitmq", BrokerConnectionString(rabbitMqEndpoint, "gateway", gatewayRabbitMqPassword))
             .WaitFor(rabbitMq);
