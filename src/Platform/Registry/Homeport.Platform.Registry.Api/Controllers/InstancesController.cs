@@ -107,6 +107,6 @@ public sealed class InstancesController(Registrations registrations, ILogger<Ins
             .Select(route => new Domain.Manifests.ManifestRoute(route.Method, route.Path, route.Scope, route.Meter, route.Quantity))
             .ToList();
 
-        return new Manifest(manifest.Id, manifest.Name, manifest.Version, manifest.ContractVersion, routes, manifest.Scopes, manifest.Meters);
+        return new Manifest(manifest.Id, manifest.Name, manifest.Version, manifest.ContractVersion, routes, manifest.Scopes, manifest.Meters, manifest.OpenApiUrl);
     }
 }

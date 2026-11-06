@@ -27,6 +27,8 @@ every failure, keyed by the field path in the manifest, in the notation of
   registration is made for.
 - Every route path starts with `/v{major}/`; its scope and meter are among
   the manifest's `scopes` and `meters`.
+- `openApiUrl` is an absolute path below the instance's address, such as
+  `/openapi/v1.json`: no scheme, no host, no query.
 
 The instance is not registered. Fix the manifest and start the module again;
 the same manifest fails the same way. A module built with `Homeport.Sdk` logs

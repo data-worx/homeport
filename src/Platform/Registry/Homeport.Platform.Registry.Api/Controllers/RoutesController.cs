@@ -61,7 +61,7 @@ public sealed class RoutesController(Registrations registrations) : ControllerBa
             .Select(module => new ModuleRoutesResponse(
                 module.ModuleId,
                 module.Routes
-                    .Select(route => new RouteResponse(route.Method, route.Path, route.Scope, route.Meter, route.Quantity, route.Instances))
+                    .Select(route => new RouteResponse(route.Method, route.Path, route.Scope, route.Meter, route.Quantity, route.Instances, route.Version, route.OpenApiUrl))
                     .ToList()))
             .ToList());
     }

@@ -12,7 +12,7 @@ public sealed class RegistrationsTests
     private static readonly Instance Valid = new(
         "instance-1",
         new Uri("http://things-1:8080"),
-        new Manifest(ModuleId, "Things", "1.0.0", 0, [new ManifestRoute("GET", "/v1/things", "things.read", "requests", 1)], ["things.read"], ["requests"]));
+        new Manifest(ModuleId, "Things", "1.0.0", 0, [new ManifestRoute("GET", "/v1/things", "things.read", "requests", 1)], ["things.read"], ["requests"], "/openapi/v1.json"));
 
     private readonly InMemoryStore store = new();
     private readonly Registrations registrations;
