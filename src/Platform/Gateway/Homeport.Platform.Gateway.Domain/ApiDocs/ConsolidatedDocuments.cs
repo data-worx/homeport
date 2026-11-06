@@ -55,7 +55,12 @@ public static partial class ConsolidatedDocuments
     private const string HttpSchemeType = "http";
     private const string BearerScheme = "bearer";
     private const string JwtFormat = "JWT";
-    private const string SchemeDescription = "A token from the identity provider, obtained with the client credentials of a client.";
+    /// <summary>Where a caller reads how to obtain the token the security scheme asks for.</summary>
+    public const string ObtainingATokenUrl = "https://github.com/data-worx/homeport/blob/main/docs/api-consumers/obtaining-a-token.md";
+
+    // Markdown, which OpenAPI allows in a description and Scalar renders as a link.
+    private const string SchemeDescription =
+        "A token from the identity provider, obtained with the client credentials of a client: see [obtaining a token](" + ObtainingATokenUrl + ").";
 
     // The fields of a path item that hold for all its operations and are kept with them.
     private static readonly string[] PathItemFields = ["summary", "description", "parameters"];

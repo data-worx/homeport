@@ -50,6 +50,9 @@ curl -s \
   | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p'
 ```
 
+Wherever the page says that an operation requires authentication, it links
+to [obtaining a token](obtaining-a-token.md) in the Homeport repository.
+
 Paste the printed token into **Bearer Token** under **Authentication** and
 send the request with **Test Request**. The request goes from your browser
 straight to the gateway, under the path shown.

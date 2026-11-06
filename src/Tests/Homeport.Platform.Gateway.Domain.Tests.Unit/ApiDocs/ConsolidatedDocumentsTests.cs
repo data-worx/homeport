@@ -143,6 +143,17 @@ public sealed class ConsolidatedDocumentsTests
         }
 
         [Fact]
+        public void Links_The_Bearer_Scheme_To_How_A_Token_Is_Obtained()
+        {
+            var document = Consolidate(EchoRoute);
+
+            Assert.Contains(
+                $"]({ConsolidatedDocuments.ObtainingATokenUrl})",
+                document["components"]!["securitySchemes"]!["bearer"]!["description"]!.GetValue<string>(),
+                StringComparison.Ordinal);
+        }
+
+        [Fact]
         public void Keeps_Only_The_Tags_The_Kept_Operations_Use()
         {
             var document = Consolidate(EchoRoute);
