@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Gateway.Api.ApiDocs;
 using Homeport.Platform.Gateway.Infrastructure.Registry;
 using Yarp.ReverseProxy.Configuration;
 
@@ -8,11 +9,13 @@ namespace Homeport.Platform.Gateway.Api.Routing;
 /// <summary>
 /// Reads the route table from the registry every <see cref="PollInterval"/>
 /// and rebuilds the proxy configuration when it changed (ADR-0004). While the
-/// registry cannot be read, the gateway keeps serving the last known routes.
+/// registry cannot be read, the gateway keeps serving the last known routes,
+/// and the API docs stay as they are.
 /// </summary>
 internal sealed class RouteTablePoller(
     RegistryClient registry,
     InMemoryConfigProvider proxy,
+    ApiDocsRefresher docs,
     TimeProvider time,
     ILogger<RouteTablePoller> logger)
     : BackgroundService
@@ -46,6 +49,7 @@ internal sealed class RouteTablePoller(
             var (routes, clusters) = ModuleRoutes.Build(read.Table);
             proxy.Update(routes, clusters);
             etag = read.ETag;
+            docs.RoutesChanged(read.Table);
 
             logger.LogInformation(
                 "Routes changed: {RouteCount} routes of modules {ModuleIds}",

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Gateway.Api.ApiDocs;
 using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Api.Errors;
 using Homeport.Platform.Gateway.Api.Proxies;
@@ -60,6 +61,7 @@ public sealed class Program
             .AddTransforms<UsageReports>()
             .AddTransforms<ModuleErrors>();
         builder.Services.AddHostedService<RouteTablePoller>();
+        builder.Services.AddApiDocs();
 
         var app = builder.Build();
 
@@ -78,6 +80,13 @@ public sealed class Program
         app.UseMiddleware<ModuleRequestChallenge>();
         app.UseAuthorization();
         app.MapControllers();
+
+        // Off, the view is not mapped at all and answers 404 like any unknown path.
+        var docs = app.Services.GetRequiredService<IOptions<ApiDocsOptions>>().Value;
+        if (docs.Enabled)
+        {
+            app.MapApiDocs();
+        }
 
         // Mapped by YARP rather than served by a controller (dotnet-core.web):
         // the proxy endpoints are framework-mapped, like the health endpoints.
@@ -108,9 +117,10 @@ public sealed class Program
             var moduleTokens = app.Services.GetRequiredService<IOptions<ModuleTokenOptions>>().Value;
             var usage = app.Services.GetRequiredService<IOptions<UsageOptions>>().Value;
             var proxies = app.Services.GetRequiredService<IOptions<TrustedProxiesOptions>>().Value;
+            var docs = app.Services.GetRequiredService<IOptions<ApiDocsOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
@@ -124,7 +134,8 @@ public sealed class Program
                 moduleTokens.Lifetime,
                 usage.EffectiveRetryDelays,
                 proxies.Proxies.Count == 0 ? None : string.Join(", ", proxies.Proxies),
-                proxies.Networks.Count == 0 ? None : string.Join(", ", proxies.Networks));
+                proxies.Networks.Count == 0 ? None : string.Join(", ", proxies.Networks),
+                docs.Enabled ? "on" : "off");
         });
     }
 }
