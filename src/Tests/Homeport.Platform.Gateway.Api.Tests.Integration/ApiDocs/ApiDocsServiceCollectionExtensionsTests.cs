@@ -46,7 +46,7 @@ public sealed class ApiDocsServiceCollectionExtensionsTests
         {
             return new WebApplicationFactory<Program>().WithWebHostBuilder(host =>
             {
-                host.UseEnvironment(environment).WithUsage().WithSigningKey().WithIdentityProvider(GatewaySettings.UnusedAuthority);
+                host.UseEnvironment(environment).WithUsage().WithTokenBuckets().WithSigningKey().WithIdentityProvider(GatewaySettings.UnusedAuthority);
                 if (enabled is not null)
                 {
                     host.UseSetting("Gateway:Docs:Enabled", enabled);

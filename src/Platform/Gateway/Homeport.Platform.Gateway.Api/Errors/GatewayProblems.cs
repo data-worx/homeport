@@ -34,6 +34,12 @@ internal static class GatewayProblems
         "The control plane is not available.",
         StatusCodes.Status503ServiceUnavailable);
 
+    /// <summary>The tenant's requests exceeded the rate limit of its plan.</summary>
+    internal static readonly GatewayProblem RateLimited = new(
+        "rate-limited",
+        "The rate limit is exceeded.",
+        StatusCodes.Status429TooManyRequests);
+
     /// <summary>No module is mounted at the path.</summary>
     internal static readonly GatewayProblem UnknownModule = new(
         "unknown-module",

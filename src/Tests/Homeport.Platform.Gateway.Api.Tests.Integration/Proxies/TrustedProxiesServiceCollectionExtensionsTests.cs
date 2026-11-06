@@ -89,7 +89,7 @@ public sealed class TrustedProxiesServiceCollectionExtensionsTests
         {
             await using var misconfigured = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(host => host
-                    .WithUsage()
+                    .WithUsage().WithTokenBuckets()
                     .WithSigningKey()
                     .WithIdentityProvider(GatewaySettings.UnusedAuthority)
                     .UseSetting($"{TrustedProxiesOptions.SectionName}:Proxies:0", "proxy.example"));
@@ -102,7 +102,7 @@ public sealed class TrustedProxiesServiceCollectionExtensionsTests
         {
             await using var misconfigured = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(host => host
-                    .WithUsage()
+                    .WithUsage().WithTokenBuckets()
                     .WithSigningKey()
                     .WithIdentityProvider(GatewaySettings.UnusedAuthority)
                     .UseSetting($"{TrustedProxiesOptions.SectionName}:Networks:0", "192.0.2.0"));
@@ -115,7 +115,7 @@ public sealed class TrustedProxiesServiceCollectionExtensionsTests
             var started = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(host =>
                 {
-                    host.WithUsage()
+                    host.WithUsage().WithTokenBuckets()
                         .WithSigningKey()
                         .WithRegistry(gateway.Registry)
                         .WithClients(gateway.IdentityProvider, gateway.ControlPlane)

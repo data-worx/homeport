@@ -16,7 +16,7 @@ public sealed class JwksControllerTests
         public async Task Returns_The_Signing_Key_With_Its_Key_Id_Without_A_Token()
         {
             await using var gateway = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithUsage().WithSigningKey().WithIdentityProvider(GatewaySettings.UnusedAuthority));
+                .WithWebHostBuilder(host => host.WithUsage().WithTokenBuckets().WithSigningKey().WithIdentityProvider(GatewaySettings.UnusedAuthority));
 
             var keyIds = await KeyIds(gateway);
 
@@ -27,7 +27,7 @@ public sealed class JwksControllerTests
         public async Task Returns_The_Additional_Key_After_The_Signing_Key_When_Configured()
         {
             await using var gateway = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithUsage().WithSigningKey().WithAdditionalPublicKey().WithIdentityProvider(GatewaySettings.UnusedAuthority));
+                .WithWebHostBuilder(host => host.WithUsage().WithTokenBuckets().WithSigningKey().WithAdditionalPublicKey().WithIdentityProvider(GatewaySettings.UnusedAuthority));
 
             var keyIds = await KeyIds(gateway);
 
@@ -38,7 +38,7 @@ public sealed class JwksControllerTests
         public async Task Publishes_Es256_Keys_On_P256()
         {
             await using var gateway = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(host => host.WithUsage().WithSigningKey().WithIdentityProvider(GatewaySettings.UnusedAuthority));
+                .WithWebHostBuilder(host => host.WithUsage().WithTokenBuckets().WithSigningKey().WithIdentityProvider(GatewaySettings.UnusedAuthority));
 
             var key = (await Keys(gateway)).Single();
 

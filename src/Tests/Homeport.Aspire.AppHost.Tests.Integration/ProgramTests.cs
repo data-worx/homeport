@@ -21,6 +21,9 @@ public sealed class ProgramTests
     {
         private const string BatchPath = "/modules/echo/v1/echo/batch";
 
+        // Far more than the seeded plan's bucket holds and refills while they run.
+        private const int ThrottledRequests = 30;
+
         [Theory]
         [InlineData("postgres")]
         [InlineData("rabbitmq")]
@@ -237,6 +240,36 @@ public sealed class ProgramTests
             var received = await gateway.GetFromJsonAsync<ReceivedRequestResponse>(RunningAppHost.EchoRequestPath);
 
             Assert.DoesNotContain(received!.Headers.Values, value => value.Contains(token, StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task Answers_Requests_Over_The_Seeded_Plans_Limit_With_Too_Many_Requests_And_Retry_After()
+        {
+            var gateway = await appHost.ThrottledGatewayRoutingEchoAsync();
+
+            var responses = await Task.WhenAll(Enumerable.Range(0, ThrottledRequests)
+                .Select(_ => gateway.GetAsync(RunningAppHost.EchoRequestPath)));
+
+            var rejected = responses.Where(response => response.StatusCode == HttpStatusCode.TooManyRequests).ToList();
+            Assert.NotEmpty(rejected);
+            Assert.All(rejected, response => Assert.NotNull(response.Headers.RetryAfter?.Delta));
+        }
+
+        // Each replica alone would accept a bucketful; together they accept
+        // what the one bucket in Valkey held, plus what it refilled meanwhile.
+        [Fact]
+        public async Task Accepts_No_More_Across_Both_Gateway_Replicas_Than_The_Seeded_Plan_Allows()
+        {
+            var replicas = await appHost.GatewayReplicasRoutingEchoAsync();
+            var started = TimeProvider.System.GetTimestamp();
+
+            var responses = await Task.WhenAll(Enumerable.Range(0, ThrottledRequests)
+                .Select(request => replicas[request % replicas.Count].GetAsync(RunningAppHost.EchoRequestPath)));
+
+            var elapsed = TimeProvider.System.GetElapsedTime(started);
+            var allowed = RunningAppHost.SeededBurst + (int)Math.Ceiling(elapsed.TotalSeconds * RunningAppHost.SeededRequestsPerSecond);
+            Assert.Equal(2, replicas.Count);
+            Assert.InRange(responses.Count(response => response.IsSuccessStatusCode), 0, allowed);
         }
 
         private Task<HttpClient> Gateway() => appHost.GatewayRoutingEchoAsync();
