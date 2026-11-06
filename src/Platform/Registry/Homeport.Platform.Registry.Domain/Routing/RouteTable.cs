@@ -20,6 +20,7 @@ public static class RouteTable
     /// with different attributes, those of the instance with the highest
     /// <see cref="Manifest.Version"/> apply; between equal versions, the
     /// lowest instance id decides, so the choice does not depend on order.
+    /// The same instance documents the route (ADR-0017).
     /// </remarks>
     public static IReadOnlyList<ModuleRoutes> Build(IEnumerable<Instance> instances)
     {
@@ -47,8 +48,7 @@ public static class RouteTable
         var winner = declared
             .OrderByDescending(declaration => declaration.Instance.Manifest.Version, SemanticVersions.Precedence)
             .ThenBy(declaration => declaration.Instance.InstanceId, StringComparer.Ordinal)
-            .First()
-            .Route;
+            .First();
 
         var addresses = declared
             .Select(declaration => declaration.Instance.Address)
@@ -56,6 +56,16 @@ public static class RouteTable
             .OrderBy(address => address.ToString(), StringComparer.Ordinal)
             .ToList();
 
-        return new Route(winner.Method, winner.Path, winner.Scope, winner.Meter, winner.Quantity, addresses);
+        var (instance, route) = winner;
+
+        return new Route(
+            route.Method,
+            route.Path,
+            route.Scope,
+            route.Meter,
+            route.Quantity,
+            addresses,
+            instance.Manifest.Version,
+            new Uri(instance.Address, instance.Manifest.OpenApiUrl));
     }
 }

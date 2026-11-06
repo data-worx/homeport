@@ -93,6 +93,19 @@ public sealed class ProgramTests
             Assert.Equal(["gateway", "keycloak"], external);
         }
 
+        [Fact]
+        public async Task Links_The_Gateway_To_The_Api_Docs_It_Serves()
+        {
+            using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
+            var gateway = await appHost.App.ResourceNotifications.WaitForResourceHealthyAsync("gateway", timeout.Token);
+            var link = gateway.Snapshot.Urls.Single(url => url.DisplayProperties.DisplayName == "API docs");
+
+            using var client = new HttpClient();
+            var response = await client.GetAsync(new Uri(link.Url), timeout.Token);
+
+            Assert.Equal((HttpStatusCode.OK, "text/html"), (response.StatusCode, response.Content.Headers.ContentType?.MediaType));
+        }
+
         // Whether the developer certificate is trusted differs between machines,
         // so the model is asserted rather than the listener Keycloak opens. The
         // annotation is experimental in Aspire and the only place that says so.

@@ -21,7 +21,7 @@ the .NET SDK (`Homeport.Sdk`) is a convenience, not a requirement.
 | `routes[]` | `method`, `path`, required `scope`, `meter` and `quantity` per route |
 | `scopes[]` | The OAuth scopes the module defines |
 | `meters[]` | The meters the module counts in, for example `requests`, `messages`, `documents` |
-| `openApiUrl` | Where the module's OpenAPI document is served |
+| `openApiUrl` | Where the module's OpenAPI document is served: an absolute path below the instance's address, such as `/openapi/v1.json` |
 
 Every route `path` starts with `/v{major}/`, for example `/v1/echo`. Minor
 changes stay backwards compatible; a breaking change is a new major version

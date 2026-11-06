@@ -9,10 +9,14 @@ namespace Homeport.Shared.Internal.Platform.Registry;
 /// <param name="Meter">The meter a request is counted in.</param>
 /// <param name="Quantity">How much one request counts.</param>
 /// <param name="Instances">The addresses of the instances that declare the route.</param>
+/// <param name="Version">The version of the instance whose attributes apply.</param>
+/// <param name="OpenApiUrl">The OpenAPI document of that instance, which documents the route (ADR-0017).</param>
 public sealed record RouteResponse(
     string Method,
     string Path,
     string Scope,
     string Meter,
     int Quantity,
-    IReadOnlyList<Uri> Instances);
+    IReadOnlyList<Uri> Instances,
+    string Version,
+    Uri OpenApiUrl);

@@ -14,7 +14,7 @@ public sealed class ValkeyInstanceStoreTests : IClassFixture<ValkeyContainer>, I
     private static readonly Instance Echo = new(
         "instance-1",
         new Uri("http://echo-1:8080"),
-        new Manifest("echo", "Echo", "1.0.0", 0, [new ManifestRoute("POST", "/v1/echo", "echo.invoke", "requests", 1)], ["echo.invoke"], ["requests"]));
+        new Manifest("echo", "Echo", "1.0.0", 0, [new ManifestRoute("POST", "/v1/echo", "echo.invoke", "requests", 1)], ["echo.invoke"], ["requests"], "/openapi/v1.json"));
 
     private readonly ValkeyContainer valkey;
     private readonly ValkeyInstanceStore store;

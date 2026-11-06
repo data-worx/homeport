@@ -17,6 +17,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`operators/reverse-proxy.md`](operators/reverse-proxy.md) | Running the gateway behind a reverse proxy, and which proxies' forwarded headers it trusts |
 | [`operators/identity-provider.md`](operators/identity-provider.md) | Connecting the identity provider whose client tokens the gateway accepts, and mapping its clients to tenants |
 | [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |
+| [`operators/api-docs.md`](operators/api-docs.md) | Switching the consolidated API docs on with `Gateway:Docs:Enabled`, what they expose and where they come from |
 
 ## Module developers — building a module on the contract and the SDK
 
@@ -36,6 +37,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`api-consumers/obtaining-a-token.md`](api-consumers/obtaining-a-token.md) | Getting a client-credentials token and calling a module with it |
 | [`api-consumers/calling-a-module.md`](api-consumers/calling-a-module.md) | The URL scheme for calling a module through the gateway |
 | [`api-consumers/errors.md`](api-consumers/errors.md) | The error format, and what the gateway does to a module's errors |
+| [`api-consumers/api-docs.md`](api-consumers/api-docs.md) | The consolidated API docs at `/platform/docs`, and trying a request with a token from `curl` |
 
 ## Architecture — why Homeport is built the way it is
 

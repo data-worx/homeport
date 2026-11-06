@@ -21,7 +21,7 @@ public sealed class RouteTableTests
 
     private static Instance Instance(string moduleId, string instanceId, Uri address, string version, params ManifestRoute[] routes)
     {
-        var manifest = new Manifest(moduleId, "Things", version, 0, routes, ["things.read", "things.write"], ["requests", "documents"]);
+        var manifest = new Manifest(moduleId, "Things", version, 0, routes, ["things.read", "things.write"], ["requests", "documents"], "/openapi/v1.json");
         return new Instance(instanceId, address, manifest);
     }
 
@@ -83,6 +83,19 @@ public sealed class RouteTableTests
 
             var route = Assert.Single(Assert.Single(table).Routes);
             Assert.Equal(("documents", 5), (route.Meter, route.Quantity));
+        }
+
+        [Fact]
+        public void Names_The_Document_Of_The_Instance_With_The_Highest_Version()
+        {
+            var table = RouteTable.Build(
+            [
+                Instance("a", FirstAddress, "1.9.0", Read),
+                Instance("b", SecondAddress, "1.10.0", Read),
+            ]);
+
+            var route = Assert.Single(Assert.Single(table).Routes);
+            Assert.Equal(("1.10.0", new Uri("http://things-2:8080/openapi/v1.json")), (route.Version, route.OpenApiUrl));
         }
 
         [Fact]

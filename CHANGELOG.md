@@ -142,6 +142,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Response.ReportUsage(meter, quantity)`. Echo gains
   `POST /v1/echo/batch`, which counts one in the meter `items` per item. See
   [reporting usage](docs/module-developers/reporting-usage.md).
+- Every API of an installation in one place: the gateway serves Scalar at
+  `/platform/docs`, with one document per module and one for the platform.
+  A module's document shows the paths a caller actually uses and only the
+  routes the gateway forwards, each as the newest instance describes it.
+  Requests are tried with a pasted bearer token. Everything is served by the
+  gateway; nothing is loaded from or sent to a CDN. On by default only in
+  Development, where the Aspire dashboard links it as `API docs` on the
+  gateway; `Gateway:Docs:Enabled` switches it on elsewhere, anonymously.
+  See [API docs](docs/api-consumers/api-docs.md) and
+  [switching them on](docs/operators/api-docs.md).
+
+### Changed
+
+- The registry rejects a manifest whose `openApiUrl` is not an absolute path
+  on the instance, such as `/openapi/v1.json`, with `422`. A module built
+  with `Homeport.Sdk` already sends one.
 
 ### Fixed
 

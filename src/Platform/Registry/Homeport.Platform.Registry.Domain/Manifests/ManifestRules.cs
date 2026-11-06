@@ -58,6 +58,13 @@ public static partial class ManifestRules
             ValidateRoute(manifest, index, errors);
         }
 
+        // A path only, so the gateway fetches the document from the instance
+        // itself and from nowhere else.
+        if (!OpenApiUrlPattern().IsMatch(manifest.OpenApiUrl ?? string.Empty))
+        {
+            errors.Add("openApiUrl", $"OpenAPI URL '{manifest.OpenApiUrl}' must be an absolute path such as /openapi/v1.json.");
+        }
+
         return errors.ToDictionary();
     }
 
@@ -117,6 +124,10 @@ public static partial class ManifestRules
 
     [GeneratedRegex("^/v[1-9][0-9]*/")]
     private static partial Regex PathPattern();
+
+    // One slash, then no second one, no backslash, query or fragment: never a host.
+    [GeneratedRegex(@"^/(?![/\\])[^\\?#]*$")]
+    private static partial Regex OpenApiUrlPattern();
 
     // The messages per field, in the order they were found.
     private sealed class Errors

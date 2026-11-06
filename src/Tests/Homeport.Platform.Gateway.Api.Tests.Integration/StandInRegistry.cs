@@ -54,7 +54,7 @@ internal sealed class StandInRegistry : IAsyncDisposable
         [
             new ModuleRoutesResponse(
                 "echo",
-                paths.Select(path => new RouteResponse(HttpMethods.Get, path, "echo.invoke", "requests", 1, [new Uri(address)])).ToList()),
+                paths.Select(path => new RouteResponse(HttpMethods.Get, path, "echo.invoke", "requests", 1, [new Uri(address)], "1.0.0", new Uri(new Uri(address), "/openapi/v1.json"))).ToList()),
         ]);
     }
 

@@ -45,6 +45,9 @@ public sealed class RoutesControllerTests
             var route = Assert.Single(module.Routes);
             Assert.Equal(("POST", "/v1/echo"), (route.Method, route.Path));
             Assert.Equal([InstancesControllerTests.Registration.Address], route.Instances);
+            Assert.Equal(
+                (InstancesControllerTests.Manifest.Version, new Uri("http://echo-1:8080/openapi/v1.json")),
+                (route.Version, route.OpenApiUrl));
         }
 
         [Fact]

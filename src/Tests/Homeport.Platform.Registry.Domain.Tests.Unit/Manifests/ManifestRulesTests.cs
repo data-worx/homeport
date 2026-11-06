@@ -17,7 +17,8 @@ public sealed class ManifestRulesTests
         ContractVersion: 0,
         Routes: [ValidRoute],
         Scopes: ["things.write"],
-        Meters: ["requests"]);
+        Meters: ["requests"],
+        OpenApiUrl: "/openapi/v1.json");
 
     public sealed class Validate
     {
@@ -47,6 +48,20 @@ public sealed class ManifestRulesTests
             var errors = ManifestRules.Validate(id, Valid with { Id = id });
 
             Assert.Contains(errors["id"], message => message.StartsWith($"Id '{id}' must start", StringComparison.Ordinal));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("openapi/v1.json")]
+        [InlineData("http://elsewhere/openapi/v1.json")]
+        [InlineData("//elsewhere/openapi/v1.json")]
+        [InlineData(@"/\elsewhere/openapi/v1.json")]
+        [InlineData("/openapi/v1.json?x=1")]
+        public void Reports_An_OpenApi_Url_That_Is_Not_An_Absolute_Path(string url)
+        {
+            var errors = ManifestRules.Validate(ModuleId, Valid with { OpenApiUrl = url });
+
+            Assert.Equal([$"OpenAPI URL '{url}' must be an absolute path such as /openapi/v1.json."], errors["openApiUrl"]);
         }
 
         [Fact]
