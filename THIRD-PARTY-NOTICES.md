@@ -25,9 +25,9 @@ asset change; the `notices` gate fails while it is stale.
 | Cronos | 0.11.0 | MIT | Copyright © 2016–2025 Hangfire OÜ. |
 | FastExpressionCompiler | 5.4.1 | MIT | Copyright © 2016-2026 Maksim Volkau |
 | Humanizer.Core | 2.14.1 | MIT | Copyright (c) .NET Foundation and Contributors |
-| JasperFx | 2.99.0 | MIT | — not declared by the package |
-| JasperFx.Events | 2.99.0 | MIT | — not declared by the package |
-| JasperFx.RuntimeCompiler | 5.0.1 | MIT | — not declared by the package |
+| JasperFx | 2.99.0 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
+| JasperFx.Events | 2.99.0 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
+| JasperFx.RuntimeCompiler | 5.0.1 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
 | Microsoft.AspNetCore.Authentication.JwtBearer | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.AspNetCore.OpenApi | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Bcl.AsyncInterfaces | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
@@ -85,7 +85,7 @@ asset change; the `notices` gate fails while it is stale.
 | Polly.Extensions | 8.4.2 | BSD-3-Clause | Copyright (c) 2024, App vNext |
 | Polly.RateLimiting | 8.4.2 | BSD-3-Clause | Copyright (c) 2024, App vNext |
 | RabbitMQ.Client | 7.2.2 | Apache-2.0 (chosen from Apache-2.0 OR MPL-2.0) | Copyright (c) 2007-2026 Broadcom. All Rights Reserved. The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries. |
-| Scalar.AspNetCore | 2.19.0 | MIT | — not declared by the package |
+| Scalar.AspNetCore | 2.19.0 | MIT | Copyright (c) 2023-present Scalar |
 | Spectre.Console | 0.55.0 | MIT | Patrik Svensson, Phil Scott, Nils Andresen, Cédric Luthi |
 | Spectre.Console.Ansi | 0.55.0 | MIT | Patrik Svensson, Phil Scott, Nils Andresen, Cédric Luthi |
 | StackExchange.Redis | 2.13.17 | MIT | 2014 - 2026 Stack Exchange, Inc. |
@@ -98,10 +98,10 @@ asset change; the `notices` gate fails while it is stale.
 | System.IdentityModel.Tokens.Jwt | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.IO.Hashing | 10.0.12 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Linq.Dynamic.Core | 1.7.4 | Apache-2.0 | Copyright © ZZZ Projects |
-| WolverineFx | 6.61.0 | MIT | — not declared by the package |
-| WolverineFx.Newtonsoft | 6.61.0 | MIT | — not declared by the package |
-| WolverineFx.RabbitMQ | 6.61.0 | MIT | — not declared by the package |
-| WolverineFx.RuntimeCompilation | 6.61.0 | MIT | — not declared by the package |
+| WolverineFx | 6.61.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.Newtonsoft | 6.61.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.RabbitMQ | 6.61.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.RuntimeCompilation | 6.61.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
 | Yarp.ReverseProxy | 2.3.0 | MIT | © Microsoft Corporation. All rights reserved. |
 
 A copyright reading "— not declared by the package" is declared neither in that package's own
