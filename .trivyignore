@@ -47,3 +47,6 @@ CVE-2026-91403 exp:2026-12-31
 CVE-2026-119373 exp:2026-12-31
 CVE-2026-119586 exp:2026-12-31
 CVE-2026-102554 exp:2026-12-31
+
+# Demonstration for #53: expired on purpose.
+CVE-2000-0001 exp:2026-11-01
