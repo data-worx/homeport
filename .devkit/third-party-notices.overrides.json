@@ -9,9 +9,18 @@
     "  \"Some.Package\": { \"notice\": \"Copyright (c) ...\", \"source\": \"https://...\" }",
     "'assets': shipped files no deps.json names - fonts, icons. Each entry is",
     "  { \"name\", \"version\", \"license\", \"copyright\", \"files\": [ \"path\", ... ] }",
+    "'license': the licence a package offered under a choice of licences is shipped",
+    "under, one of the alternatives of its expression, with where the choice is stated:",
+    "  \"Some.Package\": { \"chosen\": \"Apache-2.0\", \"source\": \"https://...\" }",
     "The generator fails when an entry names a package that is not shipped, or a",
     "file that does not exist."
   ],
   "copyright": {},
-  "assets": []
+  "assets": [],
+  "license": {
+    "RabbitMQ.Client": {
+      "chosen": "Apache-2.0",
+      "source": "https://github.com/rabbitmq/rabbitmq-dotnet-client/blob/main/LICENSE"
+    }
+  }
 }

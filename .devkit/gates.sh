@@ -10,12 +10,20 @@ cd "$(git rev-parse --show-toplevel)"
 
 SLN="Homeport.slnx"
 
-# The project whose `dotnet publish` output is shipped, e.g.
-# "src/Acme.Shell/Acme.Shell.csproj". Set it when the repository ships a
-# distributable build: the third-party licences it carries must travel with it
-# (dotnet-core.notices). Empty skips the notices gate - a library or an internal
-# service has nothing to give notice for.
-NOTICES_PROJECT=""
+# The projects whose `dotnet publish` output is shipped: every project that
+# becomes an image in deploy/compose/docker-compose.yaml, as the table in
+# .github/scripts/scan-images.sh lists them. The third-party licences they carry
+# must travel with them (dotnet-core.notices), so one THIRD-PARTY-NOTICES.md
+# covers all of them, and each sets ShipsThirdPartyNotices to carry it in its
+# image. Empty skips the notices gate - a library or an internal service has
+# nothing to give notice for.
+NOTICES_PROJECTS=(
+  "src/Modules/Echo/Homeport.Modules.Echo.Api/Homeport.Modules.Echo.Api.csproj"
+  "src/Platform/ControlPlane/Homeport.Platform.ControlPlane/Homeport.Platform.ControlPlane.csproj"
+  "src/Platform/Gateway/Homeport.Platform.Gateway.Api/Homeport.Platform.Gateway.Api.csproj"
+  "src/Platform/Metering/Homeport.Platform.Metering.Api/Homeport.Platform.Metering.Api.csproj"
+  "src/Platform/Registry/Homeport.Platform.Registry.Api/Homeport.Platform.Registry.Api.csproj"
+)
 
 # -warnaserror so the gate itself enforces "0 warnings", rather than relying on
 # TreatWarningsAsErrors in a Directory.Build.props the project owns and may
@@ -54,17 +62,22 @@ gate_format() { dotnet format "${SLN}" --verify-no-changes; }
 
 # Regenerates the notices into a temporary file and compares it with the
 # committed one, the way the format gate verifies without writing. To update
-# the committed file after a package change, run the generator without --output:
-#   dotnet run --file .devkit/generate-third-party-notices.cs -- --project "${NOTICES_PROJECT}"
+# the committed file after a package change, run the generator without --output,
+# with one --project per entry of NOTICES_PROJECTS:
+#   dotnet run --file .devkit/generate-third-party-notices.cs -- \
+#     $(sed -n '/^NOTICES_PROJECTS=(/,/^)/s/^  "\(.*\)"$/--project \1/p' .devkit/gates.sh)
 gate_notices() {
-  if [ -z "${NOTICES_PROJECT}" ]; then
-    echo "NOTICES_PROJECT is empty - this repository ships no distributable build"
+  if [ "${#NOTICES_PROJECTS[@]}" -eq 0 ]; then
+    echo "NOTICES_PROJECTS is empty - this repository ships no distributable build"
     return 77
   fi
-  local generated rc=0
+  local generated rc=0 project args=()
+  for project in "${NOTICES_PROJECTS[@]}"; do
+    args+=(--project "${project}")
+  done
   generated="$(mktemp)"
   dotnet run --file .devkit/generate-third-party-notices.cs -- \
-      --project "${NOTICES_PROJECT}" --output "${generated}" \
+      "${args[@]}" --output "${generated}" \
     && diff -u THIRD-PARTY-NOTICES.md "${generated}" \
     || rc=1
   rm -f "${generated}"
@@ -100,7 +113,7 @@ gate_expectation() {
     build)   echo "0 warnings, 0 errors" ;;
     test)    echo "all tests green" ;;
     format)  echo "no formatting changes needed" ;;
-    notices) echo "THIRD-PARTY-NOTICES.md matches what the shipped project publishes" ;;
+    notices) echo "THIRD-PARTY-NOTICES.md matches what the shipped projects publish" ;;
     compose) echo "deploy/compose/ matches what the AppHost publishes" ;;
   esac
 }
