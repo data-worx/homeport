@@ -10,4 +10,12 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <!-- Own images are built on chiseled .NET base images (ADR-0009): no shell,
+       no package manager, non-root by default. Without InvariantGlobalization
+       the SDK picks the -extra variant, which keeps ICU and time zone data.
+       Only `dotnet publish -t:PublishContainer` reads it. -->
+  <PropertyGroup>
+    <ContainerFamily>noble-chiseled</ContainerFamily>
+  </PropertyGroup>
+
 </Project>

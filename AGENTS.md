@@ -351,11 +351,25 @@ A test that passes or fails depending on timing is a broken test. See
 
 ## Supply chain
 
-- CI builds, tests, creates an SBOM and scans **every image in the compose
-  files** — own and third-party — with Trivy. High or Critical fails the build.
-- Exceptions only in `.trivyignore`, each with a reason and an expiry date.
-- A nightly scheduled re-scan covers all images.
-- Third-party images are pinned by digest. Dependabot proposes updates.
+See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
+[the supply chain](docs/architecture/supply-chain.md).
+
+- The *Supply chain* workflow scans **every image in the compose files** —
+  own and third-party — with Trivy, on every pull request, every push to
+  `main` and nightly. High or Critical fails the run. It writes a CycloneDX
+  SBOM per own image as a build artifact.
+- Every image of the compose files is in the scan: a new own image is added
+  to the table in `.github/scripts/scan-images.sh`, or the scan fails.
+- Findings are removed at the source first: a patched version, a newer
+  digest, or a leaner variant of the image.
+- Exceptions only in `.trivyignore`, each entry with `exp:YYYY-MM-DD` in a
+  block that opens with a comment giving the reason. A missing reason or
+  expiry date, or an expired entry, fails the run.
+- Third-party images are pinned as `tag@digest` in the AppHost. Dependabot
+  proposes updates for NuGet packages, GitHub Actions and the digests in
+  `deploy/compose/`; a digest update is copied into the AppHost in the same
+  pull request.
+- Actions in workflows are pinned by commit SHA, the version in a comment.
 - Own images use chiseled .NET base images, run as non-root, and are signed
   with cosign on release.
 

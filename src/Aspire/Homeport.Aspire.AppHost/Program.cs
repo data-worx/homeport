@@ -17,6 +17,11 @@ public static class Program
     // have to escape.
     private const int PasswordLength = 32;
 
+    // Aspire's own initdb arguments, plus ICU as the collation provider: the
+    // Alpine image's C library sorts text by byte, ICU sorts it as the Debian
+    // image did.
+    private const string InitDbArgs = "--auth-host=scram-sha-256 --auth-local=scram-sha-256 --locale-provider=icu --icu-locale=und";
+
     // Relative to the AppHost project: the scripts and the realm live with the deployment.
     private const string InitFiles = "../../../deploy/postgres/init";
     private const string RabbitMqInitFiles = "../../../deploy/rabbitmq/init";
@@ -51,8 +56,14 @@ public static class Program
         builder.AddDockerComposeEnvironment("compose")
             .WithDashboard(false);
 
-        // Third-party images are pinned by digest. The tag stays next to it, so
-        // a reader sees which version the digest stands for.
+        // Third-party images are pinned by digest, written as tag@digest so the
+        // compose file carries both: a reader sees which version the digest
+        // stands for, and Dependabot proposes a new digest within that tag
+        // rather than the digest of `latest`. Its pull request changes only
+        // deploy/compose/; the new digest is copied here in the same request.
+        // Alpine variants where they exist: the Debian ones carry vulnerable
+        // packages that have no fix yet, and the scan of every image fails on
+        // them (ADR-0009).
         // One database for all of Homeport (ADR-0005). The init script gives each
         // service a schema, an owner role for its migrations and an app role to
         // run as; the passwords are generated like the server's own.
@@ -62,8 +73,8 @@ public static class Program
         var meteringAppPassword = builder.AddParameter("metering-app-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
 
         var postgres = builder.AddPostgres("postgres")
-            .WithImageTag("18.3")
-            .WithImageSHA256("7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db")
+            .WithImageTag("18.6-alpine@sha256:123b17998ccaf47e53b502e8c6a1e79afd8f579c6f3eec83c563da026f957395")
+            .WithEnvironment("POSTGRES_INITDB_ARGS", InitDbArgs)
             .WithEnvironment("POSTGRES_DB", Database)
             .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", controlPlaneOwnerPassword)
             .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", controlPlaneAppPassword)
@@ -77,8 +88,7 @@ public static class Program
         var gatewayRabbitMqPassword = builder.AddParameter("gateway-rabbitmq-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var meteringRabbitMqPassword = builder.AddParameter("metering-rabbitmq-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var rabbitMq = builder.AddRabbitMQ("rabbitmq")
-            .WithImageTag("4.3")
-            .WithImageSHA256("8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75")
+            .WithImageTag("4.3-alpine@sha256:68fd0566c1c5a5aef2d7b3ad55af8be503a767c1ff8646d7088c8c7946270cf9")
             .WithEnvironment("GATEWAY_RABBITMQ_PASSWORD", gatewayRabbitMqPassword)
             .WithEnvironment("METERING_RABBITMQ_PASSWORD", meteringRabbitMqPassword)
             .WithBindMount(RabbitMqInitFiles, RabbitMqInitDirectory, isReadOnly: true)
@@ -87,8 +97,7 @@ public static class Program
         var rabbitMqEndpoint = rabbitMq.Resource.PrimaryEndpoint;
 
         var valkey = builder.AddValkey("valkey")
-            .WithImageTag("9.1")
-            .WithImageSHA256("418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd");
+            .WithImageTag("9.1-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b");
 
         // Development and tests only. An operator brings their own identity
         // provider (ADR-0006), so the compose file runs Keycloak in development
@@ -103,8 +112,7 @@ public static class Program
         var seedClientId = builder.AddParameter("seed-client-id", "local-client");
         var keycloakHostAddress = $"{Uri.UriSchemeHttp}://localhost:{KeycloakPort}";
         var keycloak = builder.AddKeycloak("keycloak", port: KeycloakPort)
-            .WithImageTag("26.6")
-            .WithImageSHA256("0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4")
+            .WithImageTag("26.8@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b")
             .WithRealmImport(Realms)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_ID", seedClientId)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_SECRET", builder.AddParameter("local-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
