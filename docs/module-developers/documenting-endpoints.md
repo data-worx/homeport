@@ -83,6 +83,15 @@ Problem Details with `application/problem+json`:
 
 A status the action declares itself is kept as the action describes it.
 
+## Where callers see it
+
+The gateway shows the document in its [API docs](../api-consumers/api-docs.md),
+with every path under `/modules/<module id>/` and only the operations the
+manifest declares as routes. An endpoint missing from the manifest is
+missing there too, however well it is documented. The manifest's
+`openApiUrl` is a path on the instance, such as `/openapi/v1.json`; the
+registry rejects anything else.
+
 ## Check it in a test
 
 `ModuleOpenApi.Validate` checks the document for what a caller needs from
