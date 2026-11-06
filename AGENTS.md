@@ -372,6 +372,12 @@ See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
 - Actions in workflows are pinned by commit SHA, the version in a comment.
 - Own images use chiseled .NET base images, run as non-root, and are signed
   with cosign on release.
+- One `THIRD-PARTY-NOTICES.md` in the repository root covers every project
+  that becomes an own image: each is listed in `NOTICES_PROJECTS` in
+  `.devkit/gates.sh`, sets `ShipsThirdPartyNotices`, and carries the file at
+  `/app/THIRD-PARTY-NOTICES.md`. Third-party images are not in it — Homeport
+  does not redistribute them — and the content of the base images is covered
+  by the SBOM, not by this file.
 
 ## Work organisation
 

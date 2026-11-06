@@ -9,9 +9,51 @@
     "  \"Some.Package\": { \"notice\": \"Copyright (c) ...\", \"source\": \"https://...\" }",
     "'assets': shipped files no deps.json names - fonts, icons. Each entry is",
     "  { \"name\", \"version\", \"license\", \"copyright\", \"files\": [ \"path\", ... ] }",
+    "'license': the licence a package offered under a choice of licences is shipped",
+    "under, one of the alternatives of its expression, with where the choice is stated:",
+    "  \"Some.Package\": { \"chosen\": \"Apache-2.0\", \"source\": \"https://...\" }",
     "The generator fails when an entry names a package that is not shipped, or a",
     "file that does not exist."
   ],
-  "copyright": {},
-  "assets": []
+  "copyright": {
+    "JasperFx": {
+      "notice": "Copyright (c) 2024 The \"Critter Stack\" and JasperFx Tools",
+      "source": "https://github.com/JasperFx/jasperfx/blob/96b9202cc5b1255eca1e53868e37caec8b39d2f5/LICENSE"
+    },
+    "JasperFx.Events": {
+      "notice": "Copyright (c) 2024 The \"Critter Stack\" and JasperFx Tools",
+      "source": "https://github.com/JasperFx/jasperfx/blob/96b9202cc5b1255eca1e53868e37caec8b39d2f5/LICENSE"
+    },
+    "JasperFx.RuntimeCompiler": {
+      "notice": "Copyright (c) 2024 The \"Critter Stack\" and JasperFx Tools",
+      "source": "https://github.com/JasperFx/jasperfx/blob/43131f8a33f8af44964606d277fb1f159a3649b0/LICENSE"
+    },
+    "Scalar.AspNetCore": {
+      "notice": "Copyright (c) 2023-present Scalar",
+      "source": "https://github.com/scalar/scalar/blob/1fa4255b2ad83c956fe5dc8838aa7b3c4e4fd3b9/LICENSE"
+    },
+    "WolverineFx": {
+      "notice": "Copyright (c) Jeremy D. Miller and Contributors.",
+      "source": "https://github.com/JasperFx/wolverine/blob/29806dd8a8180d165878a6dcb8f096abd782dc84/LICENSE"
+    },
+    "WolverineFx.Newtonsoft": {
+      "notice": "Copyright (c) Jeremy D. Miller and Contributors.",
+      "source": "https://github.com/JasperFx/wolverine/blob/29806dd8a8180d165878a6dcb8f096abd782dc84/LICENSE"
+    },
+    "WolverineFx.RabbitMQ": {
+      "notice": "Copyright (c) Jeremy D. Miller and Contributors.",
+      "source": "https://github.com/JasperFx/wolverine/blob/29806dd8a8180d165878a6dcb8f096abd782dc84/LICENSE"
+    },
+    "WolverineFx.RuntimeCompilation": {
+      "notice": "Copyright (c) Jeremy D. Miller and Contributors.",
+      "source": "https://github.com/JasperFx/wolverine/blob/29806dd8a8180d165878a6dcb8f096abd782dc84/LICENSE"
+    }
+  },
+  "assets": [],
+  "license": {
+    "RabbitMQ.Client": {
+      "chosen": "Apache-2.0",
+      "source": "https://github.com/rabbitmq/rabbitmq-dotnet-client/blob/main/LICENSE"
+    }
+  }
 }

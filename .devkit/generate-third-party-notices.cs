@@ -6,10 +6,15 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-// Regenerates THIRD-PARTY-NOTICES.md from what one project actually publishes.
-// Project-owned: devkit-sync never overwrites this file. Which project that is,
-// is NOTICES_PROJECT in .devkit/gates.sh; an empty value switches the notices
-// gate off, for a repository that ships no distributable build.
+// Regenerates THIRD-PARTY-NOTICES.md from what the shipped projects actually
+// publish. Project-owned: devkit-sync never overwrites this file. Which projects
+// those are, is NOTICES_PROJECTS in .devkit/gates.sh; an empty value switches
+// the notices gate off, for a repository that ships no distributable build.
+//
+// Every project is published and checked on its own, and the file is the union
+// of all of them: one row per package and version, however many projects ship
+// it. One file covers every shipped project, so a package only one of them
+// ships is listed all the same.
 //
 // A PackageReference scan cannot tell shipped packages from build-time-only
 // ones, and neither can a plain `dotnet build`'s own deps.json: a design-time
@@ -48,14 +53,22 @@ using System.Threading.Tasks;
 //
 // The licence texts themselves are committed under .devkit/licenses/, one file
 // per SPDX identifier, named exactly as nuget-license reports it. They are the
-// canonical texts and are not edited, with one exception: MIT.txt carries a
-// placeholder where the canonical template puts the copyright line, because
-// one text covers several entries and each entry's own notice sits in the
-// table above it. A shipped package or asset under a licence with no file
-// there fails rather than producing a notices file that claims to reproduce a
-// licence it does not carry.
+// canonical texts and are not edited, with one exception: one text covers
+// several entries, and each entry's own notice sits in the table above it, so
+// where the canonical template names the copyright holder, the text names the
+// table instead. MIT.txt and BSD-3-Clause.txt carry a placeholder in the
+// copyright line; PostgreSQL.txt does, and says "the copyright holder" where
+// the canonical text names the University of California, as every package
+// under it puts its own name there. A shipped package or asset under a licence
+// with no file there fails rather than producing a notices file that claims to
+// reproduce a licence it does not carry.
 //
-// Usage: dotnet run --file .devkit/generate-third-party-notices.cs -- --project <csproj> [--output <path>]
+// A package offered under a choice of licences ("Apache-2.0 OR MPL-2.0") is
+// shipped under one of them. Which one is recorded in the 'license' section of
+// the overrides file, and the table names both the choice and the expression
+// it was made from. A choice that is not one of the alternatives fails.
+//
+// Usage: dotnet run --file .devkit/generate-third-party-notices.cs -- --project <csproj> [--project <csproj> ...] [--output <path>]
 //
 // --output defaults to THIRD-PARTY-NOTICES.md at the repository root, i.e. this
 // overwrites the real, committed file - the maintenance command to run by hand
@@ -93,7 +106,7 @@ internal static class Program
 
     private static async Task<int> GenerateAsync(string[] args)
     {
-        if (!TryParseArgs(args, out var projectArg, out var outputArg, out var argumentError))
+        if (!TryParseArgs(args, out var projectArgs, out var outputArg, out var argumentError))
         {
             Console.Error.WriteLine(argumentError);
             return 1;
@@ -103,49 +116,87 @@ internal static class Program
         var outputPath = outputArg is null ? Path.Combine(repoRoot, NoticesFileName) : Path.GetFullPath(outputArg);
         Directory.SetCurrentDirectory(repoRoot);
 
-        var project = new Project(projectArg!);
-        if (!File.Exists(project.Path))
+        var projects = projectArgs.Select(path => new Project(path)).ToList();
+        var missing = projects.FirstOrDefault(project => !File.Exists(project.Path));
+        if (missing is not null)
         {
-            Console.Error.WriteLine($"--project names {project.Path}, which does not exist.");
+            Console.Error.WriteLine($"--project names {missing.Path}, which does not exist.");
             return 1;
         }
 
-        var runtimeIdentifiers = (await RunAsync("dotnet", "msbuild", project.Path, "-getProperty:RuntimeIdentifiers"))
-            .Trim()
-            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var targetFramework = (await RunAsync("dotnet", "msbuild", project.Path, "-getProperty:TargetFramework")).Trim();
-        var assemblyName = (await RunAsync("dotnet", "msbuild", project.Path, "-getProperty:AssemblyName")).Trim();
         var packageRoot = ParseGlobalPackages(await RunAsync("dotnet", "nuget", "locals", "global-packages", "--list"));
 
         var publishDir = Directory.CreateTempSubdirectory("third-party-notices-");
         try
         {
             var problems = new List<string>();
+            var shipped = new HashSet<PackageIdentity>();
+            var metadata = new Dictionary<PackageIdentity, PackageNotice>();
+            var platforms = new List<(string Build, string RuntimeIdentifier, PublishContents Contents)>();
+            var publishCount = 0;
 
-            var portable = await PublishAsync(project, assemblyName, publishDir.FullName, targetFramework, runtimeIdentifier: null);
-            var platforms = new List<(string RuntimeIdentifier, PublishContents Contents)>();
-            foreach (var runtimeIdentifier in runtimeIdentifiers)
+            foreach (var project in projects)
             {
-                platforms.Add((runtimeIdentifier, await PublishAsync(project, assemblyName, publishDir.FullName, targetFramework, runtimeIdentifier)));
-            }
+                var runtimeIdentifiers = (await RunAsync("dotnet", "msbuild", project.Path, "-getProperty:RuntimeIdentifiers"))
+                    .Trim()
+                    .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var targetFramework = (await RunAsync("dotnet", "msbuild", project.Path, "-getProperty:TargetFramework")).Trim();
+                var assemblyName = (await RunAsync("dotnet", "msbuild", project.Path, "-getProperty:AssemblyName")).Trim();
+                var projectPublishDir = Path.Combine(publishDir.FullName, project.Name);
 
-            if (portable.RuntimePacks.Count > 0)
-            {
-                problems.Add("The publish without a runtime identifier carries the .NET runtime, although it is "
-                    + "meant to be the portable, framework-dependent build; establish why before shipping it.");
-            }
+                var portable = await PublishAsync(project, assemblyName, projectPublishDir, targetFramework, runtimeIdentifier: null);
+                publishCount++;
+                if (portable.RuntimePacks.Count > 0)
+                {
+                    problems.Add($"The publish of {project.Name} without a runtime identifier carries the .NET "
+                        + "runtime, although it is meant to be the portable, framework-dependent build; establish "
+                        + "why before shipping it.");
+                }
 
-            foreach (var (runtimeIdentifier, contents) in platforms)
-            {
-                problems.AddRange(Differences("the portable build", portable.Packages, runtimeIdentifier, contents.Packages));
+                foreach (var runtimeIdentifier in runtimeIdentifiers)
+                {
+                    var contents = await PublishAsync(project, assemblyName, projectPublishDir, targetFramework, runtimeIdentifier);
+                    publishCount++;
+                    var build = $"{project.Name} {runtimeIdentifier}";
+                    platforms.Add((build, runtimeIdentifier, contents));
+                    problems.AddRange(Differences($"the portable build of {project.Name}", portable.Packages, build, contents.Packages));
+                }
+
+                shipped.UnionWith(portable.Packages);
+                foreach (var (identity, notice) in await ReadLicenseMetadataAsync(project))
+                {
+                    metadata.TryAdd(identity, notice);
+                }
             }
 
             var runtimeNotices = ReadRuntimeNotices(packageRoot, platforms, problems);
 
-            var shipped = portable.Packages;
-            var metadata = await ReadLicenseMetadataAsync(project);
             var overrides = ReadCopyrightOverrides();
+            var licenseChoices = ReadLicenseChoices();
             var assets = ReadAssets();
+
+            foreach (var id in licenseChoices.Keys.Where(id => shipped.All(package => package.Id != id)))
+            {
+                problems.Add($"{OverridesFileName} chooses the licence of {id}, which no shipped project ships.");
+            }
+
+            foreach (var (identity, notice) in metadata.Where(entry => shipped.Contains(entry.Key)).ToList())
+            {
+                if (!licenseChoices.TryGetValue(identity.Id, out var chosen))
+                {
+                    continue;
+                }
+
+                var alternatives = notice.License.Split(" OR ", StringSplitOptions.TrimEntries);
+                if (alternatives.Length < 2 || !alternatives.Contains(chosen, StringComparer.Ordinal))
+                {
+                    problems.Add($"{OverridesFileName} chooses {chosen} for {identity.Id} {identity.Version}, "
+                        + $"which is offered under '{notice.License}', not under a choice that includes it.");
+                    continue;
+                }
+
+                metadata[identity] = notice with { License = chosen, OfferedUnder = notice.License };
+            }
 
             foreach (var file in assets.SelectMany(asset => asset.Files).Where(file => !File.Exists(file)))
             {
@@ -167,7 +218,7 @@ internal static class Program
 
             foreach (var id in overrides.Keys.Where(id => shipped.All(package => package.Id != id)))
             {
-                problems.Add($"{OverridesFileName} overrides the copyright of {id}, which {project.Name} does not ship.");
+                problems.Add($"{OverridesFileName} overrides the copyright of {id}, which no shipped project ships.");
             }
 
             var rows = shipped
@@ -180,6 +231,7 @@ internal static class Program
                 .Concat(runtimeNotices.Select(runtime => new PackageNotice(
                     runtime.Id, runtime.Version, runtime.License, runtime.Copyright)))
                 .OrderBy(notice => notice.Id, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(notice => notice.Version, StringComparer.Ordinal)
                 .ToList();
 
             var licenseTexts = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -187,6 +239,14 @@ internal static class Program
             foreach (var license in licenses.Distinct(StringComparer.OrdinalIgnoreCase))
             {
                 var path = LicenseTextPath(license);
+                if (license.Contains(" OR ", StringComparison.Ordinal))
+                {
+                    problems.Add(
+                        $"'{license}' is a choice of licences. Record the one it is shipped under in the 'license' "
+                        + $"section of {OverridesFileName}.");
+                    continue;
+                }
+
                 if (path is null || !File.Exists(path))
                 {
                     problems.Add(
@@ -212,12 +272,12 @@ internal static class Program
             // notices gate would be red with a whole-file diff and no hint why.
             using (var writer = new StreamWriter(outputPath) { NewLine = "\n" })
             {
-                Render(writer, project, rows, assets, runtimeNotices, licenseTexts);
+                Render(writer, projects, rows, assets, runtimeNotices, licenseTexts);
             }
 
             Console.WriteLine(
                 $"Wrote {rows.Count} packages, {assets.Count} assets and {licenseTexts.Count} licence texts, "
-                + $"checked against {runtimeIdentifiers.Length + 1} publishes, to {outputPath}.");
+                + $"checked against {publishCount} publishes of {projects.Count} projects, to {outputPath}.");
             return 0;
         }
         finally
@@ -226,9 +286,9 @@ internal static class Program
         }
     }
 
-    private static bool TryParseArgs(string[] args, out string? project, out string? output, out string? error)
+    private static bool TryParseArgs(string[] args, out List<string> projects, out string? output, out string? error)
     {
-        project = null;
+        projects = [];
         output = null;
         error = null;
         for (var i = 0; i < args.Length; i++)
@@ -239,7 +299,14 @@ internal static class Program
                     error = $"{args[i]} needs a path.";
                     return false;
                 case "--project":
-                    project = args[++i];
+                    var project = args[++i];
+                    if (projects.Contains(project))
+                    {
+                        error = $"--project names {project} twice.";
+                        return false;
+                    }
+
+                    projects.Add(project);
                     break;
                 case "--output":
                     output = args[++i];
@@ -250,10 +317,10 @@ internal static class Program
             }
         }
 
-        if (project is null)
+        if (projects.Count == 0)
         {
-            error = "--project is required: the project file whose publish is shipped, as NOTICES_PROJECT in "
-                + ".devkit/gates.sh names it.";
+            error = "--project is required, once per project file whose publish is shipped, as NOTICES_PROJECTS "
+                + "in .devkit/gates.sh names them.";
             return false;
         }
 
@@ -359,15 +426,15 @@ internal static class Program
     // file, so nothing about the runtime is written down by hand.
     private static IReadOnlyList<RuntimeNotice> ReadRuntimeNotices(
         string packageRoot,
-        IReadOnlyList<(string RuntimeIdentifier, PublishContents Contents)> platforms,
+        IReadOnlyList<(string Build, string RuntimeIdentifier, PublishContents Contents)> platforms,
         List<string> problems)
     {
-        var notices = new Dictionary<string, (string RuntimeIdentifier, RuntimeNotice Notice)>();
-        foreach (var (runtimeIdentifier, contents) in platforms)
+        var notices = new Dictionary<string, (string Build, RuntimeNotice Notice)>();
+        foreach (var (build, runtimeIdentifier, contents) in platforms)
         {
             if (contents.RuntimePacks.Count == 0)
             {
-                problems.Add($"The {runtimeIdentifier} build carries no .NET runtime, although it is meant to be self-contained.");
+                problems.Add($"The {build} build carries no .NET runtime, although it is meant to be self-contained.");
             }
 
             foreach (var pack in contents.RuntimePacks)
@@ -375,7 +442,7 @@ internal static class Program
                 var suffix = "." + runtimeIdentifier;
                 if (!pack.Id.EndsWith(suffix, StringComparison.Ordinal))
                 {
-                    problems.Add($"The runtime pack {pack.Id} of the {runtimeIdentifier} build does not end in {suffix}.");
+                    problems.Add($"The runtime pack {pack.Id} of the {build} build does not end in {suffix}.");
                     continue;
                 }
 
@@ -395,12 +462,12 @@ internal static class Program
 
                 if (!notices.TryGetValue(id, out var first))
                 {
-                    notices[id] = (runtimeIdentifier, notice);
+                    notices[id] = (build, notice);
                 }
                 else if (first.Notice != notice)
                 {
-                    problems.Add($"The {id} notices of the {runtimeIdentifier} build differ from those of the "
-                        + $"{first.RuntimeIdentifier} build. One notices file covers every build.");
+                    problems.Add($"The {id} notices of the {build} build differ from those of the "
+                        + $"{first.Build} build. One notices file covers every build.");
                 }
             }
         }
@@ -463,6 +530,15 @@ internal static class Program
             .ToDictionary(entry => entry.Name, entry => entry.Value.GetProperty("notice").GetString()!);
     }
 
+    // The licence a package offered under a choice of licences is shipped under.
+    private static Dictionary<string, string> ReadLicenseChoices()
+    {
+        using var document = JsonDocument.Parse(File.ReadAllText(OverridesFileName));
+
+        return document.RootElement.GetProperty("license").EnumerateObject()
+            .ToDictionary(entry => entry.Name, entry => entry.Value.GetProperty("chosen").GetString()!);
+    }
+
     private static IReadOnlyList<AssetNotice> ReadAssets()
     {
         using var document = JsonDocument.Parse(File.ReadAllText(OverridesFileName));
@@ -485,7 +561,7 @@ internal static class Program
 
     private static void Render(
         TextWriter writer,
-        Project project,
+        IReadOnlyList<Project> projects,
         IReadOnlyList<PackageNotice> rows,
         IReadOnlyList<AssetNotice> assets,
         IReadOnlyList<RuntimeNotice> runtimeNotices,
@@ -493,10 +569,16 @@ internal static class Program
     {
         writer.WriteLine("# Third-party notices");
         writer.WriteLine();
-        writer.WriteLine($"{project.Name} ships the third-party packages{(assets.Count > 0 ? " and assets" : "")} listed below. The");
-        writer.WriteLine("tables name the licence each one is used under and the copyright notice it");
-        writer.WriteLine("carries; the full text of every licence named is reproduced further down, as");
-        writer.WriteLine("those licences require.");
+        writer.WriteLine($"The projects below ship the third-party packages{(assets.Count > 0 ? " and assets" : "")} listed further");
+        writer.WriteLine("down, each one listed once however many of them ship it. The tables name the");
+        writer.WriteLine("licence each one is used under and the copyright notice it carries; the full");
+        writer.WriteLine("text of every licence named is reproduced at the end, as those licences require.");
+        writer.WriteLine();
+        foreach (var project in projects.OrderBy(project => project.Name, StringComparer.Ordinal))
+        {
+            writer.WriteLine($"- {project.Name}");
+        }
+
         writer.WriteLine();
         writer.WriteLine("This file is generated — see `.devkit/generate-third-party-notices.cs` — and");
         writer.WriteLine("ships next to what `dotnet publish` produces. Regenerate it after a package or");
@@ -508,7 +590,8 @@ internal static class Program
         writer.WriteLine("|---|---|---|---|");
         foreach (var row in rows)
         {
-            writer.WriteLine($"| {row.Id} | {row.Version} | {row.License} | {Cell(row.Copyright)} |");
+            var license = row.OfferedUnder is null ? row.License : $"{row.License} (chosen from {row.OfferedUnder})";
+            writer.WriteLine($"| {row.Id} | {row.Version} | {license} | {Cell(row.Copyright)} |");
         }
 
         if (rows.Any(row => row.Copyright == NotDeclared))
@@ -631,7 +714,7 @@ internal static class Program
         return stdout.Result;
     }
 
-    // The project whose publish is shipped, as the repository root sees it.
+    // A project whose publish is shipped, as the repository root sees it.
     private sealed record Project(string Path)
     {
         public string Directory => System.IO.Path.GetDirectoryName(Path)!;
@@ -645,7 +728,9 @@ internal static class Program
 
     private sealed record RuntimeNotice(string Id, string Version, string License, string Copyright, string ThirdPartyNotices);
 
-    private sealed record PackageNotice(string Id, string Version, string License, string Copyright);
+    // OfferedUnder is the licence expression a package offers a choice from,
+    // when License is the one chosen from it.
+    private sealed record PackageNotice(string Id, string Version, string License, string Copyright, string? OfferedUnder = null);
 
     private sealed record AssetNotice(
         string Name,
