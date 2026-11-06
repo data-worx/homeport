@@ -34,18 +34,29 @@ bash .github/scripts/scan-images.sh
 
 ## Exceptions
 
-A finding that cannot be fixed yet — no patched image exists, or the
-vulnerable code is unreachable — goes into `.trivyignore`:
+A finding is removed at the source first: a patched version of the image, a
+newer digest of the same tag, or a leaner variant. That is why PostgreSQL,
+RabbitMQ and Valkey run on their Alpine variants — the Debian ones carry
+packages with vulnerabilities that have no fix yet. PostgreSQL is
+initialised with ICU as its collation provider, because the Alpine C library
+sorts text by byte.
+
+What remains — a finding only the image's maintainers can fix — goes into
+`.trivyignore`, in a block that opens with the reason, each entry with an
+expiry date:
 
 ```text
-# Reason: why this finding is acceptable until the date below.
+# keycloak: why these findings are acceptable until the date below.
 CVE-2026-12345 exp:2026-12-31
+CVE-2026-12346 exp:2026-12-31
 ```
+
+An entry applies to every scanned image, not only the one it was written for.
 
 Trivy alone would stop ignoring an expired entry and stay silent while the
 finding is gone. [`check-trivyignore.sh`](../../.github/scripts/check-trivyignore.sh)
-runs first and fails on an entry without a reason directly above it, without
-an expiry date, or past it, so every exception is looked at again when it
+runs first and fails on an entry outside a block with a reason, without an
+expiry date, or past it, so every exception is looked at again when it
 expires.
 
 ## Own images

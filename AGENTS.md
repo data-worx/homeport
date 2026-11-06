@@ -360,9 +360,11 @@ See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
   SBOM per own image as a build artifact.
 - Every image of the compose files is in the scan: a new own image is added
   to the table in `.github/scripts/scan-images.sh`, or the scan fails.
-- Exceptions only in `.trivyignore`, each entry with a reason in a comment
-  directly above it and `exp:YYYY-MM-DD`. A missing reason or expiry date,
-  or an expired entry, fails the run.
+- Findings are removed at the source first: a patched version, a newer
+  digest, or a leaner variant of the image.
+- Exceptions only in `.trivyignore`, each entry with `exp:YYYY-MM-DD` in a
+  block that opens with a comment giving the reason. A missing reason or
+  expiry date, or an expired entry, fails the run.
 - Third-party images are pinned as `tag@digest` in the AppHost. Dependabot
   proposes updates for NuGet packages, GitHub Actions and the digests in
   `deploy/compose/`; a digest update is copied into the AppHost in the same
