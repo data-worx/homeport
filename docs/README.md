@@ -50,6 +50,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`architecture/data-model.md`](architecture/data-model.md) | One database with a schema and two roles per service, tenant-owned versus platform tables, and row-level security |
 | [`architecture/metering.md`](architecture/metering.md) | How a request becomes usage, what is delivered and counted exactly once, and why there is no outbox |
 | [`architecture/testing.md`](architecture/testing.md) | Why tests control their clocks, wait for signals and keep the end-to-end tests small |
+| [`architecture/supply-chain.md`](architecture/supply-chain.md) | Which images are scanned and how, exceptions in `.trivyignore`, chiseled own images, and Dependabot updates of the digests |
 | [`architecture/adr/`](architecture/adr/README.md) | Architecture decision records |
 
 ## Reference — normative specifications

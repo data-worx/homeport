@@ -51,8 +51,11 @@ public static class Program
         builder.AddDockerComposeEnvironment("compose")
             .WithDashboard(false);
 
-        // Third-party images are pinned by digest. The tag stays next to it, so
-        // a reader sees which version the digest stands for.
+        // Third-party images are pinned by digest, written as tag@digest so the
+        // compose file carries both: a reader sees which version the digest
+        // stands for, and Dependabot proposes a new digest within that tag
+        // rather than the digest of `latest`. Its pull request changes only
+        // deploy/compose/; the new digest is copied here in the same request.
         // One database for all of Homeport (ADR-0005). The init script gives each
         // service a schema, an owner role for its migrations and an app role to
         // run as; the passwords are generated like the server's own.
@@ -62,8 +65,7 @@ public static class Program
         var meteringAppPassword = builder.AddParameter("metering-app-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
 
         var postgres = builder.AddPostgres("postgres")
-            .WithImageTag("18.3")
-            .WithImageSHA256("7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db")
+            .WithImageTag("18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db")
             .WithEnvironment("POSTGRES_DB", Database)
             .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", controlPlaneOwnerPassword)
             .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", controlPlaneAppPassword)
@@ -77,8 +79,7 @@ public static class Program
         var gatewayRabbitMqPassword = builder.AddParameter("gateway-rabbitmq-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var meteringRabbitMqPassword = builder.AddParameter("metering-rabbitmq-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var rabbitMq = builder.AddRabbitMQ("rabbitmq")
-            .WithImageTag("4.3")
-            .WithImageSHA256("8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75")
+            .WithImageTag("4.3@sha256:8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75")
             .WithEnvironment("GATEWAY_RABBITMQ_PASSWORD", gatewayRabbitMqPassword)
             .WithEnvironment("METERING_RABBITMQ_PASSWORD", meteringRabbitMqPassword)
             .WithBindMount(RabbitMqInitFiles, RabbitMqInitDirectory, isReadOnly: true)
@@ -87,8 +88,7 @@ public static class Program
         var rabbitMqEndpoint = rabbitMq.Resource.PrimaryEndpoint;
 
         var valkey = builder.AddValkey("valkey")
-            .WithImageTag("9.1")
-            .WithImageSHA256("418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd");
+            .WithImageTag("9.1@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd");
 
         // Development and tests only. An operator brings their own identity
         // provider (ADR-0006), so the compose file runs Keycloak in development
@@ -103,8 +103,7 @@ public static class Program
         var seedClientId = builder.AddParameter("seed-client-id", "local-client");
         var keycloakHostAddress = $"{Uri.UriSchemeHttp}://localhost:{KeycloakPort}";
         var keycloak = builder.AddKeycloak("keycloak", port: KeycloakPort)
-            .WithImageTag("26.6")
-            .WithImageSHA256("0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4")
+            .WithImageTag("26.6@sha256:0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4")
             .WithRealmImport(Realms)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_ID", seedClientId)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_SECRET", builder.AddParameter("local-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))

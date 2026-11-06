@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# The supply-chain checks of ADR-0009: Trivy scans every image of
+# deploy/compose/ - own and third-party - and High or Critical fails the run,
+# except what .trivyignore lists, each entry with a reason and an expiry date.
+# Every own image gets a CycloneDX SBOM as a build artifact. The nightly run
+# catches a vulnerability published after the last change.
+name: Supply chain
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: bash .github/scripts/check-trivyignore.sh
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
+        with:
+          version: v0.76.2
+          cache: true
+      - run: bash .github/scripts/scan-images.sh sbom
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: sbom
+          path: sbom/
+          if-no-files-found: error

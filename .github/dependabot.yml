@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Dependabot proposes updates for packages, actions and image digests
+# (ADR-0009). The compose file is generated from the AppHost: a digest update
+# is copied into src/Aspire/Homeport.Aspire.AppHost/Program.cs in the same
+# pull request, or the compose gate fails.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker-compose
+    directory: /deploy/compose
+    schedule:
+      interval: weekly
