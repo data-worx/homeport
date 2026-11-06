@@ -20,7 +20,8 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 /// gateway forwards, except for the paths under <see cref="ErrorsPath"/>, which
 /// answer with an error, and <see cref="UsagePath"/>, which reports usage.
 /// Clients authenticate with a stand-in identity
-/// provider and are looked up at a stand-in control plane. What the gateway
+/// provider and are looked up at a stand-in control plane, and draw from
+/// <see cref="Buckets"/> rather than Valkey. What the gateway
 /// logs, down to Debug, is read from <see cref="Logs"/>, and the messages it
 /// publishes are tracked through <see cref="Host"/>.
 /// </summary>
@@ -80,6 +81,9 @@ public sealed class ForwardingGateway : IAsyncLifetime
     /// <summary>The gateway's host, for tracking the messages it publishes.</summary>
     internal IHost Host => Started.Services.GetRequiredService<IHost>();
 
+    /// <summary>The token buckets the gateway draws from; full unless a test says otherwise.</summary>
+    internal StandInTokenBuckets Buckets { get; } = new();
+
     internal StandInRegistry Registry => registry ?? throw new InvalidOperationException("The registry has not been started.");
 
     internal StandInIdentityProvider IdentityProvider => identityProvider ?? throw new InvalidOperationException("The identity provider has not been started.");
@@ -118,6 +122,7 @@ public sealed class ForwardingGateway : IAsyncLifetime
         gateway = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(host => host
                 .WithUsage()
+                .WithTokenBuckets(Buckets)
                 .WithSigningKey()
                 .WithRegistry(registry)
                 .WithClients(identityProvider, controlPlane)

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Aspire.Hosting.Docker.Resources.ServiceNodes.Swarm;
 using Homeport.Shared.ServiceDefaults;
 
 namespace Homeport.Aspire.AppHost;
@@ -35,6 +36,10 @@ public static class Program
     // Where the gateway serves the consolidated API docs, and the link the dashboard shows for them.
     private const string ApiDocsPath = "/platform/docs";
     private const string ApiDocsDisplayText = "API docs";
+
+    // Two, so every run shows that a tenant's rate limit holds across
+    // replicas: they share its bucket in Valkey (ADR-0007).
+    private const int GatewayReplicas = 2;
 
     /// <summary>Declares every resource and runs or publishes them.</summary>
     public static void Main(string[] args)
@@ -172,7 +177,13 @@ public static class Program
             })
             .WithReference(registry)
             .WithEnvironment("ConnectionStrings__rabbitmq", BrokerConnectionString(rabbitMqEndpoint, "gateway", gatewayRabbitMqPassword))
-            .WaitFor(rabbitMq);
+            .WaitFor(rabbitMq)
+            .WithReference(valkey)
+            .WaitFor(valkey)
+            .WithReplicas(GatewayReplicas)
+
+            // The compose publisher does not take the replicas from the model.
+            .PublishAsDockerComposeService((_, service) => service.Deploy = new Deploy { Replicas = GatewayReplicas });
 
         // The registry validates the gateway's service tokens against its JWKS,
         // and Echo its module tokens.

@@ -50,7 +50,9 @@ migrated and seeded the control plane's database, and `control-plane` starts
 only then; see [the control plane](control-plane.md). `metering-migrate` and
 `metering` do the same for metering; see [metering](metering.md). Echo
 registers at the registry once it has started, and the gateway routes to it
-a few seconds later; see [the registry](registry.md).
+a few seconds later; see [the registry](registry.md). The gateway runs as two
+replicas, which share every tenant's rate limit; see
+[throttling](throttling.md).
 
 The gateway is the only Homeport service with an external endpoint; its
 address is in the dashboard. Keycloak is reachable from the host too, at
@@ -193,6 +195,7 @@ docker compose ps --format '{{.Service}} {{.State}}'
 control-plane running
 echo running
 gateway running
+gateway running
 keycloak running
 metering running
 postgres running
@@ -201,7 +204,8 @@ registry running
 valkey running
 ```
 
-The gateway publishes a port to the host, chosen by Docker on every start.
+The gateway runs as two replicas, each publishing a port to the host, chosen
+by Docker on every start; `docker compose port` names the first one's.
 Keycloak publishes `8080`, so a client on the host gets its token there, and
 its management port, chosen by Docker. Get a token for `local-client`, ask
 for the gateway's port, then call Echo through it. Until Echo has registered

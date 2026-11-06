@@ -86,6 +86,11 @@ reader it is written for:
 - Keep data access provider-neutral. Vendor-specific SQL is allowed only for
   the row-level security setup and for the schema and role setup in
   `deploy/postgres/init/`.
+- Code outside C# only where an atomic operation must run inside a data
+  store: row-level security SQL in PostgreSQL, counter scripts in Valkey.
+  Each one is a file in an Infrastructure project and has an integration
+  test. The init scripts in `deploy/` are the one exception: they set up a
+  store before any service runs.
 - Every service owns one schema in the one Homeport database, with an owner
   role that runs its migrations and an app role without DDL rights that the
   service runs as. Migrations run as a one-shot `migrate` command of the
@@ -286,6 +291,8 @@ See [ADR-0016](docs/architecture/adr/0016-error-responses.md).
 - Counters live in Valkey, so limits hold across gateway replicas.
 - Exceeding a limit returns `429` with `Retry-After`. Remaining limits are
   exposed through RateLimit headers.
+- Valkey unreachable: fail open. Requests pass unthrottled, counted by
+  `homeport.gateway.ratelimit.unavailable`, with a rate-limited warning.
 
 ## Metering
 

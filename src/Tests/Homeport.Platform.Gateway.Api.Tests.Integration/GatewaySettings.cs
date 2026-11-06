@@ -2,6 +2,8 @@
 
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using Homeport.Platform.Gateway.Application.Throttling;
+using Homeport.Platform.Gateway.Infrastructure.Throttling;
 using Homeport.Platform.Gateway.Infrastructure.Usage;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -27,12 +29,32 @@ internal static class GatewaySettings
     // what it publishes is tracked rather than sent.
     private const string UnusedBroker = "amqp://guest:guest@127.0.0.1:1/";
 
+    // A Valkey nothing listens on.
+    private const string UnusedValkey = "127.0.0.1:1";
+
     /// <summary>Publishes usage events to Wolverine's stub transports instead of a broker.</summary>
     internal static IWebHostBuilder WithUsage(this IWebHostBuilder host)
     {
         return host
             .UseSetting($"ConnectionStrings:{UsageServiceCollectionExtensions.ConnectionName}", UnusedBroker)
             .ConfigureTestServices(services => services.DisableAllExternalWolverineTransports());
+    }
+
+    /// <summary>
+    /// Draws the rate limit from <paramref name="buckets"/>, or from buckets
+    /// that are always full, rather than from Valkey.
+    /// </summary>
+    internal static IWebHostBuilder WithTokenBuckets(this IWebHostBuilder host, ITokenBuckets? buckets = null)
+    {
+        return host
+            .WithUnreachableValkey()
+            .ConfigureTestServices(services => services.AddSingleton(buckets ?? new StandInTokenBuckets()));
+    }
+
+    /// <summary>Draws the rate limit from a Valkey nothing listens on, so every request passes unthrottled.</summary>
+    internal static IWebHostBuilder WithUnreachableValkey(this IWebHostBuilder host)
+    {
+        return host.UseSetting($"ConnectionStrings:{ThrottlingServiceCollectionExtensions.ValkeyConnectionName}", UnusedValkey);
     }
 
     /// <summary>A fresh P-256 signing key under <see cref="KeyId"/>.</summary>

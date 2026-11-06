@@ -152,6 +152,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gateway; `Gateway:Docs:Enabled` switches it on elsewhere, anonymously.
   See [API docs](docs/api-consumers/api-docs.md) and
   [switching them on](docs/operators/api-docs.md).
+- The gateway holds every tenant to the rate limit of its plan, a token
+  bucket of the plan's burst refilled at its requests per second. A request
+  over it is answered with `429`, `Retry-After` and the problem type
+  `rate-limited`, never reaches the module and is not metered; every module
+  response carries the `RateLimit-Policy` and `RateLimit` headers. The
+  buckets live in Valkey, so the limit holds across gateway replicas, and the
+  AppHost and the compose file now run two. While Valkey is down the gateway
+  fails open and counts the requests it let through. See
+  [rate limits](docs/api-consumers/rate-limits.md) and
+  [throttling](docs/operators/throttling.md).
 
 ### Changed
 

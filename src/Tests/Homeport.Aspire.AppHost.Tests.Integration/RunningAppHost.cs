@@ -7,6 +7,7 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
 
 namespace Homeport.Aspire.AppHost.Tests.Integration;
@@ -49,6 +50,20 @@ public sealed class RunningAppHost : IAsyncLifetime
     // failing. A request that takes longer counts as not answered yet.
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(3);
 
+    /// <summary>
+    /// The rate limit of the seeded plan in this run: small, so the throttling
+    /// tests reach it with a handful of requests, however slow the machine.
+    /// </summary>
+    internal const int SeededRequestsPerSecond = 1;
+
+    /// <summary>How many requests the seeded plan's bucket holds in this run.</summary>
+    internal const int SeededBurst = 5;
+
+    private const string GatewayEndpoint = "http";
+
+    // Every replica is told where to listen; the dashboard shows only the proxy in front of them.
+    private const string ListenUrlsVariable = "ASPNETCORE_URLS";
+
     /// <summary>The tenant the control plane seeds, as the AppHost's parameter names it.</summary>
     internal static readonly Guid SeededTenantId = Guid.Parse("3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61");
 
@@ -86,9 +101,62 @@ public sealed class RunningAppHost : IAsyncLifetime
     /// A client of the gateway with a token of <see cref="SeededClient"/>
     /// granting <see cref="EchoInvokeScope"/>, once
     /// Echo, the gateway, Keycloak and the control plane are healthy and the
-    /// gateway routes to Echo.
+    /// gateway routes to Echo. It sends a request that exceeds the seeded
+    /// plan's limit again once the gateway says a token is free.
     /// </summary>
-    internal async Task<HttpClient> GatewayRoutingEchoAsync()
+    internal Task<HttpClient> GatewayRoutingEchoAsync()
+    {
+        return RoutingEchoAsync(new HttpClient(new RetryAfterHandler()) { BaseAddress = App.GetEndpoint("gateway", GatewayEndpoint) });
+    }
+
+    /// <summary>
+    /// Like <see cref="GatewayRoutingEchoAsync"/>, but a request that exceeds
+    /// the seeded plan's limit is answered as the gateway answered it.
+    /// </summary>
+    internal Task<HttpClient> ThrottledGatewayRoutingEchoAsync()
+    {
+        return RoutingEchoAsync(App.CreateHttpClient("gateway"));
+    }
+
+    /// <summary>
+    /// A client per gateway replica, sent to the replica itself rather than
+    /// through the proxy in front of them, each like
+    /// <see cref="ThrottledGatewayRoutingEchoAsync"/>.
+    /// </summary>
+    internal async Task<IReadOnlyList<HttpClient>> GatewayReplicasRoutingEchoAsync()
+    {
+        using var timeout = new CancellationTokenSource(StartTimeout);
+        var replicas = App.Services.GetRequiredService<DistributedApplicationModel>().Resources
+            .Single(resource => resource.Name == "gateway")
+            .Annotations.OfType<ReplicaAnnotation>()
+            .Single().Replicas;
+
+        var addresses = new Dictionary<string, Uri>(StringComparer.Ordinal);
+        await foreach (var update in App.ResourceNotifications.WatchAsync(timeout.Token))
+        {
+            var listening = update.Snapshot.EnvironmentVariables
+                .FirstOrDefault(variable => variable.Name == ListenUrlsVariable)?.Value;
+            if (update.Resource.Name == "gateway" && update.Snapshot.HealthStatus == HealthStatus.Healthy && listening is not null)
+            {
+                addresses[update.ResourceId] = new Uri(listening);
+            }
+
+            if (addresses.Count == replicas)
+            {
+                break;
+            }
+        }
+
+        var clients = new List<HttpClient>();
+        foreach (var address in addresses.Values)
+        {
+            clients.Add(await RoutingEchoAsync(new HttpClient { BaseAddress = address }));
+        }
+
+        return clients;
+    }
+
+    private async Task<HttpClient> RoutingEchoAsync(HttpClient gateway)
     {
         using var timeout = new CancellationTokenSource(StartTimeout);
         await App.ResourceNotifications.WaitForResourceHealthyAsync("echo", timeout.Token);
@@ -96,7 +164,6 @@ public sealed class RunningAppHost : IAsyncLifetime
         await App.ResourceNotifications.WaitForResourceHealthyAsync("keycloak", timeout.Token);
         await App.ResourceNotifications.WaitForResourceHealthyAsync("control-plane", timeout.Token);
 
-        var gateway = App.CreateHttpClient("gateway");
         gateway.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await TokenAsync(SeededClient, EchoInvokeScope));
         await StatusOnceAsync(gateway, status => status != HttpStatusCode.NotFound, RouteTimeout);
 
@@ -240,7 +307,12 @@ public sealed class RunningAppHost : IAsyncLifetime
     {
         using var timeout = new CancellationTokenSource(StartTimeout);
 
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Homeport_Aspire_AppHost>(timeout.Token);
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Homeport_Aspire_AppHost>(
+            [
+                $"Parameters:seed-plan-requests-per-second={SeededRequestsPerSecond}",
+                $"Parameters:seed-plan-burst={SeededBurst}",
+            ],
+            timeout.Token);
         app = await builder.BuildAsync(timeout.Token);
         await app.StartAsync(timeout.Token);
     }
