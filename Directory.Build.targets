@@ -9,4 +9,15 @@
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
   </ItemGroup>
 
+  <!-- A project that becomes an image sets ShipsThirdPartyNotices, and its
+       publish - so its image, under /app/ - carries the one notices file of
+       the repository root (dotnet-core.notices). No Exists condition: a
+       missing file fails the publish instead of shipping an image without it. -->
+  <ItemGroup Condition="'$(ShipsThirdPartyNotices)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)THIRD-PARTY-NOTICES.md"
+          Link="THIRD-PARTY-NOTICES.md"
+          CopyToPublishDirectory="PreserveNewest"
+          CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
 </Project>

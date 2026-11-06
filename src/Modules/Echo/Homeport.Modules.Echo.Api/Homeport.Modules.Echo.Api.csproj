@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Becomes an image: carries THIRD-PARTY-NOTICES.md (Directory.Build.targets). -->
+    <ShipsThirdPartyNotices>true</ShipsThirdPartyNotices>
     <!-- The XML docs of the controllers become the OpenAPI document
          (dotnet-core.web); CS1591 stays off, the rule covers endpoints only. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
