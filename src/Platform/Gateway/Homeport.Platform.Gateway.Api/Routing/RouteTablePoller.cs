@@ -10,11 +10,13 @@ namespace Homeport.Platform.Gateway.Api.Routing;
 /// Reads the route table from the registry every <see cref="PollInterval"/>
 /// and rebuilds the proxy configuration when it changed (ADR-0004). While the
 /// registry cannot be read, the gateway keeps serving the last known routes,
-/// and the API docs stay as they are.
+/// and the API docs stay as they are. The <see cref="PlatformRoutes"/> stand
+/// next to the module routes in every configuration.
 /// </summary>
 internal sealed class RouteTablePoller(
     RegistryClient registry,
     InMemoryConfigProvider proxy,
+    PlatformRoutes platform,
     ApiDocsRefresher docs,
     TimeProvider time,
     ILogger<RouteTablePoller> logger)
@@ -47,7 +49,8 @@ internal sealed class RouteTablePoller(
             }
 
             var (routes, clusters) = ModuleRoutes.Build(read.Table);
-            proxy.Update(routes, clusters);
+            var (platformRoutes, platformClusters) = platform.Build();
+            proxy.Update([.. platformRoutes, .. routes], [.. platformClusters, .. clusters]);
             etag = read.ETag;
             docs.RoutesChanged(read.Table);
 

@@ -10,13 +10,15 @@ namespace Homeport.Platform.Gateway.Infrastructure.Signing;
 /// <summary>
 /// Issues the token the gateway sends a module with every forwarded request
 /// (ADR-0011): audience the module id, claims tenant, client, subject and
-/// scopes. A token is issued per request, since its claims are the caller's.
+/// scopes. The caller token for a platform service (ADR-0019) is the same
+/// token for the service's audience. A token is issued per request, since
+/// its claims are the caller's.
 /// </summary>
 public sealed class ModuleTokenIssuer(SigningKeys keys, IOptions<ModuleTokenOptions> options, TimeProvider time)
 {
     private readonly JsonWebTokenHandler handler = new();
 
-    /// <summary>A token that tells <see cref="ModuleCaller.ModuleId"/> who calls it.</summary>
+    /// <summary>A token that tells <see cref="ModuleCaller.Audience"/> who calls it.</summary>
     public string Issue(ModuleCaller caller)
     {
         ArgumentNullException.ThrowIfNull(caller);
@@ -26,7 +28,7 @@ public sealed class ModuleTokenIssuer(SigningKeys keys, IOptions<ModuleTokenOpti
         return handler.CreateToken(new SecurityTokenDescriptor
         {
             Issuer = GatewayTokens.Issuer,
-            Audience = caller.ModuleId,
+            Audience = caller.Audience,
             Claims = new Dictionary<string, object>
             {
                 [GatewayTokens.SubjectClaim] = caller.Subject,

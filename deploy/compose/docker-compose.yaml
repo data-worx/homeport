@@ -148,6 +148,7 @@ services:
       CONTROL_PLANE_HTTP: "http://control-plane:${CONTROL_PLANE_PORT}"
       services__control-plane__http__0: "http://control-plane:${CONTROL_PLANE_PORT}"
       CONTROL_PLANE_HTTPS: "https://control-plane:${CONTROL_PLANE_PORT}"
+      PlatformRoutes__MeteringUrl: "http://metering:${METERING_PORT}"
     ports:
       - "${GATEWAY_PORT}"
     depends_on:
@@ -219,6 +220,9 @@ services:
       OTEL_SERVICE_NAME: "homeport-metering"
       ConnectionStrings__metering: "Host=postgres;Port=5432;Database=homeport;Username=metering_app;Password=${METERING_APP_PASSWORD}"
       ConnectionStrings__rabbitmq: "amqp://metering:${METERING_RABBITMQ_PASSWORD}@rabbitmq:5672"
+      GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
+      services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
+      GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
     expose:
       - "${METERING_PORT}"
     depends_on:

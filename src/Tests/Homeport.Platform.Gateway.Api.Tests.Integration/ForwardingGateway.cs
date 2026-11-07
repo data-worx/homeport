@@ -19,7 +19,8 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 /// request with the path and the headers it received, so a test sees what the
 /// gateway forwards, except for the paths under <see cref="ErrorsPath"/>, which
 /// answer with an error, and <see cref="UsagePath"/>, which reports usage.
-/// Clients authenticate with a stand-in identity
+/// The platform routes go to a stand-in for metering, which answers every
+/// request the same way. Clients authenticate with a stand-in identity
 /// provider and are looked up at a stand-in control plane, and draw from
 /// <see cref="Buckets"/> rather than Valkey. What the gateway
 /// logs, down to Debug, is read from <see cref="Logs"/>, and the messages it
@@ -63,6 +64,7 @@ public sealed class ForwardingGateway : IAsyncLifetime
     private static readonly TimeSpan RoutesPoll = TimeSpan.FromMilliseconds(50);
 
     private WebApplication? module;
+    private WebApplication? metering;
     private StandInRegistry? registry;
     private StandInIdentityProvider? identityProvider;
     private StandInControlPlane? controlPlane;
@@ -109,10 +111,14 @@ public sealed class ForwardingGateway : IAsyncLifetime
             context.Response.Headers[ModuleHeaders.Usage] = context.Request.Query[ReportQuery];
             return Results.NoContent();
         });
-        module.MapFallback(context => context.Response.WriteAsJsonAsync(new ForwardedRequest(
-            context.Request.Path,
-            context.Request.Headers.ToDictionary(header => header.Key.ToLowerInvariant(), header => header.Value.ToString()))));
+        module.MapFallback(EchoRequest);
         await module.StartAsync();
+
+        var meteringBuilder = WebApplication.CreateSlimBuilder();
+        meteringBuilder.WebHost.UseUrls(LocalAddress);
+        metering = meteringBuilder.Build();
+        metering.MapFallback(EchoRequest);
+        await metering.StartAsync();
 
         registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(
             module.Urls.Single(), RequestPath, UsagePath, NotFoundProblemPath, InternalProblemPath, HtmlBadRequestPath));
@@ -126,6 +132,7 @@ public sealed class ForwardingGateway : IAsyncLifetime
                 .WithSigningKey()
                 .WithRegistry(registry)
                 .WithClients(identityProvider, controlPlane)
+                .UseSetting("PlatformRoutes:MeteringUrl", metering.Urls.Single())
                 .ConfigureLogging(logging => logging.AddFakeLogging().SetMinimumLevel(LogLevel.Debug)));
         await WaitForRoutesAsync(gateway);
     }
@@ -174,5 +181,18 @@ public sealed class ForwardingGateway : IAsyncLifetime
             await module.StopAsync();
             await module.DisposeAsync();
         }
+
+        if (metering is not null)
+        {
+            await metering.StopAsync();
+            await metering.DisposeAsync();
+        }
+    }
+
+    private static Task EchoRequest(HttpContext context)
+    {
+        return context.Response.WriteAsJsonAsync(new ForwardedRequest(
+            context.Request.Path,
+            context.Request.Headers.ToDictionary(header => header.Key.ToLowerInvariant(), header => header.Value.ToString())));
     }
 }

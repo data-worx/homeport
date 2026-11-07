@@ -72,6 +72,11 @@ public sealed class RunningAppHost : IAsyncLifetime
 
     private static readonly TimeSpan MeteringPoll = TimeSpan.FromMilliseconds(250);
 
+    private const string EchoRequestsSql = """
+        SELECT coalesce(sum("Quantity"), 0)::bigint FROM metering."UsageEvents"
+        WHERE "ModuleId" = 'echo' AND "Meter" = 'requests' AND "OccurredAt" >= @from AND "OccurredAt" < @to
+        """;
+
     // In one statement, so the event and the aggregates come from the same
     // snapshot; metering writes them in one transaction.
     private const string UsageOfTraceSql = """
@@ -263,6 +268,22 @@ public sealed class RunningAppHost : IAsyncLifetime
 
             await Task.Delay(MeteringPoll, timeout.Token);
         }
+    }
+
+    /// <summary>
+    /// The sum of the quantities of every event metering holds for
+    /// <see cref="SeededTenantId"/> of Echo's meter <c>requests</c> in
+    /// [<paramref name="from"/>, <paramref name="to"/>).
+    /// </summary>
+    internal async Task<long> RecordedEchoRequestsAsync(DateTimeOffset from, DateTimeOffset to)
+    {
+        using var timeout = new CancellationTokenSource(MeteringTimeout);
+        await using var connection = await MeteringConnectionAsync(timeout.Token);
+        await using var query = new NpgsqlCommand(EchoRequestsSql, connection);
+        query.Parameters.AddWithValue("from", from);
+        query.Parameters.AddWithValue("to", to);
+
+        return (long)(await query.ExecuteScalarAsync(timeout.Token))!;
     }
 
     private async Task<NpgsqlConnection> MeteringConnectionAsync(CancellationToken cancellationToken)

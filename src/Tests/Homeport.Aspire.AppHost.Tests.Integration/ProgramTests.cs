@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -10,7 +11,9 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Modules.Echo.V1;
+using Homeport.Shared.Client.Platform.Metering.V1;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic.FileIO;
 
 namespace Homeport.Aspire.AppHost.Tests.Integration;
 
@@ -23,6 +26,8 @@ public sealed class ProgramTests
 
         // Far more than the seeded plan's bucket holds and refills while they run.
         private const int ThrottledRequests = 30;
+
+        private static readonly TimeSpan ExportPoll = TimeSpan.FromMilliseconds(250);
 
         [Theory]
         [InlineData("postgres")]
@@ -183,6 +188,37 @@ public sealed class ProgramTests
             Assert.Equal((5, usage.EventsInHour, usage.EventsOnDay), (usage.Quantity, usage.Hourly, usage.Daily));
         }
 
+        // The other tests' calls to Echo, and the gateway's own probes, count in
+        // the same hours, and a probe's event may reach metering after its
+        // answer reached the test. So the export is compared with the events
+        // metering holds once both agree, after three calls it has counted.
+        // Two hours, so the hour may turn while the test runs.
+        [Fact]
+        public async Task Exports_The_Requests_Metering_Counted_For_Calls_To_Echo_In_Json()
+        {
+            var gateway = await Gateway();
+            var hour = UsageHour();
+            await CallEchoAndWaitForMeteringAsync(gateway, calls: 3);
+
+            var (exported, recorded) = await ExportedAndRecordedAsync(gateway, hour, csv: false);
+
+            Assert.InRange(recorded, 3, long.MaxValue);
+            Assert.Equal(recorded, exported);
+        }
+
+        [Fact]
+        public async Task Exports_The_Requests_Metering_Counted_For_Calls_To_Echo_In_Csv()
+        {
+            var gateway = await Gateway();
+            var hour = UsageHour();
+            await CallEchoAndWaitForMeteringAsync(gateway, calls: 3);
+
+            var (exported, recorded) = await ExportedAndRecordedAsync(gateway, hour, csv: true);
+
+            Assert.InRange(recorded, 3, long.MaxValue);
+            Assert.Equal(recorded, exported);
+        }
+
         [Fact]
         public async Task Removes_The_Usage_Report_Of_Echo_Before_The_Caller_Sees_It()
         {
@@ -273,5 +309,71 @@ public sealed class ProgramTests
         }
 
         private Task<HttpClient> Gateway() => appHost.GatewayRoutingEchoAsync();
+
+        private static DateTimeOffset UsageHour()
+        {
+            var now = TimeProvider.System.GetUtcNow();
+            return new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, 0, 0, TimeSpan.Zero);
+        }
+
+        // Each call is traced, so the test waits until metering has counted it.
+        private async Task CallEchoAndWaitForMeteringAsync(HttpClient gateway, int calls)
+        {
+            for (var i = 0; i < calls; i++)
+            {
+                var traceId = ActivityTraceId.CreateRandom().ToHexString();
+                using var request = new HttpRequestMessage(HttpMethod.Get, RunningAppHost.EchoRequestPath);
+                request.Headers.Add("traceparent", $"00-{traceId}-00f067aa0ba902b7-01");
+                using var response = await gateway.SendAsync(request);
+                await appHost.MeteredAsync(traceId);
+            }
+        }
+
+        // Polls until the export and the recorded events agree, or the time is up.
+        private async Task<(long Exported, long Recorded)> ExportedAndRecordedAsync(HttpClient gateway, DateTimeOffset hour, bool csv)
+        {
+            var deadline = TimeProvider.System.GetUtcNow() + RunningAppHost.MeteringTimeout;
+            while (true)
+            {
+                var exported = await ExportedRequestsAsync(gateway, hour, csv);
+                var recorded = await appHost.RecordedEchoRequestsAsync(hour, hour.AddHours(2));
+                if (exported == recorded || TimeProvider.System.GetUtcNow() >= deadline)
+                {
+                    return (exported, recorded);
+                }
+
+                await Task.Delay(ExportPoll);
+            }
+        }
+
+        // The seeded tenant's requests to Echo in the hour from hour on and the next.
+        private static async Task<long> ExportedRequestsAsync(HttpClient gateway, DateTimeOffset hour, bool csv)
+        {
+            var path = $"/platform/v1/usage?from={hour:yyyy-MM-ddTHH:mm:ssZ}&to={hour.AddHours(2):yyyy-MM-ddTHH:mm:ssZ}&granularity=hour&module=echo&meter=requests";
+            using var request = new HttpRequestMessage(HttpMethod.Get, path);
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(csv ? UsageApi.CsvMediaType : "application/json"));
+            using var response = await gateway.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            if (!csv)
+            {
+                var usage = await response.Content.ReadFromJsonAsync<UsageResponse>();
+                return usage!.Usage.Sum(entry => entry.Quantity);
+            }
+
+            using var parser = new TextFieldParser(await response.Content.ReadAsStreamAsync());
+            parser.SetDelimiters(",");
+            parser.HasFieldsEnclosedInQuotes = true;
+            var header = parser.ReadFields()!;
+            var quantity = Array.IndexOf(header, "quantity");
+
+            var total = 0L;
+            while (!parser.EndOfData)
+            {
+                total += long.Parse(parser.ReadFields()![quantity], CultureInfo.InvariantCulture);
+            }
+
+            return total;
+        }
     }
 }

@@ -2,7 +2,9 @@
 
 Metering counts the usage of every module per tenant: every request the
 gateway forwards to a module becomes a usage event, which metering adds to
-an hourly and a daily aggregate per tenant, module and meter. How it works
+an hourly and a daily aggregate per tenant, module and meter. A tenant reads
+its own aggregates through the gateway at `/platform/v1/usage`, as JSON or
+CSV; see [reading usage](../api-consumers/reading-usage.md). How it works
 and what it guarantees is in
 [the architecture page](../architecture/metering.md).
 
@@ -110,8 +112,25 @@ The gateway publishes with `ConnectionStrings__rabbitmq` built from
 retry, `00:00:01`, `00:00:05` and `00:00:30` when none is set. Setting one
 replaces all three. The gateway logs the delays that apply when it starts.
 
-Metering serves no API in this release beyond its health endpoints; the
-export of usage follows.
+## The usage export
+
+Metering serves `GET /v1/usage`, which the gateway forwards from
+`/platform/v1/usage` to clients with the scope `usage.read`. The route is
+configured in the gateway, not registered
+([ADR-0019](../architecture/adr/0019-tokens-for-forwarded-platform-requests.md)).
+The gateway replaces the client's token with a caller token for the
+audience `homeport-metering`, which names the client's tenant; metering
+validates it against the gateway's JWKS and serves that tenant's rows only.
+A service token, which names no tenant, is refused with `403`.
+
+| Environment variable | Service | Meaning |
+|---|---|---|
+| `PlatformRoutes__MeteringUrl` | gateway | Where the gateway forwards the export; `http://metering` when none is set. The AppHost and the compose file set metering's endpoint |
+| `GatewayTokens__JwksUri` | metering | The gateway's JWKS; `http://gateway/.well-known/jwks.json` when none is set, which the reference the AppHost and the compose file set resolves |
+
+The gateway logs the metering address that applies when it starts. The
+export counts against the tenant's rate limit and is not itself metered.
+Metering logs a token it refuses at Warning, without the token.
 
 ## Metrics and logs
 

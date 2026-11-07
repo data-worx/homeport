@@ -17,21 +17,28 @@ namespace Homeport.Platform.Gateway.Api.Usage;
 /// whatever the status. Part of the proxy pipeline, so it sees only requests
 /// of a known client on a module's route; one the gateway refuses before -
 /// <c>401</c>, <c>403</c>, an unknown module - is not a module request and
-/// is not counted. The quantity is the route's default, unless the module
+/// is not counted, and neither is a request on a platform route, which names
+/// no module. The quantity is the route's default, unless the module
 /// reported one that <see cref="ReportedUsage"/> accepts.
 /// </summary>
 internal sealed class UsageEvents(RequestDelegate next, TimeProvider time, UsageMetrics metrics, ILogger<UsageEvents> logger)
 {
     public async Task InvokeAsync(HttpContext context, UsagePublisher publisher)
     {
+        var route = context.GetReverseProxyFeature().Route.Config.Metadata
+            ?? throw new InvalidOperationException("A proxy route carries no metadata.");
+        if (!route.ContainsKey(ModuleRoutes.ModuleIdMetadata))
+        {
+            await next(context);
+            return;
+        }
+
         var started = time.GetTimestamp();
         await next(context);
 
         // The client policy of every module route has set it.
         var client = context.Features.Get<ClientResponse>()
             ?? throw new InvalidOperationException("A request reached a module without a known client.");
-        var route = context.GetReverseProxyFeature().Route.Config.Metadata
-            ?? throw new InvalidOperationException("A module route carries no metadata.");
 
         await publisher.PublishAsync(new UsageRecorded(
             Guid.NewGuid(),
