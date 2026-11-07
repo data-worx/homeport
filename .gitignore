@@ -443,3 +443,6 @@ FodyWeavers.xsd
 
 # An operator's local compose override, as docs/operators/logging.md describes it
 deploy/compose/docker-compose.override.yaml
+
+# The private half of the release signing key; only cosign.pub is committed
+cosign.key
