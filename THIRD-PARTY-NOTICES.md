@@ -76,8 +76,8 @@ asset change; the `notices` gate fails while it is stale.
 | OpenTelemetry.Api.ProviderBuilderExtensions | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
 | OpenTelemetry.Exporter.OpenTelemetryProtocol | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
 | OpenTelemetry.Extensions.Hosting | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Instrumentation.AspNetCore | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Instrumentation.Http | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Instrumentation.AspNetCore | 1.20.2 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Instrumentation.Http | 1.20.2 | Apache-2.0 | Copyright The OpenTelemetry Authors |
 | OpenTelemetry.Instrumentation.Runtime | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
 | Pipelines.Sockets.Unofficial | 2.2.16 | MIT | Marc Gravell 2018 |
 | Polly.Core | 8.4.2 | BSD-3-Clause | Copyright (c) 2024, App vNext |
