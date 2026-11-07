@@ -18,7 +18,7 @@ public sealed class ProgramTests
             var response = await echo.CreateClient().GetStringAsync("/.well-known/homeport/manifest");
 
             var root = JsonDocument.Parse(response).RootElement;
-            Assert.Equal(0, root.GetProperty("contractVersion").GetInt32());
+            Assert.Equal(1, root.GetProperty("contractVersion").GetInt32());
         }
 
         [Fact]

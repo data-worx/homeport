@@ -21,7 +21,7 @@ public sealed class RouteTableTests
 
     private static Instance Instance(string moduleId, string instanceId, Uri address, string version, params ManifestRoute[] routes)
     {
-        var manifest = new Manifest(moduleId, "Things", version, 0, routes, ["things.read", "things.write"], ["requests", "documents"], "/openapi/v1.json");
+        var manifest = new Manifest(moduleId, "Things", version, 1, routes, ["things.read", "things.write"], ["requests", "documents"], "/openapi/v1.json");
         return new Instance(instanceId, address, manifest);
     }
 

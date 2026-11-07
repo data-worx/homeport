@@ -113,7 +113,7 @@ open the dashboard, follow the endpoint of `echo` and append
   ],
   "scopes": ["echo.invoke"],
   "meters": ["requests"],
-  "contractVersion": 0,
+  "contractVersion": 1,
   "openApiUrl": "/openapi/v1.json"
 }
 ```

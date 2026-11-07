@@ -309,7 +309,7 @@ public sealed class HomeportModuleExtensionsTests
             Assert.Equal("things", root.GetProperty("id").GetString());
             Assert.Equal("Things", root.GetProperty("name").GetString());
             Assert.Equal("1.2.3", root.GetProperty("version").GetString());
-            Assert.Equal(0, root.GetProperty("contractVersion").GetInt32());
+            Assert.Equal(1, root.GetProperty("contractVersion").GetInt32());
             Assert.Equal(["things.write"], root.GetProperty("scopes").EnumerateArray().Select(scope => scope.GetString()));
             Assert.Equal(["requests"], root.GetProperty("meters").EnumerateArray().Select(meter => meter.GetString()));
         }

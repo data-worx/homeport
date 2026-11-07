@@ -82,7 +82,7 @@ public sealed class InstancesControllerTests
             Assert.Equal(MediaTypeNames.Application.ProblemJson, response.Content.Headers.ContentType?.MediaType);
             var problem = await response.Content.ReadFromJsonAsync<ProblemResponse>();
             Assert.Equal(new Uri(ProblemConventions.TypePrefix + "invalid-manifest"), problem?.Type);
-            Assert.Equal(["Contract version 99 is not supported; supported versions: 0."], problem?.Errors?["contractVersion"] ?? []);
+            Assert.Equal(["Contract version 99 is not supported; supported versions: 1."], problem?.Errors?["contractVersion"] ?? []);
         }
 
         [Fact]

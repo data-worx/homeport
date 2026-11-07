@@ -1,9 +1,9 @@
 # Module contract
 
-**Status: draft, `contractVersion` 0.** Normative once v0.1 ships, which sets
-`contractVersion` to 1; from then on every change bumps it. Until then
-it changes freely, but every change still updates the SDK and the Echo module
-in the same pull request.
+**Status: normative, `contractVersion` 1**, the version released with v0.1.
+Every change bumps it and updates the SDK, this documentation and the Echo
+module in the same pull request. The drafts before it carried version 0 and
+were never released.
 
 The contract is language-neutral HTTP. A module may be written in any language;
 the .NET SDK (`Homeport.Sdk`) is a convenience, not a requirement.

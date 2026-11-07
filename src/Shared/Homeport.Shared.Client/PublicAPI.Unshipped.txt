@@ -1,5 +1,5 @@
 #nullable enable
-const Homeport.Shared.Client.ModuleContract.ModuleManifest.CurrentContractVersion = 0 -> int
+const Homeport.Shared.Client.ModuleContract.ModuleManifest.CurrentContractVersion = 1 -> int
 const Homeport.Shared.Client.ModuleContract.ModuleManifest.ManifestPath = "/.well-known/homeport/manifest" -> string!
 const Homeport.Shared.Client.ModuleContract.ModuleManifest.OpenApiPath = "/openapi/v1.json" -> string!
 const Homeport.Shared.Client.ModuleContract.ModuleHeaders.Usage = "X-Homeport-Usage" -> string!

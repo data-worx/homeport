@@ -3,8 +3,7 @@
 How Homeport keeps track of what its images contain, and why it is set up
 this way. The decision is
 [ADR-0009](adr/0009-supply-chain-security.md); the binding rules are in
-[`AGENTS.md`](../../AGENTS.md#supply-chain). Signing and publishing images
-come with the release work.
+[`AGENTS.md`](../../AGENTS.md#supply-chain).
 
 ## What is scanned
 
@@ -15,8 +14,11 @@ images, built from their projects the way a release builds them. The
 [`.github/scripts/scan-images.sh`](../../.github/scripts/scan-images.sh),
 which reads the image list from the compose file rather than keeping one of
 its own. An own image appears there as a variable such as `${GATEWAY_IMAGE}`;
-the script maps it to its project through a table, and fails on a variable it
-cannot map. A new service therefore cannot slip past the scan.
+the script maps it to its project through the table in
+[`own-images.sh`](../../.github/scripts/own-images.sh), which the release
+shares, and fails on a variable it cannot map. A new service therefore cannot
+slip past the scan. The image is named by `ContainerRepository` in its
+project.
 
 Trivy fails the run on any High or Critical vulnerability. The workflow runs
 on every pull request, on every push to `main`, and nightly: a vulnerability
@@ -68,6 +70,38 @@ what a scanner finds in a full distribution image and most of what an
 attacker could use. The SDK picks the `-extra` variant, which keeps ICU and
 the time zone data, because no project switches to invariant globalisation.
 The image runs as the non-root user `app` (UID 1654).
+
+## Releases
+
+A tag releases. The [*Release* workflow](../../.github/workflows/release.yml)
+runs on a tag `vX.Y.Z`, or `vX.Y.Z-<pre-release>` such as `v0.1.0-rc.1`, and
+[`check-release.sh`](../../.github/scripts/check-release.sh) refuses it
+unless the tagged commit is on `main`, `X.Y.Z` is the `<Version>` in
+`src/Directory.Build.props`, and — for a release, not a pre-release —
+`CHANGELOG.md` has its section `## [X.Y.Z]`. That section becomes the
+release notes, so no release goes out without them.
+
+[`release-images.sh`](../../.github/scripts/release-images.sh) then builds
+every own image from the table in `own-images.sh`, the same images the scan
+covers. Each is scanned before anything is pushed, so a High or Critical
+finding stops the release, and only then pushed to
+`ghcr.io/data-worx/<image>`, signed with cosign and given its SBOM as a
+signed CycloneDX attestation. The GitHub release carries the compose file
+with every own image pinned by digest, the `deploy/` directory it needs, and
+one SBOM per image.
+
+Signing uses a key pair rather than Sigstore's keyless signing, and writes
+no entry into Sigstore's public transparency log. An installation without
+internet access verifies an image with `cosign.pub` from the repository and
+access to its registry alone, as [verifying an image](../operators/verifying-images.md)
+shows. The price is that trust rests on the key: there is no public record
+of what was signed. The private key and its password are the repository
+secrets `COSIGN_PRIVATE_KEY` and `COSIGN_PASSWORD`, and no workflow but
+the release reads them.
+
+Nothing is signed or pushed outside a release: the scan builds the same
+images on every pull request without pushing them. The scripts the release
+runs are tested by the `scripts` gate.
 
 ## Licence notices
 

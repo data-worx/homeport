@@ -120,9 +120,15 @@ The compose file in [`deploy/compose/`](../../deploy/compose/) is generated
 from the AppHost. Do not edit it; a change belongs in the AppHost, and the
 `compose` gate fails until the file is regenerated.
 
-No image of Homeport's own is published yet, so build the images of the
-gateway, the registry, the control plane, metering and the Echo module
-locally first, from the repository root:
+To run a released version, take `homeport-deploy-<version>.tar.gz` from its
+[GitHub release](https://github.com/data-worx/homeport/releases): its
+compose file runs the released images, pinned by digest, so the `_IMAGE`
+lines below are not needed. Verify the images first, as
+[verifying an image](verifying-images.md) describes.
+
+To run the source of this checkout, build the images of the gateway, the
+registry, the control plane, metering and the Echo module locally first,
+from the repository root:
 
 ```bash
 dotnet publish src/Platform/Gateway/Homeport.Platform.Gateway.Api -t:PublishContainer
@@ -135,11 +141,11 @@ dotnet publish src/Modules/Echo/Homeport.Modules.Echo.Api -t:PublishContainer
 The last line of each names its image:
 
 ```text
-… "homeport-platform-gateway-api:latest" …
-… "homeport-platform-registry-api:latest" …
-… "homeport-platform-controlplane:latest" …
-… "homeport-platform-metering-api:latest" …
-… "homeport-modules-echo-api:latest" …
+… "homeport-gateway:latest" …
+… "homeport-registry:latest" …
+… "homeport-control-plane:latest" …
+… "homeport-metering:latest" …
+… "homeport-module-echo:latest" …
 ```
 
 The compose file reads its settings from `deploy/compose/.env`, which is never
@@ -155,13 +161,13 @@ control plane's image, `metering-migrate` from metering's:
 ```bash
 cd deploy/compose
 {
-  printf 'ECHO_IMAGE=homeport-modules-echo-api:latest\nECHO_PORT=8080\n'
-  printf 'GATEWAY_IMAGE=homeport-platform-gateway-api:latest\nGATEWAY_PORT=8080\n'
-  printf 'REGISTRY_IMAGE=homeport-platform-registry-api:latest\nREGISTRY_PORT=8080\n'
-  printf 'CONTROL_PLANE_IMAGE=homeport-platform-controlplane:latest\nCONTROL_PLANE_PORT=8080\n'
-  printf 'CONTROL_PLANE_MIGRATE_IMAGE=homeport-platform-controlplane:latest\n'
-  printf 'METERING_IMAGE=homeport-platform-metering-api:latest\nMETERING_PORT=8080\n'
-  printf 'METERING_MIGRATE_IMAGE=homeport-platform-metering-api:latest\n'
+  printf 'ECHO_IMAGE=homeport-module-echo:latest\nECHO_PORT=8080\n'
+  printf 'GATEWAY_IMAGE=homeport-gateway:latest\nGATEWAY_PORT=8080\n'
+  printf 'REGISTRY_IMAGE=homeport-registry:latest\nREGISTRY_PORT=8080\n'
+  printf 'CONTROL_PLANE_IMAGE=homeport-control-plane:latest\nCONTROL_PLANE_PORT=8080\n'
+  printf 'CONTROL_PLANE_MIGRATE_IMAGE=homeport-control-plane:latest\n'
+  printf 'METERING_IMAGE=homeport-metering:latest\nMETERING_PORT=8080\n'
+  printf 'METERING_MIGRATE_IMAGE=homeport-metering:latest\n'
   printf 'POSTGRES_BINDMOUNT_0=../postgres/init\nKEYCLOAK_BINDMOUNT_0=../keycloak/realms\n'
   printf 'RABBITMQ_BINDMOUNT_0=../rabbitmq/init\n'
   sed -n 's/^\([A-Z_]*_\(PASSWORD\|SECRET\)\)=$/\1/p' .env.example | while read -r name; do

@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Releases a tag (ADR-0009): vX.Y.Z on main, with its section in CHANGELOG.md,
+# or vX.Y.Z-<pre-release> for a pre-release. Every own image of
+# deploy/compose/ is scanned, pushed to GHCR, signed with cosign and carries
+# its SBOM as a signed attestation. The GitHub release carries the compose
+# file pinned to the released images, the deploy directory it needs and one
+# SBOM per image. See docs/operators/verifying-images.md.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write # the GitHub release
+      packages: write # the images in GHCR
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The whole history, so check-release.sh sees whether the tag is on main.
+          fetch-depth: 0
+      - id: check
+        run: bash .github/scripts/check-release.sh "${TAG}" release-notes.md >> "${GITHUB_OUTPUT}"
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+      - uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
+        with:
+          version: v0.76.2
+          cache: true
+      - uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
+        with:
+          cosign-release: v3.1.4
+      - run: echo "${GH_TOKEN}" | docker login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: bash .github/scripts/release-images.sh "${{ steps.check.outputs.image_tag }}" release
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+      - name: Assemble the release assets
+        run: |
+          bash .github/scripts/render-compose.sh release/images.env release/docker-compose.yaml
+          bundle="homeport-deploy-${TAG#v}"
+          mkdir -p "release/${bundle}/deploy"
+          cp -r deploy/compose deploy/keycloak deploy/postgres deploy/rabbitmq "release/${bundle}/deploy/"
+          cp release/docker-compose.yaml "release/${bundle}/deploy/compose/docker-compose.yaml"
+          tar -czf "release/${bundle}.tar.gz" -C release "${bundle}"
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ steps.check.outputs.prerelease }}
+        run: |
+          flags=()
+          if [ "${PRERELEASE}" = "true" ]; then flags=(--prerelease --latest=false); fi
+          gh release create "${TAG}" --verify-tag --title "Homeport ${TAG#v}" \
+            --notes-file release-notes.md "${flags[@]}" \
+            release/docker-compose.yaml "release/homeport-deploy-${TAG#v}.tar.gz" release/sbom/*.cdx.json

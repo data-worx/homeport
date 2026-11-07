@@ -13,7 +13,7 @@ every failure, keyed by the field path in the manifest, in the notation of
   "title": "The manifest breaks the module contract.",
   "status": 422,
   "errors": {
-    "contractVersion": ["Contract version 99 is not supported; supported versions: 0."],
+    "contractVersion": ["Contract version 99 is not supported; supported versions: 1."],
     "routes[0].path": ["Path '/echo' must start with /v{major}/."]
   },
   "traceId": "4bf92f3577b34da6a3ce929d0e0e4736"

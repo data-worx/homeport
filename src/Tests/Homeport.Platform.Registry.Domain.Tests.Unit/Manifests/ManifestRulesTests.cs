@@ -14,7 +14,7 @@ public sealed class ManifestRulesTests
         Id: ModuleId,
         Name: "Things",
         Version: "1.2.3",
-        ContractVersion: 0,
+        ContractVersion: 1,
         Routes: [ValidRoute],
         Scopes: ["things.write"],
         Meters: ["requests"],
@@ -35,7 +35,7 @@ public sealed class ManifestRulesTests
         {
             var errors = ManifestRules.Validate(ModuleId, Valid with { ContractVersion = 99 });
 
-            Assert.Equal(["Contract version 99 is not supported; supported versions: 0."], errors["contractVersion"]);
+            Assert.Equal(["Contract version 99 is not supported; supported versions: 1."], errors["contractVersion"]);
         }
 
         [Theory]

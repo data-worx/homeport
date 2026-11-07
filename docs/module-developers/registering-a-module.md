@@ -52,7 +52,7 @@ stops with exit code 1, because it would run without ever being routed to:
 | Answer | Reason | Log names |
 |---|---|---|
 | `401` | Unknown module id, or a wrong key | the status |
-| `422` | The manifest breaks the module contract | every field and its message, such as `contractVersion: Contract version 99 is not supported; supported versions: 0.` |
+| `422` | The manifest breaks the module contract | every field and its message, such as `contractVersion: Contract version 99 is not supported; supported versions: 1.` |
 
 A registry that cannot be reached is not a refusal. The module logs a
 warning and tries again every 10 s.

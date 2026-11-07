@@ -13,48 +13,20 @@ set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
-compose="deploy/compose/docker-compose.yaml"
+. .github/scripts/own-images.sh
+
 sbom_dir="${1:-sbom}"
 tag="scan"
-
-# The project each own image of the compose file is built from, by the
-# variable that names the image there. A `migrate` service runs the image of
-# its service, so <NAME>_MIGRATE_IMAGE maps through <NAME>. A variable missing
-# here fails the scan, so no image of the compose file goes unscanned.
-declare -A projects=(
-  [CONTROL_PLANE]="src/Platform/ControlPlane/Homeport.Platform.ControlPlane"
-  [ECHO]="src/Modules/Echo/Homeport.Modules.Echo.Api"
-  [GATEWAY]="src/Platform/Gateway/Homeport.Platform.Gateway.Api"
-  [METERING]="src/Platform/Metering/Homeport.Platform.Metering.Api"
-  [REGISTRY]="src/Platform/Registry/Homeport.Platform.Registry.Api"
-)
-
-third_party=()
-declare -A own=()
 fail=0
 
-while read -r ref; do
-  if [[ "${ref}" =~ ^\$\{([A-Z_]+)_IMAGE\}$ ]]; then
-    name="${BASH_REMATCH[1]%_MIGRATE}"
-    if [ -z "${projects[${name}]:-}" ]; then
-      echo "No project for ${ref} in ${compose}; add it to the table in $0"
-      fail=1
-      continue
-    fi
-    own["${name}"]="${projects[${name}]}"
-  else
-    third_party+=("${ref}")
-  fi
-done < <(sed -n -E 's/^[[:space:]]+image:[[:space:]]*"?([^"]+)"?[[:space:]]*$/\1/p' "${compose}")
-
-[ "${fail}" -eq 0 ] || exit 1
+read_compose_images || exit 1
 
 images=("${third_party[@]}")
 for name in $(printf '%s\n' "${!own[@]}" | sort); do
-  repository="homeport-$(echo "${name}" | tr 'A-Z_' 'a-z-')"
+  repository="$(image_repository "${own[${name}]}")"
   echo "::group::Build ${repository} from ${own[${name}]}"
   dotnet publish "${own[${name}]}" -t:PublishContainer --nologo \
-    -p:ContainerRepository="${repository}" -p:ContainerImageTag="${tag}" || fail=1
+    -p:ContainerImageTag="${tag}" || fail=1
   echo "::endgroup::"
   images+=("${repository}:${tag}")
 done

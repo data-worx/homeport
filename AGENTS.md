@@ -359,7 +359,8 @@ See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
   `main` and nightly. High or Critical fails the run. It writes a CycloneDX
   SBOM per own image as a build artifact.
 - Every image of the compose files is in the scan: a new own image is added
-  to the table in `.github/scripts/scan-images.sh`, or the scan fails.
+  to the table in `.github/scripts/own-images.sh`, or the scan and the
+  release fail.
 - Findings are removed at the source first: a patched version, a newer
   digest, or a leaner variant of the image.
 - Exceptions only in `.trivyignore`, each entry with `exp:YYYY-MM-DD` in a
@@ -372,6 +373,12 @@ See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
 - Actions in workflows are pinned by commit SHA, the version in a comment.
 - Own images use chiseled .NET base images, run as non-root, and are signed
   with cosign on release.
+- A release is a tag `vX.Y.Z` on `main` whose `X.Y.Z` is the `<Version>` in
+  `src/Directory.Build.props` and has its section in `CHANGELOG.md`; the
+  *Release* workflow refuses any other. It signs with the key pair whose
+  public half is `cosign.pub`, without Sigstore's transparency log, so an
+  operator verifies offline. The private key exists only as a repository
+  secret and in the maintainer's secret store.
 - One `THIRD-PARTY-NOTICES.md` in the repository root covers every project
   that becomes an own image: each is listed in `NOTICES_PROJECTS` in
   `.devkit/gates.sh`, sets `ShipsThirdPartyNotices`, and carries the file at

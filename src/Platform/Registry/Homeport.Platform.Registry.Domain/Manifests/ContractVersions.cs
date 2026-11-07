@@ -6,8 +6,9 @@ namespace Homeport.Platform.Registry.Domain.Manifests;
 public static class ContractVersions
 {
     /// <summary>
-    /// The current version and, once there is one, the previous. The contract
-    /// is at 0 until v0.1 ships, so there is no previous version yet.
+    /// The current version and, once there is one, the previous. Version 1 is
+    /// the first released with v0.1; the drafts before it were never released,
+    /// so there is no previous version yet.
     /// </summary>
-    public static IReadOnlyList<int> Supported { get; } = [0];
+    public static IReadOnlyList<int> Supported { get; } = [1];
 }

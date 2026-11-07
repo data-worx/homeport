@@ -162,9 +162,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fails open and counts the requests it let through. See
   [rate limits](docs/api-consumers/rate-limits.md) and
   [throttling](docs/operators/throttling.md).
+- Releases with signed images. A tag publishes Homeport's own images to
+  GHCR as `ghcr.io/data-worx/homeport-<component>`, each signed with cosign
+  and carrying its SBOM as a signed attestation. An operator verifies an
+  image with `cosign.pub` from the repository alone, without network access
+  to Sigstore. Each GitHub release carries a compose file pinned to the
+  released images by digest, the `deploy/` directory it needs, and the SBOM
+  of every image. A release is refused without its section in this
+  changelog. See [verifying an image](docs/operators/verifying-images.md).
 
 ### Changed
 
+- The module contract is normative at `contractVersion` 1. `Homeport.Sdk`
+  and Echo declare 1, and the registry accepts only 1, so a module built on
+  a draft of the contract is rejected with `422` until it is rebuilt.
+- Homeport's own images are named after their component — `homeport-gateway`,
+  `homeport-registry`, `homeport-control-plane`, `homeport-metering`,
+  `homeport-module-echo` — locally as in GHCR. A `.env` for the compose file
+  that names the old local images needs the new names.
 - The registry rejects a manifest whose `openApiUrl` is not an absolute path
   on the instance, such as `/openapi/v1.json`, with `422`. A module built
   with `Homeport.Sdk` already sends one.
