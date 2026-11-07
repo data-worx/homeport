@@ -28,6 +28,7 @@ decision is a new ADR that supersedes the old one, and the old one is marked
 | [0016](0016-error-responses.md) | Error responses | Accepted |
 | [0017](0017-consolidated-api-docs.md) | Consolidated API docs | Accepted |
 | [0018](0018-where-wire-types-live.md) | Where wire types live | Accepted |
+| [0019](0019-tokens-for-forwarded-platform-requests.md) | Tokens for forwarded platform requests | Accepted |
 
 ## Template
 

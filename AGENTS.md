@@ -227,6 +227,11 @@ Security-critical. No exception without an ADR.
   *Service-to-service* and
   [ADR-0014](docs/architecture/adr/0014-authentication-between-services.md)
   prescribe.
+- A client request the gateway forwards to a platform service, such as
+  `/platform/v1/usage`, carries a caller token instead: the claims of a
+  module token, audience the service. Platform routes are configured in
+  the gateway, never registered. See
+  [ADR-0019](docs/architecture/adr/0019-tokens-for-forwarded-platform-requests.md).
 - W3C `traceparent` is propagated to the module.
 - If the registry is unavailable, the gateway keeps serving the last known
   routes.
@@ -257,6 +262,9 @@ Security-critical. No exception without an ADR. See
   issues with the same key as module tokens: audience the called component,
   subject `homeport-gateway`, lifetime at most 5 minutes. A service rejects
   a request without a valid token for its own audience with `401`.
+- A service token carries no tenant. An endpoint that serves a tenant's
+  data requires a caller token's tenant claim and scope, and serves that
+  tenant only (ADR-0019).
 - Any other caller gets its mechanism through an ADR that meets these
   rules.
 - Traffic between components is not encrypted by Homeport until mTLS is
