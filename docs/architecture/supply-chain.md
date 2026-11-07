@@ -115,3 +115,20 @@ file carries over. Without the tag, Dependabot would propose the digest of
 
 Actions are pinned by commit SHA, with the version in a comment, because a
 tag can be moved to other code after it was reviewed.
+
+Packages released together arrive in one pull request: Aspire, OpenTelemetry
+and WolverineFx each form a group, so `main` never carries mixed versions of
+one family. `Microsoft.EntityFrameworkCore.Design` is ignored. It is pinned to
+the EF Core version Aspire brings, and on its own an update breaks the build,
+so it is moved by hand together with an Aspire update. Every pull request is
+titled with the prefix `chore`, because the squash merge makes the title the
+commit on `main`.
+
+An update of a package that a shipped project publishes fails the `notices`
+gate until [`THIRD-PARTY-NOTICES.md`](../../THIRD-PARTY-NOTICES.md) is
+regenerated on the same branch and committed:
+
+```bash
+dotnet run --file .devkit/generate-third-party-notices.cs -- \
+  $(sed -n '/^NOTICES_PROJECTS=(/,/^)/s/^  "\(.*\)"$/--project \1/p' .devkit/gates.sh)
+```
