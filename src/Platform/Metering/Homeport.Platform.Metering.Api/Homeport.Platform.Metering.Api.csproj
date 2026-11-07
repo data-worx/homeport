@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- Becomes an image: carries THIRD-PARTY-NOTICES.md (Directory.Build.targets). -->
     <ShipsThirdPartyNotices>true</ShipsThirdPartyNotices>
+    <!-- The image name, locally and in GHCR: the service.name of the component. -->
+    <ContainerRepository>homeport-metering</ContainerRepository>
   </PropertyGroup>
 
   <ItemGroup>

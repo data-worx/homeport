@@ -51,10 +51,10 @@ done < <(sed -n -E 's/^[[:space:]]+image:[[:space:]]*"?([^"]+)"?[[:space:]]*$/\1
 
 images=("${third_party[@]}")
 for name in $(printf '%s\n' "${!own[@]}" | sort); do
-  repository="homeport-$(echo "${name}" | tr 'A-Z_' 'a-z-')"
+  repository="$(dotnet msbuild "${own[${name}]}" -getProperty:ContainerRepository | tr -d '\r')"
   echo "::group::Build ${repository} from ${own[${name}]}"
   dotnet publish "${own[${name}]}" -t:PublishContainer --nologo \
-    -p:ContainerRepository="${repository}" -p:ContainerImageTag="${tag}" || fail=1
+    -p:ContainerImageTag="${tag}" || fail=1
   echo "::endgroup::"
   images+=("${repository}:${tag}")
 done
