@@ -21,6 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Authentication\Homeport.Shared.Authentication.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Client\Homeport.Shared.Client.csproj" />
     <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Internal\Homeport.Shared.Internal.csproj" />
     <ProjectReference Include="..\..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Homeport.Platform.Metering.Infrastructure\Homeport.Platform.Metering.Infrastructure.csproj" />

@@ -1,12 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
+using System.Text.Json;
 using DotNet.Testcontainers.Configurations;
 using Homeport.Platform.Metering.Api.Messaging;
 using Homeport.Platform.Metering.Infrastructure.Persistence;
+using Homeport.Shared.Authentication;
 using Homeport.Shared.Internal.Platform.Metering;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
@@ -20,8 +29,9 @@ namespace Homeport.Platform.Metering.Api.Tests.Integration;
 /// Metering in memory, against a throwaway PostgreSQL prepared by
 /// <c>deploy/postgres/init/init-homeport.sh</c> and migrated by
 /// <c>migrate</c>, and a throwaway RabbitMQ, with a stand-in for the gateway
-/// that publishes <see cref="UsageRecorded"/> the way the gateway does.
-/// Needs a running Docker.
+/// that publishes <see cref="UsageRecorded"/> the way the gateway does and
+/// signs tokens for metering, its JWKS served on a local port. Needs a
+/// running Docker.
 /// </summary>
 public sealed class RunningMetering : IAsyncLifetime
 {
@@ -40,6 +50,10 @@ public sealed class RunningMetering : IAsyncLifetime
     private const string InitDirectory = "/docker-entrypoint-initdb.d/";
 
     private const string TenantSetting = "homeport.tenant_id";
+
+    private const string LocalAddress = "http://127.0.0.1:0";
+
+    private const string KeyId = "test";
 
     private const UnixFileModes Executable =
         UnixFileModes.UserRead | UnixFileModes.UserExecute
@@ -66,6 +80,8 @@ public sealed class RunningMetering : IAsyncLifetime
 
     private readonly RabbitMqContainer rabbitMq = new RabbitMqBuilder(RabbitMqImage).Build();
 
+    private readonly ECDsa gatewayKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+    private WebApplication? jwks;
     private WebApplicationFactory<Program>? metering;
     private IHost? gateway;
 
@@ -76,6 +92,42 @@ public sealed class RunningMetering : IAsyncLifetime
 
     /// <summary>Metering's services.</summary>
     internal IServiceProvider Services => Metering.Services;
+
+    /// <summary>A client of metering that sends <paramref name="token"/> as bearer token, or none.</summary>
+    internal HttpClient CreateClient(string? token = null)
+    {
+        var client = Metering.CreateClient();
+        if (token is not null)
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, token);
+        }
+
+        return client;
+    }
+
+    /// <summary>
+    /// A caller token as the gateway forwards a client's request (ADR-0019):
+    /// for <paramref name="tenantId"/>, granting <paramref name="scopes"/>.
+    /// </summary>
+    internal string CallerToken(Guid tenantId, IReadOnlyList<string> scopes, string audience = MeteringService.Audience)
+    {
+        return Token(audience, new Dictionary<string, object>
+        {
+            [GatewayTokens.SubjectClaim] = "local-client",
+            [GatewayTokens.TenantIdClaim] = tenantId.ToString(),
+            [GatewayTokens.ClientIdClaim] = "local-client",
+            [GatewayTokens.ScopeClaim] = string.Join(GatewayTokens.ScopeSeparator, scopes),
+        });
+    }
+
+    /// <summary>A service token, as the gateway calls metering as itself (ADR-0014).</summary>
+    internal string ServiceToken()
+    {
+        return Token(MeteringService.Audience, new Dictionary<string, object>
+        {
+            [GatewayTokens.SubjectClaim] = GatewayTokens.GatewaySubject,
+        });
+    }
 
     /// <summary>
     /// Publishes <paramref name="message"/> as the gateway does and returns once
@@ -116,6 +168,13 @@ public sealed class RunningMetering : IAsyncLifetime
     {
         await Task.WhenAll(postgres.StartAsync(), rabbitMq.StartAsync());
 
+        var jwksBuilder = WebApplication.CreateSlimBuilder();
+        jwksBuilder.WebHost.UseUrls(LocalAddress);
+        jwks = jwksBuilder.Build();
+        var document = JsonSerializer.Serialize(new JsonWebKeySetResponse([PublicJsonWebKey.FromKey(gatewayKey, KeyId)]));
+        jwks.Run(context => context.Response.WriteAsync(document));
+        await jwks.StartAsync();
+
         if (await MigrateCommand.RunAsync([$"--ConnectionStrings:{MigrateCommand.OwnerConnectionName}={ConnectionString(OwnerRole, OwnerPassword)}"]) != 0)
         {
             throw new InvalidOperationException("migrate failed; its log says why.");
@@ -124,7 +183,8 @@ public sealed class RunningMetering : IAsyncLifetime
         metering = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(host => host
                 .UseSetting($"ConnectionStrings:{MeteringPersistenceExtensions.AppConnectionName}", ConnectionString(AppRole, AppPassword))
-                .UseSetting($"ConnectionStrings:{MeteringMessagingExtensions.ConnectionName}", rabbitMq.GetConnectionString()));
+                .UseSetting($"ConnectionStrings:{MeteringMessagingExtensions.ConnectionName}", rabbitMq.GetConnectionString())
+                .UseSetting($"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}", $"{jwks.Urls.Single()}{GatewayTokens.JwksPath}"));
 
         // Starts metering, so its queue exists before anything is published.
         _ = metering.Services;
@@ -154,7 +214,30 @@ public sealed class RunningMetering : IAsyncLifetime
             await metering.DisposeAsync();
         }
 
+        if (jwks is not null)
+        {
+            await jwks.StopAsync();
+            await jwks.DisposeAsync();
+        }
+
+        gatewayKey.Dispose();
         await Task.WhenAll(postgres.DisposeAsync().AsTask(), rabbitMq.DisposeAsync().AsTask());
+    }
+
+    private string Token(string audience, Dictionary<string, object> claims)
+    {
+        var now = TimeProvider.System.GetUtcNow().UtcDateTime;
+
+        return new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor
+        {
+            Issuer = GatewayTokens.Issuer,
+            Audience = audience,
+            Claims = claims,
+            IssuedAt = now,
+            NotBefore = now,
+            Expires = now + GatewayTokens.MaximumLifetime,
+            SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(gatewayKey) { KeyId = KeyId }, GatewayTokens.SigningAlgorithm),
+        });
     }
 
     private string ConnectionString(string role, string password)

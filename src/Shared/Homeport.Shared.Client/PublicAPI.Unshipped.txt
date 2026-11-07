@@ -151,3 +151,50 @@ static Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.operator !=(Homeport
 static Homeport.Shared.Client.Modules.Echo.V1.BatchResponse.operator ==(Homeport.Shared.Client.Modules.Echo.V1.BatchResponse? left, Homeport.Shared.Client.Modules.Echo.V1.BatchResponse? right) -> bool
 static Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.operator !=(Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? left, Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? right) -> bool
 static Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest.operator ==(Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? left, Homeport.Shared.Client.Modules.Echo.V1.EchoBatchRequest? right) -> bool
+Homeport.Shared.Client.Platform.Metering.V1.UsageApi
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse!
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Deconstruct(out System.DateTime Period, out string! Module, out string! Meter, out long Quantity) -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Equals(Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse? other) -> bool
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Meter.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Meter.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Module.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Module.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Period.get -> System.DateTime
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Period.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Quantity.get -> long
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Quantity.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.UsageEntryResponse(System.DateTime Period, string! Module, string! Meter, long Quantity) -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Metering.V1.UsageResponse!
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.Deconstruct(out System.DateTime From, out System.DateTime To, out string! Granularity, out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse!>! Usage) -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.Equals(Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? other) -> bool
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.From.get -> System.DateTime
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.From.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.Granularity.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.Granularity.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.To.get -> System.DateTime
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.To.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.Usage.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse!>!
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.Usage.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.UsageResponse(System.DateTime From, System.DateTime To, string! Granularity, System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse!>! Usage) -> void
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.CsvMediaType = "text/csv" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.Day = "day" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.FromParameter = "from" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.GranularityParameter = "granularity" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.Hour = "hour" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.MeterParameter = "meter" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.ModuleParameter = "module" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.Path = "/v1/usage" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.ReadScope = "usage.read" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.UsageApi.ToParameter = "to" -> string!
+override Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.ToString() -> string!
+static Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? left, Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? left, Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? right) -> bool

@@ -34,6 +34,7 @@ public static class MeteringPersistenceExtensions
             .AddInterceptors(services.GetRequiredService<TenantSessionInterceptor>()));
         builder.EnrichNpgsqlDbContext<MeteringDbContext>();
         builder.Services.AddScoped<IUsageStore, UsageStore>();
+        builder.Services.AddScoped<IUsageReader, UsageReader>();
 
         return builder;
     }
