@@ -14,7 +14,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`operators/signing-key.md`](operators/signing-key.md) | Generating, configuring and rotating the gateway's signing key |
 | [`operators/registry.md`](operators/registry.md) | The registry, the modules' registration keys and what happens while it is down |
 | [`operators/control-plane.md`](operators/control-plane.md) | The control plane, preparing its database, the `migrate` step and the seed configuration |
-| [`operators/metering.md`](operators/metering.md) | Metering, preparing its database and the broker users, what may be lost, retention, its configuration and metrics |
+| [`operators/metering.md`](operators/metering.md) | Metering, preparing its database and the broker users, what may be lost, retention, the usage export, its configuration and metrics |
 | [`operators/throttling.md`](operators/throttling.md) | The rate limit per tenant: plan limits, the buckets in Valkey, failing open while Valkey is down, and the metrics |
 | [`operators/reverse-proxy.md`](operators/reverse-proxy.md) | Running the gateway behind a reverse proxy, and which proxies' forwarded headers it trusts |
 | [`operators/identity-provider.md`](operators/identity-provider.md) | Connecting the identity provider whose client tokens the gateway accepts, and mapping its clients to tenants |
@@ -40,6 +40,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`api-consumers/calling-a-module.md`](api-consumers/calling-a-module.md) | The URL scheme for calling a module through the gateway |
 | [`api-consumers/errors.md`](api-consumers/errors.md) | The error format, and what the gateway does to a module's errors |
 | [`api-consumers/rate-limits.md`](api-consumers/rate-limits.md) | The rate limit of your tenant's plan, the RateLimit headers, and `429` with `Retry-After` |
+| [`api-consumers/reading-usage.md`](api-consumers/reading-usage.md) | Reading your tenant's usage per hour or day from `/platform/v1/usage`, as JSON or CSV |
 | [`api-consumers/api-docs.md`](api-consumers/api-docs.md) | The consolidated API docs at `/platform/docs`, and trying a request with a token from `curl` |
 
 ## Architecture — why Homeport is built the way it is

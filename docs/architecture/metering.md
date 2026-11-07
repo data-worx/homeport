@@ -59,6 +59,21 @@ broker outage shorter than its retries, and may be missing otherwise.
 The request itself never waits for the broker: the gateway has answered
 before it publishes.
 
+## Reading usage
+
+A tenant reads its aggregates with `GET /platform/v1/usage`
+([reading usage](../api-consumers/reading-usage.md)). The gateway checks the
+client and the scope `usage.read`, throttles the call and forwards it to
+metering with a caller token that names the tenant
+([ADR-0019](adr/0019-tokens-for-forwarded-platform-requests.md)). Metering
+checks the token again and reads the hourly or daily aggregates of that
+tenant with the same query filters and row-level security it writes them
+with. The call itself is not metered: a platform route names no module.
+
+A bucket is exported when it starts in [`from`, `to`). That rule is the
+domain's, like the buckets themselves, so a period that starts or ends
+inside a day selects the days the same way whatever the database.
+
 ## Why it is built this way
 
 - **No outbox at the gateway.** An outbox needs a database the gateway

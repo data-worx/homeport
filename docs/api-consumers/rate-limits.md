@@ -1,7 +1,8 @@
 # Rate limits
 
-Every request to a module counts against the rate limit of your tenant's
-plan. The limit is a token bucket: it holds a number of requests at once,
+Every request to a module, and every call to a platform API such as
+[the usage export](reading-usage.md), counts against the rate limit of your
+tenant's plan. The limit is a token bucket: it holds a number of requests at once,
 the *burst*, and refills at a steady rate in requests per second. All
 clients of a tenant draw from the same bucket, whichever gateway replica
 answers them. The operator sets both numbers per plan.
@@ -11,7 +12,7 @@ unknown module — does not count.
 
 ## The headers
 
-Every module response carries two headers, defined by the IETF draft
+Every response of a module or a platform API carries two headers, defined by the IETF draft
 [RateLimit header fields for HTTP](https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/):
 
 ```text
