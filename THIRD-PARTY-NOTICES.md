@@ -25,9 +25,9 @@ asset change; the `notices` gate fails while it is stale.
 | Cronos | 0.11.0 | MIT | Copyright © 2016–2025 Hangfire OÜ. |
 | FastExpressionCompiler | 5.4.1 | MIT | Copyright © 2016-2026 Maksim Volkau |
 | Humanizer.Core | 2.14.1 | MIT | Copyright (c) .NET Foundation and Contributors |
-| JasperFx | 2.99.0 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
-| JasperFx.Events | 2.99.0 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
-| JasperFx.RuntimeCompiler | 5.0.1 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
+| JasperFx | 2.100.1 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
+| JasperFx.Events | 2.100.1 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
+| JasperFx.RuntimeCompiler | 5.1.0 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
 | Microsoft.AspNetCore.Authentication.JwtBearer | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.AspNetCore.OpenApi | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Bcl.AsyncInterfaces | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
@@ -98,10 +98,10 @@ asset change; the `notices` gate fails while it is stale.
 | System.IdentityModel.Tokens.Jwt | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.IO.Hashing | 10.0.12 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Linq.Dynamic.Core | 1.7.4 | Apache-2.0 | Copyright © ZZZ Projects |
-| WolverineFx | 6.61.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
-| WolverineFx.Newtonsoft | 6.61.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
-| WolverineFx.RabbitMQ | 6.61.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
-| WolverineFx.RuntimeCompilation | 6.61.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx | 6.62.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.Newtonsoft | 6.62.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.RabbitMQ | 6.62.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.RuntimeCompilation | 6.62.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
 | Yarp.ReverseProxy | 2.3.0 | MIT | © Microsoft Corporation. All rights reserved. |
 
 A copyright reading "— not declared by the package" is declared neither in that package's own
