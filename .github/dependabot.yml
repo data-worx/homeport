@@ -4,17 +4,43 @@
 # (ADR-0009). The compose file is generated from the AppHost: a digest update
 # is copied into src/Aspire/Homeport.Aspire.AppHost/Program.cs in the same
 # pull request, or the compose gate fails.
+#
+# Pull requests are squash-merged, so the title becomes the commit on main:
+# every ecosystem uses the prefix chore (forge.commits).
 version: 2
 updates:
   - package-ecosystem: nuget
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: chore
+    # Packages released together arrive in one pull request, so main never
+    # carries mixed versions of one family.
+    groups:
+      aspire:
+        patterns:
+          - "Aspire*"
+      opentelemetry:
+        patterns:
+          - "OpenTelemetry*"
+      wolverine:
+        patterns:
+          - "WolverineFx*"
+    ignore:
+      # Pinned to the EF Core version Aspire.Npgsql.EntityFrameworkCore.PostgreSQL
+      # brings; updated on its own it breaks the build with MSB3277. It is
+      # moved by hand together with an Aspire update.
+      - dependency-name: Microsoft.EntityFrameworkCore.Design
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: chore
   - package-ecosystem: docker-compose
     directory: /deploy/compose
     schedule:
       interval: weekly
+    commit-message:
+      prefix: chore
