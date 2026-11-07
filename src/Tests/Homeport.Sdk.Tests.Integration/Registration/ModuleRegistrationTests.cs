@@ -109,7 +109,7 @@ public sealed class ModuleRegistrationTests
         {
             Registry.RegisterStatus = StatusCodes.Status422UnprocessableEntity;
             Registry.RefusalBody = """
-                {"type":"https://homeport.data-worx.de/problems/invalid-manifest","title":"The manifest breaks the module contract.","status":422,"traceId":"0","errors":{"contractVersion":["Contract version 99 is not supported; supported versions: 0."]}}
+                {"type":"https://homeport.data-worx.de/problems/invalid-manifest","title":"The manifest breaks the module contract.","status":422,"traceId":"0","errors":{"contractVersion":["Contract version 99 is not supported; supported versions: 1."]}}
                 """;
 
             try
@@ -119,7 +119,7 @@ public sealed class ModuleRegistrationTests
                 await WaitForStopAsync(module.App);
 
                 var error = Assert.Single(logs.Entries, entry => entry.Level == LogLevel.Error);
-                Assert.Contains("contractVersion: Contract version 99 is not supported; supported versions: 0.", error.Message);
+                Assert.Contains("contractVersion: Contract version 99 is not supported; supported versions: 1.", error.Message);
                 Assert.Equal(1, Environment.ExitCode);
             }
             finally
