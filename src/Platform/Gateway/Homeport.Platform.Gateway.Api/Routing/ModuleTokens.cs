@@ -14,7 +14,9 @@ namespace Homeport.Platform.Gateway.Api.Routing;
 
 /// <summary>
 /// Replaces the client's token with a module token on every request forwarded
-/// to a module (ADR-0011). The client's token never reaches the module.
+/// to a module (ADR-0011), and with a caller token of the same claims on every
+/// request forwarded to a platform service (ADR-0019). The client's token
+/// never leaves the gateway.
 /// </summary>
 internal sealed class ModuleTokens(ModuleTokenIssuer issuer, IOptions<ClientAuthenticationOptions> options) : ITransformProvider
 {
@@ -28,14 +30,15 @@ internal sealed class ModuleTokens(ModuleTokenIssuer issuer, IOptions<ClientAuth
 
     public void Apply(TransformBuilderContext context)
     {
-        if (context.Route.Metadata?.TryGetValue(ModuleRoutes.ModuleIdMetadata, out var moduleId) == true)
+        if (context.Route.Metadata?.TryGetValue(ModuleRoutes.ModuleIdMetadata, out var audience) == true
+            || context.Route.Metadata?.TryGetValue(PlatformRoutes.AudienceMetadata, out audience) == true)
         {
-            context.AddRequestTransform(transform => ReplaceAsync(transform, moduleId));
+            context.AddRequestTransform(transform => ReplaceAsync(transform, audience));
         }
     }
 
-    /// <summary>Sets a module token for <paramref name="moduleId"/> in place of the client's token.</summary>
-    internal ValueTask ReplaceAsync(RequestTransformContext context, string moduleId)
+    /// <summary>Sets a token for <paramref name="audience"/>, a module id or a platform service, in place of the client's token.</summary>
+    internal ValueTask ReplaceAsync(RequestTransformContext context, string audience)
     {
         // The client policy of every module route has set it.
         var client = context.HttpContext.Features.Get<ClientResponse>()
@@ -46,7 +49,7 @@ internal sealed class ModuleTokens(ModuleTokenIssuer issuer, IOptions<ClientAuth
         var subject = user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? client.ClientId;
 
         var token = issuer.Issue(new ModuleCaller(
-            moduleId,
+            audience,
             client.TenantId,
             client.ClientId,
             subject,

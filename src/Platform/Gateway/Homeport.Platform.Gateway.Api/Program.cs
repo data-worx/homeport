@@ -14,13 +14,15 @@ using Homeport.Platform.Gateway.Infrastructure.Throttling;
 using Homeport.Platform.Gateway.Infrastructure.Usage;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.Extensions.Options;
+using Yarp.ReverseProxy.Configuration;
 
 namespace Homeport.Platform.Gateway.Api;
 
 /// <summary>
 /// The gateway: the one entry point of Homeport, which forwards
 /// <c>/modules/{moduleId}/{path}</c> to the module on the routes the registry
-/// knows for clients the control plane knows, and issues the tokens
+/// knows, and <c>/platform/{path}</c> to the platform service behind it, for
+/// clients the control plane knows, and issues the tokens
 /// Homeport's components trust. Every error it answers with is Problem
 /// Details (ADR-0016).
 /// </summary>
@@ -57,8 +59,18 @@ public sealed class Program
             options.SuppressDiagnosticsCallback = context => context.Exception is ControlPlaneUnavailableException;
         });
         builder.Services.AddSingleton<IConfigureOptions<ProblemDetailsOptions>, GatewayProblemDetails>();
+        builder.Services.AddOptions<PlatformRoutesOptions>().BindConfiguration(PlatformRoutesOptions.SectionName);
+        builder.Services.AddSingleton<PlatformRoutes>();
+
+        // What LoadFromMemory registers, but starting with the platform routes,
+        // so they are served before the registry has been read.
+        builder.Services.AddSingleton(services =>
+        {
+            var (routes, clusters) = services.GetRequiredService<PlatformRoutes>().Build();
+            return new InMemoryConfigProvider(routes, clusters);
+        });
+        builder.Services.AddSingleton<IProxyConfigProvider>(services => services.GetRequiredService<InMemoryConfigProvider>());
         builder.Services.AddReverseProxy()
-            .LoadFromMemory([], [])
             .AddTransforms<HomeportHeaders>()
             .AddTransforms<ModuleTokens>()
             .AddTransforms<UsageReports>()
@@ -123,13 +135,15 @@ public sealed class Program
             var usage = app.Services.GetRequiredService<IOptions<UsageOptions>>().Value;
             var proxies = app.Services.GetRequiredService<IOptions<TrustedProxiesOptions>>().Value;
             var docs = app.Services.GetRequiredService<IOptions<ApiDocsOptions>>().Value;
+            var platform = app.Services.GetRequiredService<IOptions<PlatformRoutesOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, usage from {MeteringUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
                 app.Services.GetRequiredService<IOptions<RegistryOptions>>().Value.Url,
+                platform.MeteringUrl,
                 clients.Authority,
                 clients.Audience,
                 clients.ClientIdClaim,
