@@ -359,7 +359,8 @@ See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
   `main` and nightly. High or Critical fails the run. It writes a CycloneDX
   SBOM per own image as a build artifact.
 - Every image of the compose files is in the scan: a new own image is added
-  to the table in `.github/scripts/scan-images.sh`, or the scan fails.
+  to the table in `.github/scripts/own-images.sh`, or the scan and the
+  release fail.
 - Findings are removed at the source first: a patched version, a newer
   digest, or a leaner variant of the image.
 - Exceptions only in `.trivyignore`, each entry with `exp:YYYY-MM-DD` in a

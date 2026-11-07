@@ -15,8 +15,11 @@ images, built from their projects the way a release builds them. The
 [`.github/scripts/scan-images.sh`](../../.github/scripts/scan-images.sh),
 which reads the image list from the compose file rather than keeping one of
 its own. An own image appears there as a variable such as `${GATEWAY_IMAGE}`;
-the script maps it to its project through a table, and fails on a variable it
-cannot map. A new service therefore cannot slip past the scan.
+the script maps it to its project through the table in
+[`own-images.sh`](../../.github/scripts/own-images.sh), which the release
+shares, and fails on a variable it cannot map. A new service therefore cannot
+slip past the scan. The image is named by `ContainerRepository` in its
+project.
 
 Trivy fails the run on any High or Critical vulnerability. The workflow runs
 on every pull request, on every push to `main`, and nightly: a vulnerability

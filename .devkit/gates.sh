@@ -2,7 +2,7 @@
 # The gates that must be green before a commit. Project-owned: devkit-sync
 # never overwrites this file, so adjust the commands to fit the repository.
 #
-# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|all]
+# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|scripts|all]
 #         (no argument means all)
 set -uo pipefail
 
@@ -12,7 +12,7 @@ SLN="Homeport.slnx"
 
 # The projects whose `dotnet publish` output is shipped: every project that
 # becomes an image in deploy/compose/docker-compose.yaml, as the table in
-# .github/scripts/scan-images.sh lists them. The third-party licences they carry
+# .github/scripts/own-images.sh lists them. The third-party licences they carry
 # must travel with them (dotnet-core.notices), so one THIRD-PARTY-NOTICES.md
 # covers all of them, and each sets ShipsThirdPartyNotices to carry it in its
 # image. Empty skips the notices gate - a library or an internal service has
@@ -107,6 +107,10 @@ gate_compose() {
   return "${rc}"
 }
 
+# The tests of the release scripts in .github/scripts/, against throwaway
+# fixtures. The scripts run only on a tag, so they are tested before then.
+gate_scripts() { bash .github/scripts/test-release-scripts.sh; }
+
 # Expectation per gate, printed when a gate fails.
 gate_expectation() {
   case "$1" in
@@ -115,12 +119,13 @@ gate_expectation() {
     format)  echo "no formatting changes needed" ;;
     notices) echo "THIRD-PARTY-NOTICES.md matches what the shipped projects publish" ;;
     compose) echo "deploy/compose/ matches what the AppHost publishes" ;;
+    scripts) echo "every release script test passes" ;;
   esac
 }
 
 # --- runner, do not edit below unless you know why ---------------------------
 
-GATES="build test format notices compose"
+GATES="build test format notices compose scripts"
 
 # A gate returns 77 when it does not apply to this repository; its last line of
 # output says why.
