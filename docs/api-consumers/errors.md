@@ -3,7 +3,8 @@
 Every error Homeport answers with — whether the gateway or a module produced
 it — has the same shape: Problem Details (RFC 9457), media type
 `application/problem+json`. You handle one error format, whichever module
-you call. See [ADR-0016](../architecture/adr/0016-error-responses.md).
+you call, and whatever your `Accept` header asks for: a request for
+`text/csv` that is rejected still gets Problem Details. See [ADR-0016](../architecture/adr/0016-error-responses.md).
 
 ## The body
 
