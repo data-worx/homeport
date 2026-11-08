@@ -30,6 +30,16 @@ Exactly what you can call through the gateway:
   same name differently, the newer one keeps the name and the other is
   prefixed with its version, such as `v1.2.0_Order`.
 
+## What the platform document shows
+
+The APIs of Homeport itself, such as
+[reading usage](reading-usage.md) at `GET /platform/v1/usage`, by the same
+rules: every path starts with `/platform/`, as you call it, and only the
+operations the gateway forwards are listed. Each is described by the
+platform service behind it. The gateway reads those descriptions when it
+starts and every 30 seconds; while a service cannot be reached, its last
+description stays.
+
 The documents themselves are at
 `https://<gateway>/platform/docs/openapi/<module id>.json` and
 `…/openapi/platform.json`, for a code generator or any other OpenAPI tool.

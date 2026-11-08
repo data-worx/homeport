@@ -228,14 +228,50 @@ public sealed class ConsolidatedDocumentsTests
 
     public sealed class ForPlatform
     {
-        [Fact]
-        public void Names_The_Platform_With_A_Bearer_Scheme_And_No_Paths()
+        private static readonly Uri MeteringUrl = new("http://metering:8080/openapi/v1.json");
+
+        private static readonly JsonObject MeteringSource = Parse("""
+            {
+              "openapi": "3.1.1",
+              "info": { "title": "Metering", "version": "1.0.0" },
+              "paths": {
+                "/v1/usage": { "get": { "operationId": "Usage" } },
+                "/v1/internal": { "get": { "operationId": "Internal" } }
+              }
+            }
+            """);
+
+        private static readonly DocumentedRoute UsageRoute = new("GET", "/v1/usage", "0.1.0", MeteringUrl);
+
+        private static JsonObject Consolidate(IReadOnlyDictionary<Uri, JsonObject> sources)
         {
-            var document = ConsolidatedDocuments.ForPlatform("0.1.0");
+            return ConsolidatedDocuments.ForPlatform("0.1.0", "/platform", [UsageRoute], sources);
+        }
+
+        [Fact]
+        public void Names_The_Platform_And_Its_Version_With_A_Bearer_Scheme()
+        {
+            var document = Consolidate(new Dictionary<Uri, JsonObject>());
 
             Assert.Equal(ConsolidatedDocuments.PlatformTitle, document["info"]!["title"]!.GetValue<string>());
-            Assert.Empty(Paths(document));
+            Assert.Equal("0.1.0", document["info"]!["version"]!.GetValue<string>());
             Assert.Equal("""[{"bearer":[]}]""", document["security"]!.ToJsonString());
+        }
+
+        [Fact]
+        public void Puts_Every_Platform_Route_Under_The_Public_Prefix()
+        {
+            var document = Consolidate(new Dictionary<Uri, JsonObject> { [MeteringUrl] = MeteringSource });
+
+            Assert.Equal(["/platform/v1/usage"], Paths(document));
+        }
+
+        [Fact]
+        public void Lists_No_Path_While_No_Service_Document_Is_Known()
+        {
+            var document = Consolidate(new Dictionary<Uri, JsonObject>());
+
+            Assert.Empty(Paths(document));
         }
     }
 }

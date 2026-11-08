@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Homeport.Platform.Gateway.Infrastructure.ApiDocs;
 
-/// <summary>Wires the client that reads the OpenAPI documents of module instances.</summary>
+/// <summary>Wires the clients that read the OpenAPI documents of module instances and platform services.</summary>
 public static class ModuleDocumentsServiceCollectionExtensions
 {
     /// <summary>Adds <see cref="ModuleDocumentsClient"/>.</summary>
@@ -12,6 +12,18 @@ public static class ModuleDocumentsServiceCollectionExtensions
     {
         services.AddHttpClient(ModuleDocumentsClient.ClientName);
         services.AddSingleton<ModuleDocumentsClient>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds <see cref="PlatformDocumentsClient"/>. Needs
+    /// <see cref="Signing.SigningServiceCollectionExtensions.AddGatewaySigning"/>.
+    /// </summary>
+    public static IServiceCollection AddPlatformDocumentsClient(this IServiceCollection services)
+    {
+        services.AddHttpClient(PlatformDocumentsClient.ClientName);
+        services.AddSingleton<PlatformDocumentsClient>();
 
         return services;
     }

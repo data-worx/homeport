@@ -65,11 +65,23 @@ public static partial class ConsolidatedDocuments
     // The fields of a path item that hold for all its operations and are kept with them.
     private static readonly string[] PathItemFields = ["summary", "description", "parameters"];
 
-    /// <summary>The platform's document.</summary>
+    /// <summary>
+    /// The platform's document: for every platform route, the operation from
+    /// the document of the service behind it, under
+    /// <paramref name="publicPrefix"/>, by the same rules as
+    /// <see cref="ForModule"/>.
+    /// </summary>
     /// <param name="version">The version of Homeport the gateway runs.</param>
-    public static JsonObject ForPlatform(string version)
+    /// <param name="publicPrefix">What a caller puts in front of a route's path, <c>/platform</c>.</param>
+    /// <param name="routes">The platform routes the gateway serves.</param>
+    /// <param name="sources">The documents of the platform services, by their URL; a missing one documents nothing.</param>
+    public static JsonObject ForPlatform(
+        string version,
+        string publicPrefix,
+        IReadOnlyList<DocumentedRoute> routes,
+        IReadOnlyDictionary<Uri, JsonObject> sources)
     {
-        return Skeleton(PlatformTitle, version);
+        return Consolidate(PlatformTitle, version, publicPrefix, routes, sources);
     }
 
     /// <summary>
@@ -89,7 +101,18 @@ public static partial class ConsolidatedDocuments
         IReadOnlyDictionary<Uri, JsonObject> sources)
     {
         var versions = routes.Select(route => route.Version).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal);
-        var document = Skeleton(moduleId, string.Join(VersionSeparator, versions));
+
+        return Consolidate(moduleId, string.Join(VersionSeparator, versions), publicPrefix, routes, sources);
+    }
+
+    private static JsonObject Consolidate(
+        string title,
+        string version,
+        string publicPrefix,
+        IReadOnlyList<DocumentedRoute> routes,
+        IReadOnlyDictionary<Uri, JsonObject> sources)
+    {
+        var document = Skeleton(title, version);
         var paths = document[PathsKey]!.AsObject();
         var components = new Components();
         var tags = new Tags();
