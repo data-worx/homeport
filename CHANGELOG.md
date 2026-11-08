@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The platform document of the API docs at `/platform/docs` lists the
+  platform APIs, starting with the usage export at `GET /platform/v1/usage`,
+  with the parameters and responses the service behind each describes.
+  Metering serves its OpenAPI document to the gateway; the gateway reads it
+  every 30 seconds and keeps the last one while metering is unavailable. See
+  [API docs](docs/api-consumers/api-docs.md).
+
 - A tenant reads its own usage at `GET /platform/v1/usage`, per hour or per
   day and optionally per module and meter, as JSON or, with
   `Accept: text/csv`, as CSV with a header row, for showback and

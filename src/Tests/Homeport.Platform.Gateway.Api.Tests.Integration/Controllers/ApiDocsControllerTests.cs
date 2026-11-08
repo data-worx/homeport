@@ -7,6 +7,7 @@ using Homeport.Platform.Gateway.Api.Tests.Integration.ApiDocs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Homeport.Platform.Gateway.Api.Tests.Integration.Controllers;
 
@@ -16,6 +17,7 @@ public sealed class ApiDocsControllerTests
     {
         private const string PollerCategory = "Homeport.Platform.Gateway.Api.Routing.RouteTablePoller";
         private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan PlatformInterval = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan WaitTimeout = TimeSpan.FromSeconds(10);
         private static readonly TimeSpan WaitPoll = TimeSpan.FromMilliseconds(20);
 
@@ -57,6 +59,54 @@ public sealed class ApiDocsControllerTests
             var document = await docs.DocumentAsync("platform");
 
             Assert.Equal("Homeport platform", document["info"]!["title"]!.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Lists_The_Usage_Export_In_The_Platform_Document_Under_Its_Public_Path()
+        {
+            var document = await docs.DocumentAsync("platform");
+
+            Assert.Equal(["/platform/v1/usage"], Paths(document));
+        }
+
+        [Fact]
+        public async Task Takes_The_Query_Parameters_And_Media_Types_Of_The_Usage_Export_From_Metering()
+        {
+            var operation = (await docs.DocumentAsync("platform"))["paths"]!["/platform/v1/usage"]!["get"]!;
+
+            Assert.Equal(
+                ("from", "application/json, text/csv"),
+                (operation["parameters"]![0]!["name"]!.GetValue<string>(), string.Join(", ", operation["responses"]!["200"]!["content"]!.AsObject().Select(entry => entry.Key))));
+        }
+
+        [Fact]
+        public async Task Leaves_Out_A_Platform_Operation_The_Gateway_Does_Not_Route()
+        {
+            var document = await docs.DocumentAsync("platform");
+
+            Assert.DoesNotContain("/platform" + DocumentingGateway.UnroutedPlatformPath, Paths(document));
+        }
+
+        [Fact]
+        public void Reads_The_Platform_Document_With_A_Service_Token_For_Metering()
+        {
+            var token = new JsonWebToken(docs.MeteringToken);
+
+            Assert.Equal(
+                ("homeport-metering", "homeport-gateway"),
+                (Assert.Single(token.Audiences), token.Subject));
+        }
+
+        // A failure no resilience handler retries, so the test does not wait out a backoff.
+        [Fact]
+        public async Task Keeps_The_Last_Platform_Document_While_Metering_Fails_To_Serve_Its_Own()
+        {
+            docs.MeteringDocumentFails = true;
+
+            docs.PlatformTime.Advance(PlatformInterval);
+            await docs.WaitForUnreadDocumentsAsync(1);
+
+            Assert.Equal(["/platform/v1/usage"], Paths(await docs.DocumentAsync("platform")));
         }
 
         [Fact]

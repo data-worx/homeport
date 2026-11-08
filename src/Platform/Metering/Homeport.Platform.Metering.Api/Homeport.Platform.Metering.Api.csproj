@@ -8,6 +8,10 @@
     <ShipsThirdPartyNotices>true</ShipsThirdPartyNotices>
     <!-- The image name, locally and in GHCR: the service.name of the component. -->
     <ContainerRepository>homeport-metering</ContainerRepository>
+    <!-- The XML docs of the controllers become the OpenAPI document
+         (dotnet-core.web); CS1591 stays off, the rule covers endpoints only. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Its source generator takes the XML docs into the OpenAPI document. -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="WolverineFx.RabbitMQ" />
     <!-- Compiles the handlers Wolverine generates at start-up. -->
     <PackageReference Include="WolverineFx.RuntimeCompilation" />

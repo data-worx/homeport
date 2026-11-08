@@ -10,4 +10,10 @@ public static class MeteringService
 
     /// <summary>The audience of the tokens metering accepts (ADR-0014, ADR-0019).</summary>
     public const string Audience = "homeport-metering";
+
+    /// <summary>
+    /// Where metering serves its OpenAPI document, which the gateway reads with
+    /// a service token for the platform's API docs (ADR-0017).
+    /// </summary>
+    public const string OpenApiPath = "/openapi/v1.json";
 }
