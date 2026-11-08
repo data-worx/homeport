@@ -59,6 +59,7 @@ public sealed class Program
             .AddPolicy(UsageReaderRequirement.Policy, policy => policy
                 .RequireAuthenticatedUser()
                 .AddRequirements(new UsageReaderRequirement()));
+        builder.Services.AddOpenApi();
         builder.Services.AddControllers(options => options.OutputFormatters.Add(new UsageCsvOutputFormatter()));
         builder.Services.AddProblemDetails();
         builder.Services.AddSingleton<IConfigureOptions<ProblemDetailsOptions>, MeteringProblemDetails>();
@@ -74,6 +75,11 @@ public sealed class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+
+        // Behind the default policy: only a token of the gateway's for metering
+        // reads it, a service token included (ADR-0014).
+        app.MapOpenApi(MeteringService.OpenApiPath)
+            .RequireAuthorization();
 
         app.Lifetime.ApplicationStarted.Register(() => app.Logger.LogInformation("Metering started on {Urls}", app.Urls));
         await app.RunAsync();
