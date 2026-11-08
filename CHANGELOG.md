@@ -203,6 +203,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   claimed the same ports and left a dead proxy on them once they finished,
   so the dashboard showed the services unhealthy and the gateway answered
   `503 control-plane-unavailable`.
+- The seeded tenant, plan and client of a local AppHost run take their
+  values from `Parameters:seed-…` in the user secrets, with the documented
+  values as defaults. Before, the defaults were fixed and a configured value
+  was ignored, so a smaller plan for trying out the rate limit never applied.
 
 ### Security
 
