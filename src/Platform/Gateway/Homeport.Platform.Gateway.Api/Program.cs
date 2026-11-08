@@ -49,6 +49,7 @@ public sealed class Program
         builder.AddThrottling();
         builder.Services.AddControllers();
         builder.Services.AddProblemDetails();
+        builder.Services.AddSingleton<IProblemDetailsWriter, AnyAcceptProblemDetailsWriter>();
         builder.Services.Configure<ExceptionHandlerOptions>(options =>
         {
             options.StatusCodeSelector = exception => exception is ControlPlaneUnavailableException

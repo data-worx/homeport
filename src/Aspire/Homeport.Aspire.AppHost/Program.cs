@@ -109,7 +109,7 @@ public static class Program
         // metadata and keys over the network it shares with it. It serves plain
         // HTTP even where the developer certificate is trusted, which would
         // otherwise move it to HTTPS and leave the HTTP address unanswered.
-        var seedClientId = builder.AddParameter("seed-client-id", "local-client");
+        var seedClientId = builder.AddParameter("seed-client-id", new LocalDefault("local-client"));
         var keycloakHostAddress = $"{Uri.UriSchemeHttp}://localhost:{KeycloakPort}";
         var keycloak = builder.AddKeycloak("keycloak", port: KeycloakPort)
             .WithImageTag("26.8@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b")
@@ -199,18 +199,19 @@ public static class Program
         echo.WithReference(gateway);
 
         // The control plane: `migrate` applies its migrations as the owner role
-        // and seeds one tenant, plan and client; the service starts after it
-        // completed and runs as the app role.
+        // and seeds one tenant, plan and client, whose values configuration
+        // overrides; the service starts after it completed and runs as the app
+        // role.
         var controlPlaneMigrate = builder.AddProject<Projects.Homeport_Platform_ControlPlane>("control-plane-migrate", launchProfileName: null)
             .WithArgs("migrate")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-control-plane-migrate")
             .WithEnvironment("ConnectionStrings__control-plane-owner", ConnectionString(postgresEndpoint, "control_plane_owner", controlPlaneOwnerPassword))
-            .WithEnvironment("Seed__TenantId", builder.AddParameter("seed-tenant-id", "3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61"))
-            .WithEnvironment("Seed__TenantName", builder.AddParameter("seed-tenant-name", "Local tenant"))
-            .WithEnvironment("Seed__PlanId", builder.AddParameter("seed-plan-id", "8a2e4c6d-1f3b-4a5c-9d7e-0b1c2d3e4f50"))
-            .WithEnvironment("Seed__PlanName", builder.AddParameter("seed-plan-name", "Local plan"))
-            .WithEnvironment("Seed__RequestsPerSecond", builder.AddParameter("seed-plan-requests-per-second", "10"))
-            .WithEnvironment("Seed__Burst", builder.AddParameter("seed-plan-burst", "20"))
+            .WithEnvironment("Seed__TenantId", builder.AddParameter("seed-tenant-id", new LocalDefault("3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61")))
+            .WithEnvironment("Seed__TenantName", builder.AddParameter("seed-tenant-name", new LocalDefault("Local tenant")))
+            .WithEnvironment("Seed__PlanId", builder.AddParameter("seed-plan-id", new LocalDefault("8a2e4c6d-1f3b-4a5c-9d7e-0b1c2d3e4f50")))
+            .WithEnvironment("Seed__PlanName", builder.AddParameter("seed-plan-name", new LocalDefault("Local plan")))
+            .WithEnvironment("Seed__RequestsPerSecond", builder.AddParameter("seed-plan-requests-per-second", new LocalDefault("10")))
+            .WithEnvironment("Seed__Burst", builder.AddParameter("seed-plan-burst", new LocalDefault("20")))
             .WithEnvironment("Seed__ClientId", seedClientId)
             .WaitFor(postgres);
 

@@ -106,7 +106,16 @@ users of the gateway and metering, see [metering](metering.md). The two
 The seeded tenant, plan and client are parameters too, with fixed defaults:
 tenant `3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61`, plan
 `8a2e4c6d-1f3b-4a5c-9d7e-0b1c2d3e4f50` with 10 requests per second and a
-burst of 20, and the client `local-client`.
+burst of 20, and the client `local-client`. A value under
+`Parameters:seed-…` in the user secrets overrides its default, for example
+a smaller plan:
+
+```bash
+dotnet user-secrets set "Parameters:seed-plan-requests-per-second" 1 --project src/Aspire/Homeport.Aspire.AppHost
+dotnet user-secrets set "Parameters:seed-plan-burst" 5 --project src/Aspire/Homeport.Aspire.AppHost
+```
+
+`control-plane-migrate` brings the plan in line on the next start.
 
 Keycloak's admin console is at <http://localhost:8080/admin>. Sign in as
 `admin` with `keycloak-password`. Keycloak takes the longest of the four to

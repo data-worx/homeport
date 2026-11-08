@@ -88,6 +88,25 @@ public sealed class ProgramTests
             Assert.Equal((KnownResourceStates.Finished, 0), (migrate?.Snapshot.State?.Text, migrate?.Snapshot.ExitCode));
         }
 
+        // The throttling tests rely on the small plan this run configures
+        // rather than the AppHost's default.
+        [Fact]
+        public async Task Seeds_The_Plan_The_Run_Configures()
+        {
+            using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
+            await appHost.App.ResourceNotifications.WaitForResourceAsync("control-plane-migrate", KnownResourceStates.Finished, timeout.Token);
+
+            appHost.App.ResourceNotifications.TryGetCurrentState("control-plane-migrate", out var migrate);
+            var seed = migrate!.Snapshot.EnvironmentVariables
+                .Where(variable => variable.Name is "Seed__RequestsPerSecond" or "Seed__Burst")
+                .Select(variable => (variable.Name, variable.Value))
+                .Order();
+
+            Assert.Equal(
+                [("Seed__Burst", RunningAppHost.SeededBurst.ToString(CultureInfo.InvariantCulture)), ("Seed__RequestsPerSecond", RunningAppHost.SeededRequestsPerSecond.ToString(CultureInfo.InvariantCulture))],
+                seed);
+        }
+
         [Fact]
         public void Exposes_Only_The_Gateway_And_Keycloak_Externally()
         {
