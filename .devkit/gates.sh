@@ -37,11 +37,13 @@ NOTICES_PROJECTS=(
 # The build is incremental, so after the build gate it does nothing.
 gate_build()  { dotnet build  "${SLN}" --nologo -warnaserror -nodeReuse:false; }
 #
-# The runner shows only the last lines of a failing gate, which are the
-# summaries of the test projects that finished last, so the test gate repeats
-# every failing test with its message at the end. English output, so the
-# pattern holds on every machine. The output goes to a file, not through a
-# pipe: a child process that outlives the run would keep a pipe open forever.
+# The runner shows the whole log of a failing gate, in which a failing test is
+# buried among the summaries of every test project, so the test gate repeats
+# every failing test at the end: its name, its full error message and its
+# stack trace, up to the next test or the project's summary. English output,
+# so the patterns hold on every machine. The output goes to a file, not
+# through a pipe: a child process that outlives the run would keep a pipe open
+# forever.
 # A test that hangs is aborted after 5 minutes and named.
 gate_test() {
   local log rc
@@ -53,7 +55,11 @@ gate_test() {
   cat "${log}"
   if [ "${rc}" -ne 0 ]; then
     echo "--- failing tests ---"
-    grep -E -A3 '^[[:space:]]+Failed [^!]' "${log}"
+    awk '
+      /^[[:space:]]+(Failed|Passed|Skipped) [^!]/ { show = ($1 == "Failed") }
+      /^[[:space:]]*(Failed|Passed)! / || /^[[:space:]]*Data collector / { show = 0 }
+      show
+    ' "${log}"
   fi
   rm -f "${log}"
   return "${rc}"
@@ -128,7 +134,9 @@ gate_expectation() {
 GATES="build test format notices compose scripts"
 
 # A gate returns 77 when it does not apply to this repository; its last line of
-# output says why.
+# output says why. A passing gate prints PASS, a skipped one SKIP and the
+# reason, and a failing one its whole log, so a failure in CI can be read
+# without running it again.
 run_one() {
   local name="$1" log rc
   log="$(mktemp)"
@@ -146,7 +154,7 @@ run_one() {
     return 0
   fi
   printf '  FAIL - expected: %s\n' "$(gate_expectation "${name}")"
-  tail -n 15 "${log}" | sed 's/^/    /'
+  sed 's/^/    /' "${log}"
   rm -f "${log}"
   return 1
 }
