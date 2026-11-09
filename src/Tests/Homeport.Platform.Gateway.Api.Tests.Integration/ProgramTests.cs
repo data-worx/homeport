@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.Metrics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -7,12 +8,17 @@ using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Homeport.Platform.Gateway.Api.Telemetry;
+using Homeport.Platform.Gateway.Infrastructure.Usage;
 using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Problems;
 using Homeport.Shared.Internal.Platform.ControlPlane;
+using Homeport.Shared.ServiceDefaults;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.Metrics.Testing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
@@ -358,6 +364,28 @@ public sealed class ProgramTests
             Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
             Assert.Equal(ProblemTypePrefix + "control-plane-unavailable", problem["type"]?.GetValue<string>());
             Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        // The labels a homeport.* metric of the gateway may carry. Each is
+        // bounded and never taken from a request: no request id, trace id or
+        // anything a caller sent. A new label is added here deliberately.
+        [Fact]
+        public async Task Labels_Its_Metrics_Only_With_Bounded_Values()
+        {
+            string[] allowed = [TelemetryAttributes.ModuleId, RequestMetrics.StatusCodeTag, UsageMetrics.ReasonTag];
+            using var labels = new MetricLabels();
+            using var requests = new MetricCollector<long>(
+                gateway.Host.Services.GetRequiredService<IMeterFactory>(), UsageMetrics.MeterName, RequestMetrics.RequestsInstrument);
+            using var forwarded = await gateway.CreateClient().SendAsync(Traced(ModulePath(ForwardingGateway.RequestPath)));
+            using var failed = await gateway.CreateClient().SendAsync(Traced(ModulePath(ForwardingGateway.NotFoundProblemPath)));
+            using var rejected = await gateway.CreateClient().SendAsync(Traced(ModulePath($"{ForwardingGateway.UsagePath}?{ForwardingGateway.ReportQuery}=requests%3D0")));
+            gateway.Buckets.Next = StandInTokenBuckets.Empty;
+            using var throttled = await gateway.CreateClient().SendAsync(Traced(ModulePath(ForwardingGateway.RequestPath)));
+            gateway.Buckets.Next = StandInTokenBuckets.Full;
+
+            await requests.WaitForMeasurementsAsync(4, LogTimeout);
+
+            Assert.All(labels.Seen, seen => Assert.Contains(seen.Label, allowed));
         }
 
         private static string ModulePath(string path) => "/modules/echo" + path;
