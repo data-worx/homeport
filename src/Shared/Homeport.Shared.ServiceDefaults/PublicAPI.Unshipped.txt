@@ -4,3 +4,8 @@ const Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions.ReadinessPath = 
 Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions
 static Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions.AddServiceDefaults<TBuilder>(this TBuilder builder) -> TBuilder
 static Homeport.Shared.ServiceDefaults.ServiceDefaultsExtensions.MapDefaultEndpoints(this Microsoft.AspNetCore.Builder.WebApplication! app) -> Microsoft.AspNetCore.Builder.WebApplication!
+const Homeport.Shared.ServiceDefaults.TelemetryAttributes.ClientId = "homeport.client.id" -> string!
+const Homeport.Shared.ServiceDefaults.TelemetryAttributes.Meter = "homeport.meter" -> string!
+const Homeport.Shared.ServiceDefaults.TelemetryAttributes.ModuleId = "homeport.module.id" -> string!
+const Homeport.Shared.ServiceDefaults.TelemetryAttributes.TenantId = "homeport.tenant.id" -> string!
+Homeport.Shared.ServiceDefaults.TelemetryAttributes

@@ -89,6 +89,10 @@ public static class HomeportModuleExtensions
     /// without a body, such as a <c>404</c> for an unknown path or a <c>401</c>
     /// for a missing token, gets a Problem Details body.
     /// </para>
+    /// <para>
+    /// Each request's span carries the module id and, with a module token, the
+    /// tenant and client it names.
+    /// </para>
     /// <para>Once the module has started, it logs the manifest it serves.</para>
     /// </remarks>
     public static WebApplication MapHomeportModule(this WebApplication app)
@@ -97,6 +101,12 @@ public static class HomeportModuleExtensions
         app.UseStatusCodePages();
 
         app.UseAuthentication();
+        var moduleId = app.Services.GetRequiredService<ModuleManifest>().Id;
+        app.Use((context, next) =>
+        {
+            CallerTelemetry.Tag(Activity.Current, moduleId, context.User);
+            return next(context);
+        });
         app.UseAuthorization();
 
         app.MapDefaultEndpoints();

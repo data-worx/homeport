@@ -5,6 +5,7 @@ using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Api.Errors;
 using Homeport.Platform.Gateway.Api.Proxies;
 using Homeport.Platform.Gateway.Api.Routing;
+using Homeport.Platform.Gateway.Api.Telemetry;
 using Homeport.Platform.Gateway.Api.Throttling;
 using Homeport.Platform.Gateway.Api.Usage;
 using Homeport.Platform.Gateway.Infrastructure.ControlPlane;
@@ -77,6 +78,7 @@ public sealed class Program
             .AddTransforms<UsageReports>()
             .AddTransforms<ModuleErrors>();
         builder.Services.AddHostedService<RouteTablePoller>();
+        builder.Services.AddSingleton<RequestMetrics>();
         builder.Services.AddApiDocs();
 
         var app = builder.Build();
@@ -106,11 +108,13 @@ public sealed class Program
 
         // Mapped by YARP rather than served by a controller (dotnet-core.web):
         // the proxy endpoints are framework-mapped, like the health endpoints.
-        // A request over its tenant's rate limit is rejected first, so it is
-        // not metered; usage is recorded around YARP's own steps, which a
-        // custom pipeline has to name.
+        // Its telemetry comes first, so a throttled request is traced and
+        // counted too. A request over its tenant's rate limit is rejected
+        // next, so it is not metered; usage is recorded around YARP's own
+        // steps, which a custom pipeline has to name.
         app.MapReverseProxy(proxy =>
         {
+            proxy.UseMiddleware<ModuleRequestTelemetry>();
             proxy.UseMiddleware<RequestThrottling>();
             proxy.UseMiddleware<UsageEvents>();
             proxy.UseSessionAffinity();

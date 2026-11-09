@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A request to a module is one trace from the gateway through the module and
+  RabbitMQ to metering, with the client's `traceparent` honoured throughout.
+  Every span of it carries the tenant, client and module
+  (`homeport.tenant.id`, `homeport.client.id`, `homeport.module.id`) and,
+  where it applies, the meter (`homeport.meter`). The new metric
+  `homeport.gateway.requests` counts requests per module and status code. See
+  [tracing](docs/operators/tracing.md).
+
 - The platform document of the API docs at `/platform/docs` lists the
   platform APIs, starting with the usage export at `GET /platform/v1/usage`,
   with the parameters and responses the service behind each describes.

@@ -19,6 +19,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`operators/reverse-proxy.md`](operators/reverse-proxy.md) | Running the gateway behind a reverse proxy, and which proxies' forwarded headers it trusts |
 | [`operators/identity-provider.md`](operators/identity-provider.md) | Connecting the identity provider whose client tokens the gateway accepts, and mapping its clients to tenants |
 | [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |
+| [`operators/tracing.md`](operators/tracing.md) | The trace of a request from the gateway to metering, the span attributes and the request metrics |
 | [`operators/api-docs.md`](operators/api-docs.md) | Switching the consolidated API docs on with `Gateway:Docs:Enabled`, what they expose and where they come from |
 
 ## Module developers — building a module on the contract and the SDK

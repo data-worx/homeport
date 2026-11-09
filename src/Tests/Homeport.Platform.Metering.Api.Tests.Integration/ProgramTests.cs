@@ -3,6 +3,7 @@
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json.Nodes;
+using Homeport.Platform.Metering.Api.Messaging;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Internal.Platform.Metering;
 
@@ -12,6 +13,23 @@ public sealed class ProgramTests
 {
     public sealed class Main(RunningMetering metering) : IClassFixture<RunningMetering>
     {
+        // The labels a homeport.* metric of metering may carry. Each is
+        // bounded and never taken from an event: no tenant, trace id or route.
+        // A new label is added here deliberately.
+        [Fact]
+        public async Task Labels_Its_Metrics_Only_With_Bounded_Values()
+        {
+            string[] allowed = [MeteringMetrics.OutcomeTag];
+            using var labels = new MetricLabels();
+            var message = new UsageRecorded(
+                Guid.NewGuid(), DateTimeOffset.Parse("2026-11-09T10:00:00Z"), Guid.NewGuid(), "local-client", "echo", "/v1/echo", "requests", 1, 200, 12, "0af7651916cd43dd8448eb211c80319c");
+            await metering.PublishAsync(message);
+
+            await metering.PublishAsync(message);
+
+            Assert.All(labels.Seen, seen => Assert.Contains(seen.Label, allowed));
+        }
+
         [Fact]
         public async Task Serves_No_OpenApi_Document_Without_A_Token()
         {
