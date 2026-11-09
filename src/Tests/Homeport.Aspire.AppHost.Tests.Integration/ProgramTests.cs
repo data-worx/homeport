@@ -324,7 +324,13 @@ public sealed class ProgramTests
             var elapsed = TimeProvider.System.GetElapsedTime(started);
             var allowed = RunningAppHost.SeededBurst + (int)Math.Ceiling(elapsed.TotalSeconds * RunningAppHost.SeededRequestsPerSecond);
             Assert.Equal(2, replicas.Count);
-            Assert.InRange(responses.Count(response => response.IsSuccessStatusCode), 0, allowed);
+            var succeeded = responses.Count(response => response.IsSuccessStatusCode);
+            if (succeeded > allowed)
+            {
+                Assert.Fail($"DIAGNOSTIC (#154): {succeeded} > {allowed}, per replica {string.Join("/", responses.Select((response, index) => (response, index)).GroupBy(pair => pair.index % replicas.Count).Select(group => group.Count(pair => pair.response.IsSuccessStatusCode)))}{Environment.NewLine}{await appHost.GatewayLogsAsync()}");
+            }
+
+            Assert.InRange(succeeded, 0, allowed);
         }
 
         private Task<HttpClient> Gateway() => appHost.GatewayRoutingEchoAsync();

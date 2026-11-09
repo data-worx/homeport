@@ -152,6 +152,7 @@ public sealed class RunningAppHost : IAsyncLifetime
             }
         }
 
+        GatewayReplicaIds = [.. addresses.Keys];
         var clients = new List<HttpClient>();
         foreach (var address in addresses.Values)
         {
@@ -159,6 +160,29 @@ public sealed class RunningAppHost : IAsyncLifetime
         }
 
         return clients;
+    }
+
+    // DIAGNOSTIC (#154): the replicas the last GatewayReplicasRoutingEchoAsync found.
+    internal IReadOnlyList<string> GatewayReplicaIds { get; private set; } = [];
+
+    // DIAGNOSTIC (#154): the last lines of every replica's log.
+    internal async Task<string> GatewayLogsAsync()
+    {
+        const int LinesPerReplica = 1000;
+        var logs = App.Services.GetRequiredService<ResourceLoggerService>();
+        var lines = new List<string>();
+        foreach (var id in GatewayReplicaIds)
+        {
+            var replica = new List<string>();
+            await foreach (var batch in logs.GetAllAsync(id))
+            {
+                replica.AddRange(batch.Select(line => $"{id}: {System.Text.RegularExpressions.Regex.Replace(line.Content, @"\u001b\[[0-9;]*m", string.Empty)}"));
+            }
+
+            lines.AddRange(replica.TakeLast(LinesPerReplica));
+        }
+
+        return string.Join(Environment.NewLine, lines);
     }
 
     private async Task<HttpClient> RoutingEchoAsync(HttpClient gateway)
