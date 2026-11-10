@@ -1,9 +1,9 @@
 # Data model
 
-How Homeport keeps its data in PostgreSQL, and why a table is either
-tenant-owned or a platform table. The binding rules are in the *Tech stack*
-and *Multi-tenancy* sections of [`AGENTS.md`](../../AGENTS.md#multi-tenancy);
-the decision is [ADR-0005](adr/0005-persistence-and-multi-tenancy.md).
+How Homeport keeps its data in PostgreSQL, why a table is either
+tenant-owned or a platform table, and which keys it keeps in Valkey. The
+binding rules are in the *Tech stack* and *Multi-tenancy* sections of
+[`AGENTS.md`](../../AGENTS.md#multi-tenancy); the decision is [ADR-0005](adr/0005-persistence-and-multi-tenancy.md).
 
 ## One database, one schema per service
 
@@ -98,3 +98,21 @@ The same notation; the three tables share no foreign key, and `TenantId`
 refers to `control_plane.Tenants` only logically.
 
 ![ER diagram of the metering schema](data-model-metering.drawio.svg)
+
+## Valkey
+
+Besides PostgreSQL, Homeport keeps short-lived state in Valkey, shared by
+every replica of the service that writes it. Every key starts with
+`homeport:` and the name of its owning service:
+
+| Key pattern | Type | Time to live | Owner | Value |
+|---|---|---|---|---|
+| `homeport:registry:instances:<module id>:<instance id>` | String | 30 s after the last registration or heartbeat | Registry | The instance as JSON: instance id, address and manifest |
+| `homeport:gateway:ratelimit:<tenant id>` | Hash | Until the bucket would be full again | Gateway | The tenant's token bucket: `tokens` left, and `at`, the time of the last take in microseconds of Valkey's clock |
+
+A key that expired is no loss: a module registers again, and a missing
+bucket is a full one. The keys have no relations to each other or to a
+table, so there is no ER diagram of them; this table is the whole key space.
+How each service uses its keys is described in
+[the registry](../operators/registry.md) and
+[throttling](../operators/throttling.md).

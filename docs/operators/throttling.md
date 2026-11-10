@@ -26,8 +26,8 @@ effect once that has passed.
 
 ## The buckets
 
-The buckets live in Valkey, one key per tenant,
-`homeport:gateway:ratelimit:<tenant id>`. The gateway takes a token with a
+The buckets live in Valkey, one key per tenant; the key is listed in
+[the data model](../architecture/data-model.md#valkey). The gateway takes a token with a
 script that runs inside Valkey, so it is atomic: however many gateway
 replicas a tenant's requests reach, together they accept no more than the
 one bucket allows. The script uses Valkey's clock, not the gateway's, so
