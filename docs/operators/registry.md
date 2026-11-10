@@ -8,8 +8,10 @@ every 5 s. Starting a module makes it reachable; stopping it removes its
 routes. See [ADR-0004](../architecture/adr/0004-gateway-and-service-discovery.md).
 
 The registry keeps the instances in Valkey, each for 30 s after its last
-heartbeat. It needs nothing else, and nothing is lost when it restarts: a
-running module registers again on its own.
+heartbeat; their keys are listed in
+[the data model](../architecture/data-model.md#valkey). It needs nothing
+else, and nothing is lost when it restarts: a running module registers again
+on its own.
 
 ## Registration keys
 
