@@ -29,8 +29,9 @@ internal static class GatewaySettings
     // what it publishes is tracked rather than sent.
     private const string UnusedBroker = "amqp://guest:guest@127.0.0.1:1/";
 
-    // A Valkey nothing listens on.
-    private const string UnusedValkey = "127.0.0.1:1";
+    // A Valkey nothing listens on, given up on quickly: the gateway connects
+    // while it starts, and waits that long before it starts without Valkey.
+    private const string UnusedValkey = "127.0.0.1:1,connectTimeout=100";
 
     /// <summary>Publishes usage events to Wolverine's stub transports instead of a broker.</summary>
     internal static IWebHostBuilder WithUsage(this IWebHostBuilder host)
