@@ -82,7 +82,8 @@ and without the query filters and through raw SQL as the app role.
 One diagram per schema, drawn from the service's EF Core model snapshot. Both
 files are draw.io diagrams: open them in draw.io to edit them, and export
 them again uncompressed. A migration updates its schema's diagram in the same
-pull request.
+pull request. A test per schema asserts that the diagram names every table and
+column of the EF Core model.
 
 ### `control_plane`
 

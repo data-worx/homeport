@@ -11,10 +11,26 @@ namespace Homeport.Platform.Metering.Infrastructure.Tests.Integration.Persistenc
 /// <summary>
 /// The cross-tenant leakage tests through EF Core (ADR-0005): with tenant A
 /// set, no query returns a row of tenant B - neither through the query
-/// filters nor, with them switched off, past row-level security.
+/// filters nor, with them switched off, past row-level security. And that the
+/// schema's ER diagram names every table and column of the model.
 /// </summary>
 public sealed class MeteringDbContextTests
 {
+    public sealed class Model
+    {
+        private const string Diagram = "data-model-metering.drawio.svg";
+
+        [Fact]
+        public void Names_Every_Table_And_Column_In_The_Er_Diagram()
+        {
+            using var context = new MeteringDesignTimeDbContextFactory().CreateDbContext([]);
+
+            var missing = ErDiagram.Read(Diagram).MissingFrom(context);
+
+            Assert.True(missing.Count == 0, $"{Diagram} lacks: {string.Join(", ", missing)}");
+        }
+    }
+
     [Collection(MeteringDatabase.Collection)]
     public sealed class UsageEvents(MeteringDatabase database)
     {
