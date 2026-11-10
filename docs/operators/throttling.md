@@ -47,12 +47,18 @@ Valkey into an outage of Homeport. The gateway stays ready meanwhile: Valkey
 has no part in its health check, and a request does not wait for Valkey but
 passes at once.
 
+The gateway connects to Valkey while it starts, before it accepts a request,
+so its first requests are throttled like every other. A gateway that starts
+while Valkey is down waits for the connect timeout — 5 seconds unless the
+connection string sets `connectTimeout` — then starts and fails open.
+
 What tells you it happened:
 
 | Signal | When |
 |---|---|
 | Metric `homeport.gateway.ratelimit.unavailable` | Counts every request that passed unthrottled |
 | Warning `Valkey could not be reached; requests pass without a rate limit` | Logged at most once a minute per replica, with the exception, however many requests pass |
+| Warning `Valkey could not be reached at start` | Logged once by a replica that started without Valkey |
 
 Alert on the metric: while it rises, no tenant is limited. The limits apply
 again as soon as Valkey answers; a bucket Valkey lost starts full.

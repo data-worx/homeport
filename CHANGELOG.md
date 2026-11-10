@@ -226,6 +226,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   values from `Parameters:seed-…` in the user secrets, with the documented
   values as defaults. Before, the defaults were fixed and a configured value
   was ignored, so a smaller plan for trying out the rate limit never applied.
+- The gateway connects to Valkey while it starts instead of with its first
+  request. Before, a burst of first requests to a fresh replica on a machine
+  with few cores could time the connection out, and the whole burst passed
+  without a rate limit although Valkey was up. A gateway that starts while
+  Valkey is down now starts after the connect timeout. See
+  [throttling](docs/operators/throttling.md).
 
 ### Security
 

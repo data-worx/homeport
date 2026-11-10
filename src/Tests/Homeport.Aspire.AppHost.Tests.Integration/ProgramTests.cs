@@ -27,6 +27,9 @@ public sealed class ProgramTests
         // Far more than the seeded plan's bucket holds and refills while they run.
         private const int ThrottledRequests = 30;
 
+        private const string RateLimitHeader = "RateLimit";
+        private const string RateLimitPolicyHeader = "RateLimit-Policy";
+
         private static readonly TimeSpan ExportPoll = TimeSpan.FromMilliseconds(250);
 
         [Theory]
@@ -312,6 +315,8 @@ public sealed class ProgramTests
 
         // Each replica alone would accept a bucketful; together they accept
         // what the one bucket in Valkey held, plus what it refilled meanwhile.
+        // The count alone does not tell why a run accepted more, so a failure
+        // says what each replica did.
         [Fact]
         public async Task Accepts_No_More_Across_Both_Gateway_Replicas_Than_The_Seeded_Plan_Allows()
         {
@@ -323,8 +328,30 @@ public sealed class ProgramTests
 
             var elapsed = TimeProvider.System.GetElapsedTime(started);
             var allowed = RunningAppHost.SeededBurst + (int)Math.Ceiling(elapsed.TotalSeconds * RunningAppHost.SeededRequestsPerSecond);
+            var accepted = responses.Count(response => response.IsSuccessStatusCode);
             Assert.Equal(2, replicas.Count);
-            Assert.InRange(responses.Count(response => response.IsSuccessStatusCode), 0, allowed);
+            Assert.True(
+                accepted <= allowed,
+                $"Accepted {accepted} of {ThrottledRequests} requests, at most {allowed} were allowed. {PerReplica(responses, replicas.Count)}");
+        }
+
+        // What each replica answered to the requests sent to it in turn. A
+        // replica that could not reach Valkey fails open and sends no
+        // RateLimit headers; one that throttles names the plan it applied in
+        // RateLimit-Policy.
+        private static string PerReplica(HttpResponseMessage[] responses, int replicas)
+        {
+            return string.Join("; ", Enumerable.Range(0, replicas).Select(replica =>
+            {
+                var answers = responses.Where((_, request) => request % replicas == replica).ToList();
+                var policies = answers
+                    .SelectMany(response => response.Headers.TryGetValues(RateLimitPolicyHeader, out var values) ? values : [])
+                    .Distinct(StringComparer.Ordinal);
+
+                return $"Replica {replica} accepted {answers.Count(response => response.IsSuccessStatusCode)} of {answers.Count}, "
+                    + $"{answers.Count(response => !response.Headers.Contains(RateLimitHeader))} without a rate limit (failed open), "
+                    + $"applying the policies [{string.Join(", ", policies)}]";
+            }));
         }
 
         private Task<HttpClient> Gateway() => appHost.GatewayRoutingEchoAsync();

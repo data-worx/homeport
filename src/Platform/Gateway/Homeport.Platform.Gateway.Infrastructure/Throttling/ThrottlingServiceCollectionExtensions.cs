@@ -15,7 +15,8 @@ public static class ThrottlingServiceCollectionExtensions
     public const string ValkeyConnectionName = "valkey";
 
     /// <summary>
-    /// Adds <see cref="RequestThrottle"/> on buckets in Valkey. The gateway
+    /// Adds <see cref="RequestThrottle"/> on buckets in Valkey, connected
+    /// while the gateway starts (<see cref="ValkeyConnection"/>). The gateway
     /// fails open, so Valkey adds no health check, may be unreachable at
     /// start, and a command fails at once while it is down rather than
     /// waiting in a backlog: the gateway stays ready and fast without it.
@@ -35,6 +36,7 @@ public static class ThrottlingServiceCollectionExtensions
         builder.Services.AddSingleton<ThrottlingMetrics>();
         builder.Services.AddSingleton<ITokenBuckets, ValkeyTokenBuckets>();
         builder.Services.AddSingleton<RequestThrottle>();
+        builder.Services.AddHostedService<ValkeyConnection>();
 
         return builder;
     }
