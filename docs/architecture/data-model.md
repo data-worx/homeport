@@ -76,3 +76,24 @@ table's owner, so `migrate` is not held to them.
 Every feature that touches tenant data has a cross-tenant leakage test:
 with tenant A set, no query returns a row of tenant B, through EF Core with
 and without the query filters and through raw SQL as the app role.
+
+## Schemas
+
+One diagram per schema, drawn from the service's EF Core model snapshot. Both
+files are draw.io diagrams: open them in draw.io to edit them, and export
+them again uncompressed. A migration updates its schema's diagram in the same
+pull request.
+
+### `control_plane`
+
+Each table lists its columns with type and nullability; an edge runs from a
+foreign key to the key it refers to, the crow's foot on the many side.
+
+![ER diagram of the control_plane schema](data-model-control-plane.drawio.svg)
+
+### `metering`
+
+The same notation; the three tables share no foreign key, and `TenantId`
+refers to `control_plane.Tenants` only logically.
+
+![ER diagram of the metering schema](data-model-metering.drawio.svg)

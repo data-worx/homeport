@@ -69,6 +69,9 @@ reader it is written for:
   pull request.
 - A directory is created with its first document, never empty.
 - English only. Every document is listed in [docs/README.md](docs/README.md).
+- A migration updates its schema's ER diagram,
+  `docs/architecture/data-model-<schema>.drawio.svg` with `-` for `_`, in
+  the same pull request. See [the data model](docs/architecture/data-model.md#schemas).
 
 ## Tech stack
 
