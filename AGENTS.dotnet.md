@@ -60,6 +60,7 @@ src/
     <Name>.Tools.<Tool>/
   Tests/
     Architecture.Tests/
+    <Name>.Testing/               optional, helpers for the test projects
 ```
 
 Within a stack — `<Stack>` below stands for the stack's path, `Core` or
@@ -84,6 +85,7 @@ Outside the stacks:
 | `<Name>.Sdk` — at most one | `src/Sdk/` | Shared, packages; no stack project |
 | `<Name>.Tools.<Tool>` — a development tool | `src/Tools/` | anything, when it is a composition root |
 | a test project | `src/Tests/` | whatever it needs to assert something, Infrastructure included |
+| `<Name>.Testing` — the test library, at most one | `src/Tests/` | whatever a test project may; referenced by test projects only |
 
 - **A project is named `<Name>`, then every grouping directory between `src/`
   and the project, then its own name** (`dotnet.namespaces`). `<Name>` is the
@@ -164,6 +166,15 @@ framework demands.
 Constructor injection only. No service locator, no `new` on a service, no
 static mutable state.
 
+**A factory registered with the container performs no I/O.** The container
+runs it when it first hands the service out, under the singleton's lock, and
+every request arriving meanwhile holds a thread-pool thread waiting for it —
+the connect starves the pool it needs and times out. That covers a client
+library's `Add…Client` extension that connects synchronously, too.
+
+A service that connects when it is created is created while the host starts,
+by a hosted service, never by the first request that needs it.
+
 ## Persistence {#dotnet.persistence}
 
 The domain layer contains no attributes from the ORM or the web framework.
@@ -197,7 +208,25 @@ side.
 
 Tests that assert solution-wide rules — such as which project may reference
 which — belong to no single project and carry no `.Unit`/`.Integration`
-suffix. That is the only exception; a second one needs a ticket that argues
+suffix.
+
+**Helpers several test projects need live in one test library,
+`src/Tests/<Name>.Testing`, not in copies.** Stand-ins for other components,
+containers with their pinned images, the repository root of the checkout,
+readers for files a test checks:
+
+- It is a class library, not a test project. It holds no tests, and an
+  SDK-style project file sets `IsTestProject` to `false`.
+- Only test projects reference it.
+- It may reference whatever a test project may.
+- There is at most one — not one per stack or per layer.
+- It is named `<Name>.Testing`, not `<Name>.Tests.…`, so it does not read as a
+  test project of a project called `<Name>`.
+
+`Architecture.Tests` asserts the name, the count and that nothing outside
+`src/Tests/` references it. Whether it holds tests is kept in review.
+
+These two are the only exceptions; a third one needs a ticket that argues
 for it.
 
 **One test class per class under test, one nested class per method under
