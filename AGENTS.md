@@ -381,6 +381,9 @@ See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
 - Actions in workflows are pinned by commit SHA, the version in a comment.
 - Own images use chiseled .NET base images, run as non-root, and are signed
   with cosign on release.
+- A new own image's package in GHCR is created private by its first
+  release. The maintainer makes it public by hand in the package settings
+  right after that release.
 - A release is a tag `vX.Y.Z` on `main` whose `X.Y.Z` is the `<Version>` in
   `src/Directory.Build.props` and has its section in `CHANGELOG.md`; the
   *Release* workflow refuses any other. It signs with the key pair whose

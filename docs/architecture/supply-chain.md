@@ -90,6 +90,12 @@ signed CycloneDX attestation. The GitHub release carries the compose file
 with every own image pinned by digest, the `deploy/` directory it needs, and
 one SBOM per image.
 
+GHCR creates the package of an image private when the image is pushed for
+the first time, and GitHub offers no API to change that. After the first
+release of a new own image the maintainer makes its package public by hand,
+in the package settings, so an operator can pull it without an account. The
+organisation already allows public container packages.
+
 Signing uses a key pair rather than Sigstore's keyless signing, and writes
 no entry into Sigstore's public transparency log. An installation without
 internet access verifies an image with `cosign.pub` from the repository and
