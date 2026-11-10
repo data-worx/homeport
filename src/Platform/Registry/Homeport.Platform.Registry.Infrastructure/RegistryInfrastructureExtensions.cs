@@ -16,7 +16,8 @@ public static class RegistryInfrastructureExtensions
     public const string ValkeyConnectionName = "valkey";
 
     /// <summary>
-    /// Keeps the instances in Valkey and reads the registration keys from
+    /// Keeps the instances in Valkey, connected while the registry starts
+    /// (<see cref="ValkeyConnection"/>), and reads the registration keys from
     /// configuration, checked at start-up.
     /// </summary>
     public static IHostApplicationBuilder AddRegistryInfrastructure(this IHostApplicationBuilder builder)
@@ -29,6 +30,7 @@ public static class RegistryInfrastructureExtensions
         builder.Services.AddSingleton<IValidateOptions<RegistrationKeyOptions>, RegistrationKeyOptionsValidator>();
         builder.Services.AddSingleton<IRegistrationKeySource, ConfiguredRegistrationKeys>();
         builder.Services.AddSingleton<IInstanceStore, ValkeyInstanceStore>();
+        builder.Services.AddHostedService<ValkeyConnection>();
 
         return builder;
     }
