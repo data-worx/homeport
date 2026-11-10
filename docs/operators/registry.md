@@ -91,6 +91,12 @@ services:
 If Valkey is down, the registry answers registrations and route reads with
 `500`; the effect is the same as the registry being down.
 
+The registry connects to Valkey while it starts, before it accepts a
+request. A registry that starts while Valkey is down waits for the connect
+timeout — 5 seconds unless the connection string sets `connectTimeout` —
+logs the warning `Valkey could not be reached at start`, then starts. It is
+not ready (`/health/ready`) and answers with `500` until Valkey answers.
+
 ## Reading the routes
 
 `GET /routes` on the registry returns the route table the gateway uses. Only

@@ -17,6 +17,9 @@ public sealed class ValkeyContainer : IAsyncLifetime
     private readonly RedisContainer container = new RedisBuilder(Image).Build();
     private ConnectionMultiplexer? connection;
 
+    /// <summary>The connection string a component under test connects with.</summary>
+    internal string ConnectionString => container.GetConnectionString();
+
     internal IConnectionMultiplexer Connection =>
         connection ?? throw new InvalidOperationException("Valkey has not been started.");
 

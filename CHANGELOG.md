@@ -232,6 +232,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   without a rate limit although Valkey was up. A gateway that starts while
   Valkey is down now starts after the connect timeout. See
   [throttling](docs/operators/throttling.md).
+- The registry connects to Valkey while it starts instead of with its first
+  request, as the gateway does. Before, the first requests to a fresh
+  registry waited for the connection, and on a machine with few cores they
+  could time it out although Valkey was up. A registry that starts while
+  Valkey is down now starts after the connect timeout. See
+  [the registry](docs/operators/registry.md#when-the-registry-is-down).
 
 ### Security
 
