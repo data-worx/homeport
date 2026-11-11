@@ -31,13 +31,15 @@ Out of scope: any product code.
 
 ## M1 — v0.1 Walking skeleton
 
+Done: released as v0.1.0.
+
 One thin path that works end to end. No portal, no API keys, no real module.
 
 Done when:
 
 1. `docker compose up` (generated from the AppHost) starts gateway, registry,
    control plane, metering, Echo module, PostgreSQL, RabbitMQ, Valkey and
-   Keycloak. `--profile observability` adds the Grafana stack.
+   Keycloak.
 2. Echo registers with its manifest and sends heartbeats. Its route appears in
    the gateway without a restart. Stopping Echo removes the route after the
    TTL.
@@ -51,15 +53,17 @@ Done when:
 6. Every call produces a `UsageRecorded` event that ends up aggregated in
    PostgreSQL. Duplicate events are not counted twice. The usage export works
    as CSV and JSON, for the calling tenant only.
-7. One trace shows gateway → Echo → RabbitMQ → metering.
+7. One trace shows gateway → Echo → RabbitMQ → metering in the Aspire
+   dashboard.
 8. CI: build, tests, SBOM, Trivy scan of all images, cosign signing, push to
    GHCR on tag, nightly scan.
 9. `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md` (with the CLA) and a
    `README.md` with a quickstart.
 
 Out of scope: portal, API keys, real modules, Helm chart, invoices, quotas,
-the period-close webhook, a write API for the control plane, usage reporting
-from asynchronous workers.
+the period-close webhook, an observability profile for the compose
+deployment, a write API for the control plane, usage reporting from
+asynchronous workers.
 
 ## Later — not yet phased
 
@@ -70,6 +74,8 @@ from asynchronous workers.
 - Quotas
 - Period-close webhook
 - Usage reporting from asynchronous workers
+- Observability profile for the compose deployment: Grafana with a Homeport
+  dashboard
 - `Deprecation` and `Sunset` headers for module routes
 - Operator-defined module groups under `/modules/`
 - In-product developer portal: a catalogue of the modules registered in an

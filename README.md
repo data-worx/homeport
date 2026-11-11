@@ -21,9 +21,10 @@ More in [docs/architecture/vision.md](docs/architecture/vision.md).
 
 ## Status
 
-Pre-alpha. The walking skeleton runs: a call goes through the gateway to a
-module and is metered. The milestones ahead are described in
-[ROADMAP.md](ROADMAP.md).
+Pre-alpha. v0.1.0, the walking skeleton, is released: a call goes through the
+gateway to a module and is metered. Images and the compose file are on the
+[releases page](https://github.com/data-worx/homeport/releases). The
+milestones ahead are described in [ROADMAP.md](ROADMAP.md).
 
 ## Quickstart
 
