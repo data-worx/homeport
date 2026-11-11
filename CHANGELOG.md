@@ -251,3 +251,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `TrustedProxies`. Before, the compose file let the gateway take them from
   any caller, who could so pass as another address or as having called over
   HTTPS. See [running behind a reverse proxy](docs/operators/reverse-proxy.md).
+- Aspire is updated to 13.6.5, which fixes the elevation of privilege
+  CVE-2026-120006 (GHSA-f7vh-h5g3-7jrh) in the AppHost. EF Core follows to
+  10.0.14 with it.
