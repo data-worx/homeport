@@ -37,7 +37,9 @@ var manifest = new ModuleManifest(
   digits and `-`, starting with a letter; `platform` is reserved.
 - **`Version`** is the module's own SemVer version. `ModuleVersion.Of` reads
   it from the assembly, so it follows the build's `Version` and carries the
-  commit as build metadata, for example `0.1.0+c1fef1c…`.
+  commit as build metadata, for example `0.1.0+c1fef1c…`. A Homeport build
+  from source reports the placeholder `0.0.0-dev+…`; a release build takes
+  the version from its tag.
 - **`Routes`** lists every endpoint the module serves. A path starts with
   `/v{major}/`. The scope is what a caller needs, the meter and quantity are
   what one request counts.

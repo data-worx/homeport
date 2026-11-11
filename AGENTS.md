@@ -388,18 +388,34 @@ See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
 - A new own image's package in GHCR is created private by its first
   release. The maintainer makes it public by hand in the package settings
   right after that release.
-- A release is a tag `vX.Y.Z` on `main` whose `X.Y.Z` is the `<Version>` in
-  `src/Directory.Build.props` and has its section in `CHANGELOG.md`; the
-  *Release* workflow refuses any other. It signs with the key pair whose
-  public half is `cosign.pub`, without Sigstore's transparency log, so an
-  operator verifies offline. The private key exists only as a repository
-  secret and in the maintainer's secret store.
+- The *Release* workflow signs with the key pair whose public half is
+  `cosign.pub`, without Sigstore's transparency log, so an operator verifies
+  offline. The private key exists only as a repository secret and in the
+  maintainer's secret store.
 - One `THIRD-PARTY-NOTICES.md` in the repository root covers every project
   that becomes an own image: each is listed in `NOTICES_PROJECTS` in
   `.devkit/gates.sh`, sets `ShipsThirdPartyNotices`, and carries the file at
   `/app/THIRD-PARTY-NOTICES.md`. Third-party images are not in it — Homeport
   does not redistribute them — and the content of the base images is covered
   by the SBOM, not by this file.
+
+## Releasing
+
+See [releasing](docs/releasing.md).
+
+- Release model: **trunk with tags** (`core.release-models`). Candidates
+  and releases are tagged on `main`; `release/X.Y` only for a fix to a line
+  that is no longer the latest.
+- Artifacts: **web or service** (`core.release-service`). Every own image
+  of the compose files, as `ghcr.io/data-worx/<image>:<version>`, plus a
+  GitHub release carrying the compose file pinned to them by digest, the
+  deploy bundle `homeport-deploy-<version>.tar.gz` and one SBOM per image.
+- `src/Directory.Build.props` carries the placeholder version `0.0.0-dev`.
+  The *Release* workflow passes the version from the tag to the build.
+- `.github/scripts/check-release.sh` refuses any tag but `vX.Y.Z` and
+  `vX.Y.Z-rc.N` on `main` or `release/X.Y`, and any without its section
+  `## [X.Y.Z]` in `CHANGELOG.md`. The workflow runs the gates on the
+  tagged commit before anything is pushed.
 
 ## Work organisation
 

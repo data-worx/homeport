@@ -74,17 +74,21 @@ The image runs as the non-root user `app` (UID 1654).
 ## Releases
 
 A tag releases. The [*Release* workflow](../../.github/workflows/release.yml)
-runs on a tag `vX.Y.Z`, or `vX.Y.Z-<pre-release>` such as `v0.1.0-rc.1`, and
-[`check-release.sh`](../../.github/scripts/check-release.sh) refuses it
-unless the tagged commit is on `main`, `X.Y.Z` is the `<Version>` in
-`src/Directory.Build.props`, and — for a release, not a pre-release —
-`CHANGELOG.md` has its section `## [X.Y.Z]`. That section becomes the
-release notes, so no release goes out without them.
+runs on a tag `vX.Y.Z`, or `vX.Y.Z-rc.N` for a candidate such as
+`v0.1.0-rc.1`, and [`check-release.sh`](../../.github/scripts/check-release.sh)
+refuses it unless the tagged commit is on `main` — or on `release/X.Y` for a
+fix to an older line — and `CHANGELOG.md` has its section `## [X.Y.Z]`. That section
+becomes the release notes, so no release goes out without them. The version
+comes from the tag alone: the repository carries the placeholder
+`0.0.0-dev`, and the release build takes the version as its one input.
+Before anything is built for the release, the gates run on the tagged
+commit, since a tag may point at a commit no pull request was built from.
+The steps a maintainer takes are in [releasing](../releasing.md).
 
 [`release-images.sh`](../../.github/scripts/release-images.sh) then builds
-every own image from the table in `own-images.sh`, the same images the scan
-covers. Each is scanned before anything is pushed, so a High or Critical
-finding stops the release, and only then pushed to
+every own image from the table in `own-images.sh` with that version — the
+same images the scan covers. Each is scanned before anything is pushed, so a
+High or Critical finding stops the release, and only then pushed to
 `ghcr.io/data-worx/<image>`, signed with cosign and given its SBOM as a
 signed CycloneDX attestation. The GitHub release carries the compose file
 with every own image pinned by digest, the `deploy/` directory it needs, and

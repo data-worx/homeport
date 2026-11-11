@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Checks that a tag may be released and writes its release notes:
+# Checks that a tag may be released and writes its release notes
+# (core.releasing, trunk with tags - see docs/releasing.md):
 #
-# - the tag is vX.Y.Z, or vX.Y.Z-<pre-release> for a pre-release;
-# - X.Y.Z is the <Version> in src/Directory.Build.props, so the binaries in
-#   the images report the version they are released as;
-# - the tagged commit is on origin/main;
-# - a release has its section "## [X.Y.Z]" in CHANGELOG.md, and the notes are
-#   that section. A pre-release needs none; its notes are [Unreleased].
+# - the tag is vX.Y.Z, or vX.Y.Z-rc.N for a candidate;
+# - the tagged commit is on origin/main, or on origin/release/X.Y for a fix
+#   to a line that is no longer the latest;
+# - CHANGELOG.md has the section "## [X.Y.Z]", which the release request cut
+#   before any candidate was tagged. The notes are that section.
 #
-# Prints version=, prerelease= and image_tag= lines for $GITHUB_OUTPUT.
+# The version comes from the tag and nowhere else: the repository carries a
+# placeholder, and the release build takes the version printed here.
+#
+# Prints version=, prerelease= and latest= lines for $GITHUB_OUTPUT. Only a
+# release from main is the latest; a candidate and a fix to an old line never
+# are.
 #
 # Usage:  bash .github/scripts/check-release.sh <tag> <notes file>
 set -uo pipefail
@@ -18,25 +23,26 @@ set -uo pipefail
 tag="${1:?usage: check-release.sh <tag> <notes file>}"
 notes="${2:?usage: check-release.sh <tag> <notes file>}"
 changelog="CHANGELOG.md"
-props="src/Directory.Build.props"
 
-if [[ ! "${tag}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)(-([0-9A-Za-z.-]+))?$ ]]; then
-  echo "Tag ${tag} is neither vX.Y.Z nor vX.Y.Z-<pre-release>" >&2
+if [[ ! "${tag}" =~ ^v(([0-9]+)\.([0-9]+)\.[0-9]+)(-rc\.[1-9][0-9]*)?$ ]]; then
+  echo "Tag ${tag} is neither vX.Y.Z nor vX.Y.Z-rc.N" >&2
   exit 1
 fi
-version="${BASH_REMATCH[1]}"
-pre="${BASH_REMATCH[3]}"
+release="${BASH_REMATCH[1]}"
+line="${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+candidate="${BASH_REMATCH[4]}"
+version="${tag#v}"
 
 fail=0
 
-declared="$(sed -n -E 's|^[[:space:]]*<Version>([^<]+)</Version>[[:space:]]*$|\1|p' "${props}")"
-if [ "${declared}" != "${version}" ]; then
-  echo "Tag ${tag} releases ${version}, but ${props} declares <Version>${declared}</Version>" >&2
-  fail=1
-fi
+on_branch() { git merge-base --is-ancestor "${tag}^{commit}" "origin/$1" 2>/dev/null; }
 
-if ! git merge-base --is-ancestor "${tag}^{commit}" origin/main 2>/dev/null; then
-  echo "Tag ${tag} is not on origin/main" >&2
+if on_branch main; then
+  branch="main"
+elif on_branch "release/${line}"; then
+  branch="release/${line}"
+else
+  echo "Tag ${tag} is neither on origin/main nor on origin/release/${line}" >&2
   fail=1
 fi
 
@@ -49,19 +55,17 @@ section() {
   ' "${changelog}"
 }
 
-if [ -z "${pre}" ]; then
-  if ! grep -q -E "^## \[${version//./\\.}\]( - .*)?$" "${changelog}"; then
-    echo "${changelog} has no section \"## [${version}]\" for tag ${tag}" >&2
-    fail=1
-  else
-    section "${version}" > "${notes}"
-  fi
+if ! grep -q -E "^## \[${release//./\\.}\]( - .*)?$" "${changelog}"; then
+  echo "${changelog} has no section \"## [${release}]\" for tag ${tag}; cut the changelog first" >&2
+  fail=1
+elif [ -n "${candidate}" ]; then
+  { echo "Candidate for ${release}, not for production."; section "${release}"; } > "${notes}"
 else
-  { echo "Pre-release of ${version}, not for production."; section "Unreleased"; } > "${notes}"
+  section "${release}" > "${notes}"
 fi
 
 [ "${fail}" -eq 0 ] || exit 1
 
 echo "version=${version}"
-echo "image_tag=${tag#v}"
-if [ -n "${pre}" ]; then echo "prerelease=true"; else echo "prerelease=false"; fi
+if [ -n "${candidate}" ]; then echo "prerelease=true"; else echo "prerelease=false"; fi
+if [ -z "${candidate}" ] && [ "${branch}" = "main" ]; then echo "latest=true"; else echo "latest=false"; fi

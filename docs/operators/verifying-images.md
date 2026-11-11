@@ -17,8 +17,8 @@ the Homeport release workflow built, unchanged since.
 | `ghcr.io/data-worx/homeport-module-echo` | The Echo reference module |
 
 Each is tagged with the version it is released as, `0.1.0` for v0.1.0. A
-pre-release such as `v0.1.0-rc.1` is tagged `0.1.0-rc.1` and is not meant
-for production.
+release candidate such as `v0.1.0-rc.1` is tagged `0.1.0-rc.1` and is not
+meant for production.
 
 ## What a release carries
 
