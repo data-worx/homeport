@@ -19,8 +19,8 @@ asset change; the `notices` gate fails while it is stale.
 
 | Package | Version | Licence | Copyright |
 |---|---|---|---|
-| Aspire.Npgsql.EntityFrameworkCore.PostgreSQL | 13.6.4 | MIT | © Microsoft Corporation. All rights reserved. |
-| Aspire.StackExchange.Redis | 13.6.4 | MIT | © Microsoft Corporation. All rights reserved. |
+| Aspire.Npgsql.EntityFrameworkCore.PostgreSQL | 13.6.5 | MIT | © Microsoft Corporation. All rights reserved. |
+| Aspire.StackExchange.Redis | 13.6.5 | MIT | © Microsoft Corporation. All rights reserved. |
 | AspNetCore.HealthChecks.Redis | 9.0.0 | Apache-2.0 | — not declared by the package |
 | Cronos | 0.11.0 | MIT | Copyright © 2016–2025 Hangfire OÜ. |
 | FastExpressionCompiler | 5.4.1 | MIT | Copyright © 2016-2026 Maksim Volkau |
@@ -43,14 +43,14 @@ asset change; the `notices` gate fails while it is stale.
 | Microsoft.CodeAnalysis.VisualBasic | 5.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.CodeAnalysis.VisualBasic.Workspaces | 5.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.CodeAnalysis.Workspaces.Common | 5.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
-| Microsoft.EntityFrameworkCore | 10.0.12 | MIT | © Microsoft Corporation. All rights reserved. |
-| Microsoft.EntityFrameworkCore.Abstractions | 10.0.12 | MIT | © Microsoft Corporation. All rights reserved. |
-| Microsoft.EntityFrameworkCore.Relational | 10.0.12 | MIT | © Microsoft Corporation. All rights reserved. |
+| Microsoft.EntityFrameworkCore | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
+| Microsoft.EntityFrameworkCore.Abstractions | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
+| Microsoft.EntityFrameworkCore.Relational | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Extensions.AmbientMetadata.Application | 10.11.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Extensions.Compliance.Abstractions | 10.11.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Extensions.DependencyInjection.AutoActivation | 10.11.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Extensions.Diagnostics.ExceptionSummarization | 10.11.0 | MIT | © Microsoft Corporation. All rights reserved. |
-| Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore | 10.0.12 | MIT | © Microsoft Corporation. All rights reserved. |
+| Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Extensions.Http.Diagnostics | 10.11.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Extensions.Http.Resilience | 10.11.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Extensions.Resilience | 10.11.0 | MIT | © Microsoft Corporation. All rights reserved. |
@@ -96,7 +96,7 @@ asset change; the `notices` gate fails while it is stale.
 | System.Composition.Runtime | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Composition.TypedParts | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.IdentityModel.Tokens.Jwt | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
-| System.IO.Hashing | 10.0.12 | MIT | © Microsoft Corporation. All rights reserved. |
+| System.IO.Hashing | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Linq.Dynamic.Core | 1.7.4 | Apache-2.0 | Copyright © ZZZ Projects |
 | WolverineFx | 6.62.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
 | WolverineFx.Newtonsoft | 6.62.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
