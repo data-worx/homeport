@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\Echo\Homeport.Modules.Echo.Api\Homeport.Modules.Echo.Api.csproj" />
+    <ProjectReference Include="..\Homeport.Testing\Homeport.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\Homeport.Shared.Authentication\Homeport.Shared.Authentication.csproj" />
+    <ProjectReference Include="..\Homeport.Testing\Homeport.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>

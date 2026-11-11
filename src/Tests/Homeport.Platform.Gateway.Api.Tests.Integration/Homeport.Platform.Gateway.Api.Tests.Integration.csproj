@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Platform\Gateway\Homeport.Platform.Gateway.Api\Homeport.Platform.Gateway.Api.csproj" />
+    <ProjectReference Include="..\Homeport.Testing\Homeport.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Homeport.Platform.ControlPlane.Tests.Integration.Persistence;
+namespace Homeport.Testing.Persistence;
 
 /// <summary>
 /// The tables and columns an ER diagram in <c>docs/architecture/</c> names, read
@@ -13,7 +13,7 @@ namespace Homeport.Platform.ControlPlane.Tests.Integration.Persistence;
 /// table is a swimlane labelled with its name, optionally followed by a
 /// parenthesised note; a column is a cell inside it labelled with its name.
 /// </summary>
-internal sealed class ErDiagram
+public sealed class ErDiagram
 {
     private const string DiagramDirectory = "docs/architecture";
     private const string SwimlaneStyle = "swimlane";

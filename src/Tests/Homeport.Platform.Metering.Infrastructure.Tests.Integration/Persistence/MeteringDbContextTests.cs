@@ -2,6 +2,7 @@
 
 using Homeport.Platform.Metering.Domain.Usage;
 using Homeport.Platform.Metering.Infrastructure.Persistence;
+using Homeport.Testing.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;

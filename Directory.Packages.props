@@ -23,6 +23,7 @@
     <!-- The EF Core version Aspire.Npgsql.EntityFrameworkCore.PostgreSQL brings:
          a higher one splits the tool's and the service's EF Core apart. -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.11.0" />
@@ -36,6 +37,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.20.2" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.20.1" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.19.0" />
+    <PackageVersion Include="StackExchange.Redis" Version="2.13.17" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.16.0" />
     <PackageVersion Include="Testcontainers.RabbitMq" Version="4.16.0" />
     <PackageVersion Include="Testcontainers.Redis" Version="4.16.0" />

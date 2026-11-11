@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Platform\ControlPlane\Homeport.Platform.ControlPlane\Homeport.Platform.ControlPlane.csproj" />
+    <ProjectReference Include="..\Homeport.Testing\Homeport.Testing.csproj" />
   </ItemGroup>
 
   <!-- The database is prepared by the same script the AppHost runs. -->

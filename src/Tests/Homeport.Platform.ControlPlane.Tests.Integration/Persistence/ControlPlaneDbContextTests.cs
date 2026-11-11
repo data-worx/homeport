@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Platform.ControlPlane.Persistence;
+using Homeport.Testing.Persistence;
 
 namespace Homeport.Platform.ControlPlane.Tests.Integration.Persistence;
 

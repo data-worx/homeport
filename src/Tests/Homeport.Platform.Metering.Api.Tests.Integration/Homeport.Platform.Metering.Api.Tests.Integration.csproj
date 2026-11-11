@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Platform\Metering\Homeport.Platform.Metering.Api\Homeport.Platform.Metering.Api.csproj" />
+    <ProjectReference Include="..\Homeport.Testing\Homeport.Testing.csproj" />
   </ItemGroup>
 
   <!-- The database is prepared by the same script the AppHost runs. -->

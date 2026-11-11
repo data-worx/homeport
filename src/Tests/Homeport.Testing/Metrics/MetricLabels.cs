@@ -3,13 +3,13 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.Metrics;
 
-namespace Homeport.Platform.Gateway.Api.Tests.Integration;
+namespace Homeport.Testing.Metrics;
 
 /// <summary>
 /// Records the label names of every measurement on an instrument named
 /// <c>homeport.*</c>, in every meter of the process, while it lives.
 /// </summary>
-internal sealed class MetricLabels : IDisposable
+public sealed class MetricLabels : IDisposable
 {
     private const string HomeportPrefix = "homeport.";
 
@@ -32,7 +32,7 @@ internal sealed class MetricLabels : IDisposable
     }
 
     /// <summary>Every instrument that was measured with a label, and the label.</summary>
-    internal IReadOnlyCollection<(string Instrument, string Label)> Seen => seen.Keys.ToList();
+    public IReadOnlyCollection<(string Instrument, string Label)> Seen => seen.Keys.ToList();
 
     public void Dispose() => listener.Dispose();
 

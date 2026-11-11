@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using Homeport.Platform.Metering.Api.Messaging;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Internal.Platform.Metering;
+using Homeport.Testing.Metrics;
 
 namespace Homeport.Platform.Metering.Api.Tests.Integration;
 

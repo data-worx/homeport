@@ -6,6 +6,7 @@ using Homeport.Platform.Gateway.Application.Throttling;
 using Homeport.Platform.Gateway.Domain.Throttling;
 using Homeport.Platform.Gateway.Infrastructure.Throttling;
 using Homeport.Platform.Gateway.Infrastructure.Usage;
+using Homeport.Testing.Containers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.Metrics.Testing;
@@ -107,7 +108,7 @@ public sealed class ValkeyTokenBucketsTests
         [Fact]
         public async Task Returns_Unavailable_And_Counts_It_While_Valkey_Is_Stopped()
         {
-            var stopped = new RedisBuilder(ValkeyContainer.Image).Build();
+            var stopped = new RedisBuilder(ContainerImages.Valkey).Build();
             await stopped.StartAsync();
             var connectionString = stopped.GetConnectionString();
             await stopped.DisposeAsync();

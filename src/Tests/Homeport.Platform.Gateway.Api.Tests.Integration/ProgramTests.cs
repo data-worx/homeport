@@ -14,6 +14,7 @@ using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Problems;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Homeport.Shared.ServiceDefaults;
+using Homeport.Testing.Metrics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
