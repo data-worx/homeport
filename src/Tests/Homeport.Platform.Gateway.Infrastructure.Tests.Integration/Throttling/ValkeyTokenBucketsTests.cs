@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using Homeport.Platform.Gateway.Application.Throttling;
 using Homeport.Platform.Gateway.Domain.Throttling;
@@ -11,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.Metrics.Testing;
 using Microsoft.Extensions.Hosting;
+using StackExchange.Redis;
 using Testcontainers.Redis;
 
 namespace Homeport.Platform.Gateway.Infrastructure.Tests.Integration.Throttling;
@@ -20,6 +20,13 @@ public sealed class ValkeyTokenBucketsTests
     public sealed class TakeAsync(ValkeyContainer valkey) : IClassFixture<ValkeyContainer>, IAsyncLifetime
     {
         private const int Parallel = 50;
+
+        private const string TokensField = "tokens";
+
+        private const string AtField = "at";
+
+        // Microseconds since the epoch, in the year 2286.
+        private const long FarFuture = 9_999_999_999_999_999;
 
         // Slow, so the bucket hardly refills while a test runs.
         private static readonly RateLimit Limit = new(1, 10);
@@ -41,10 +48,7 @@ public sealed class ValkeyTokenBucketsTests
         public async Task Refuses_A_Token_From_An_Empty_Bucket()
         {
             var tenantId = Guid.NewGuid();
-            for (var i = 0; i < Limit.Burst; i++)
-            {
-                await Buckets.TakeAsync(tenantId, Limit, CancellationToken.None);
-            }
+            await EmptyAsync(tenantId);
 
             var bucket = await Buckets.TakeAsync(tenantId, Limit, CancellationToken.None);
 
@@ -55,28 +59,28 @@ public sealed class ValkeyTokenBucketsTests
         public async Task States_When_An_Empty_Bucket_Holds_A_Token_Again()
         {
             var tenantId = Guid.NewGuid();
-            for (var i = 0; i < Limit.Burst; i++)
-            {
-                await Buckets.TakeAsync(tenantId, Limit, CancellationToken.None);
-            }
+            await EmptyAsync(tenantId);
 
             var bucket = await Buckets.TakeAsync(tenantId, Limit, CancellationToken.None);
 
-            Assert.InRange(bucket.Value.NextToken, TimeSpan.FromMilliseconds(1), TimeSpan.FromSeconds(1));
+            // One token at one per second.
+            Assert.Equal(TimeSpan.FromSeconds(1), bucket.Value.NextToken);
         }
 
         [Fact]
         public async Task Never_Hands_Out_More_Tokens_Than_The_Bucket_Holds_To_Parallel_Calls()
         {
             var tenantId = Guid.NewGuid();
-            var watch = Stopwatch.StartNew();
+            var server = valkey.Connection.GetServers().Single();
+            var before = await server.TimeAsync();
 
             var buckets = await Task.WhenAll(Enumerable.Range(0, Parallel)
                 .Select(_ => Buckets.TakeAsync(tenantId, Limit, CancellationToken.None)));
-            watch.Stop();
+            var after = await server.TimeAsync();
 
-            // What the bucket held, plus what it refilled while the calls ran.
-            var allowed = Limit.Burst + (int)Math.Ceiling(watch.Elapsed.TotalSeconds * Limit.RequestsPerSecond);
+            // What the bucket held, plus what it refilled while the calls ran by
+            // Valkey's clock, the one the script refills by, which may be stepped.
+            var allowed = Limit.Burst + (int)Math.Ceiling(Math.Max(0, (after - before).TotalSeconds) * Limit.RequestsPerSecond);
             Assert.InRange(buckets.Count(bucket => bucket.Value.Taken), Limit.Burst, allowed);
         }
 
@@ -134,6 +138,16 @@ public sealed class ValkeyTokenBucketsTests
             {
                 await StopAsync(host);
             }
+        }
+
+        // Writes an empty bucket last refilled in the future, so the script, which
+        // counts no time before that, refills nothing however long the test takes
+        // and however Valkey's clock is stepped. The fields are the script's.
+        private async Task EmptyAsync(Guid tenantId)
+        {
+            await valkey.Connection.GetDatabase().HashSetAsync(
+                ValkeyTokenBuckets.KeyPrefix + tenantId.ToString("D"),
+                [new HashEntry(TokensField, 0), new HashEntry(AtField, FarFuture)]);
         }
 
         private static async Task<IHost> StartAsync(string connectionString)
