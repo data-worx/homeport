@@ -8,6 +8,7 @@ using Homeport.Platform.Metering.Api.Messaging;
 using Homeport.Platform.Metering.Infrastructure.Persistence;
 using Homeport.Shared.Authentication;
 using Homeport.Shared.Internal.Platform.Metering;
+using Homeport.Testing.Containers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -60,15 +61,10 @@ public sealed class RunningMetering : IAsyncLifetime
         | UnixFileModes.GroupRead | UnixFileModes.GroupExecute
         | UnixFileModes.OtherRead | UnixFileModes.OtherExecute;
 
-    // Pinned like the AppHost pins them.
-    private const string PostgresImage = "postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db";
-
-    private const string RabbitMqImage = "rabbitmq:4.3@sha256:8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75";
-
     // Long enough for a cold start of the handler; a delivery takes milliseconds.
     private static readonly TimeSpan DeliveryTimeout = TimeSpan.FromSeconds(30);
 
-    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder(PostgresImage)
+    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder(ContainerImages.Postgres)
         .WithDatabase(Database)
         .WithEnvironment("METERING_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("METERING_APP_PASSWORD", AppPassword)
@@ -78,7 +74,7 @@ public sealed class RunningMetering : IAsyncLifetime
         .WithResourceMapping(new FileInfo(Path.Combine(AppContext.BaseDirectory, InitScript)), InitDirectory, fileMode: Executable)
         .Build();
 
-    private readonly RabbitMqContainer rabbitMq = new RabbitMqBuilder(RabbitMqImage).Build();
+    private readonly RabbitMqContainer rabbitMq = new RabbitMqBuilder(ContainerImages.RabbitMq).Build();
 
     private readonly ECDsa gatewayKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
     private WebApplication? jwks;

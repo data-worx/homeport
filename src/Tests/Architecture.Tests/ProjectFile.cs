@@ -20,6 +20,9 @@ internal sealed record ProjectFile(
     IReadOnlyList<string> PackageReferences,
     IReadOnlyList<string> FrameworkReferences)
 {
+    /// <summary>The suffix of the one test library <c>dotnet.tests</c> allows.</summary>
+    internal const string TestLibrarySuffix = ".Testing";
+
     /// <summary>The layer names a project outside a service or module must not carry.</summary>
     private static readonly string[] LayerNames = ["Domain", "Application", "Infrastructure"];
 
@@ -96,6 +99,13 @@ internal sealed record ProjectFile(
     /// </summary>
     internal bool CarriesLayerName => Name.StartsWith($"{GroupingName}.", StringComparison.Ordinal)
         && Name[(GroupingName.Length + 1)..].Split('.').Intersect(LayerNames).Any();
+
+    /// <summary>
+    /// A project in <c>src/Tests/</c> that holds helpers for test projects, not
+    /// tests: <c>Homeport.Testing</c> under <c>dotnet.tests</c>.
+    /// </summary>
+    internal bool IsTestLibrary => Location == ProjectLocation.Tests
+        && Name.EndsWith(TestLibrarySuffix, StringComparison.Ordinal);
 
     internal bool BelongsToUnit => Location is ProjectLocation.Platform or ProjectLocation.Modules;
 

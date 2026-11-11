@@ -2,6 +2,7 @@
 
 using System.Net.Http.Headers;
 using Homeport.Shared.Client.ModuleContract;
+using Homeport.Testing.Gateway;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;

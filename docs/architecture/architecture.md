@@ -63,6 +63,7 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Shared.Authentication.Tests.Integration` | Runs a service that accepts gateway tokens against a stand-in JWKS, including a key published after it was read | `Homeport.Shared.Authentication` |
 | `Homeport.Shared.Contracts.Tests.Unit` | Asserts the result type | `Homeport.Shared.Contracts` |
 | `Homeport.Shared.ServiceDefaults.Tests.Integration` | Asserts the health endpoints outside Development | `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Testing` | The test library of `dotnet.tests`, holding no tests: the stand-in gateway, the test signing key, the metric label recorder, the ER diagram reader, the throwaway Valkey and the pinned images of PostgreSQL, RabbitMQ and Valkey the test projects start | `Homeport.Shared.Authentication` |
 
 The gateway, the registry, the control plane and metering are the only platform services so far. The target picture is in
 [vision.md](vision.md); the binding layout is in
@@ -142,6 +143,7 @@ src/
     Homeport.Shared.Authentication.Tests.Unit/
     Homeport.Shared.Contracts.Tests.Unit/
     Homeport.Shared.ServiceDefaults.Tests.Integration/
+    Homeport.Testing/
 ```
 
 ## Why it is cut this way

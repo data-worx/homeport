@@ -231,6 +231,7 @@ public sealed class LayoutTests
         [InlineData("Tests/Homeport.Shared.ServiceDefaults.Tests")]
         [InlineData("Tests/Homeport.Tests.Shared.ServiceDefaults.Unit")]
         [InlineData("Tests/Homeport.Shared.Contracts.Tests.Unit")]
+        [InlineData("Tests/Homeport.Shared.Testing")]
         public void Reports_A_Test_Project_Not_Named_After_A_Project_Of_The_Tree(string path)
         {
             ProjectFile[] projects =
@@ -248,6 +249,7 @@ public sealed class LayoutTests
         [InlineData("Tests/Homeport.Shared.ServiceDefaults.Tests.Unit")]
         [InlineData("Tests/Homeport.Shared.ServiceDefaults.Tests.Integration")]
         [InlineData("Tests/Architecture.Tests")]
+        [InlineData("Tests/Homeport.Testing")]
         public void Accepts_A_Test_Project_Named_After_A_Project_Of_The_Tree(string path)
         {
             ProjectFile[] projects =
@@ -257,6 +259,45 @@ public sealed class LayoutTests
             ];
 
             var offenders = LayoutRules.MisnamedTestProjects(projects);
+
+            Assert.Empty(offenders);
+        }
+    }
+
+    public sealed class SurplusTestLibraries
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = LayoutRules.SurplusTestLibraries(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Fact]
+        public void Reports_Every_Library_When_There_Are_Two()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Tests/Homeport.Testing"),
+                Fixture.Project("Tests/Homeport.Platform.Testing"),
+            ];
+
+            var offenders = LayoutRules.SurplusTestLibraries(projects);
+
+            Assert.Equal(["src/Tests/Homeport.Testing", "src/Tests/Homeport.Platform.Testing"], offenders);
+        }
+
+        [Fact]
+        public void Accepts_One_Library()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Tests/Homeport.Testing"),
+                Fixture.Project("Tests/Homeport.Sdk.Tests.Unit", "Homeport.Testing"),
+            ];
+
+            var offenders = LayoutRules.SurplusTestLibraries(projects);
 
             Assert.Empty(offenders);
         }

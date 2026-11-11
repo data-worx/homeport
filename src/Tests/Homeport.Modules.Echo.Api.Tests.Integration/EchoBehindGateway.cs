@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net.Http.Headers;
+using Homeport.Testing.Gateway;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Homeport.Modules.Echo.Api.Tests.Integration;

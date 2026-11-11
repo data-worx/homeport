@@ -121,6 +121,7 @@ src/
   Tools/Homeport.Tools.<Tool>
   Tests/<project under test>.Tests.Unit | .Tests.Integration
   Tests/Architecture.Tests
+  Tests/Homeport.Testing
 ```
 
 - **One module = one API service plus an optional worker.** Features inside a

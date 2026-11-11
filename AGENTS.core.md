@@ -54,6 +54,21 @@ not done.
 
 Conversely: no documentation is written for something that does not exist yet.
 
+## Diagrams {#core.diagrams}
+
+- Diagrams are drawn with **draw.io**.
+- They are stored as `.drawio.svg`, exported uncompressed with the diagram
+  embedded:
+  `draw.io -x -f svg -e -u -o <out>.drawio.svg <in>.drawio`.
+  Forges render the file, draw.io opens it for editing, and a test can read
+  its labels. No separate PNG, and no `.drawio` source file in the repository.
+- A diagram lives next to the document that embeds it and is named after that
+  document and its subject: `<document>-<subject>.drawio.svg`.
+- A diagram is an image of a document, embedded with Markdown image syntax.
+  It is not a document of its own and is not listed in `docs/README.md`.
+- `.gitattributes` carries no line for `*.drawio.svg`. It stays text, so it
+  diffs.
+
 ## Architecture {#core.architecture}
 
 - **The dependency arrow points inwards, never outwards.** The centre holds the
@@ -175,6 +190,157 @@ delete it; do not learn to ignore it.
 - Where a change is large, say how it would be sliced into commits before
   making them.
 - Never rewrite published history.
+
+## Releasing {#core.releasing}
+
+What turns a merged default branch into something that is deployed or
+downloaded. A repository states in its own `AGENTS.md`, under *Releasing*,
+which release model it follows (`core.release-models`) and which artifacts it
+ships (`core.release-artifacts`). The steps belong in `docs/releasing.md`.
+
+- **A release comes only from a version tag, created by hand.** Nothing is
+  released on merge. The release workflow refuses a tag that does not point at
+  a commit on a branch the release model allows.
+- A release is tagged `vX.Y.Z`, a candidate for it `vX.Y.Z-rc.N`.
+- **The version comes from the tag and nowhere else.** The repository carries
+  a placeholder version, and every build from source reports it. Nothing in
+  the repository is bumped for a release.
+- **A release starts with a release request that cuts the changelog**:
+  `## [Unreleased]` becomes `## [X.Y.Z] - <date>`, and nothing else changes
+  but what has to be true once the version is out — the README, the docs. No
+  change to code or behaviour goes into it. Candidates are tagged after it is
+  merged, and a fix found on a candidate adds its line to that section.
+- **The workflow refuses `vX.Y.Z` without its changelog section**, before it
+  does anything else, and that section becomes the release text. A candidate
+  needs no section.
+- **The workflow runs the gates again on the tagged commit.** A green request
+  does not stand in for them: the tag may point at a commit no request was
+  ever built from.
+- **A candidate is not a release.** Whatever the forge or the registry can hold
+  back stays a draft or a prerelease, and nothing a candidate produces is
+  marked as the latest.
+- **`vX.Y.Z` is tagged on the commit of the candidate that was accepted.** The
+  release is built from that commit and differs from the candidate in its
+  version only — which the shape rule below makes true.
+- **Build once, promote.** Wherever there is an artifact, each version is
+  built exactly once, by the workflow its tag started. That artifact is the
+  one that reaches every environment in turn; deploying it again, or to the
+  next environment, never builds the commit again. A rebuild is an artifact
+  nobody tested.
+- **The shape of a published build is set in the project, never on a build or
+  publish command line.** A switch that changes what is resolved or bundled
+  belongs in the project files, so that everything derived from the build —
+  notices, licences, checksums — describes what is distributed. The only
+  inputs a release build takes are the version and, where there are several,
+  the target platform.
+- **A candidate that is not needed any more leaves nothing behind that can be
+  fetched.** Its draft, its tag and every artifact it published are deleted.
+  Deleting the draft and the tag alone leaves the artifacts downloadable.
+
+## Release models {#core.release-models}
+
+How code moves from the default branch to a release. A repository follows
+exactly one, and names it under *Releasing* in its `AGENTS.md`.
+
+**Trunk with tags.** Candidates and releases are tagged on the default branch.
+
+- A fix lands on the default branch and goes out with the next candidate.
+- A `release/X.Y` branch is created only to fix a release that is no longer
+  the latest, from the last tag of that line, and that release is tagged there.
+  It is never marked as the latest.
+- The fix reaches the default branch as well, through its own request.
+
+**Stabilisation branch.** A `release/X.Y` branch is cut from the default
+branch when a release starts, tested there and fixed there while the default
+branch moves on.
+
+- The release request that cuts the changelog targets `release/X.Y`.
+  Candidates and the release are tagged on that branch. The cut section
+  reaches the default branch with the release, through its own request.
+- A fix is made against `release/X.Y` and reaches the default branch at once,
+  through its own request — not in one merge at the end of the release.
+- The branch stays for fixes to that line and is never merged back as a whole.
+
+In both models `release/X.Y` is a long-lived branch, not a work branch: work on
+it still happens on `feature/` and `fix/` branches through a request.
+
+**Branches named after environments — `test`, `qa`, `prod` — that a change is
+merged through are not a release model, and are not used.** The build that
+reaches production is rebuilt from a different branch than the one that was
+tested, which breaks build once, promote. Fixes made on the way have to be
+merged back at the end, and which version runs where is answered by comparing
+branches instead of reading a tag. An environment is a place an artifact is
+deployed to, never a branch.
+
+## Release artifacts {#core.release-artifacts}
+
+What a release produces. A repository names under *Releasing* in its
+`AGENTS.md` every type it ships, and the rules of each named type bind on top
+of `core.releasing`. What is specific to the project — the platforms, the
+image or package name, the environments — is written there too, never here.
+
+### Desktop {#core.release-desktop}
+
+A self-contained executable per platform, downloaded and started by a person.
+
+- The platforms are a list in the project. A release builds every platform on
+  it, a build for a platform that is not on it fails, and a new platform is a
+  change to the list.
+- Each platform's build is packed into one archive whose name carries the
+  version and the platform, and the release carries a checksum file over all
+  its files.
+- A candidate puts its archives on a draft release only. A release publishes
+  them, marked as the latest unless it fixes an old line.
+- Cleaning up a candidate deletes the draft with its files, and the tag.
+
+### Web or service {#core.release-service}
+
+A container image, deployed to one or more environments.
+
+- The image is tagged with the version. `latest` moves only with the release
+  that is the latest — never with a candidate, never with a fix to an old line.
+- A registry has no drafts: a candidate's image can be pulled as soon as it is
+  pushed. Its clean-up is therefore part of discarding it, not an option.
+- An environment is deployed by version or by digest, never by `latest`.
+  Promoting to the next environment deploys the same digest, and a rollback
+  deploys an earlier version's image.
+- Cleaning up a candidate deletes its image version on the registry with
+  everything the tag points at — the image of each platform and each
+  attestation — not the tag alone.
+
+### Library {#core.release-library}
+
+A package on a registry, such as NuGet or npm.
+
+- A candidate is published as the prerelease version `X.Y.Z-rc.N`, which a
+  package manager does not pick unless asked for it.
+- A published version is never overwritten or published again. A broken
+  release is followed by the next version.
+- Cleaning up a candidate deletes its version where the registry allows it.
+  Where the registry can only unlist, it is unlisted — the one case in which a
+  discarded candidate can still be fetched, and by its exact version only.
+
+### Static site {#core.release-site}
+
+A built site uploaded to a static host.
+
+- The artifact is the built upload, stored with its version where it outlives
+  the workflow run — as a file on the forge release.
+- Deploying uploads that artifact. A deployment never builds the site, and a
+  rollback deploys an earlier version's artifact.
+- A candidate is deployed to the test environment where the repository names
+  one, and to nothing where it does not; its artifact is then checked as it
+  is. A release deploys its artifact to production.
+- Cleaning up a candidate deletes its draft, its artifact and its tag.
+
+### None {#core.release-none}
+
+Nothing deployable — a repository of rules, documents or configuration.
+
+- It still has versions and a changelog. The tag and the changelog section are
+  the release, and the workflow publishes the section as the release text on
+  the forge.
+- It has no candidates: there is no artifact a candidate could check.
 
 ## Boundaries {#core.boundaries}
 

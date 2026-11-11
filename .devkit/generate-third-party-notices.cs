@@ -531,11 +531,17 @@ internal static class Program
     }
 
     // The licence a package offered under a choice of licences is shipped under.
+    // An overrides file from before the section existed has no choices to make.
     private static Dictionary<string, string> ReadLicenseChoices()
     {
         using var document = JsonDocument.Parse(File.ReadAllText(OverridesFileName));
 
-        return document.RootElement.GetProperty("license").EnumerateObject()
+        if (!document.RootElement.TryGetProperty("license", out var choices))
+        {
+            return [];
+        }
+
+        return choices.EnumerateObject()
             .ToDictionary(entry => entry.Name, entry => entry.Value.GetProperty("chosen").GetString()!);
     }
 

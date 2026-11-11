@@ -78,7 +78,8 @@ internal static class LayoutRules
     /// <summary>
     /// Test projects not named after a project of the tree plus <c>.Tests.Unit</c>
     /// or <c>.Tests.Integration</c>. <c>Architecture.Tests</c> is the one
-    /// solution-wide exception (<c>dotnet.tests</c>).
+    /// solution-wide exception, and <c>Homeport.Testing</c> the one test
+    /// library (<c>dotnet.tests</c>).
     /// </summary>
     internal static List<string> MisnamedTestProjects(IReadOnlyList<ProjectFile> projects)
     {
@@ -89,9 +90,24 @@ internal static class LayoutRules
 
         return projects
             .Where(project => project.Location == ProjectLocation.Tests && project.Name != "Architecture.Tests")
+            .Where(project => project.Name != project.Solution + ProjectFile.TestLibrarySuffix)
             .Where(project => project.ProjectUnderTest is not { } underTest || !production.Contains(underTest))
             .Select(project => project.Path)
             .ToList();
+    }
+
+    /// <summary>
+    /// Every test library when there is more than one: <c>dotnet.tests</c>
+    /// allows one, not one per stack or per layer.
+    /// </summary>
+    internal static List<string> SurplusTestLibraries(IEnumerable<ProjectFile> projects)
+    {
+        var libraries = projects
+            .Where(project => project.IsTestLibrary)
+            .Select(project => project.Path)
+            .ToList();
+
+        return libraries.Count > 1 ? libraries : [];
     }
 
     /// <summary>

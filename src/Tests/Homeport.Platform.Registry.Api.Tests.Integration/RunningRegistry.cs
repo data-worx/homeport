@@ -8,6 +8,7 @@ using Homeport.Platform.Registry.Infrastructure;
 using Homeport.Platform.Registry.Infrastructure.Keys;
 using Homeport.Shared.Authentication;
 using Homeport.Shared.Internal.Platform.Registry;
+using Homeport.Testing.Containers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,10 +36,7 @@ public sealed class RunningRegistry : IAsyncLifetime
 
     private const string LocalAddress = "http://127.0.0.1:0";
 
-    // Pinned like the AppHost pins it.
-    private const string ValkeyImage = "valkey/valkey:9.1@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd";
-
-    private readonly RedisContainer valkey = new RedisBuilder(ValkeyImage).Build();
+    private readonly RedisContainer valkey = new RedisBuilder(ContainerImages.Valkey).Build();
     private readonly ECDsa gatewayKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
     private WebApplication? jwks;
     private WebApplicationFactory<Program>? registry;

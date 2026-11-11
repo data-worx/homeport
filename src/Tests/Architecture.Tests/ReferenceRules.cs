@@ -195,6 +195,19 @@ internal static class ReferenceRules
     }
 
     /// <summary>
+    /// References to the test library from any project but a test: it holds
+    /// stand-ins and fixtures, and a production project that takes it ships
+    /// them (<c>dotnet.tests</c>).
+    /// </summary>
+    internal static List<string> TestLibraryReferrers(IReadOnlyList<ProjectFile> projects)
+    {
+        return Offenders(
+            projects,
+            project => project.Location != ProjectLocation.Tests,
+            (_, target) => !target.IsTestLibrary);
+    }
+
+    /// <summary>
     /// Project references to a project that is not under <c>src/</c>, from any
     /// project but a tool or a test.
     /// </summary>

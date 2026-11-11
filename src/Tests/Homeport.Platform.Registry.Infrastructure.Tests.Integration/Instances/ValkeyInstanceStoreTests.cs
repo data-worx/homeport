@@ -3,6 +3,7 @@
 using Homeport.Platform.Registry.Domain.Manifests;
 using Homeport.Platform.Registry.Domain.Routing;
 using Homeport.Platform.Registry.Infrastructure.Instances;
+using Homeport.Testing.Containers;
 
 namespace Homeport.Platform.Registry.Infrastructure.Tests.Integration.Instances;
 

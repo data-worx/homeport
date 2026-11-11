@@ -4,6 +4,7 @@ using System.Diagnostics.Metrics;
 using System.Text;
 using Homeport.Platform.Gateway.Infrastructure.Usage;
 using Homeport.Shared.Internal.Platform.Metering;
+using Homeport.Testing.Containers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.Metrics.Testing;
@@ -18,16 +19,13 @@ public sealed class UsagePublisherTests
     // Each test starts a broker and a gateway host of its own: one removes the exchange.
     public sealed class PublishAsync : IAsyncLifetime
     {
-        // Pinned like the AppHost pins it.
-        private const string RabbitMqImage = "rabbitmq:4.3@sha256:8144dac709541439da6106d7421079132171b7f0a48b7a7b1f4bd39b22abdb75";
-
         private const string Queue = "test.usage";
 
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
 
         private static readonly TimeSpan Poll = TimeSpan.FromMilliseconds(50);
 
-        private readonly RabbitMqContainer rabbitMq = new RabbitMqBuilder(RabbitMqImage).Build();
+        private readonly RabbitMqContainer rabbitMq = new RabbitMqBuilder(ContainerImages.RabbitMq).Build();
         private IHost? host;
         private IConnection? connection;
         private IChannel? channel;

@@ -169,16 +169,19 @@ MIT, Apache-2.0 and most other package licences make it a condition that the
 copyright notice and the licence text travel with the software. A library or an
 internal service ships nothing to give notice for and leaves it off.
 
-- `NOTICES_PROJECT` in `.devkit/gates.sh` names the project whose
-  `dotnet publish` output is shipped. Empty skips the gate.
-- `.devkit/generate-third-party-notices.cs` writes `THIRD-PARTY-NOTICES.md` at
-  the repository root from that publish's `deps.json` — what the build actually
-  ships, not what the project references — once per runtime identifier the
-  project lists. It needs the .NET 10 SDK. After a package change, regenerate
-  and commit the file:
+- `NOTICES_PROJECTS` in `.devkit/gates.sh` names every project whose
+  `dotnet publish` output is shipped, one array entry each — one per image,
+  when the repository ships several. Empty skips the gate.
+- `.devkit/generate-third-party-notices.cs` writes one `THIRD-PARTY-NOTICES.md`
+  at the repository root from each publish's `deps.json` — what the builds
+  actually ship, not what the projects reference — once per project and per
+  runtime identifier it lists. The file is the union: every package and version
+  once, however many projects ship it, and the projects named in its header.
+  It needs the .NET 10 SDK. After a package change, regenerate and commit the
+  file, with one `--project` per entry:
 
   ```bash
-  dotnet run --file .devkit/generate-third-party-notices.cs -- --project <NOTICES_PROJECT>
+  dotnet run --file .devkit/generate-third-party-notices.cs -- --project <a> --project <b>
   ```
 
 - Licence texts live in `.devkit/licenses/<SPDX>.txt`; the generator fails on a
@@ -186,6 +189,11 @@ internal service ships nothing to give notice for and leaves it off.
   shipped files that are not packages, go into
   `.devkit/third-party-notices.overrides.json` — copied from the source, never
   made up.
+- A package offered under a choice of licences, such as
+  `Apache-2.0 OR MPL-2.0`, is shipped under one of them. The choice goes into
+  the `license` section of the overrides file, with where the package states
+  it; the generator fails on an unresolved choice and on one that is not among
+  the alternatives.
 - To regenerate on every publish, hook the generator into the shipped project
   with `BeforeTargets="Publish"`, never `AfterTargets="Build"`: an editor's
   background builds fire `Build` constantly, and the generator publishes the

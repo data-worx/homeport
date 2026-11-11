@@ -3,7 +3,7 @@
 using StackExchange.Redis;
 using Testcontainers.Redis;
 
-namespace Homeport.Platform.Registry.Infrastructure.Tests.Integration;
+namespace Homeport.Testing.Containers;
 
 /// <summary>
 /// A throwaway Valkey, the image the AppHost runs, started once for the tests
@@ -11,20 +11,17 @@ namespace Homeport.Platform.Registry.Infrastructure.Tests.Integration;
 /// </summary>
 public sealed class ValkeyContainer : IAsyncLifetime
 {
-    // Pinned like the AppHost pins it.
-    private const string Image = "valkey/valkey:9.1@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd";
-
-    private readonly RedisContainer container = new RedisBuilder(Image).Build();
+    private readonly RedisContainer container = new RedisBuilder(ContainerImages.Valkey).Build();
     private ConnectionMultiplexer? connection;
 
     /// <summary>The connection string a component under test connects with.</summary>
-    internal string ConnectionString => container.GetConnectionString();
+    public string ConnectionString => container.GetConnectionString();
 
-    internal IConnectionMultiplexer Connection =>
+    public IConnectionMultiplexer Connection =>
         connection ?? throw new InvalidOperationException("Valkey has not been started.");
 
     /// <summary>Removes every key, so a test starts from an empty Valkey.</summary>
-    internal async Task FlushAsync()
+    public async Task FlushAsync()
     {
         foreach (var server in Connection.GetServers())
         {
@@ -33,7 +30,7 @@ public sealed class ValkeyContainer : IAsyncLifetime
     }
 
     /// <summary>The remaining lifetime of the one key Valkey holds.</summary>
-    internal async Task<TimeSpan?> TimeToLiveAsync()
+    public async Task<TimeSpan?> TimeToLiveAsync()
     {
         var key = Connection.GetServers().SelectMany(server => server.Keys()).Single();
         return await Connection.GetDatabase().KeyTimeToLiveAsync(key);

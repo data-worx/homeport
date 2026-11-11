@@ -3,6 +3,7 @@
 using DotNet.Testcontainers.Configurations;
 using Homeport.Platform.Metering.Domain.Usage;
 using Homeport.Platform.Metering.Infrastructure.Persistence;
+using Homeport.Testing.Containers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,10 +45,7 @@ public sealed class MeteringDatabase : IAsyncLifetime
         | UnixFileModes.GroupRead | UnixFileModes.GroupExecute
         | UnixFileModes.OtherRead | UnixFileModes.OtherExecute;
 
-    // Pinned like the AppHost pins it.
-    private const string PostgresImage = "postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db";
-
-    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder(PostgresImage)
+    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder(ContainerImages.Postgres)
         .WithDatabase(Database)
         .WithEnvironment("METERING_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("METERING_APP_PASSWORD", AppPassword)

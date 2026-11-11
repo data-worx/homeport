@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using Homeport.Sdk;
 using Homeport.Shared.Client.ModuleContract;
+using Homeport.Testing.Gateway;
 
 namespace Homeport.Modules.Echo.Api.Tests.Integration;
 

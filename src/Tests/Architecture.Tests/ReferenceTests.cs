@@ -471,6 +471,48 @@ public sealed class ReferenceTests
         }
     }
 
+    public sealed class TestLibraryReferrers
+    {
+        [Fact]
+        public void Finds_None_In_This_Repository()
+        {
+            var offenders = ReferenceRules.TestLibraryReferrers(SolutionTree.Projects);
+
+            Assert.Empty(offenders);
+        }
+
+        [Theory]
+        [InlineData("Platform/Gateway/Homeport.Platform.Gateway.Api")]
+        [InlineData("Shared/Homeport.Shared.Authentication")]
+        [InlineData("Tools/Homeport.Tools.Seed")]
+        public void Reports_A_Project_Outside_Tests(string path)
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project(path, "Homeport.Testing"),
+                Fixture.Project("Tests/Homeport.Testing"),
+            ];
+
+            var offenders = ReferenceRules.TestLibraryReferrers(projects);
+
+            Assert.Equal([$"{path.Split('/')[^1]} -> Homeport.Testing"], offenders);
+        }
+
+        [Fact]
+        public void Accepts_A_Test_Project()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Tests/Homeport.Sdk.Tests.Integration", "Homeport.Testing"),
+                Fixture.Project("Tests/Homeport.Testing"),
+            ];
+
+            var offenders = ReferenceRules.TestLibraryReferrers(projects);
+
+            Assert.Empty(offenders);
+        }
+    }
+
     public sealed class ReferencesBetweenUnits
     {
         [Fact]

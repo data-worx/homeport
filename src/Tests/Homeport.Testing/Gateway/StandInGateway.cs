@@ -9,19 +9,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Homeport.Modules.Echo.Api.Tests.Integration;
+namespace Homeport.Testing.Gateway;
 
 /// <summary>
 /// A stand-in for the gateway on a local port: it publishes the JWKS of its
 /// key and signs module tokens with it the way the gateway does.
 /// </summary>
-internal sealed class StandInGateway : IAsyncDisposable
+public sealed class StandInGateway : IAsyncDisposable
 {
-    internal const string TenantId = "3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61";
+    public const string TenantId = "3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61";
 
-    internal const string ClientId = "local-client";
+    public const string ClientId = "local-client";
 
-    internal const string Subject = "service-account-local-client";
+    public const string Subject = "service-account-local-client";
 
     private const string LocalAddress = "http://127.0.0.1:0";
 
@@ -33,9 +33,9 @@ internal sealed class StandInGateway : IAsyncDisposable
     private WebApplication? app;
 
     /// <summary>Where the stand-in publishes its JWKS, for <c>GatewayTokens:JwksUri</c>.</summary>
-    internal string JwksUri => (app?.Urls.Single() ?? throw new InvalidOperationException("The stand-in has not been started.")) + GatewayTokens.JwksPath;
+    public string JwksUri => (app?.Urls.Single() ?? throw new InvalidOperationException("The stand-in has not been started.")) + GatewayTokens.JwksPath;
 
-    internal static async Task<StandInGateway> StartAsync()
+    public static async Task<StandInGateway> StartAsync()
     {
         var gateway = new StandInGateway();
         var builder = WebApplication.CreateSlimBuilder();
@@ -50,13 +50,13 @@ internal sealed class StandInGateway : IAsyncDisposable
     }
 
     /// <summary>A module token for <paramref name="audience"/> granting <paramref name="scopes"/>.</summary>
-    internal string Issue(string audience, string scopes, TimeSpan? expiresIn = null)
+    public string Issue(string audience, string scopes, TimeSpan? expiresIn = null)
     {
         return Sign(audience, scopes, expiresIn ?? Lifetime, key);
     }
 
     /// <summary>A token like <see cref="Issue"/>, but signed with a key the gateway does not publish.</summary>
-    internal static string IssueWithForeignKey(string audience, string scopes)
+    public static string IssueWithForeignKey(string audience, string scopes)
     {
         using var foreign = ECDsa.Create(ECCurve.NamedCurves.nistP256);
         return Sign(audience, scopes, Lifetime, foreign);

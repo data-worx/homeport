@@ -9,6 +9,7 @@ using Homeport.Platform.ControlPlane.Persistence;
 using Homeport.Platform.ControlPlane.Seeding;
 using Homeport.Shared.Authentication;
 using Homeport.Shared.Internal.Platform.ControlPlane;
+using Homeport.Testing.Containers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -53,10 +54,7 @@ public sealed class RunningControlPlane : IAsyncLifetime
         | UnixFileModes.GroupRead | UnixFileModes.GroupExecute
         | UnixFileModes.OtherRead | UnixFileModes.OtherExecute;
 
-    // Pinned like the AppHost pins it.
-    private const string PostgresImage = "postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db";
-
-    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder(PostgresImage)
+    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder(ContainerImages.Postgres)
         .WithDatabase(Database)
         .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", AppPassword)
