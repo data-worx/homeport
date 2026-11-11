@@ -4,7 +4,7 @@
 
 ## What Homeport is
 
-Homeport is a **self-hosted platform for deep business modules**.
+Homeport is a **self-hosted platform for business modules**.
 
 - A company pulls a Homeport release — container images and Docker Compose
   files — and runs it in **its own environment**.

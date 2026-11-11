@@ -1,4 +1,4 @@
-Homeport is a self-hosted platform for deep business modules. This design kit serves two surfaces that must feel like one product: the **Admin Portal** (Blazor + MudBlazor) and the **Landing Page** (static site, `homeport.data-worx.de`). `design/tokens/tokens.json` is the single source of truth for both.
+Homeport is a self-hosted platform for business modules. This design kit serves two surfaces that must feel like one product: the **Admin Portal** (Blazor + MudBlazor) and the **Landing Page** (static site, `homeport.data-worx.de`). `design/tokens/tokens.json` is the single source of truth for both.
 
 > *Your data never leaves port.*
 
