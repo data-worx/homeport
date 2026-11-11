@@ -380,8 +380,8 @@ See [ADR-0009](docs/architecture/adr/0009-supply-chain-security.md) and
   expiry date, or an expired entry, fails the run.
 - Third-party images are pinned as `tag@digest` in the AppHost. Dependabot
   proposes updates for NuGet packages, GitHub Actions and the digests in
-  `deploy/compose/`; a digest update is copied into the AppHost in the same
-  pull request.
+  `deploy/compose/`; a digest update is copied into the AppHost and into
+  `ContainerImages` of `Homeport.Testing` in the same pull request.
 - Actions in workflows are pinned by commit SHA, the version in a comment.
 - Own images use chiseled .NET base images, run as non-root, and are signed
   with cosign on release.

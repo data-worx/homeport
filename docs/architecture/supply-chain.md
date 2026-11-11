@@ -157,6 +157,11 @@ same branch. The AppHost pins each image as `tag@digest`, which the compose
 file carries over. Without the tag, Dependabot would propose the digest of
 `latest`, a major upgrade nobody asked for; with it, it stays within the tag.
 
+The tests start the same images: the new `tag@digest` is copied into
+[`ContainerImages`](../../src/Tests/Homeport.Testing/Containers/ContainerImages.cs)
+in the same pull request, so no test runs against an image an operator never
+runs.
+
 Actions are pinned by commit SHA, with the version in a comment, because a
 tag can be moved to other code after it was reviewed.
 
