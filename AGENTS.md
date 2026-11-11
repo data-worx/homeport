@@ -23,7 +23,7 @@ does not exist.
 
 ## Overview
 
-Homeport is a self-hosted platform for deep business modules: an operator runs
+Homeport is a self-hosted platform for business modules: an operator runs
 it in their own environment, and it provides gateway, multi-tenancy,
 authentication, throttling, usage metering, observability and an admin portal.
 Each module covers one thick business domain in depth.

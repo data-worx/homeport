@@ -2,7 +2,10 @@
 
 > **Homeport by data-worx** — *Your data never leaves port.*
 
-Homeport is a self-hosted platform for deep business modules. An operator runs
+**Business services in your own infrastructure – multi-tenant, metered, open source.**
+Gateway, tenants, authentication, rate limits and usage export included – add the business modules you need.
+
+Homeport is a self-hosted platform for business modules. An operator runs
 it in their own environment, and it provides what a SaaS product would:
 gateway, multi-tenancy, authentication, throttling, usage metering,
 observability and an admin portal. Each module covers one thick business
