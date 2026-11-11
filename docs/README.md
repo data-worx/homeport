@@ -63,6 +63,12 @@ Arranged by reader. A directory exists once it has its first document.
 | [`reference/module-contract/`](reference/module-contract/README.md) | The language-neutral contract every module implements |
 | [`reference/problems/`](reference/problems/README.md) | Homeport's problem types, one page each |
 
+## Maintainers — releasing Homeport
+
+| Document | About |
+|---|---|
+| [`releasing.md`](releasing.md) | Cutting the changelog, tagging candidates and the release, removing a discarded candidate, and fixing an older line |
+
 ## Design
 
 | Document | About |

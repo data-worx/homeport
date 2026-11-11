@@ -36,13 +36,13 @@ expect() {
 echo "check-release.sh"
 
 repo="${work}/repo"
-mkdir -p "${repo}/src"
+mkdir -p "${repo}"
 cd "${repo}"
 git init -q -b main
 git config user.email test@example.invalid
 git config user.name test
 git config core.autocrlf false
-cat > CHANGELOG.md <<'EOF'
+cat > CHANGELOG.md <<'EOF2'
 # Changelog
 
 ## [Unreleased]
@@ -60,15 +60,21 @@ cat > CHANGELOG.md <<'EOF'
 ## [0.0.9] - 2026-10-01
 
 - Something older
-EOF
-printf '<Project>\n  <PropertyGroup>\n    <Version>0.1.0</Version>\n  </PropertyGroup>\n</Project>\n' \
-  > src/Directory.Build.props
+EOF2
 git add -A && git commit -q -m main
 git update-ref refs/remotes/origin/main HEAD
 git tag v0.1.0
 git tag v0.1.0-rc.1
 git tag v0.2.0
+git tag v0.2.0-rc.1
+git tag v0.1.0-beta.1
+git tag v0.1.0-rc.0
 git tag v0.1.0.1
+git checkout -q -b release/0.0
+git commit -q --allow-empty -m fix
+git update-ref refs/remotes/origin/release/0.0 HEAD
+git tag v0.0.9
+git tag v0.1.0-rc.3
 git checkout -q -b side
 git commit -q --allow-empty -m side
 git tag v0.1.0-rc.2
@@ -84,16 +90,21 @@ if grep -q -F "Something older" "${notes}" || grep -q -F "Something upcoming" "$
 else
   pass "the notes stop at the next section"
 fi
-expect "a release prints its image tag" 0 "image_tag=0.1.0" bash "${check}" v0.1.0 "${notes}"
-expect "a release without its section fails" 1 "CHANGELOG.md has no section \"## [0.2.0]\"" \
-  bash "${check}" v0.2.0 "${notes}"
-expect "a release of another version than declared fails" 1 "declares <Version>0.1.0</Version>" \
-  bash "${check}" v0.2.0 "${notes}"
-expect "a pre-release without a section passes" 0 "prerelease=true" bash "${check}" v0.1.0-rc.1 "${notes}"
-expect "a pre-release keeps its suffix in the image tag" 0 "image_tag=0.1.0-rc.1" \
-  bash "${check}" v0.1.0-rc.1 "${notes}"
-expect "the notes of a pre-release are [Unreleased]" 0 "- Something upcoming" cat "${notes}"
-expect "a tag off main fails" 1 "Tag v0.1.0-rc.2 is not on origin/main" bash "${check}" v0.1.0-rc.2 "${notes}"
+expect "a release prints its version" 0 "version=0.1.0" bash "${check}" v0.1.0 "${notes}"
+expect "a release from main is the latest" 0 "latest=true" bash "${check}" v0.1.0 "${notes}"
+expect "a release without its section fails" 1 "CHANGELOG.md has no section \"## [0.2.0]\""   bash "${check}" v0.2.0 "${notes}"
+expect "a candidate with the cut section passes" 0 "prerelease=true" bash "${check}" v0.1.0-rc.1 "${notes}"
+expect "a candidate keeps its suffix in the version" 0 "version=0.1.0-rc.1"   bash "${check}" v0.1.0-rc.1 "${notes}"
+expect "a candidate is never the latest" 0 "latest=false" bash "${check}" v0.1.0-rc.1 "${notes}"
+expect "the notes of a candidate say so" 0 "Candidate for 0.1.0, not for production." cat "${notes}"
+expect "the notes of a candidate are the cut section" 0 "- Something released" cat "${notes}"
+expect "a candidate without the cut section fails" 1 "CHANGELOG.md has no section \"## [0.2.0]\""   bash "${check}" v0.2.0-rc.1 "${notes}"
+expect "a fix on its release line passes" 0 "prerelease=false" bash "${check}" v0.0.9 "${notes}"
+expect "a fix on its release line is not the latest" 0 "latest=false" bash "${check}" v0.0.9 "${notes}"
+expect "a tag on another line's release branch fails" 1   "Tag v0.1.0-rc.3 is neither on origin/main nor on origin/release/0.1" bash "${check}" v0.1.0-rc.3 "${notes}"
+expect "a tag off main fails" 1 "Tag v0.1.0-rc.2 is neither on origin/main" bash "${check}" v0.1.0-rc.2 "${notes}"
+expect "a pre-release other than rc fails" 1 "is neither vX.Y.Z nor vX.Y.Z-rc.N"   bash "${check}" v0.1.0-beta.1 "${notes}"
+expect "a candidate numbered 0 fails" 1 "is neither vX.Y.Z nor vX.Y.Z-rc.N" bash "${check}" v0.1.0-rc.0 "${notes}"
 expect "a malformed tag fails" 1 "is neither vX.Y.Z nor" bash "${check}" v0.1.0.1 "${notes}"
 
 echo "render-compose.sh"
