@@ -1,6 +1,6 @@
 # ADR-0019: Tokens for forwarded platform requests
 
-- Status: Accepted
+- Status: Accepted; supplemented by ADR-0020
 - Date: 2026-11-07
 
 ## Context

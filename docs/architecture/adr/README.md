@@ -19,16 +19,17 @@ decision is a new ADR that supersedes the old one, and the old one is marked
 | [0007](0007-throttling-and-metering.md) | Throttling and metering | Accepted |
 | [0008](0008-observability.md) | Observability | Accepted |
 | [0009](0009-supply-chain-security.md) | Supply-chain security | Accepted |
-| [0010](0010-admin-portal.md) | Admin portal | Accepted |
+| [0010](0010-admin-portal.md) | Admin portal | Accepted; API path superseded by ADR-0020 |
 | [0011](0011-gateway-issued-tokens-for-modules.md) | Gateway-issued tokens for modules | Accepted |
 | [0012](0012-module-registration-keys.md) | Module registration keys | Accepted |
 | [0013](0013-url-scheme-and-api-versioning.md) | URL scheme and API versioning | Accepted; URL scheme for module paths superseded by ADR-0015 |
-| [0014](0014-authentication-between-services.md) | Authentication between services | Accepted |
+| [0014](0014-authentication-between-services.md) | Authentication between services | Accepted; supplemented by ADR-0020 |
 | [0015](0015-operator-defined-module-groups.md) | Operator-defined module groups | Accepted |
 | [0016](0016-error-responses.md) | Error responses | Accepted |
 | [0017](0017-consolidated-api-docs.md) | Consolidated API docs | Accepted |
 | [0018](0018-where-wire-types-live.md) | Where wire types live | Accepted |
-| [0019](0019-tokens-for-forwarded-platform-requests.md) | Tokens for forwarded platform requests | Accepted |
+| [0019](0019-tokens-for-forwarded-platform-requests.md) | Tokens for forwarded platform requests | Accepted; supplemented by ADR-0020 |
+| [0020](0020-the-operator-as-a-caller.md) | The operator as a caller | Accepted |
 
 ## Template
 
