@@ -61,7 +61,7 @@ Homeport is a **self-hosted platform for business modules**.
                  │  Registry        modules register + heartbeat          │
                  │  ControlPlane    tenants, plans, clients, keys (API)   │
                  │  Metering        consumes usage, aggregates, exports   │
-                 │  Portal          Blazor admin UI → ControlPlane        │
+                 │  Portal          Blazor admin UI → gateway admin port  │
                  │                                                        │
                  │  Modules         <module>-api  (+ <module>-worker)     │
                  │                                                        │

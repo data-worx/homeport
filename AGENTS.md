@@ -218,7 +218,17 @@ Security-critical. No exception without an ADR.
 - PostgreSQL row-level security on every tenant-owned table, driven by the
   session setting `homeport.tenant_id`, which an interceptor sets per
   connection or transaction.
-- Platform-admin access uses a dedicated database role and is audited.
+- Platform-admin access uses a dedicated database role per service,
+  `<schema>_admin`, which reads every tenant's rows through a row-level
+  security policy for that role, never `BYPASSRLS`. It gets `SELECT` on what
+  it reads and `INSERT` and `SELECT` on the service's audit table, nothing
+  else. See
+  [ADR-0020](docs/architecture/adr/0020-the-operator-as-a-caller.md).
+- Every admin change and every admin read of tenant data writes an entry
+  into the platform table `<schema>.audit_entries` of the owning service,
+  in the same transaction, with the operator's subject and display name.
+  The app role has `INSERT` and `SELECT` on it, nothing else, and an
+  integration test asserts that. Homeport never deletes an entry.
 - Every feature that touches tenant data has a **cross-tenant leakage test**.
 
 ## Gateway
@@ -241,6 +251,10 @@ Security-critical. No exception without an ADR.
   module token, audience the service. Platform routes are configured in
   the gateway, never registered. See
   [ADR-0019](docs/architecture/adr/0019-tokens-for-forwarded-platform-requests.md).
+- The admin API, `/platform/v1/admin/...`, answers only on the gateway's
+  second, admin endpoint; on the public endpoint it does not exist. The
+  compose file does not publish the admin port. See
+  [ADR-0020](docs/architecture/adr/0020-the-operator-as-a-caller.md).
 - W3C `traceparent` is propagated to the module.
 - If the registry is unavailable, the gateway keeps serving the last known
   routes.
@@ -274,6 +288,12 @@ Security-critical. No exception without an ADR. See
 - A service token carries no tenant. An endpoint that serves a tenant's
   data requires a caller token's tenant claim and scope, and serves that
   tenant only (ADR-0019).
+- The operator is a caller through the portal (ADR-0020). The portal calls
+  the admin API from its server only, with the operator's access token from
+  OIDC authorization code with PKCE. The gateway checks the configured admin
+  claim and forwards with a caller token: audience the service, subject the
+  operator, scope `admin`, no tenant claim, lifetime at most 5 minutes. A
+  service serves its admin endpoints on that scope only.
 - Any other caller gets its mechanism through an ADR that meets these
   rules.
 - Traffic between components is not encrypted by Homeport until mTLS is
@@ -300,6 +320,10 @@ See [ADR-0016](docs/architecture/adr/0016-error-responses.md).
   Details body of its own.
 - A business error is a result value inside a service. The API layer maps it
   onto a problem type; the domain knows no HTTP status.
+- The one exception: the portal answers a browser's request with an HTML
+  error page that shows the trace id. It reads the admin API's Problem
+  Details with the `Problems` read model of `Homeport.Shared.Client`
+  (ADR-0020).
 
 ## Throttling
 

@@ -1,6 +1,6 @@
 # ADR-0010: Admin portal
 
-- Status: Accepted
+- Status: Accepted; API path superseded by ADR-0020
 - Date: 2026-10-19
 
 ## Context
