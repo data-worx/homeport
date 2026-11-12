@@ -19,6 +19,9 @@ For every call to a module the gateway
    ([ADR-0011](../architecture/adr/0011-gateway-issued-tokens-for-modules.md)).
    The client's token never reaches the module.
 
+The whole path of a call, with every token on the way, is drawn in
+[the request flow](../architecture/request-flow.md).
+
 Keycloak in the AppHost and the compose file is for development and tests
 only. Connect your own provider in production.
 

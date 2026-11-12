@@ -8,6 +8,9 @@ run it is in [the operators' page](../operators/metering.md).
 
 ## The path of one request
 
+The [request flow](request-flow.md#a-call-to-a-module) draws the whole
+call, from the client's token to the aggregates.
+
 1. The gateway forwards a request to a module and answers the client. Then
    it publishes one `UsageRecorded`: a new `eventId`, the tenant and client,
    the module, the **route template** from the manifest (`/v1/orders/{id}`,
