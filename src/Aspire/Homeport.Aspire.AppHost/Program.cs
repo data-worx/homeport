@@ -202,7 +202,7 @@ public static class Program
         // and seeds one tenant, plan and client, whose values configuration
         // overrides; the service starts after it completed and runs as the app
         // role.
-        var controlPlaneMigrate = builder.AddProject<Projects.Homeport_Platform_ControlPlane>("control-plane-migrate", launchProfileName: null)
+        var controlPlaneMigrate = builder.AddProject<Projects.Homeport_Platform_ControlPlane_Api>("control-plane-migrate", launchProfileName: null)
             .WithArgs("migrate")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-control-plane-migrate")
             .WithEnvironment("ConnectionStrings__control-plane-owner", ConnectionString(postgresEndpoint, "control_plane_owner", controlPlaneOwnerPassword))
@@ -215,7 +215,7 @@ public static class Program
             .WithEnvironment("Seed__ClientId", seedClientId)
             .WaitFor(postgres);
 
-        var controlPlane = builder.AddProject<Projects.Homeport_Platform_ControlPlane>("control-plane")
+        var controlPlane = builder.AddProject<Projects.Homeport_Platform_ControlPlane_Api>("control-plane")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-control-plane")
             .WithEnvironment("ConnectionStrings__control-plane", ConnectionString(postgresEndpoint, "control_plane_app", controlPlaneAppPassword))
             .WithReference(gateway)

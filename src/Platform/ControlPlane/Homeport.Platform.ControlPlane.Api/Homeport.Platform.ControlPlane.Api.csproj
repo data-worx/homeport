@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Becomes an image: carries THIRD-PARTY-NOTICES.md (Directory.Build.targets). -->
+    <ShipsThirdPartyNotices>true</ShipsThirdPartyNotices>
+    <!-- The image name, locally and in GHCR: the service.name of the component. -->
+    <ContainerRepository>homeport-control-plane</ContainerRepository>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Homeport.Platform.ControlPlane.Api.Tests.Integration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Authentication\Homeport.Shared.Authentication.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Client\Homeport.Shared.Client.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Internal\Homeport.Shared.Internal.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Homeport.Platform.ControlPlane.Infrastructure\Homeport.Platform.ControlPlane.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

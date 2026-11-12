@@ -19,7 +19,7 @@ SLN="Homeport.slnx"
 # nothing to give notice for.
 NOTICES_PROJECTS=(
   "src/Modules/Echo/Homeport.Modules.Echo.Api/Homeport.Modules.Echo.Api.csproj"
-  "src/Platform/ControlPlane/Homeport.Platform.ControlPlane/Homeport.Platform.ControlPlane.csproj"
+  "src/Platform/ControlPlane/Homeport.Platform.ControlPlane.Api/Homeport.Platform.ControlPlane.Api.csproj"
   "src/Platform/Gateway/Homeport.Platform.Gateway.Api/Homeport.Platform.Gateway.Api.csproj"
   "src/Platform/Metering/Homeport.Platform.Metering.Api/Homeport.Platform.Metering.Api.csproj"
   "src/Platform/Registry/Homeport.Platform.Registry.Api/Homeport.Platform.Registry.Api.csproj"
