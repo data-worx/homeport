@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Runs the gates of .devkit/gates.sh - build, test, format, notices - on every
-# pull request against main and every push to main. The runner has Docker,
-# which the integration and end-to-end tests need.
+# Runs every gate of .devkit/gates.sh on every pull request against main and
+# every push to main. The runner has Docker, which the integration and
+# end-to-end tests need, and Node.js, which the design gate needs.
 name: CI
 
 on:

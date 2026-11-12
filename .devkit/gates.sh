@@ -2,7 +2,7 @@
 # The gates that must be green before a commit. Project-owned: devkit-sync
 # never overwrites this file, so adjust the commands to fit the repository.
 #
-# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|scripts|all]
+# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|scripts|design|all]
 #         (no argument means all)
 set -uo pipefail
 
@@ -117,6 +117,32 @@ gate_compose() {
 # fixtures. The scripts run only on a tag, so they are tested before then.
 gate_scripts() { bash .github/scripts/test-release-scripts.sh; }
 
+# Rebuilds the design kit and fails when that changes a file under design/:
+# its generated files are committed and must match their sources. It compares
+# the working tree before and after the build rather than against HEAD, so a
+# correctly rebuilt change passes before it is committed. A failing run has
+# already rebuilt the listed files; review and commit them.
+design_state() {
+  local paths
+  paths="$(git ls-files -co --exclude-standard -- design/)"
+  paste -d ' ' <(printf '%s
+' "${paths}" | git hash-object --stdin-paths) <(printf '%s
+' "${paths}")
+}
+gate_design() {
+  local before after
+  command -v node > /dev/null || { echo "node not found - the design gate needs Node.js 18 or later"; return 1; }
+  before="$(design_state)"
+  node design/tools/build-kit.mjs > /dev/null || return 1
+  after="$(design_state)"
+  [ "${before}" = "${after}" ] && return 0
+  echo "node design/tools/build-kit.mjs changed these files:"
+  diff <(printf '%s
+' "${before}") <(printf '%s
+' "${after}") | sed -n 's/^[<>] [0-9a-f]* /  /p' | sort -u
+  return 1
+}
+
 # Expectation per gate, printed when a gate fails.
 gate_expectation() {
   case "$1" in
@@ -126,12 +152,13 @@ gate_expectation() {
     notices) echo "THIRD-PARTY-NOTICES.md matches what the shipped projects publish" ;;
     compose) echo "deploy/compose/ matches what the AppHost publishes" ;;
     scripts) echo "every release script test passes" ;;
+    design)  echo "design/ matches what design/tools/build-kit.mjs generates" ;;
   esac
 }
 
 # --- runner, do not edit below unless you know why ---------------------------
 
-GATES="build test format notices compose scripts"
+GATES="build test format notices compose scripts design"
 
 # A gate returns 77 when it does not apply to this repository; its last line of
 # output says why. A passing gate prints PASS, a skipped one SKIP and the
