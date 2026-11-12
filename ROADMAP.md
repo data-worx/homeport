@@ -65,11 +65,55 @@ the period-close webhook, an observability profile for the compose
 deployment, a write API for the control plane, usage reporting from
 asynchronous workers.
 
+## M2 — v0.2 Admin portal
+
+The operator manages tenants, plans and clients in a web portal and reads
+modules, usage and audit across tenants, without touching the database or
+the seed data.
+
+Done when:
+
+1. The portal is for the operator only. The operator signs in with OIDC —
+   authorization code with PKCE — at their own identity provider, and a
+   configurable claim grants access. There is one role.
+2. The portal is Blazor Server with MudBlazor, its theme generated from the
+   design tokens. Its user interface is in English only.
+3. The portal reaches the platform services only through an admin API on the
+   gateway, on a separate port that the compose file does not publish.
+4. Tenants can be listed, created and renamed.
+5. Plans can be listed, created and changed, and deleted while no tenant
+   uses them.
+6. Clients are registered by a client id the identity provider already
+   issued, with a tenant and a plan. A client's plan can be changed, and a
+   client can be removed.
+7. The registered modules can be read.
+8. Usage can be read across tenants and exported.
+9. Every admin change and every admin read of tenant data is audited in the
+   same transaction, append-only, in the service that owns the data. The
+   audit can be read in the portal.
+10. TLS ends at the operator's reverse proxy. The portal trusts forwarded
+    headers only from configured proxies and refuses to sign in over plain
+    HTTP.
+11. Upgrading from v0.1.0 is documented, and tested per schema: migrate to
+    v0.1.0, seed, migrate to the latest version.
+12. The portal image is scanned, listed in the third-party notices and signed
+    like every own image.
+
+Out of scope: tenant self-service, suspending or deleting a tenant, creating
+clients at the identity provider, API keys, more than one role, active
+invalidation of the gateway's cached client lookups, dashboards, localisation,
+TLS between components
+([discussion #4](https://github.com/data-worx/homeport/discussions/4)).
+
 ## Later — not yet phased
 
-- Admin portal
 - API keys
-- First real module, chosen by the community poll in GitHub Discussions
+- Tenant self-service
+- Suspending or deleting a tenant
+- Active invalidation of the gateway's cached client lookups
+- First real module, chosen by the community poll in
+  [discussion #2](https://github.com/data-worx/homeport/discussions/2);
+  decided when M2 is released
 - Helm chart
 - Quotas
 - Period-close webhook
