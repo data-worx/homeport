@@ -5,7 +5,9 @@ registers at the registry when it starts, with its manifest and the address
 the gateway reaches it at, and keeps itself registered with a heartbeat every
 10 s. The gateway reads the routes of every live instance from the registry
 every 5 s. Starting a module makes it reachable; stopping it removes its
-routes. See [ADR-0004](../architecture/adr/0004-gateway-and-service-discovery.md).
+routes. See [ADR-0004](../architecture/adr/0004-gateway-and-service-discovery.md),
+and the lifecycle of an instance step by step in
+[registering a module](../module-developers/registering-a-module.md#what-happens).
 
 The registry keeps the instances in Valkey, each for 30 s after its last
 heartbeat; their keys are listed in

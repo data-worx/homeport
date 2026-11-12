@@ -35,15 +35,49 @@ The registry needs the same key under the module id; see
 
 ## What happens
 
-1. **Registration.** Once the module serves requests, it sends its manifest
-   and its address to the registry. Each instance chooses an id of its own
-   at start, so instances of one module never replace each other.
-2. **Heartbeat.** Every 10 s the instance renews its registration. An
-   instance without a heartbeat for 30 s is dropped, and the gateway stops
-   routing to it at its next poll, at most 5 s later.
-3. **Registering again.** When the registry answers a heartbeat with `404` —
-   it was down for longer than 30 s, or Valkey lost the instance — the
-   instance registers again on its own.
+An instance of a module from its start to its stop. The diagram shows one
+instance and no error path; every arrow that carries a credential is drawn
+bold and names it.
+
+![The lifecycle of a module instance: module instance, registry, Valkey and gateway](registering-a-module-lifecycle.drawio.svg)
+
+1. The instance starts and waits until it serves requests.
+2. It registers with `PUT /instances/{moduleId}/{instanceId}`, sending its
+   manifest and its address, with its **registration key** as bearer token.
+   Each instance chooses an id of its own at start, so instances of one
+   module never replace each other.
+3. The registry checks the key against the module id and the manifest
+   against the module contract.
+4. The registry stores the instance in Valkey, for 30 s.
+5. The registry answers `204`.
+6. Every 5 s the gateway reads `GET /routes` from the registry, with a
+   **service token** for the audience `homeport-registry` and the `ETag` of
+   its last read in `If-None-Match`. While nothing changed, the registry
+   answers `304` in step 9 and the gateway keeps its table.
+7. The registry reads the live instances from Valkey.
+8. Valkey returns them, the new instance among them.
+9. The registry answers with the route table and a new `ETag`.
+10. The gateway adds the routes the instance declares to its table.
+11. From now on the gateway forwards requests to those routes to the
+    instance, with a **module token** for the module id
+    ([the module token](module-token.md)).
+12. Every 10 s the instance sends a heartbeat,
+    `POST /instances/{moduleId}/{instanceId}/heartbeat`, with its
+    **registration key**.
+13. The registry renews the instance in Valkey for another 30 s.
+14. The registry answers `204`.
+15. The instance stops. It does not unregister.
+16. Valkey drops the instance 30 s after its last heartbeat.
+17. At its next poll, at most 5 s later, the gateway reads the routes with
+    its `ETag`.
+18. The registry answers with a route table without the instance, and a new
+    `ETag`.
+19. The gateway stops routing to the instance. A route no other instance
+    declares leaves its table.
+
+When the registry answers a heartbeat with `404` — it was down for longer
+than 30 s, or Valkey lost the instance — the instance registers again on its
+own, from step 2.
 
 The registry checks the manifest against the module contract, not the SDK.
 When it refuses the registration, the module logs the reason at Error and
