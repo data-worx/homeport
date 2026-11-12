@@ -24,7 +24,10 @@ More in [docs/architecture/vision.md](docs/architecture/vision.md).
 Pre-alpha. v0.1.0, the walking skeleton, is released: a call goes through the
 gateway to a module and is metered. Images and the compose file are on the
 [releases page](https://github.com/data-worx/homeport/releases). The
-milestones ahead are described in [ROADMAP.md](ROADMAP.md).
+milestones ahead are described in [ROADMAP.md](ROADMAP.md): next is M2, the
+admin portal. The first real module is chosen in
+[discussion #2](https://github.com/data-worx/homeport/discussions/2) and
+decided when M2 is released.
 
 ## Quickstart
 
