@@ -6,7 +6,7 @@ licence each one is used under and the copyright notice it carries; the full
 text of every licence named is reproduced at the end, as those licences require.
 
 - Homeport.Modules.Echo.Api
-- Homeport.Platform.ControlPlane
+- Homeport.Platform.ControlPlane.Api
 - Homeport.Platform.Gateway.Api
 - Homeport.Platform.Metering.Api
 - Homeport.Platform.Registry.Api

@@ -48,7 +48,7 @@ cd homeport
 for project in \
   Platform/Gateway/Homeport.Platform.Gateway.Api \
   Platform/Registry/Homeport.Platform.Registry.Api \
-  Platform/ControlPlane/Homeport.Platform.ControlPlane \
+  Platform/ControlPlane/Homeport.Platform.ControlPlane.Api \
   Platform/Metering/Homeport.Platform.Metering.Api \
   Modules/Echo/Homeport.Modules.Echo.Api; do
   dotnet publish "src/${project}" -t:PublishContainer

@@ -20,7 +20,7 @@ compose="deploy/compose/docker-compose.yaml"
 # its service, so <NAME>_MIGRATE_IMAGE maps through <NAME>. A variable missing
 # here fails, so no image of the compose file goes unscanned or unreleased.
 declare -A projects=(
-  [CONTROL_PLANE]="src/Platform/ControlPlane/Homeport.Platform.ControlPlane"
+  [CONTROL_PLANE]="src/Platform/ControlPlane/Homeport.Platform.ControlPlane.Api"
   [ECHO]="src/Modules/Echo/Homeport.Modules.Echo.Api"
   [GATEWAY]="src/Platform/Gateway/Homeport.Platform.Gateway.Api"
   [METERING]="src/Platform/Metering/Homeport.Platform.Metering.Api"

@@ -13,7 +13,7 @@ binding rules — the dependency direction, who may reference what — live in t
 
 | Project | Role | May depend on |
 |---|---|---|
-| `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL with its init script, RabbitMQ with its init script and a user per service, Valkey, Keycloak, the gateway as two replicas, the registry, the control plane and metering with their `migrate` steps and the Echo module with its registration key, imports the Keycloak realm with generated client secrets, links the gateway's API docs in the dashboard, and generates `deploy/compose/` | `Homeport.Platform.Gateway.Api`, `Homeport.Platform.Registry.Api`, `Homeport.Platform.ControlPlane`, `Homeport.Platform.Metering.Api`, `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Aspire.AppHost` | The topology and its single source of truth: declares PostgreSQL with its init script, RabbitMQ with its init script and a user per service, Valkey, Keycloak, the gateway as two replicas, the registry, the control plane and metering with their `migrate` steps and the Echo module with its registration key, imports the Keycloak realm with generated client secrets, links the gateway's API docs in the dashboard, and generates `deploy/compose/` | `Homeport.Platform.Gateway.Api`, `Homeport.Platform.Registry.Api`, `Homeport.Platform.ControlPlane.Api`, `Homeport.Platform.Metering.Api`, `Homeport.Modules.Echo.Api`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Shared.ServiceDefaults` | What every service sets up the same way: OpenTelemetry over OTLP, including the service's own meter and Wolverine's traces and metrics, the names of the `homeport.*` span attributes, health endpoints, service discovery, resilient HTTP clients | nothing |
 | `Homeport.Shared.Authentication` | Validates the tokens the gateway issues: issuer, audience, expiry and ES256 signature against the gateway's JWKS, and the JWKS wire format and the module token's claim names both sides share; ships with the SDK | nothing |
 | `Homeport.Shared.Contracts` | The types several services, the SDK and a Domain share: so far the result type, a value or an error with a business code | nothing |
@@ -28,7 +28,10 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Platform.Registry.Application` | Registering an instance, renewing it and building the routes, on a store of instances and a source of keys it declares | `Homeport.Platform.Registry.Domain` |
 | `Homeport.Platform.Registry.Infrastructure` | Keeps the instances in Valkey with a time to live and reads the registration keys from configuration | `Homeport.Platform.Registry.Application` |
 | `Homeport.Platform.Registry.Api` | Serves registration and heartbeat, authenticated by registration key, and the route table, authenticated by a gateway service token | `Homeport.Platform.Registry.Infrastructure`, `Homeport.Shared.Authentication`, `Homeport.Shared.Client`, `Homeport.Shared.Internal`, `Homeport.Shared.ServiceDefaults` |
-| `Homeport.Platform.ControlPlane` | One project, as it carries no business rules yet: keeps tenants, plans and clients in the schema `control_plane` with EF Core, serves `GET /clients/{clientId}` authenticated by a gateway service token, and as `migrate` applies its migrations and seeds one tenant, plan and client | `Homeport.Shared.Authentication`, `Homeport.Shared.Client`, `Homeport.Shared.Internal`, `Homeport.Shared.ServiceDefaults` |
+| `Homeport.Platform.ControlPlane.Domain` | The tenant, the plan and the client with the plan it is held to, and the longest name and client id each allows | `Homeport.Shared.Contracts` |
+| `Homeport.Platform.ControlPlane.Application` | Looking a client up with its plan, on a lookup it declares | `Homeport.Platform.ControlPlane.Domain` |
+| `Homeport.Platform.ControlPlane.Infrastructure` | Keeps tenants, plans and clients in the schema `control_plane` with EF Core, mapped by entity configurations, looks a client up with its plan, holds the migrations, and brings the seeded tenant, plan and client in line with the configuration | `Homeport.Platform.ControlPlane.Application` |
+| `Homeport.Platform.ControlPlane.Api` | Serves `GET /clients/{clientId}` authenticated by a gateway service token, and as `migrate` applies its migrations and seeds one tenant, plan and client | `Homeport.Platform.ControlPlane.Infrastructure`, `Homeport.Shared.Authentication`, `Homeport.Shared.Client`, `Homeport.Shared.Internal`, `Homeport.Shared.ServiceDefaults` |
 | `Homeport.Platform.Metering.Domain` | The usage event, its hourly and daily aggregates, the rule that buckets usage by the UTC hour and day, and the query of an export with its rules | `Homeport.Shared.Contracts` |
 | `Homeport.Platform.Metering.Application` | Recording an event once and adding it to its aggregates, and reading a tenant's aggregates for an export, on a store and a reader it declares | `Homeport.Platform.Metering.Domain` |
 | `Homeport.Platform.Metering.Infrastructure` | Keeps the events and aggregates in the schema `metering` with EF Core, filtered to one tenant by query filters and row-level security, records an event in one transaction that a duplicate leaves unchanged, reads the aggregates of one tenant, and holds the migrations | `Homeport.Platform.Metering.Application` |
@@ -42,7 +45,8 @@ binding rules — the dependency direction, who may reference what — live in t
 | `Homeport.Modules.Echo.Api.Tests.Integration` | Runs Echo in memory behind a stand-in gateway's JWKS and asserts its manifest, health, echo, batch, request and caller endpoints with and without a module token and scope, and its OpenAPI document, including the descriptions of its `Homeport.Shared.Client` types | `Homeport.Modules.Echo.Api` |
 | `Homeport.Modules.Echo.Domain.Tests.Unit` | Asserts how much a batch counts and that an empty one is rejected | `Homeport.Modules.Echo.Domain` |
 | `Homeport.Modules.Echo.Application.Tests.Unit` | Asserts that a batch comes back in its order with its quantity, and that an empty one fails | `Homeport.Modules.Echo.Application` |
-| `Homeport.Platform.ControlPlane.Tests.Integration` | Runs `migrate` and the control plane against a throwaway PostgreSQL prepared by the init script and asserts the client lookup with its token and error responses, that `migrate` seeds exactly once and fails on an invalid seed, that the app role has no DDL rights, and that the schema's ER diagram names every table and column of the model; needs Docker | `Homeport.Platform.ControlPlane` |
+| `Homeport.Platform.ControlPlane.Infrastructure.Tests.Integration` | Asserts that the schema's ER diagram names every table and column of the model | `Homeport.Platform.ControlPlane.Infrastructure` |
+| `Homeport.Platform.ControlPlane.Api.Tests.Integration` | Runs `migrate` and the control plane against a throwaway PostgreSQL prepared by the init script and asserts the client lookup with its token and error responses, that `migrate` seeds exactly once and fails on an invalid seed, and that the app role has no DDL rights; needs Docker | `Homeport.Platform.ControlPlane.Api` |
 | `Homeport.Platform.Gateway.Api.Tests.Integration` | Runs the gateway in memory against a stand-in module, registry, identity provider, control plane and metering and asserts which tokens, clients and scopes it accepts, the module token it forwards, what it forwards on which routes, how it polls the registry, the error responses it answers with, whose forwarded headers it applies, the JWKS it serves, the span attributes and request counts of a module request, that its metrics carry only bounded labels, the usage events it publishes with the quantity a module reports or the route's, the reports it rejects and removes, the `429`, `Retry-After` and RateLimit headers it answers with, that it neither meters a rejected request nor throttles one while Valkey is unreachable, that its errors read as `ProblemResponse` without loss, the consolidated API docs it serves, keeps and switches off, the platform's from metering's document read with a service token, that it forwards the usage export to metering with a caller token, throttles it and does not meter it, and that it does not start without a signing key or an identity provider or with an unreadable trusted proxy | `Homeport.Platform.Gateway.Api` |
 | `Homeport.Platform.Gateway.Application.Tests.Unit` | Asserts that a request is decided on the bucket it drew from, and passes undecided while the buckets are unavailable | `Homeport.Platform.Gateway.Application` |
 | `Homeport.Platform.Gateway.Domain.Tests.Unit` | Asserts which reported quantities are accepted and why one is rejected, the limits a plan's rate limit takes and what a draw from its bucket tells the caller, and what a consolidated API document keeps, rewrites and leaves out | `Homeport.Platform.Gateway.Domain` |
@@ -92,7 +96,10 @@ src/
       Homeport.Modules.Echo.Api/
   Platform/
     ControlPlane/
-      Homeport.Platform.ControlPlane/
+      Homeport.Platform.ControlPlane.Domain/
+      Homeport.Platform.ControlPlane.Application/
+      Homeport.Platform.ControlPlane.Infrastructure/
+      Homeport.Platform.ControlPlane.Api/
     Gateway/
       Homeport.Platform.Gateway.Domain/
       Homeport.Platform.Gateway.Application/
@@ -122,7 +129,8 @@ src/
     Homeport.Modules.Echo.Api.Tests.Integration/
     Homeport.Modules.Echo.Application.Tests.Unit/
     Homeport.Modules.Echo.Domain.Tests.Unit/
-    Homeport.Platform.ControlPlane.Tests.Integration/
+    Homeport.Platform.ControlPlane.Api.Tests.Integration/
+    Homeport.Platform.ControlPlane.Infrastructure.Tests.Integration/
     Homeport.Platform.Gateway.Api.Tests.Integration/
     Homeport.Platform.Gateway.Application.Tests.Unit/
     Homeport.Platform.Gateway.Domain.Tests.Unit/
@@ -152,8 +160,10 @@ src/
   own in the sense of `dotnet.layout`, grouped under `src/Platform/` and
   `src/Modules/`
   ([ADR-0003](adr/0003-service-granularity-and-module-contract.md)). A
-  service without business rules may stay a single project, as the control
-  plane does while it only looks clients up. The registry
+  service without business rules may stay a single project. The control
+  plane is cut into layers ahead of the admin API, whose rules — a plan is
+  deleted only while no client uses it, a rate is positive — belong in its
+  Domain. The registry
   has rules of its own — checking a manifest, merging the manifests of the
   live instances — so it is cut into layers, and so is the gateway, whose
   rules decide what a reported quantity is worth and what a tenant's rate

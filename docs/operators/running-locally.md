@@ -142,7 +142,7 @@ from the repository root:
 ```bash
 dotnet publish src/Platform/Gateway/Homeport.Platform.Gateway.Api -t:PublishContainer
 dotnet publish src/Platform/Registry/Homeport.Platform.Registry.Api -t:PublishContainer
-dotnet publish src/Platform/ControlPlane/Homeport.Platform.ControlPlane -t:PublishContainer
+dotnet publish src/Platform/ControlPlane/Homeport.Platform.ControlPlane.Api -t:PublishContainer
 dotnet publish src/Platform/Metering/Homeport.Platform.Metering.Api -t:PublishContainer
 dotnet publish src/Modules/Echo/Homeport.Modules.Echo.Api -t:PublishContainer
 ```
