@@ -12,7 +12,9 @@ GET /platform/v1/usage?from=…&to=…&granularity=hour|day[&module=…][&meter=
 Your token needs the scope `usage.read`. You only ever see your own
 tenant's usage: the tenant comes from your client, never from the request.
 The call counts against your tenant's rate limit like any other
-([rate limits](rate-limits.md)), but it is not itself counted as usage.
+([rate limits](rate-limits.md)), but it is not itself counted as usage. The path of the request through
+the gateway to metering is drawn in
+[the request flow](../architecture/request-flow.md#a-platform-request).
 
 ## Parameters
 

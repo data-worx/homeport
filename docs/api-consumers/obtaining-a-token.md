@@ -51,6 +51,8 @@ The gateway checks the token on every call:
 | `503` | [`control-plane-unavailable`](../reference/problems/control-plane-unavailable.md) | The gateway could not look the client up; retry later |
 
 A `401` or `403` from the gateway means the request never reached the module.
+What the gateway does with the token on the way to the module is drawn in
+[the request flow](../architecture/request-flow.md#a-call-to-a-module).
 
 ## Try it locally
 

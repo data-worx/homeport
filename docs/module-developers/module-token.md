@@ -4,7 +4,10 @@ A module trusts one identity source: the short-lived token the gateway signs
 for every request it forwards
 ([ADR-0011](../architecture/adr/0011-gateway-issued-tokens-for-modules.md)).
 The caller's own token never reaches the module, and the module never talks
-to the identity provider. The claims are normative in the
+to the identity provider. Where the token is issued on a request's way
+through the gateway is drawn in
+[the request flow](../architecture/request-flow.md#a-call-to-a-module).
+The claims are normative in the
 [module contract](../reference/module-contract/README.md#requests-from-the-gateway).
 This page shows how a module built with `Homeport.Sdk` uses the token. The
 Echo module in `src/Modules/Echo/` is the reference.
