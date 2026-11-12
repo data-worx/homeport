@@ -17,6 +17,8 @@ Open `design/index.html` in a browser. It works offline from the file system: no
 
    This regenerates `design/dist/` (CSS, MudBlazor theme, icons), `design/tokens/homeport.tokens.json` (W3C DTCG), `design/docs/components-index.md` and `design/index.html`.
 
+3. Commit the regenerated files with the source change. The `design` gate in `.devkit/gates.sh` rebuilds the kit and fails when that changes a file under `design/`.
+
 ## Use it
 
 - Portal: see `design/docs/portal-mudblazor.md` (copy `dist/HomeportTheme.cs`, `dist/HomeportIcons.cs`, `dist/portal.css`, `fonts/`).

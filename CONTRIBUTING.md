@@ -38,8 +38,9 @@ holder license your contribution under other terms as well — see
 2. Make the change in small, reviewable commits. Commit messages follow the
    conventional-commit format described in
    [AGENTS.github.md](AGENTS.github.md#commits-forgecommits).
-3. Run the gates and make sure they are green. On Windows, Smart App Control
-   blocks the DLLs a build produces; see
+3. Run the gates and make sure they are green. They need the .NET 10 SDK,
+   Docker and Node.js 18 or later. On Windows, Smart App Control blocks the
+   DLLs a build produces; see
    [running Homeport locally](docs/operators/running-locally.md#smart-app-control).
 
    ```bash
