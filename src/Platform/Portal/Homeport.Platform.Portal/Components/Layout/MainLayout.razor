@@ -1,0 +1,51 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@inherits LayoutComponentBase
+
+<MudThemeProvider @ref="_themeProvider" Theme="_theme" @bind-IsDarkMode="_dark" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="0">
+        <MudIconButton Icon="@HomeportIcons.Lucide.Menu" Color="Color.Inherit" Edge="Edge.Start"
+                       aria-label="Toggle navigation" OnClick="ToggleDrawer" />
+        <a href="" class="hp-brand">
+            <img src="@Assets["homeport-icon-mono-white.svg"]" alt="" width="28" height="28" />
+            <MudText Typo="Typo.h6" Inline="true">Homeport</MudText>
+            <MudText Typo="Typo.caption" Inline="true" Class="hp-brand-role">Platform admin</MudText>
+        </a>
+        <MudSpacer />
+        <MudIconButton Icon="@(_dark ? HomeportIcons.Lucide.Sun : HomeportIcons.Lucide.Moon)" Color="Color.Inherit"
+                       aria-label="Switch light or dark theme" OnClick="ToggleDarkMode" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Mini" Elevation="0">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private readonly MudTheme _theme = HomeportTheme.Create();
+    private MudThemeProvider? _themeProvider;
+    private bool _dark;
+    private bool _drawerOpen = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // The browser's preference, until the operator switches.
+        if (firstRender && _themeProvider is not null)
+        {
+            _dark = await _themeProvider.GetSystemDarkModeAsync();
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+
+    private void ToggleDarkMode() => _dark = !_dark;
+}
