@@ -50,6 +50,11 @@ CVE-2026-119379 exp:2026-12-31
 CVE-2026-119586 exp:2026-12-31
 CVE-2026-102554 exp:2026-12-31
 
+# keycloak: zlib 1.2.11-40.el9 in keycloak:26.8, development and tests only
+# (ADR-0006). Red Hat lists no fixed package yet, and the digest of
+# 2026-11-13 carries the same version. Removed with the first fixed image.
+CVE-2026-76844 exp:2026-12-31
+
 # postgres: krb5-libs 1.22.2-r1 in postgres:18.6-alpine; Alpine ships the fix
 # in 1.22.3-r0, but no image with it has been published yet, the rebuild of
 # 2026-11-11 included. Removed with the bump to the first fixed image.
