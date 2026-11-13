@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using Homeport.Platform.Gateway.Api.Admin;
 using Homeport.Platform.Gateway.Application.Throttling;
 using Homeport.Platform.Gateway.Infrastructure.Throttling;
 using Homeport.Platform.Gateway.Infrastructure.Usage;
@@ -92,6 +94,21 @@ internal static class GatewaySettings
         return host
             .WithIdentityProvider(identityProvider.Issuer)
             .UseSetting("ControlPlane:Url", controlPlane.Url);
+    }
+
+    /// <summary>
+    /// Serves the admin API on <paramref name="port"/> for operator tokens of
+    /// <paramref name="identityProvider"/>, forwarding <paramref name="endpoints"/>
+    /// in place of the admin endpoints of the release.
+    /// </summary>
+    internal static IWebHostBuilder WithAdminApi(this IWebHostBuilder host, int port, StandInIdentityProvider identityProvider, params AdminEndpoint[] endpoints)
+    {
+        return host
+            .UseSetting("AdminApi:Port", port.ToString(CultureInfo.InvariantCulture))
+            .UseSetting("AdminApi:Authority", identityProvider.Issuer)
+            .UseSetting("AdminApi:Audience", StandInIdentityProvider.OperatorAudience)
+            .UseSetting("AdminApi:RequireHttpsMetadata", "false")
+            .ConfigureTestServices(services => services.AddSingleton(new AdminRoutes(endpoints)));
     }
 
     /// <summary>Sends every request of <paramref name="client"/> with <paramref name="token"/>.</summary>

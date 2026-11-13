@@ -22,6 +22,9 @@ For every call to a module the gateway
 The whole path of a call, with every token on the way, is drawn in
 [the request flow](../architecture/request-flow.md).
 
+The operator's own tokens, for the admin API on the gateway's admin port,
+are configured apart from the clients'; see [the admin API](admin-api.md).
+
 Keycloak in the AppHost and the compose file is for development and tests
 only. Connect your own provider in production.
 

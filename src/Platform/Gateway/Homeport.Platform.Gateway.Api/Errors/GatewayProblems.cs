@@ -28,6 +28,12 @@ internal static class GatewayProblems
         "The client's token lacks the scope this route requires.",
         StatusCodes.Status403Forbidden);
 
+    /// <summary>The operator's token is valid, but lacks the claim that grants admin access (ADR-0020).</summary>
+    internal static readonly GatewayProblem AdminClaimMissing = new(
+        "admin-claim-missing",
+        "The token lacks the claim that grants admin access.",
+        StatusCodes.Status403Forbidden);
+
     /// <summary>The control plane could not be asked about the client.</summary>
     internal static readonly GatewayProblem ControlPlaneUnavailable = new(
         "control-plane-unavailable",

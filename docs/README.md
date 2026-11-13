@@ -17,6 +17,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`operators/metering.md`](operators/metering.md) | Metering, preparing its database and the broker users, what may be lost, retention, the usage export, its configuration and metrics |
 | [`operators/throttling.md`](operators/throttling.md) | The rate limit per tenant: plan limits, the buckets in Valkey, failing open while Valkey is down, and the metrics |
 | [`operators/reverse-proxy.md`](operators/reverse-proxy.md) | Running the gateway behind a reverse proxy, and which proxies' forwarded headers it trusts |
+| [`operators/admin-api.md`](operators/admin-api.md) | The gateway's admin port for the admin API, the operator's tokens it accepts, its configuration, and why it stays unpublished |
 | [`operators/identity-provider.md`](operators/identity-provider.md) | Connecting the identity provider whose client tokens the gateway accepts, and mapping its clients to tenants |
 | [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |
 | [`operators/tracing.md`](operators/tracing.md) | The trace of a request from the gateway to metering, the span attributes and the request metrics |
@@ -51,7 +52,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`architecture/vision.md`](architecture/vision.md) | What Homeport is and is not, why it exists, and the target picture |
 | [`architecture/architecture.md`](architecture/architecture.md) | The projects, the directory layout and why they are cut this way |
 | [`architecture/data-model.md`](architecture/data-model.md) | One database with a schema and two roles per service, tenant-owned versus platform tables, row-level security, and the Valkey key layout |
-| [`architecture/request-flow.md`](architecture/request-flow.md) | A call to a module and a platform request as sequence diagrams, with every token on the way and what can fail at each step |
+| [`architecture/request-flow.md`](architecture/request-flow.md) | A call to a module, a platform request and an admin request as sequence diagrams, with every token on the way and what can fail at each step |
 | [`architecture/metering.md`](architecture/metering.md) | How a request becomes usage, what is delivered and counted exactly once, and why there is no outbox |
 | [`architecture/testing.md`](architecture/testing.md) | Why tests control their clocks, wait for signals and keep the end-to-end tests small |
 | [`architecture/supply-chain.md`](architecture/supply-chain.md) | Which images are scanned and how, exceptions in `.trivyignore`, how a tag releases signed images, chiseled own images, and Dependabot updates of the digests |

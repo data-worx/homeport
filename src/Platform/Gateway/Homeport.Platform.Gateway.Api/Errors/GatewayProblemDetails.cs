@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics;
+using Homeport.Platform.Gateway.Api.Admin;
 using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Api.Routing;
 using Homeport.Platform.Gateway.Infrastructure.ControlPlane;
@@ -89,6 +90,9 @@ internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logge
             {
                 case StatusCodes.Status401Unauthorized:
                     return GatewayProblems.Unauthorized;
+                case StatusCodes.Status403Forbidden
+                    when context.GetEndpoint()?.Metadata.GetMetadata<RouteModel>()?.Config.Metadata?.ContainsKey(AdminRoutes.AdminAudienceMetadata) == true:
+                    return GatewayProblems.AdminClaimMissing;
                 // A client the control plane knows was refused for its scope only.
                 case StatusCodes.Status403Forbidden
                     when context.Features.Get<ClientResponse>() is not null

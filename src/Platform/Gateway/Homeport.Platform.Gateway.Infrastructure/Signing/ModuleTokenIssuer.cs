@@ -11,8 +11,9 @@ namespace Homeport.Platform.Gateway.Infrastructure.Signing;
 /// Issues the token the gateway sends a module with every forwarded request
 /// (ADR-0011): audience the module id, claims tenant, client, subject and
 /// scopes. The caller token for a platform service (ADR-0019) is the same
-/// token for the service's audience. A token is issued per request, since
-/// its claims are the caller's.
+/// token for the service's audience; the operator's caller token for an
+/// admin API (ADR-0020) carries the operator instead of a client. A token is
+/// issued per request, since its claims are the caller's.
 /// </summary>
 public sealed class ModuleTokenIssuer(SigningKeys keys, IOptions<ModuleTokenOptions> options, TimeProvider time)
 {
@@ -23,19 +24,42 @@ public sealed class ModuleTokenIssuer(SigningKeys keys, IOptions<ModuleTokenOpti
     {
         ArgumentNullException.ThrowIfNull(caller);
 
+        return Issue(caller.Audience, new Dictionary<string, object>
+        {
+            [GatewayTokens.SubjectClaim] = caller.Subject,
+            [GatewayTokens.TenantIdClaim] = caller.TenantId.ToString(),
+            [GatewayTokens.ClientIdClaim] = caller.ClientId,
+            [GatewayTokens.ScopeClaim] = string.Join(GatewayTokens.ScopeSeparator, caller.Scopes),
+        });
+    }
+
+    /// <summary>
+    /// A caller token that tells <see cref="OperatorCaller.Audience"/> the
+    /// operator calls its admin API (ADR-0020): the operator's subject and
+    /// display name, the one scope <see cref="GatewayTokens.AdminScope"/>, and
+    /// no tenant or client.
+    /// </summary>
+    public string Issue(OperatorCaller caller)
+    {
+        ArgumentNullException.ThrowIfNull(caller);
+
+        return Issue(caller.Audience, new Dictionary<string, object>
+        {
+            [GatewayTokens.SubjectClaim] = caller.Subject,
+            [GatewayTokens.NameClaim] = caller.Name,
+            [GatewayTokens.ScopeClaim] = GatewayTokens.AdminScope,
+        });
+    }
+
+    private string Issue(string audience, Dictionary<string, object> claims)
+    {
         var now = time.GetUtcNow();
 
         return handler.CreateToken(new SecurityTokenDescriptor
         {
             Issuer = GatewayTokens.Issuer,
-            Audience = caller.Audience,
-            Claims = new Dictionary<string, object>
-            {
-                [GatewayTokens.SubjectClaim] = caller.Subject,
-                [GatewayTokens.TenantIdClaim] = caller.TenantId.ToString(),
-                [GatewayTokens.ClientIdClaim] = caller.ClientId,
-                [GatewayTokens.ScopeClaim] = string.Join(GatewayTokens.ScopeSeparator, caller.Scopes),
-            },
+            Audience = audience,
+            Claims = claims,
             IssuedAt = now.UtcDateTime,
             NotBefore = now.UtcDateTime,
             Expires = (now + options.Value.Lifetime).UtcDateTime,

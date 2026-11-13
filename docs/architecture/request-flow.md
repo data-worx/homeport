@@ -1,25 +1,28 @@
 # Request flow
 
 How a request travels through Homeport, step by step: a call to a module,
-and a platform request that a platform service answers. Each flow is one
+a platform request that a platform service answers, and an admin request
+of the operator. Each flow is one
 sequence diagram of the successful path, followed by what can fail at each
 step and how Homeport answers it. The decisions behind it are
 [ADR-0011](adr/0011-gateway-issued-tokens-for-modules.md) (module tokens),
 [ADR-0014](adr/0014-authentication-between-services.md) (service tokens) and
 [ADR-0019](adr/0019-tokens-for-forwarded-platform-requests.md) (caller
-tokens); the binding rules are in the *Gateway* and *Service-to-service*
+tokens) and [ADR-0020](adr/0020-the-operator-as-a-caller.md) (the operator);
+the binding rules are in the *Gateway* and *Service-to-service*
 sections of [`AGENTS.md`](../../AGENTS.md#gateway).
 
 Every arrow that carries a token is drawn bold and names the token and its
-audience. Four tokens appear, and only the first comes from outside
+audience. Five tokens appear, and the first two come from outside
 Homeport:
 
 | Token | Issued by | Audience | Names a tenant |
 |---|---|---|---|
 | Client token | The operator's identity provider | Homeport, as the operator configures it | No; the gateway looks the tenant up |
+| Operator token | The operator's identity provider | The portal, as the operator configures it | No |
 | Service token | The gateway | The platform service it calls, such as `homeport-control-plane` | No |
 | Module token | The gateway | The module id, such as `echo` | Yes |
-| Caller token | The gateway | The platform service it forwards to, such as `homeport-metering` | Yes |
+| Caller token | The gateway | The platform service it forwards to, such as `homeport-metering` | Yes, except the operator's, of scope `admin` |
 
 ## A call to a module
 
@@ -166,3 +169,64 @@ tenant's data.
 | 11 | The caller token is invalid, names no tenant or lacks the scope | `401` or `403` from metering; cannot happen to a request through the gateway |
 | 11 | A parameter is missing or invalid | `400` [`validation`](../reference/problems/validation.md), with `errors` naming the parameter |
 | 12 | The read fails | `500` [`internal`](../reference/problems/internal.md) |
+
+## An admin request
+
+![An admin request: operator, portal, identity provider, the gateway's admin port, a platform service and PostgreSQL](request-flow-admin-request.drawio.svg)
+
+### What this diagram shows
+
+The operator signs in at the admin portal and the portal calls the admin
+API, which the gateway serves on its admin port only and forwards to the
+platform service that owns the data, such as the control plane. It shows
+one successful request and no error path. The admin endpoints of the
+services arrive with the admin portal; the gateway's side is in place
+([the admin API](../operators/admin-api.md)).
+
+The operator acts for no tenant. The gateway forwards with a **caller
+token** of scope `admin` that names the operator instead of a tenant and a
+client, and neither throttles nor meters the request.
+
+### Steps
+
+1. The operator opens the portal in the browser.
+2. The portal redirects the browser to the identity provider, with a PKCE
+   challenge (authorization code with PKCE).
+3. The operator signs in at the identity provider.
+4. The identity provider redirects the browser back to the portal with an
+   authorization code.
+5. The portal redeems the code with the PKCE verifier, from its server.
+6. The identity provider answers with the **operator token**, which stays
+   on the portal's server and never reaches the browser.
+7. The portal calls `/platform/v1/admin/...` on the gateway's admin port
+   with the operator token. The admin port is not published; the portal
+   reaches it on the internal network.
+8. The gateway validates the operator token: signature, issuer, the
+   audience configured for the admin API and expiry.
+9. The gateway checks the admin claim, such as `roles` with
+   `homeport-admin`, and that the token names a subject.
+10. The gateway forwards the request to the platform service as
+    `/v1/admin/...`, with a **caller token** for the service's audience
+    that names the operator's subject and display name, the scope `admin`
+    and no tenant. Admin routes are configured in the gateway, never
+    registered.
+11. The service validates the caller token against the gateway's JWKS, and
+    serves its admin endpoints on the scope `admin` only.
+12. The service reads or changes the data, and writes an audit entry with
+    the operator's subject and name in the same transaction where it
+    changes something or reads a tenant's data.
+13. PostgreSQL returns the rows.
+14. The service answers the gateway.
+15. The gateway answers the portal with the service's response.
+16. The portal renders the page for the operator.
+
+### What can fail
+
+| Step | What fails | Answer |
+|---|---|---|
+| 7 | The request goes to the public port | `404`, as for a path nothing is mounted at |
+| 7 | No token | `401` [`unauthorized`](../reference/problems/unauthorized.md) |
+| 8 | The token is expired, signed by another issuer or meant for another audience, such as a client token | `401` [`unauthorized`](../reference/problems/unauthorized.md) |
+| 9 | The token lacks the admin claim or a subject | `403` [`admin-claim-missing`](../reference/problems/admin-claim-missing.md) |
+| 10 | The service cannot be reached, is not available or does not answer in time | `502` [`module-unreachable`](../reference/problems/module-unreachable.md), `503` [`module-unavailable`](../reference/problems/module-unavailable.md) or `504` [`module-timeout`](../reference/problems/module-timeout.md), as for a module |
+| 11 | The caller token is invalid or lacks the scope `admin` | `401` or `403` from the service; cannot happen to a request through the gateway |
