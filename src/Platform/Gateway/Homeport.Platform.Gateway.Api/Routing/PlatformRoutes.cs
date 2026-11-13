@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Gateway.Api.Admin;
 using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Domain.ApiDocs;
 using Homeport.Shared.Client.Platform.Metering.V1;
@@ -16,8 +17,9 @@ namespace Homeport.Platform.Gateway.Api.Routing;
 /// (ADR-0019), and stand next to the module routes in every configuration.
 /// A platform route is authorised and throttled like a module route, but it
 /// is not metered: it carries no <see cref="ModuleRoutes.ModuleIdMetadata"/>.
+/// The <see cref="AdminRoutes"/> are platform routes too and stand next to them.
 /// </summary>
-public sealed class PlatformRoutes(IOptions<PlatformRoutesOptions> options)
+public sealed class PlatformRoutes(IOptions<PlatformRoutesOptions> options, AdminRoutes admin)
 {
     /// <summary>The prefix every platform endpoint is reached under.</summary>
     internal const string PlatformPrefix = "/platform";
@@ -25,7 +27,7 @@ public sealed class PlatformRoutes(IOptions<PlatformRoutesOptions> options)
     /// <summary>The route metadata that names the platform service a caller token is issued for.</summary>
     internal const string AudienceMetadata = "Audience";
 
-    /// <summary>The routes and clusters of the platform endpoints, one cluster per service.</summary>
+    /// <summary>The routes and clusters of the platform and admin endpoints, one cluster per service and kind.</summary>
     internal (IReadOnlyList<RouteConfig> Routes, IReadOnlyList<ClusterConfig> Clusters) Build()
     {
         var endpoints = Endpoints();
@@ -37,7 +39,9 @@ public sealed class PlatformRoutes(IOptions<PlatformRoutesOptions> options)
             .Select(endpoint => Route(endpoint.Method, endpoint.Path, endpoint.Scope, endpoint.Service.Audience, clusters[endpoint.Service.Name].ClusterId))
             .ToList();
 
-        return (routes, clusters.Values.ToList());
+        var (adminRoutes, adminClusters) = admin.Build();
+
+        return ([.. routes, .. adminRoutes], [.. clusters.Values, .. adminClusters]);
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -63,6 +64,11 @@ public sealed class RunningAppHost : IAsyncLifetime
 
     // Every replica is told where to listen; the dashboard shows only the proxy in front of them.
     private const string ListenUrlsVariable = "ASPNETCORE_URLS";
+
+    private const char ListenUrlsSeparator = ';';
+
+    // The port of the replica's admin endpoint, as the AppHost tells it.
+    private const string AdminPortVariable = "AdminApi__Port";
 
     /// <summary>The tenant the control plane seeds, as the AppHost's parameter names it.</summary>
     internal static readonly Guid SeededTenantId = Guid.Parse("3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61");
@@ -139,11 +145,16 @@ public sealed class RunningAppHost : IAsyncLifetime
         var addresses = new Dictionary<string, Uri>(StringComparer.Ordinal);
         await foreach (var update in App.ResourceNotifications.WatchAsync(timeout.Token))
         {
-            var listening = update.Snapshot.EnvironmentVariables
-                .FirstOrDefault(variable => variable.Name == ListenUrlsVariable)?.Value;
+            var variables = update.Snapshot.EnvironmentVariables;
+            var listening = variables.FirstOrDefault(variable => variable.Name == ListenUrlsVariable)?.Value;
+            var adminPort = variables.FirstOrDefault(variable => variable.Name == AdminPortVariable)?.Value;
             if (update.Resource.Name == "gateway" && update.Snapshot.HealthStatus == HealthStatus.Healthy && listening is not null)
             {
-                addresses[update.ResourceId] = new Uri(listening);
+                // The replica listens on its admin port too, which serves the admin API only.
+                addresses[update.ResourceId] = listening
+                    .Split(ListenUrlsSeparator)
+                    .Select(url => new Uri(url))
+                    .Single(url => url.Port.ToString(CultureInfo.InvariantCulture) != adminPort);
             }
 
             if (addresses.Count == replicas)

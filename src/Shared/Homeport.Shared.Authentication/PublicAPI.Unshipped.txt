@@ -33,10 +33,12 @@ Homeport.Shared.Authentication.PublicJsonWebKey.Y.get -> string!
 Homeport.Shared.Authentication.PublicJsonWebKey.Y.init -> void
 const Homeport.Shared.Authentication.GatewayTokenOptions.GatewayServiceName = "gateway" -> string!
 const Homeport.Shared.Authentication.GatewayTokenOptions.SectionName = "GatewayTokens" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.AdminScope = "admin" -> string!
 const Homeport.Shared.Authentication.GatewayTokens.ClientIdClaim = "client_id" -> string!
 const Homeport.Shared.Authentication.GatewayTokens.GatewaySubject = "homeport-gateway" -> string!
 const Homeport.Shared.Authentication.GatewayTokens.Issuer = "homeport-gateway" -> string!
 const Homeport.Shared.Authentication.GatewayTokens.JwksPath = "/.well-known/jwks.json" -> string!
+const Homeport.Shared.Authentication.GatewayTokens.NameClaim = "name" -> string!
 const Homeport.Shared.Authentication.GatewayTokens.ScopeClaim = "scope" -> string!
 const Homeport.Shared.Authentication.GatewayTokens.ScopeSeparator = ' ' -> char
 const Homeport.Shared.Authentication.GatewayTokens.SigningAlgorithm = "ES256" -> string!

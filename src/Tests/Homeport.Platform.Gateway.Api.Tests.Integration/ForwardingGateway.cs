@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net.Mime;
+using Homeport.Platform.Gateway.Api.Admin;
 using Homeport.Shared.Client.ModuleContract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,7 +21,9 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 /// gateway forwards, except for the paths under <see cref="ErrorsPath"/>, which
 /// answer with an error, and <see cref="UsagePath"/>, which reports usage.
 /// The platform routes go to a stand-in for metering, which answers every
-/// request the same way. Clients authenticate with a stand-in identity
+/// request the same way; so does the stand-in admin endpoint at
+/// <see cref="AdminPath"/>, served on <see cref="AdminPort"/> for the
+/// operator's tokens. Clients authenticate with a stand-in identity
 /// provider and are looked up at a stand-in control plane, and draw from
 /// <see cref="Buckets"/> rather than Valkey. What the gateway
 /// logs, down to Debug, is read from <see cref="Logs"/>, and the messages it
@@ -57,6 +60,18 @@ public sealed class ForwardingGateway : IAsyncLifetime
 
     internal const string InternalDetail = "Password=hunter2 rejected by the database.";
 
+    /// <summary>The port the admin API answers on, as the requests of <see cref="CreateAdminClient"/> arrive.</summary>
+    internal const int AdminPort = 8081;
+
+    /// <summary>The stand-in admin endpoint, at the service behind it: metering's stand-in.</summary>
+    internal const string AdminServicePath = "/v1/admin/stand-in";
+
+    /// <summary>The stand-in admin endpoint, at the gateway.</summary>
+    internal const string AdminPath = "/platform" + AdminServicePath;
+
+    /// <summary>The audience of the service behind the stand-in admin endpoint.</summary>
+    internal const string AdminServiceAudience = "homeport-stand-in";
+
     // Logs at Information only when the routes changed.
     private const string PollerCategory = "Homeport.Platform.Gateway.Api.Routing.RouteTablePoller";
 
@@ -73,6 +88,18 @@ public sealed class ForwardingGateway : IAsyncLifetime
     /// <summary>A client of the gateway with a token of a client the control plane knows.</summary>
     internal HttpClient CreateClient() =>
         Started.CreateClient().WithToken(IdentityProvider.Issue(StandInControlPlane.KnownClientId));
+
+    /// <summary>A client whose requests arrive on the admin port, with <paramref name="token"/> if there is one.</summary>
+    internal HttpClient CreateAdminClient(string? token = null)
+    {
+        var server = Started.Server;
+        var client = new HttpClient(server.CreateHandler(context => context.Connection.LocalPort = AdminPort))
+        {
+            BaseAddress = server.BaseAddress,
+        };
+
+        return token is null ? client : client.WithToken(token);
+    }
 
     /// <summary>A client of the gateway without a token.</summary>
     internal HttpClient CreateAnonymousClient() =>
@@ -133,6 +160,10 @@ public sealed class ForwardingGateway : IAsyncLifetime
                 .WithRegistry(registry)
                 .WithClients(identityProvider, controlPlane)
                 .UseSetting("PlatformRoutes:MeteringUrl", metering.Urls.Single())
+                .WithAdminApi(
+                    AdminPort,
+                    identityProvider,
+                    new AdminEndpoint(HttpMethods.Get, AdminServicePath, new AdminService("stand-in", AdminServiceAudience, new Uri(metering.Urls.Single()))))
                 .ConfigureLogging(logging => logging.AddFakeLogging().SetMinimumLevel(LogLevel.Debug)));
         await WaitForRoutesAsync(gateway);
     }

@@ -28,6 +28,7 @@ gateway replaces, unless a type below applies; see
 
 | Type | Status | Page |
 |---|---|---|
+| `https://homeport.data-worx.de/problems/admin-claim-missing` | 403 | [admin-claim-missing](admin-claim-missing.md) |
 | `https://homeport.data-worx.de/problems/control-plane-unavailable` | 503 | [control-plane-unavailable](control-plane-unavailable.md) |
 | `https://homeport.data-worx.de/problems/insufficient-scope` | 403 | [insufficient-scope](insufficient-scope.md) |
 | `https://homeport.data-worx.de/problems/internal` | 500 | [internal](internal.md) |

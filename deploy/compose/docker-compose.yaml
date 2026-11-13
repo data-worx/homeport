@@ -55,7 +55,7 @@ services:
     networks:
       - "aspire"
   keycloak:
-    image: "quay.io/keycloak/keycloak:26.8@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b"
+    image: "quay.io/keycloak/keycloak:26.8@sha256:c68e286cacd87b942ac1939a0a1481461109d6acd3a57dc496969a319a76bbf0"
     command:
       - "start-dev"
       - "--import-realm"
@@ -96,6 +96,8 @@ services:
       GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
       services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
       GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
+      GATEWAY_ADMIN: "http://gateway:8000"
+      services__gateway__admin__0: "http://gateway:8000"
     expose:
       - "${REGISTRY_PORT}"
     depends_on:
@@ -119,6 +121,8 @@ services:
       GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
       services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
       GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
+      GATEWAY_ADMIN: "http://gateway:8000"
+      services__gateway__admin__0: "http://gateway:8000"
     expose:
       - "${ECHO_PORT}"
     networks:
@@ -127,7 +131,7 @@ services:
     image: "${GATEWAY_IMAGE}"
     environment:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
-      HTTP_PORTS: "${GATEWAY_PORT}"
+      HTTP_PORTS: "${GATEWAY_PORT};8000"
       OTEL_SERVICE_NAME: "homeport-gateway"
       Signing__Key: "${GATEWAY_SIGNING_KEY}"
       Signing__KeyId: "${GATEWAY_SIGNING_KEY_ID}"
@@ -145,12 +149,18 @@ services:
       VALKEY_PORT: "6379"
       VALKEY_PASSWORD: "${VALKEY_PASSWORD}"
       VALKEY_URI: "valkey://:${VALKEY_PASSWORD}@valkey:6379"
+      AdminApi__Port: "8000"
+      AdminApi__Authority: "http://keycloak:8080/realms/homeport"
+      AdminApi__Audience: "homeport-portal"
+      AdminApi__RequireHttpsMetadata: "False"
       CONTROL_PLANE_HTTP: "http://control-plane:${CONTROL_PLANE_PORT}"
       services__control-plane__http__0: "http://control-plane:${CONTROL_PLANE_PORT}"
       CONTROL_PLANE_HTTPS: "https://control-plane:${CONTROL_PLANE_PORT}"
       PlatformRoutes__MeteringUrl: "http://metering:${METERING_PORT}"
     ports:
       - "${GATEWAY_PORT}"
+    expose:
+      - "8000"
     depends_on:
       rabbitmq:
         condition: "service_started"
@@ -191,6 +201,8 @@ services:
       GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
       services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
       GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
+      GATEWAY_ADMIN: "http://gateway:8000"
+      services__gateway__admin__0: "http://gateway:8000"
     expose:
       - "${CONTROL_PLANE_PORT}"
     depends_on:
@@ -223,6 +235,8 @@ services:
       GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
       services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
       GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
+      GATEWAY_ADMIN: "http://gateway:8000"
+      services__gateway__admin__0: "http://gateway:8000"
     expose:
       - "${METERING_PORT}"
     depends_on:

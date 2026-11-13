@@ -19,6 +19,11 @@ public sealed class ModuleTokenIssuerTests
             "service-account-local-client",
             ["echo.invoke", "usage.read"]);
 
+        private static readonly OperatorCaller Operator = new(
+            "homeport-control-plane",
+            "2b8d7c1e-4f6a-4b3d-8e9f-0a1b2c3d4e5f",
+            "Ada Operator");
+
         private readonly SigningKeys keys = TestKeys.Keys();
         private readonly SteppingTimeProvider time = new();
 
@@ -59,6 +64,44 @@ public sealed class ModuleTokenIssuerTests
             var token = new JsonWebToken(Issuer().Issue(Caller));
 
             Assert.Equal(TimeSpan.FromSeconds(60), token.ValidTo - token.IssuedAt);
+        }
+
+        [Fact]
+        public async Task Issues_An_Operator_Token_The_Service_Accepts_Against_The_Jwks()
+        {
+            var token = Issuer().Issue(Operator);
+
+            var result = await new JsonWebTokenHandler().ValidateTokenAsync(
+                token,
+                GatewayTokens.ValidationParameters("homeport-control-plane", new JsonWebKeySet(JsonSerializer.Serialize(keys.Jwks)).GetSigningKeys()));
+
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public void Carries_The_Operators_Subject_Name_And_The_Admin_Scope()
+        {
+            var token = new JsonWebToken(Issuer().Issue(Operator));
+
+            Assert.Equal(
+                ("2b8d7c1e-4f6a-4b3d-8e9f-0a1b2c3d4e5f", "Ada Operator", "admin"),
+                (token.Subject, token.GetClaim("name").Value, token.GetClaim("scope").Value));
+        }
+
+        [Fact]
+        public void Names_Neither_Tenant_Nor_Client_In_An_Operator_Token()
+        {
+            var token = new JsonWebToken(Issuer().Issue(Operator));
+
+            Assert.False(token.TryGetClaim("tenant_id", out _) || token.TryGetClaim("client_id", out _));
+        }
+
+        [Fact]
+        public void Issues_An_Operator_Token_For_The_Configured_Lifetime()
+        {
+            var token = new JsonWebToken(Issuer(TimeSpan.FromSeconds(30)).Issue(Operator));
+
+            Assert.Equal(TimeSpan.FromSeconds(30), token.ValidTo - token.IssuedAt);
         }
 
         public void Dispose()

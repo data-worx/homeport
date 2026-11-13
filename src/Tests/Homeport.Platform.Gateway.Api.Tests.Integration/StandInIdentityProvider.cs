@@ -13,13 +13,30 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 /// <summary>
 /// A stand-in for the operator's identity provider on a local port: it serves
 /// OpenID Connect metadata and the JWKS of its key, and issues
-/// client-credentials tokens signed with that key.
+/// client-credentials tokens, and the operator's tokens for the admin API,
+/// signed with that key.
 /// </summary>
 internal sealed class StandInIdentityProvider : IAsyncDisposable
 {
     internal const string Audience = "homeport";
 
     internal const string ClientIdClaim = "azp";
+
+    /// <summary>The audience of the operator's tokens, which the admin API accepts.</summary>
+    internal const string OperatorAudience = "homeport-portal";
+
+    /// <summary>The subject of the operator's tokens.</summary>
+    internal const string OperatorSubject = "2b8d7c1e-4f6a-4b3d-8e9f-0a1b2c3d4e5f";
+
+    /// <summary>The display name of the operator's tokens.</summary>
+    internal const string OperatorName = "Ada Operator";
+
+    /// <summary>The role that grants admin access, as the gateway's default claim expects it.</summary>
+    internal const string AdminRole = "homeport-admin";
+
+    private const string RolesClaim = "roles";
+
+    private const string NameClaim = "name";
 
     /// <summary>The scopes every token grants unless a test asks for others.</summary>
     internal const string DefaultScopes = "echo.invoke usage.read";
@@ -87,6 +104,34 @@ internal sealed class StandInIdentityProvider : IAsyncDisposable
     internal string IssueWithoutClientId()
     {
         return Sign(null, Issuer, Audience, new ECDsaSecurityKey(key) { KeyId = KeyId });
+    }
+
+    /// <summary>
+    /// An operator's token for <see cref="OperatorAudience"/> with the subject
+    /// <see cref="OperatorSubject"/>, <paramref name="roles"/> as a list, and
+    /// the name <see cref="OperatorName"/> unless <paramref name="withName"/>
+    /// is false.
+    /// </summary>
+    internal string IssueOperator(string[] roles, bool withName = true)
+    {
+        var now = TimeProvider.System.GetUtcNow().UtcDateTime;
+        var claims = new ClaimsIdentity([new Claim(JwtRegisteredClaimNames.Sub, OperatorSubject)]);
+        claims.AddClaims(roles.Select(role => new Claim(RolesClaim, role)));
+        if (withName)
+        {
+            claims.AddClaim(new Claim(NameClaim, OperatorName));
+        }
+
+        return new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor
+        {
+            Issuer = Issuer,
+            Audience = OperatorAudience,
+            Subject = claims,
+            IssuedAt = now,
+            NotBefore = now,
+            Expires = now + Lifetime,
+            SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(key) { KeyId = KeyId }, SecurityAlgorithms.EcdsaSha256),
+        });
     }
 
     public async ValueTask DisposeAsync()

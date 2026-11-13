@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Gateway.Api.Admin;
 using Homeport.Platform.Gateway.Api.ApiDocs;
 using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Api.Errors;
@@ -23,7 +24,8 @@ namespace Homeport.Platform.Gateway.Api;
 /// The gateway: the one entry point of Homeport, which forwards
 /// <c>/modules/{moduleId}/{path}</c> to the module on the routes the registry
 /// knows, and <c>/platform/{path}</c> to the platform service behind it, for
-/// clients the control plane knows, and issues the tokens
+/// clients the control plane knows, and the admin API on a port of its own
+/// for the operator (ADR-0020), and issues the tokens
 /// Homeport's components trust. Every error it answers with is Problem
 /// Details (ADR-0016).
 /// </summary>
@@ -46,6 +48,7 @@ public sealed class Program
         builder.Services.AddRegistryClient();
         builder.Services.AddControlPlaneClient();
         builder.Services.AddClientAuthentication();
+        builder.Services.AddAdminApi();
         builder.AddUsagePublishing();
         builder.AddThrottling();
         builder.Services.AddControllers();
@@ -92,6 +95,10 @@ public sealed class Program
         // become Problem Details.
         app.UseExceptionHandler();
         app.UseStatusCodePages();
+
+        // Before any token is looked at: the admin API exists on the admin
+        // port only, and the admin port serves nothing else (ADR-0020).
+        app.UseMiddleware<AdminPortBoundary>();
 
         app.MapDefaultEndpoints();
         app.UseAuthentication();
@@ -141,9 +148,10 @@ public sealed class Program
             var proxies = app.Services.GetRequiredService<IOptions<TrustedProxiesOptions>>().Value;
             var docs = app.Services.GetRequiredService<IOptions<ApiDocsOptions>>().Value;
             var platform = app.Services.GetRequiredService<IOptions<PlatformRoutesOptions>>().Value;
+            var admin = app.Services.GetRequiredService<IOptions<AdminApiOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, usage from {MeteringUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, usage from {MeteringUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}, admin API {AdminApi}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
@@ -159,7 +167,10 @@ public sealed class Program
                 usage.EffectiveRetryDelays,
                 proxies.Proxies.Count == 0 ? None : string.Join(", ", proxies.Proxies),
                 proxies.Networks.Count == 0 ? None : string.Join(", ", proxies.Networks),
-                docs.Enabled ? "on" : "off");
+                docs.Enabled ? "on" : "off",
+                admin.Port is { } adminPort
+                    ? $"on port {adminPort} for operator tokens from {admin.Authority} for {admin.Audience} with {admin.ClaimType} = {admin.ClaimValue}"
+                    : "off");
         });
     }
 }

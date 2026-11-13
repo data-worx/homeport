@@ -31,6 +31,12 @@ public static class Program
     private const string Realm = "homeport";
     private const string Audience = "homeport";
 
+    // The audience of the operator's tokens, which the gateway's admin API accepts (ADR-0020).
+    private const string AdminAudience = "homeport-portal";
+
+    // The gateway's second endpoint, which serves the admin API only.
+    private const string GatewayAdminEndpoint = "admin";
+
     // Keycloak's port on the host, fixed so its issuer is the same for a
     // client on the host and for the gateway on the compose network.
     private const int KeycloakPort = 8080;
@@ -112,7 +118,7 @@ public static class Program
         var seedClientId = builder.AddParameter("seed-client-id", new LocalDefault("local-client"));
         var keycloakHostAddress = $"{Uri.UriSchemeHttp}://localhost:{KeycloakPort}";
         var keycloak = builder.AddKeycloak("keycloak", port: KeycloakPort)
-            .WithImageTag("26.8@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b")
+            .WithImageTag("26.8@sha256:c68e286cacd87b942ac1939a0a1481461109d6acd3a57dc496969a319a76bbf0")
             .WithRealmImport(Realms)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_ID", seedClientId)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_SECRET", builder.AddParameter("local-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
@@ -190,8 +196,21 @@ public static class Program
             .WaitFor(valkey)
             .WithReplicas(GatewayReplicas)
 
+            // The admin API's own endpoint, added after the external ones, so
+            // it stays internal: the compose file exposes it on the network
+            // and publishes no port for it (ADR-0020).
+            .WithHttpEndpoint(name: GatewayAdminEndpoint)
+
             // The compose publisher does not take the replicas from the model.
             .PublishAsDockerComposeService((_, service) => service.Deploy = new Deploy { Replicas = GatewayReplicas });
+
+        // The gateway tells the admin endpoint apart by the port a request
+        // arrives on, and accepts operator tokens from the same realm.
+        gateway
+            .WithEnvironment("AdminApi__Port", gateway.GetEndpoint(GatewayAdminEndpoint).Property(EndpointProperty.TargetPort))
+            .WithEnvironment("AdminApi__Authority", ReferenceExpression.Create($"{keycloak.GetEndpoint(Uri.UriSchemeHttp)}/realms/{Realm}"))
+            .WithEnvironment("AdminApi__Audience", AdminAudience)
+            .WithEnvironment("AdminApi__RequireHttpsMetadata", bool.FalseString);
 
         // The registry validates the gateway's service tokens against its JWKS,
         // and Echo its module tokens.
