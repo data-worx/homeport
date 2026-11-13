@@ -4,7 +4,7 @@
 // </auto-generated>
 using MudBlazor;
 
-namespace Homeport.Portal.Theming;
+namespace Homeport.Platform.Portal.Theming;
 
 /// <summary>Homeport design tokens as a MudBlazor theme. Light = harbor at dawn, dark = harbor at night.</summary>
 public static class HomeportTheme
