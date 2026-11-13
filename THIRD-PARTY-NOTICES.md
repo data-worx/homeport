@@ -71,14 +71,14 @@ asset change; the `notices` gate fails while it is stale.
 | Npgsql.DependencyInjection | 10.0.3 | PostgreSQL | Copyright 2025 © The Npgsql Development Team |
 | Npgsql.EntityFrameworkCore.PostgreSQL | 10.0.3 | PostgreSQL | Copyright 2025 © The Npgsql Development Team |
 | Npgsql.OpenTelemetry | 10.0.3 | PostgreSQL | Copyright 2025 © The Npgsql Development Team |
-| OpenTelemetry | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Api | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Api.ProviderBuilderExtensions | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Exporter.OpenTelemetryProtocol | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Extensions.Hosting | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Instrumentation.AspNetCore | 1.20.2 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Instrumentation.Http | 1.20.2 | Apache-2.0 | Copyright The OpenTelemetry Authors |
-| OpenTelemetry.Instrumentation.Runtime | 1.20.1 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Api | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Api.ProviderBuilderExtensions | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Exporter.OpenTelemetryProtocol | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Extensions.Hosting | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Instrumentation.AspNetCore | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Instrumentation.Http | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| OpenTelemetry.Instrumentation.Runtime | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
 | Pipelines.Sockets.Unofficial | 2.2.16 | MIT | Marc Gravell 2018 |
 | Polly.Core | 8.4.2 | BSD-3-Clause | Copyright (c) 2024, App vNext |
 | Polly.Core | 8.6.5 | BSD-3-Clause | Copyright (c) 2015-2025, App vNext |
@@ -95,6 +95,7 @@ asset change; the `notices` gate fails while it is stale.
 | System.Composition.Hosting | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Composition.Runtime | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Composition.TypedParts | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
+| System.Diagnostics.DiagnosticSource | 11.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.IdentityModel.Tokens.Jwt | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.IO.Hashing | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Linq.Dynamic.Core | 1.7.4 | Apache-2.0 | Copyright © ZZZ Projects |
