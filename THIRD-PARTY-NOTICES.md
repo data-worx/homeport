@@ -28,7 +28,7 @@ asset change; the `notices` gate fails while it is stale.
 | JasperFx | 2.100.1 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
 | JasperFx.Events | 2.100.1 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
 | JasperFx.RuntimeCompiler | 5.1.0 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
-| Microsoft.AspNetCore.Authentication.JwtBearer | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
+| Microsoft.AspNetCore.Authentication.JwtBearer | 10.0.15 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.AspNetCore.OpenApi | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Bcl.AsyncInterfaces | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Bcl.Cryptography | 10.0.2 | MIT | © Microsoft Corporation. All rights reserved. |
