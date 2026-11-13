@@ -27,4 +27,5 @@ extension `errors` lists every failure, keyed by field path:
   same way.
 
 A rule of the domain answers the same way, such as a tenant's name that
-another tenant has: `"errors": { "name": ["A tenant named 'Sales' already exists."] }`.
+another tenant has: `"errors": { "name": ["A tenant named 'Sales' already exists."] }`,
+or a plan's burst of zero: `"errors": { "burst": ["The burst must be at least 1."] }`.

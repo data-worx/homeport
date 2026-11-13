@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The operator manages plans in the admin portal: a list with the rate
+  limit and the number of clients of each plan, dialogs to create and
+  change one, and delete with a confirmation. A plan's name is unique,
+  compared case-sensitively, and its requests per second and burst are
+  positive. A changed plan takes effect at the gateway within
+  `ControlPlane:ClientCacheLifetime`, one minute by default. See
+  [the admin portal](docs/operators/admin-portal.md#plans).
+
+- The admin API serves `GET`, `POST`, `PUT` and `DELETE` under
+  `/platform/v1/admin/plans`, each change with its audit entry. A plan that
+  a client uses is not deleted; the answer is `409` with the new problem
+  type [`plan-in-use`](docs/reference/problems/plan-in-use.md). See
+  [the admin API](docs/operators/admin-api.md#endpoints).
+
 - The operator manages tenants in the admin portal: a list with search, and
   dialogs to create and rename a tenant. A tenant's name is unique,
   compared case-sensitively. The pages show every problem of the admin API

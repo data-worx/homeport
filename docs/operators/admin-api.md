@@ -63,6 +63,11 @@ The request and response types are in `Homeport.Shared.Client`, namespace
 | `POST /platform/v1/admin/tenants` | control plane | `{ "name": "Sales" }` | `201` with the new tenant and its address in `Location` |
 | `GET /platform/v1/admin/tenants/{tenantId}` | control plane | — | `200` with the tenant, `404` for an unknown id |
 | `PUT /platform/v1/admin/tenants/{tenantId}` | control plane | `{ "name": "Sales EMEA" }` | `200` with the renamed tenant, `404` for an unknown id |
+| `GET /platform/v1/admin/plans` | control plane | — | `200` with every plan, ordered by name: id, name, requests per second, burst and number of clients |
+| `POST /platform/v1/admin/plans` | control plane | `{ "name": "Gold", "requestsPerSecond": 50, "burst": 100 }` | `201` with the new plan and its address in `Location` |
+| `GET /platform/v1/admin/plans/{planId}` | control plane | — | `200` with the plan, `404` for an unknown id |
+| `PUT /platform/v1/admin/plans/{planId}` | control plane | `{ "name": "Gold", "requestsPerSecond": 80, "burst": 160 }` | `200` with the changed plan, `404` for an unknown id |
+| `DELETE /platform/v1/admin/plans/{planId}` | control plane | — | `204`, `404` for an unknown id, `409` for a plan a client uses |
 
 A tenant's name is required, at most 200 characters, and unique among
 tenants. Surrounding whitespace is dropped. Names are compared
@@ -72,15 +77,31 @@ rule is answered with `400` and the problem type
 `errors.name`. A tenant is neither deleted nor suspended through the admin
 API.
 
+A plan's name follows the same rules among plans. Its requests per second
+and its burst are both at least 1; a burst below the rate is allowed. A
+value that breaks a rule is answered with `400` and `validation`, the
+message under `errors.name`, `errors.requestsPerSecond` or `errors.burst`.
+A plan is deleted only while no client uses it; otherwise the answer is
+`409` with the problem type
+[`plan-in-use`](../reference/problems/plan-in-use.md) and nothing changes.
+
+A changed plan takes effect at the gateway once it looks the client up
+again: the gateway keeps the plan it looked up with a client for
+`ControlPlane:ClientCacheLifetime`, one minute by default (see
+[throttling](throttling.md#plan-limits)). Until then a client keeps the
+limits it had.
+
 ## Audit
 
 Every change through the admin API writes an entry into the audit table of
 the service that owns the data, in the same transaction as the change: so
 far `control_plane.audit_entries`. An entry records when, the operator's
 subject and display name as the caller token named them, what was done
-(`tenant.created`, `tenant.renamed`), what it was done to
-(`tenants/<id>`) and a sentence for the reader. Renaming a tenant to the
-name it already has changes nothing and writes no entry.
+(`tenant.created`, `tenant.renamed`, `plan.created`, `plan.changed`,
+`plan.deleted`), what it was done to (`tenants/<id>`, `plans/<id>`) and a
+sentence for the reader with the values before and after. Renaming a tenant
+to the name it already has, or saving a plan unchanged, changes nothing and
+writes no entry; neither does a change the admin API refuses.
 
 The service's app role may only add entries and read them; it can neither
 change nor delete one. Homeport never deletes an entry. The entries hold

@@ -7,7 +7,7 @@ a Blazor Server application, so your tokens stay on its server and never
 reach the browser.
 
 You sign in, see who you are signed in as, sign out, and manage the
-tenants. The pages for plans, clients, modules, usage and the audit log
+tenants and plans. The pages for clients, modules, usage and the audit log
 follow, each with its own entry in the navigation. Every page calls the
 [admin API](admin-api.md) at the gateway's admin port, as you.
 
@@ -54,6 +54,33 @@ placeholder rows; when it cannot be loaded, the problem and *Try again*.
 
 Each change is recorded in the audit log with your subject and display name
 (see [the admin API](admin-api.md#audit)).
+
+## Plans
+
+*Plans* lists every plan with its requests per second, its burst and the
+number of clients that use it. Selecting a plan shows its facts next to the
+list.
+
+![The plan list with two plans and the facts of the selected one](admin-portal-plans.png)
+
+*Add plan* asks for a name, the requests per second and the burst; *Change*
+edits the selected plan. The name must be unique among plans, compared
+case-sensitively, and both limits must be at least 1; a burst below the
+rate is allowed. When the admin API refuses a value, the dialog puts the
+reason at its field.
+
+*Delete* asks before it deletes the selected plan. A plan that a client
+uses is not deleted; the dialog then shows the problem
+[`plan-in-use`](../reference/problems/plan-in-use.md) with the trace id:
+
+![The delete dialog with the problem that the plan is in use](admin-portal-plans-in-use.png)
+
+A changed plan reaches the gateway once it looks a client up again, after
+the gateway's `ControlPlane:ClientCacheLifetime` — one minute by default.
+Until then the plan's clients keep their old limits. A deleted plan was used
+by no client, so nothing changes at the gateway.
+
+Each change is recorded in the audit log, as for tenants.
 
 ## Configuration
 
