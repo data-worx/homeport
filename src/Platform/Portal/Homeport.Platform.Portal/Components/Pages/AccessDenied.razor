@@ -1,0 +1,15 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/access-denied"
+@attribute [AllowAnonymous]
+@attribute [ExcludeFromInteractiveRouting]
+@layout PlainLayout
+
+<PageTitle>Access denied · Homeport</PageTitle>
+
+<ErrorPanel Title="Access denied" Message="You are signed in, but not as a Homeport operator.">
+    <MudAlert Severity="Severity.Error">Your account has no Homeport role. Ask your platform admin.</MudAlert>
+    <form method="post" action="@PortalPaths.SignOut">
+        <AntiforgeryToken />
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" FullWidth="true">Sign in with another account</MudButton>
+    </form>
+</ErrorPanel>

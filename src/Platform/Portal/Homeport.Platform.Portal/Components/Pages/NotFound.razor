@@ -1,0 +1,11 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/not-found"
+@attribute [AllowAnonymous]
+@attribute [ExcludeFromInteractiveRouting]
+@layout PlainLayout
+
+<PageTitle>Page not found · Homeport</PageTitle>
+
+<ErrorPanel Title="@ErrorTexts.NotFoundTitle" Message="@ErrorTexts.NotFoundMessage">
+    <MudButton Href="" Variant="Variant.Text" Color="Color.Primary">Back to Homeport</MudButton>
+</ErrorPanel>

@@ -1,0 +1,46 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+.hp-plain {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    background: var(--mud-palette-background);
+}
+
+.hp-plain-center {
+    display: grid;
+    place-items: center;
+    padding: 32px 16px;
+}
+
+::deep .hp-plain-box {
+    width: 100%;
+    max-width: 400px;
+    padding: 32px;
+    display: grid;
+    gap: 20px;
+    justify-items: stretch;
+}
+
+.hp-plain-lockup {
+    height: 52px;
+    width: auto;
+    justify-self: start;
+}
+
+.hp-plain-art {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    opacity: 0.9;
+}
+
+.hp-plain-art img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* FocusOnNavigate focuses the page title for screen readers; it needs no ring. */
+::deep h1:focus {
+    outline: none;
+}

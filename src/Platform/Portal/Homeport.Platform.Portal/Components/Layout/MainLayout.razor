@@ -18,6 +18,21 @@
         <MudSpacer />
         <MudIconButton Icon="@(_dark ? HomeportIcons.Lucide.Sun : HomeportIcons.Lucide.Moon)" Color="Color.Inherit"
                        aria-label="Switch light or dark theme" OnClick="ToggleDarkMode" />
+        <AuthorizeView Context="auth">
+            <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" aria-label="Operator menu">
+                <ActivatorContent>
+                    <MudButton Variant="Variant.Text" Color="Color.Inherit" EndIcon="@HomeportIcons.Lucide.ChevronDown">
+                        @auth.User.Identity?.Name
+                    </MudButton>
+                </ActivatorContent>
+                <ChildContent>
+                    <form method="post" action="@PortalPaths.SignOut" class="px-2">
+                        <AntiforgeryToken />
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Text" FullWidth="true">Sign out</MudButton>
+                    </form>
+                </ChildContent>
+            </MudMenu>
+        </AuthorizeView>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Mini" Elevation="0">
         <NavMenu />

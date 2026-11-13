@@ -1,0 +1,22 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@inherits LayoutComponentBase
+
+@* The pages outside the shell: sign-in and the error pages. Static, light,
+   and the only ones that show the lockup. *@
+<MudThemeProvider Theme="_theme" />
+
+<div class="hp-plain">
+    <main class="hp-plain-center">
+        <MudPaper Outlined="true" Elevation="2" Class="hp-plain-box">
+            <img src="@Assets["homeport-lockup.svg"]" alt="Homeport" class="hp-plain-lockup" />
+            @Body
+        </MudPaper>
+    </main>
+    <div class="hp-plain-art" aria-hidden="true">
+        <img src="@Assets["hero-home-port.svg"]" alt="" />
+    </div>
+</div>
+
+@code {
+    private readonly MudTheme _theme = HomeportTheme.Create();
+}

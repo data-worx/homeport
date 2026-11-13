@@ -14,18 +14,22 @@
     <DesignKit>..\..\..\..\design\</DesignKit>
   </PropertyGroup>
 
-  <!-- The design kit is the source of the theme, the stylesheet, the fonts
-       and the logo; the portal links them rather than keeping copies. The
-       fonts are served by the portal itself, never from a CDN. -->
+  <!-- The design kit is the source of the theme, the stylesheet, the fonts,
+       the logos and the illustration; the portal links them rather than
+       keeping copies, and serves them itself, never from a CDN. ContentRoot
+       is the directory the published path is relative to, so the files are
+       served from design/ while developing. -->
   <ItemGroup>
     <Compile Include="$(DesignKit)dist\HomeportTheme.cs" Link="Theming\HomeportTheme.cs" />
     <Compile Include="$(DesignKit)dist\HomeportIcons.cs" Link="Theming\HomeportIcons.cs" />
     <Content Include="$(DesignKit)dist\portal.css" Link="wwwroot\portal.css" ContentRoot="$(DesignKit)dist\" />
     <Content Include="$(DesignKit)fonts\*.woff2" Link="wwwroot\fonts\%(Filename)%(Extension)" ContentRoot="$(DesignKit)" />
-    <Content Include="$(DesignKit)assets\logos\favicon.svg;$(DesignKit)assets\logos\homeport-icon-mono-white.svg" Link="wwwroot\%(Filename)%(Extension)" ContentRoot="$(DesignKit)assets\logos\" />
+    <Content Include="$(DesignKit)assets\logos\favicon.svg;$(DesignKit)assets\logos\homeport-icon-mono-white.svg;$(DesignKit)assets\logos\homeport-lockup.svg" Link="wwwroot\%(Filename)%(Extension)" ContentRoot="$(DesignKit)assets\logos\" />
+    <Content Include="$(DesignKit)assets\illustrations\hero-home-port.svg" Link="wwwroot\%(Filename)%(Extension)" ContentRoot="$(DesignKit)assets\illustrations\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="MudBlazor" />
   </ItemGroup>
 

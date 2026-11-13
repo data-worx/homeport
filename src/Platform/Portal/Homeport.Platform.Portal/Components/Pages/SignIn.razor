@@ -1,0 +1,42 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/sign-in"
+@attribute [AllowAnonymous]
+@attribute [ExcludeFromInteractiveRouting]
+@layout PlainLayout
+@inject IOptions<SignInOptions> SignInOptions
+
+<PageTitle>Sign in · Homeport</PageTitle>
+
+<div>
+    <MudText Typo="Typo.h4" HtmlTag="h1">Sign in</MudText>
+    <MudText Class="mud-text-secondary">Use your company account. Homeport never sees your password.</MudText>
+</div>
+
+@if (Reason == PortalPaths.HttpsRequiredReason)
+{
+    <MudAlert Severity="Severity.Error">Sign-in needs HTTPS. Open the portal at its HTTPS address.</MudAlert>
+}
+
+<MudButton Href="@StartHref" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth="true"
+           EndIcon="@HomeportIcons.Lucide.LogIn">
+    Sign in with your company account
+</MudButton>
+
+<MudText Typo="Typo.body2" Class="mud-text-secondary">
+    You will be redirected to <span class="hp-mono">@IdentityProviderHost</span>. Trouble signing in? Ask your platform admin.
+</MudText>
+
+@code {
+    [SupplyParameterFromQuery(Name = PortalPaths.ReasonParameter)]
+    private string? Reason { get; set; }
+
+    [SupplyParameterFromQuery(Name = PortalPaths.ReturnUrlParameter)]
+    private string? ReturnUrl { get; set; }
+
+    // The start checks that the page to return to belongs to the portal.
+    private string StartHref => ReturnUrl is null
+        ? PortalPaths.SignInStart
+        : new PathString(PortalPaths.SignInStart).Add(QueryString.Create(PortalPaths.ReturnUrlParameter, ReturnUrl));
+
+    private string? IdentityProviderHost => SignInOptions.Value.Authority?.Authority;
+}
