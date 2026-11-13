@@ -34,6 +34,10 @@ public sealed class RunningControlPlane : IAsyncLifetime
 {
     internal const string ClientId = "known-client";
 
+    internal const string OperatorSubject = "8d2f6a1e-operator";
+
+    internal const string OperatorName = "Dev Operator";
+
     private const string LocalAddress = "http://127.0.0.1:0";
 
     private const string Database = "homeport";
@@ -86,18 +90,51 @@ public sealed class RunningControlPlane : IAsyncLifetime
     /// <summary>A client that sends a gateway service token for the control plane.</summary>
     internal HttpClient CreateGatewayClient()
     {
-        var client = Started.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, ServiceToken());
-        return client;
+        return ClientWith(Token([new Claim(JwtRegisteredClaimNames.Sub, GatewayTokens.GatewaySubject)]));
+    }
+
+    /// <summary>
+    /// A client that sends the caller token the gateway forwards the operator
+    /// with (ADR-0020): subject <see cref="OperatorSubject"/>, name
+    /// <see cref="OperatorName"/>, scope <c>admin</c>, no tenant.
+    /// </summary>
+    internal HttpClient CreateOperatorClient()
+    {
+        return ClientWith(Token(
+        [
+            new Claim(GatewayTokens.SubjectClaim, OperatorSubject),
+            new Claim(GatewayTokens.NameClaim, OperatorName),
+            new Claim(GatewayTokens.ScopeClaim, GatewayTokens.AdminScope),
+        ]));
+    }
+
+    /// <summary>A client that sends a client's caller token, with <paramref name="scope"/> and <see cref="Tenant"/>.</summary>
+    internal HttpClient CreateCallerClient(string scope)
+    {
+        return ClientWith(Token(
+        [
+            new Claim(GatewayTokens.SubjectClaim, ClientId),
+            new Claim(GatewayTokens.ClientIdClaim, ClientId),
+            new Claim(GatewayTokens.TenantIdClaim, Tenant.Id.ToString()),
+            new Claim(GatewayTokens.ScopeClaim, scope),
+        ]));
     }
 
     /// <summary>Runs <paramref name="sql"/> as the app role, which the service runs as.</summary>
-    /// <remarks>For fixed statements only: nothing may be concatenated into them.</remarks>
-    internal async Task<object?> ExecuteScalarAsAppRoleAsync(string sql)
+    /// <remarks>
+    /// For fixed statements only: nothing may be concatenated into them. A
+    /// value goes in as one of <paramref name="parameters"/>, <c>$1</c> and on.
+    /// </remarks>
+    internal async Task<object?> ExecuteScalarAsAppRoleAsync(string sql, params object[] parameters)
     {
         await using var connection = new NpgsqlConnection(AppConnectionString);
         await connection.OpenAsync();
         await using var command = new NpgsqlCommand(sql, connection);
+        foreach (var parameter in parameters)
+        {
+            command.Parameters.Add(new NpgsqlParameter { Value = parameter });
+        }
+
         return await command.ExecuteScalarAsync();
     }
 
@@ -170,7 +207,14 @@ public sealed class RunningControlPlane : IAsyncLifetime
         }.ConnectionString;
     }
 
-    private string ServiceToken()
+    private HttpClient ClientWith(string token)
+    {
+        var client = Started.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, token);
+        return client;
+    }
+
+    private string Token(IEnumerable<Claim> claims)
     {
         var now = TimeProvider.System.GetUtcNow().UtcDateTime;
 
@@ -178,7 +222,7 @@ public sealed class RunningControlPlane : IAsyncLifetime
         {
             Issuer = GatewayTokens.Issuer,
             Audience = ControlPlaneService.Audience,
-            Subject = new ClaimsIdentity([new Claim(JwtRegisteredClaimNames.Sub, GatewayTokens.GatewaySubject)]),
+            Subject = new ClaimsIdentity(claims),
             IssuedAt = now,
             NotBefore = now,
             Expires = now + GatewayTokens.MaximumLifetime,
