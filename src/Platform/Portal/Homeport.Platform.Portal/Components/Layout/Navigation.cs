@@ -14,6 +14,7 @@ internal static class Navigation
     internal static readonly IReadOnlyList<NavigationEntry> Main =
     [
         new("Tenants", "tenants", HomeportIcons.Platform.Tenant),
+        new("Plans", "plans", HomeportIcons.Platform.Plan),
     ];
 
     /// <summary>The pages of the platform itself, shown under <em>Platform</em>.</summary>

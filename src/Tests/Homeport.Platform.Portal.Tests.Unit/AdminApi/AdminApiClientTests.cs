@@ -16,6 +16,8 @@ public sealed class AdminApiClientTests
 
     private static readonly Guid TenantId = Guid.Parse("0193a5f0-0000-7000-8000-000000000001");
 
+    private static readonly Guid PlanId = Guid.Parse("0193a5f0-0000-7000-8000-0000000000b1");
+
     public sealed class RenameTenantAsync
     {
         private readonly StandInIdentityProvider identityProvider = new();
@@ -116,6 +118,48 @@ public sealed class AdminApiClientTests
         private static HttpResponseMessage Json<TValue>(HttpStatusCode status, TValue value)
         {
             return new HttpResponseMessage(status) { Content = JsonContent.Create(value) };
+        }
+    }
+
+    public sealed class DeletePlanAsync
+    {
+        private readonly StandInIdentityProvider identityProvider = new();
+        private readonly StandInHandler gateway = new();
+
+        [Fact]
+        public async Task Calls_Delete_On_The_Plan_And_Returns_Its_Id_On_No_Content()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.NoContent);
+
+            var result = await ClientOf().DeletePlanAsync(PlanId, CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal(
+                (HttpMethod.Delete, $"http://gateway:8000/platform/v1/admin/plans/{PlanId}", PlanId),
+                (request.Method, request.RequestUri!.ToString(), result.Value));
+        }
+
+        [Fact]
+        public async Task Returns_The_Problem_Details_Of_A_Plan_In_Use()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.Conflict)
+            {
+                Content = new StringContent(
+                    """{"type":"https://homeport.data-worx.de/problems/plan-in-use","title":"The plan is in use.","status":409,"traceId":"0af7651916cd43dd8448eb211c80319c"}""",
+                    Encoding.UTF8,
+                    MediaTypeNames.Application.ProblemJson),
+            };
+
+            var result = await ClientOf().DeletePlanAsync(PlanId, CancellationToken.None);
+
+            Assert.Equal(new Uri("https://homeport.data-worx.de/problems/plan-in-use"), result.Problem!.Type);
+        }
+
+        private AdminApiClient ClientOf()
+        {
+            var valid = identityProvider.Clock.GetUtcNow().AddMinutes(5);
+            var tokens = new OperatorTokens(new SignedInOperator("operator-token", "refresh-token", valid), identityProvider.Refresher(), identityProvider.Clock);
+            return new AdminApiClient(new HttpClient(gateway) { BaseAddress = AdminEndpoint }, tokens, NullLogger<AdminApiClient>.Instance);
         }
     }
 }

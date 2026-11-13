@@ -1,0 +1,91 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject NavigationManager Navigation
+
+@* Creates a plan, or changes one: the same form, a name and the two limits.
+   The control plane judges every value, so the fields take what is typed. *@
+<MudDialog>
+    <DialogContent>
+        <ProblemAlert State="_problem" />
+        <MudStack Spacing="4">
+            <MudTextField @bind-Value="_name"
+                          Label="Name"
+                          Immediate="true"
+                          AutoFocus="true"
+                          Error="@_problem.HasError(PlansApi.NameField)"
+                          ErrorText="@_problem.ErrorOf(PlansApi.NameField)"
+                          data-field="@PlansApi.NameField" />
+            <MudNumericField @bind-Value="_requestsPerSecond"
+                             Label="Requests per second"
+                             HelperText="How fast a client's token bucket refills."
+                             Immediate="true"
+                             HideSpinButtons="true"
+                             Error="@_problem.HasError(PlansApi.RequestsPerSecondField)"
+                             ErrorText="@_problem.ErrorOf(PlansApi.RequestsPerSecondField)"
+                             data-field="@PlansApi.RequestsPerSecondField" />
+            <MudNumericField @bind-Value="_burst"
+                             Label="Burst"
+                             HelperText="How many requests a client may make at once."
+                             Immediate="true"
+                             HideSpinButtons="true"
+                             Error="@_problem.HasError(PlansApi.BurstField)"
+                             ErrorText="@_problem.ErrorOf(PlansApi.BurstField)"
+                             data-field="@PlansApi.BurstField" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveAsync" Disabled="_saving" data-action="save">@SaveLabel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private readonly ProblemState _problem = new(PlansApi.NameField, PlansApi.RequestsPerSecondField, PlansApi.BurstField);
+    private string _name = string.Empty;
+    private int _requestsPerSecond;
+    private int _burst;
+    private bool _saving;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = default!;
+
+    /// <summary>The plan to change, or <see langword="null"/> to create one.</summary>
+    [Parameter]
+    public PlanResponse? Plan { get; set; }
+
+    private string SaveLabel => Plan is null ? "Add plan" : "Save";
+
+    protected override void OnParametersSet()
+    {
+        _name = Plan?.Name ?? string.Empty;
+        _requestsPerSecond = Plan?.RequestsPerSecond ?? 0;
+        _burst = Plan?.Burst ?? 0;
+    }
+
+    private void Cancel() => Dialog.Cancel();
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+        _problem.Clear();
+        var result = Plan is null
+            ? await AdminApi.CreatePlanAsync(new CreatePlanRequest(_name, _requestsPerSecond, _burst), CancellationToken.None)
+            : await AdminApi.ChangePlanAsync(Plan.Id, new ChangePlanRequest(_name, _requestsPerSecond, _burst), CancellationToken.None);
+        _saving = false;
+
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+        }
+        else if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+        }
+        else
+        {
+            Dialog.Close(DialogResult.Ok(result.Value));
+        }
+    }
+}

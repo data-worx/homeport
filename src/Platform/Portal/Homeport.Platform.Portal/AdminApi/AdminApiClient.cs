@@ -46,7 +46,49 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
         return SendAsync<TenantResponse>(HttpMethod.Put, path, JsonContent.Create(request), cancellationToken);
     }
 
-    private async Task<AdminResult<TValue>> SendAsync<TValue>(HttpMethod method, string path, HttpContent? body, CancellationToken cancellationToken)
+    public Task<AdminResult<PlansResponse>> GetPlansAsync(CancellationToken cancellationToken)
+    {
+        return SendAsync<PlansResponse>(HttpMethod.Get, PlansApi.Path, body: null, cancellationToken);
+    }
+
+    public Task<AdminResult<PlanResponse>> CreatePlanAsync(CreatePlanRequest request, CancellationToken cancellationToken)
+    {
+        return SendAsync<PlanResponse>(HttpMethod.Post, PlansApi.Path, JsonContent.Create(request), cancellationToken);
+    }
+
+    public Task<AdminResult<PlanResponse>> ChangePlanAsync(Guid planId, ChangePlanRequest request, CancellationToken cancellationToken)
+    {
+        return SendAsync<PlanResponse>(HttpMethod.Put, PlanPathOf(planId), JsonContent.Create(request), cancellationToken);
+    }
+
+    // The answer has no body; the deleted plan's id stands in for it.
+    public Task<AdminResult<Guid>> DeletePlanAsync(Guid planId, CancellationToken cancellationToken)
+    {
+        return SendAsync(HttpMethod.Delete, PlanPathOf(planId), body: null, (_, _) => Task.FromResult(planId), cancellationToken);
+    }
+
+    private static string PlanPathOf(Guid planId)
+    {
+        return PlansApi.PlanPath.Replace($"{{{PlansApi.PlanIdRouteValue}}}", planId.ToString(), StringComparison.Ordinal);
+    }
+
+    private Task<AdminResult<TValue>> SendAsync<TValue>(HttpMethod method, string path, HttpContent? body, CancellationToken cancellationToken)
+    {
+        return SendAsync(
+            method,
+            path,
+            body,
+            async (response, token) => await response.Content.ReadFromJsonAsync<TValue>(token)
+                ?? throw new InvalidOperationException($"The admin API answered {method} {path} without a body."),
+            cancellationToken);
+    }
+
+    private async Task<AdminResult<TValue>> SendAsync<TValue>(
+        HttpMethod method,
+        string path,
+        HttpContent? body,
+        Func<HttpResponseMessage, CancellationToken, Task<TValue>> readValue,
+        CancellationToken cancellationToken)
     {
         var accessToken = await tokens.AccessTokenAsync(cancellationToken);
         if (accessToken is null)
@@ -81,9 +123,7 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
                 return AdminResult<TValue>.Failure(await ProblemOfAsync(response, cancellationToken));
             }
 
-            var value = await response.Content.ReadFromJsonAsync<TValue>(cancellationToken)
-                ?? throw new InvalidOperationException($"The admin API answered {method} {path} without a body.");
-            return AdminResult<TValue>.Success(value);
+            return AdminResult<TValue>.Success(await readValue(response, cancellationToken));
         }
     }
 
