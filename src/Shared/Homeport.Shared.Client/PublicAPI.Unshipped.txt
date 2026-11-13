@@ -198,3 +198,60 @@ static Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.operator !
 static Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.UsageEntryResponse? right) -> bool
 static Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? left, Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? right) -> bool
 static Homeport.Shared.Client.Platform.Metering.V1.UsageResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? left, Homeport.Shared.Client.Platform.Metering.V1.UsageResponse? right) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest!
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.CreateTenantRequest(string! Name) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.Deconstruct(out string! Name) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.Name.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.Name.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest
+Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest!
+Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.Deconstruct(out string! Name) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.Name.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.Name.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.RenameTenantRequest(string! Name) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse!
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.ClientCount.get -> int
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.ClientCount.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.Deconstruct(out System.Guid Id, out string! Name, out int ClientCount) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.Id.get -> System.Guid
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.Id.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.Name.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.Name.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.TenantResponse(System.Guid Id, string! Name, int ClientCount) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsApi
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse!
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.Deconstruct(out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse!>! Tenants) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.Tenants.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse!>!
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.Tenants.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.TenantsResponse(System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse!>! Tenants) -> void
+const Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsApi.NameField = "name" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsApi.Path = "/v1/admin/tenants" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsApi.TenantIdRouteValue = "tenantId" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsApi.TenantPath = "/v1/admin/tenants/{tenantId}" -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.ToString() -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.ToString() -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.ToString() -> string!
+static Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.CreateTenantRequest? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.RenameTenantRequest? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? right) -> bool
