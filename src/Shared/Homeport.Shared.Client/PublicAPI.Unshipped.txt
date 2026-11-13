@@ -255,3 +255,74 @@ static Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.operator !
 static Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.TenantResponse? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.TenantsResponse? right) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest!
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.Burst.get -> int
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.Burst.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.ChangePlanRequest(string! Name, int RequestsPerSecond, int Burst) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.Deconstruct(out string! Name, out int RequestsPerSecond, out int Burst) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.Name.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.Name.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.RequestsPerSecond.get -> int
+Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.RequestsPerSecond.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest!
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.Burst.get -> int
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.Burst.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.CreatePlanRequest(string! Name, int RequestsPerSecond, int Burst) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.Deconstruct(out string! Name, out int RequestsPerSecond, out int Burst) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.Name.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.Name.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.RequestsPerSecond.get -> int
+Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.RequestsPerSecond.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse!
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Burst.get -> int
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Burst.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.ClientCount.get -> int
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.ClientCount.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Deconstruct(out System.Guid Id, out string! Name, out int RequestsPerSecond, out int Burst, out int ClientCount) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Id.get -> System.Guid
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Id.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Name.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Name.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.PlanResponse(System.Guid Id, string! Name, int RequestsPerSecond, int Burst, int ClientCount) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.RequestsPerSecond.get -> int
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.RequestsPerSecond.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlansApi
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse!
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.Deconstruct(out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse!>! Plans) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.Plans.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse!>!
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.Plans.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.PlansResponse(System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse!>! Plans) -> void
+const Homeport.Shared.Client.Platform.ControlPlane.V1.PlansApi.BurstField = "burst" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.PlansApi.NameField = "name" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.PlansApi.Path = "/v1/admin/plans" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.PlansApi.PlanIdRouteValue = "planId" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.PlansApi.PlanPath = "/v1/admin/plans/{planId}" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.PlansApi.RequestsPerSecondField = "requestsPerSecond" -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.ToString() -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.ToString() -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.ToString() -> string!
+static Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.ChangePlanRequest? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.CreatePlanRequest? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? right) -> bool
