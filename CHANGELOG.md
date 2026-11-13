@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The gateway serves the admin API under `/platform/v1/admin/...` on a port
+  of its own, for the operator's tokens from the identity provider that
+  carry a configurable admin claim, and forwards each request to the
+  platform service with a caller token of scope `admin`. On the public port
+  the admin API does not exist, and the compose file does not publish the
+  admin port. The admin endpoints of the services follow with the admin
+  portal. See [the admin API](docs/operators/admin-api.md).
+
 ## [0.1.0] - 2026-11-11
 
 ### Added

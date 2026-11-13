@@ -72,8 +72,8 @@ reader it is written for:
 - A migration updates its schema's ER diagram,
   `docs/architecture/data-model-<schema>.drawio.svg` with `-` for `_`, in
   the same pull request. See [the data model](docs/architecture/data-model.md#schemas).
-- A change to the path of a call to a module, of a platform request or of
-  a module's registration updates its sequence diagram,
+- A change to the path of a call to a module, of a platform request, of an
+  admin request or of a module's registration updates its sequence diagram,
   `docs/architecture/request-flow-<flow>.drawio.svg` or the one in
   `docs/module-developers/registering-a-module.md`, in the same pull
   request. See [the request flow](docs/architecture/request-flow.md).

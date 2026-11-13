@@ -31,6 +31,18 @@ public static class GatewayTokens
     /// <summary>The claim of a module token that carries the caller's scopes, space-delimited (RFC 9068).</summary>
     public const string ScopeClaim = "scope";
 
+    /// <summary>
+    /// The claim of a caller token for the operator that carries the
+    /// operator's display name, for the audit entry (ADR-0020).
+    /// </summary>
+    public const string NameClaim = JwtRegisteredClaimNames.Name;
+
+    /// <summary>
+    /// The one scope of a caller token for the operator, and the only scope
+    /// a service serves its admin endpoints on (ADR-0020).
+    /// </summary>
+    public const string AdminScope = "admin";
+
     /// <summary>The separator of the scopes in <see cref="ScopeClaim"/>.</summary>
     public const char ScopeSeparator = ' ';
 

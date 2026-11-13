@@ -8,7 +8,9 @@ expired, signed by another issuer or meant for another audience; see
 [obtaining a token](../../api-consumers/obtaining-a-token.md). It does so for
 every path under `/modules/`, whatever the method, before it routes: without
 a valid token a caller never learns whether a module, a path or a method
-exists. The registry
+exists. On the admin port it answers with it for an admin request without
+a valid operator token; see [the admin API](../../operators/admin-api.md).
+The registry
 answers with it for a registration or heartbeat with an unknown module id or
 a wrong registration key, and for a read of the route table without a valid
 service token from the gateway.

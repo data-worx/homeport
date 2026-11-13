@@ -124,6 +124,32 @@ public sealed class ProgramTests
         }
 
         [Fact]
+        public void Keeps_The_Gateways_Admin_Endpoint_Internal()
+        {
+            var model = appHost.App.Services.GetRequiredService<DistributedApplicationModel>();
+
+            var admin = model.Resources
+                .Single(resource => resource.Name == "gateway")
+                .Annotations.OfType<EndpointAnnotation>()
+                .Single(endpoint => endpoint.Name == "admin");
+
+            Assert.False(admin.IsExternal);
+        }
+
+        [Fact]
+        public async Task Serves_Nothing_But_The_Admin_Api_On_The_Gateways_Admin_Endpoint()
+        {
+            using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
+            await appHost.App.ResourceNotifications.WaitForResourceHealthyAsync("gateway", timeout.Token);
+            using var client = new HttpClient { BaseAddress = appHost.App.GetEndpoint("gateway", "admin") };
+
+            // On the public endpoint, the gateway challenges it for a client token.
+            using var response = await client.GetAsync("/modules/echo/v1/echo", timeout.Token);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
         public async Task Links_The_Gateway_To_The_Api_Docs_It_Serves()
         {
             using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
