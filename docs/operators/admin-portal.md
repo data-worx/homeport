@@ -10,7 +10,11 @@ So far the portal is its shell: you sign in, see who you are signed in as,
 and sign out. Its pages for tenants, plans, clients, modules, usage and the
 audit log follow, each with its own entry in the navigation.
 
+![The portal's shell after signing in: the app bar with the operator's name, an empty navigation and the start page](admin-portal-shell.png)
+
 ## Signing in
+
+![The sign-in page: one button, and the host of the identity provider it sends you to](admin-portal-sign-in.png)
 
 1. A request from a browser without a session lands on the portal's sign-in
    page, not at the identity provider. It names the provider's host, so you
