@@ -19,9 +19,10 @@ public sealed class PlatformRoutesOptions
     public Uri MeteringUrl { get; set; } = new($"{Uri.UriSchemeHttp}://{MeteringService.ServiceName}");
 
     /// <summary>
-    /// The control plane, which serves <c>/platform/v1/admin/tenants</c>. The
-    /// default names it by its service name, which the compose network
-    /// resolves; the AppHost sets the address of its endpoint.
+    /// The control plane, which serves <c>/platform/v1/admin/tenants</c> and
+    /// <c>/platform/v1/admin/plans</c>. The default names it by its service
+    /// name, which the compose network resolves; the AppHost sets the address
+    /// of its endpoint.
     /// </summary>
     public Uri ControlPlaneUrl { get; set; } = new($"{Uri.UriSchemeHttp}://{ControlPlaneService.ServiceName}");
 }

@@ -263,7 +263,8 @@ public static class Program
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
 
         // The gateway looks clients up at the control plane, and forwards the
-        // admin API of tenants to it, which YARP needs the endpoint itself for.
+        // admin API of tenants and plans to it, which YARP needs the endpoint
+        // itself for.
         gateway.WithReference(controlPlane);
         gateway.WithEnvironment("PlatformRoutes__ControlPlaneUrl", controlPlane.GetEndpoint(Uri.UriSchemeHttp));
 
