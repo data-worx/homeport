@@ -57,3 +57,11 @@ services:
 `ASPNETCORE_FORWARDEDHEADERS_ENABLED`, which makes an ASP.NET Core service
 accept forwarded headers from any caller, has no effect on the gateway: only
 the proxies configured here are trusted.
+
+## The portal
+
+The admin portal applies forwarded headers the same way, with the same
+settings in its own environment. It needs them more than the gateway: it
+signs in only over HTTPS, and behind a proxy that terminates TLS it knows
+the request was HTTPS only from a trusted proxy's `X-Forwarded-Proto`. See
+[the admin portal](admin-portal.md#tls-and-the-reverse-proxy).

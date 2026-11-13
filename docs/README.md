@@ -17,6 +17,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`operators/metering.md`](operators/metering.md) | Metering, preparing its database and the broker users, what may be lost, retention, the usage export, its configuration and metrics |
 | [`operators/throttling.md`](operators/throttling.md) | The rate limit per tenant: plan limits, the buckets in Valkey, failing open while Valkey is down, and the metrics |
 | [`operators/reverse-proxy.md`](operators/reverse-proxy.md) | Running the gateway behind a reverse proxy, and which proxies' forwarded headers it trusts |
+| [`operators/admin-portal.md`](operators/admin-portal.md) | Signing in at the admin portal, its configuration, the client at your identity provider, TLS behind a reverse proxy, sessions and its error pages |
 | [`operators/admin-api.md`](operators/admin-api.md) | The gateway's admin port for the admin API, the operator's tokens it accepts, its configuration, and why it stays unpublished |
 | [`operators/identity-provider.md`](operators/identity-provider.md) | Connecting the identity provider whose client tokens the gateway accepts, and mapping its clients to tenants |
 | [`operators/logging.md`](operators/logging.md) | What Homeport logs at which level, and how to change the level |

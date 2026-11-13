@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The admin portal, the new image `homeport-portal`: the operator signs in
+  at their own identity provider with authorization code and PKCE, and needs
+  a configurable claim, such as `roles` with `homeport-admin`, to get in.
+  The portal signs in over HTTPS only, behind a reverse proxy whose
+  forwarded headers it trusts, and its error pages show the trace id. So far
+  it is the shell its pages for tenants, plans, clients, modules, usage and
+  the audit log will follow in. See [the admin portal](docs/operators/admin-portal.md).
+
 - The gateway serves the admin API under `/platform/v1/admin/...` on a port
   of its own, for the operator's tokens from the identity provider that
   carry a configurable admin claim, and forwards each request to the

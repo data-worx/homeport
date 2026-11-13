@@ -88,12 +88,19 @@ The AppHost imports the realm in
   grant, the audience `homeport`, `usage.read` by default and `echo.invoke`
   only when the token request asks for it with `scope=echo.invoke`;
 - the client `unmapped-client`, which the control plane does not know, for
-  the tests that expect `403`.
+  the tests that expect `403`;
+- the client `portal` of the admin portal, confidential, with authorization
+  code and PKCE `S256`, the redirect URIs below `PORTAL_ADDRESS`, the client
+  scope `profile`, and the subject, the name, the realm roles as `roles` and
+  the audience `homeport-portal` in its tokens;
+- the realm role `homeport-admin`, and the user `operator`, *Dev Operator*,
+  who holds it. See [the admin portal](admin-portal.md).
 
-The client secrets are not in the realm file. The AppHost generates them as
-the parameters `local-client-secret` and `unmapped-client-secret`; the
-compose file takes them from `LOCAL_CLIENT_SECRET` and
-`UNMAPPED_CLIENT_SECRET`.
+The client secrets and the operator's password are not in the realm file.
+The AppHost generates them as the parameters `local-client-secret`,
+`unmapped-client-secret`, `portal-client-secret` and `operator-password`;
+the compose file takes them from `LOCAL_CLIENT_SECRET`,
+`UNMAPPED_CLIENT_SECRET`, `PORTAL_CLIENT_SECRET` and `OPERATOR_PASSWORD`.
 
 Keycloak's issuer is `http://localhost:8080/realms/homeport` in both setups,
 so a token a client gets on the host is valid at the gateway. On the compose
