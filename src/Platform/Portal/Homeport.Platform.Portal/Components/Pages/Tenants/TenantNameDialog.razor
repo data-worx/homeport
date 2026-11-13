@@ -1,0 +1,68 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject NavigationManager Navigation
+
+@* Creates a tenant, or renames one: the same form, a name. *@
+<MudDialog>
+    <DialogContent>
+        <ProblemAlert State="_problem" />
+        <MudTextField @bind-Value="_name"
+                      Label="Name"
+                      Immediate="true"
+                      AutoFocus="true"
+                      Error="@_problem.HasError(TenantsApi.NameField)"
+                      ErrorText="@_problem.ErrorOf(TenantsApi.NameField)"
+                      data-field="@TenantsApi.NameField" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveAsync" Disabled="_saving" data-action="save">@SaveLabel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private readonly ProblemState _problem = new(TenantsApi.NameField);
+    private string _name = string.Empty;
+    private bool _saving;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = default!;
+
+    /// <summary>The tenant to rename, or <see langword="null"/> to create one.</summary>
+    [Parameter]
+    public TenantResponse? Tenant { get; set; }
+
+    private string SaveLabel => Tenant is null ? "Add tenant" : "Rename";
+
+    protected override void OnParametersSet()
+    {
+        _name = Tenant?.Name ?? string.Empty;
+    }
+
+    private void Cancel() => Dialog.Cancel();
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+        _problem.Clear();
+        var result = Tenant is null
+            ? await AdminApi.CreateTenantAsync(new CreateTenantRequest(_name), CancellationToken.None)
+            : await AdminApi.RenameTenantAsync(Tenant.Id, new RenameTenantRequest(_name), CancellationToken.None);
+        _saving = false;
+
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+        }
+        else if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+        }
+        else
+        {
+            Dialog.Close(DialogResult.Ok(result.Value));
+        }
+    }
+}

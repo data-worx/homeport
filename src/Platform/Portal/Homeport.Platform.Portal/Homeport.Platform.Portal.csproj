@@ -25,7 +25,7 @@
     <Content Include="$(DesignKit)dist\portal.css" Link="wwwroot\portal.css" ContentRoot="$(DesignKit)dist\" />
     <Content Include="$(DesignKit)fonts\*.woff2" Link="wwwroot\fonts\%(Filename)%(Extension)" ContentRoot="$(DesignKit)" />
     <Content Include="$(DesignKit)assets\logos\favicon.svg;$(DesignKit)assets\logos\homeport-icon-mono-white.svg;$(DesignKit)assets\logos\homeport-lockup.svg" Link="wwwroot\%(Filename)%(Extension)" ContentRoot="$(DesignKit)assets\logos\" />
-    <Content Include="$(DesignKit)assets\illustrations\hero-home-port.svg" Link="wwwroot\%(Filename)%(Extension)" ContentRoot="$(DesignKit)assets\illustrations\" />
+    <Content Include="$(DesignKit)assets\illustrations\hero-home-port.svg;$(DesignKit)assets\illustrations\spot-crane-docking.svg" Link="wwwroot\%(Filename)%(Extension)" ContentRoot="$(DesignKit)assets\illustrations\" />
   </ItemGroup>
 
   <!-- The licence files of the fonts and icons travel with them, under
@@ -38,11 +38,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Homeport.Platform.Portal.Tests.Unit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="MudBlazor" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Client\Homeport.Shared.Client.csproj" />
     <ProjectReference Include="..\..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" />
   </ItemGroup>
 

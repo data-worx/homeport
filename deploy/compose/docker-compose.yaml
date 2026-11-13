@@ -262,6 +262,7 @@ services:
       SignIn__ClientId: "portal"
       SignIn__ClientSecret: "${PORTAL_CLIENT_SECRET}"
       SignIn__RequireHttpsMetadata: "False"
+      AdminApi__Url: "http://gateway:8000"
     ports:
       - "${PORTAL_PORT}"
     depends_on:

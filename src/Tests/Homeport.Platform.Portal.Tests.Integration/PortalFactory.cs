@@ -39,6 +39,7 @@ public sealed class PortalFactory : WebApplicationFactory<Program>
         builder.UseSetting("SignIn:Authority", Authority);
         builder.UseSetting("SignIn:ClientId", "portal");
         builder.UseSetting("SignIn:ClientSecret", "test-secret");
+        builder.UseSetting("AdminApi:Url", "http://gateway:8000");
         builder.ConfigureLogging(logging => logging.ClearProviders());
         builder.ConfigureTestServices(services =>
         {
