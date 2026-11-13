@@ -33,9 +33,10 @@ internal sealed class SeedOptionsValidator : IValidateOptions<SeedOptions>
             failures.Add($"{Section}:{nameof(SeedOptions.RequestsPerSecond)} must be positive.");
         }
 
-        if (options.Burst < options.RequestsPerSecond)
+        // The plan's own rule: a burst below the rate is allowed.
+        if (options.Burst <= 0)
         {
-            failures.Add($"{Section}:{nameof(SeedOptions.Burst)} must be at least {nameof(SeedOptions.RequestsPerSecond)}.");
+            failures.Add($"{Section}:{nameof(SeedOptions.Burst)} must be positive.");
         }
 
         return failures.Count == 0 ? ValidateOptionsResult.Success : ValidateOptionsResult.Fail(failures);

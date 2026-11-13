@@ -11,13 +11,16 @@ later milestone.
 ## Plan limits
 
 A plan's limits live in the control plane, next to its tenants and clients.
-Today the control plane seeds one plan; set its limits with the seed, as
+The operator creates, changes and deletes plans in
+[the admin portal](admin-portal.md#plans) or through
+[the admin API](admin-api.md#endpoints). The control plane also seeds one
+plan; set its limits with the seed, as
 [the control plane](control-plane.md#migrating-and-seeding) describes:
 
 | Setting | Means |
 |---|---|
 | `Seed__RequestsPerSecond` | How fast the bucket refills, in requests per second; positive |
-| `Seed__Burst` | How many requests the bucket holds at once; at least the rate |
+| `Seed__Burst` | How many requests the bucket holds at once; positive, and may be below the rate |
 
 A tenant with a burst of 20 and 10 requests per second can send 20 requests
 at once, then 10 per second. The gateway keeps the plan it looked up with
