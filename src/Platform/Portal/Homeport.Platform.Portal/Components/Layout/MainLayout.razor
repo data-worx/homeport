@@ -33,7 +33,10 @@
     </MudDrawer>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
-            @Body
+            @* An element of the layout's own, so its scoped styles reach the page. *@
+            <div class="hp-page">
+                @Body
+            </div>
         </MudContainer>
     </MudMainContent>
 </MudLayout>
