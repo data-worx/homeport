@@ -68,6 +68,11 @@ services:
       HOMEPORT_LOCAL_CLIENT_SECRET: "${LOCAL_CLIENT_SECRET}"
       HOMEPORT_UNMAPPED_CLIENT_SECRET: "${UNMAPPED_CLIENT_SECRET}"
       HOMEPORT_AUDIENCE: "homeport"
+      HOMEPORT_ADMIN_AUDIENCE: "homeport-portal"
+      HOMEPORT_PORTAL_CLIENT_ID: "portal"
+      HOMEPORT_PORTAL_CLIENT_SECRET: "${PORTAL_CLIENT_SECRET}"
+      HOMEPORT_PORTAL_ADDRESS: "${PORTAL_ADDRESS}"
+      HOMEPORT_OPERATOR_PASSWORD: "${OPERATOR_PASSWORD}"
       KC_HOSTNAME: "http://localhost:8080"
       KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
     ports:
@@ -243,6 +248,23 @@ services:
       metering-migrate:
         condition: "service_completed_successfully"
       rabbitmq:
+        condition: "service_started"
+    networks:
+      - "aspire"
+  portal:
+    image: "${PORTAL_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      HTTP_PORTS: "${PORTAL_PORT}"
+      OTEL_SERVICE_NAME: "homeport-portal"
+      SignIn__Authority: "http://keycloak:8080/realms/homeport"
+      SignIn__ClientId: "portal"
+      SignIn__ClientSecret: "${PORTAL_CLIENT_SECRET}"
+      SignIn__RequireHttpsMetadata: "False"
+    ports:
+      - "${PORTAL_PORT}"
+    depends_on:
+      keycloak:
         condition: "service_started"
     networks:
       - "aspire"

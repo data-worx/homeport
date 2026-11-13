@@ -2,6 +2,7 @@
 
 using Aspire.Hosting.Docker.Resources.ServiceNodes.Swarm;
 using Homeport.Shared.ServiceDefaults;
+using Microsoft.Extensions.Hosting;
 
 namespace Homeport.Aspire.AppHost;
 
@@ -40,6 +41,13 @@ public static class Program
     // Keycloak's port on the host, fixed so its issuer is the same for a
     // client on the host and for the gateway on the compose network.
     private const int KeycloakPort = 8080;
+
+    // The portal's client in the realm, and the portal's HTTPS port on the
+    // host in a local run, fixed so the realm can name the addresses the
+    // identity provider may send the operator back to.
+    private const string PortalClientId = "portal";
+    private const int PortalPort = 7400;
+    private const string PortalEndpoint = "https";
 
     // Where the broker's init script is mounted, which starts it with a user per service.
     private const string RabbitMqInitDirectory = "/homeport-init";
@@ -116,6 +124,14 @@ public static class Program
         // HTTP even where the developer certificate is trusted, which would
         // otherwise move it to HTTPS and leave the HTTP address unanswered.
         var seedClientId = builder.AddParameter("seed-client-id", new LocalDefault("local-client"));
+
+        // The portal's confidential client and a dev operator who holds the
+        // admin role (ADR-0020); the operator's password is generated like
+        // the clients' secrets. The portal's address is where the browser
+        // reaches it, which only the operator's reverse proxy knows once the
+        // compose file runs.
+        var portalClientSecret = builder.AddParameter("portal-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
+        var portalAddress = builder.AddParameter("portal-address", new LocalDefault($"{Uri.UriSchemeHttps}://localhost:{PortalPort}"));
         var keycloakHostAddress = $"{Uri.UriSchemeHttp}://localhost:{KeycloakPort}";
         var keycloak = builder.AddKeycloak("keycloak", port: KeycloakPort)
             .WithImageTag("26.8@sha256:c68e286cacd87b942ac1939a0a1481461109d6acd3a57dc496969a319a76bbf0")
@@ -124,6 +140,11 @@ public static class Program
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_SECRET", builder.AddParameter("local-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
             .WithEnvironment("HOMEPORT_UNMAPPED_CLIENT_SECRET", builder.AddParameter("unmapped-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
             .WithEnvironment("HOMEPORT_AUDIENCE", Audience)
+            .WithEnvironment("HOMEPORT_ADMIN_AUDIENCE", AdminAudience)
+            .WithEnvironment("HOMEPORT_PORTAL_CLIENT_ID", PortalClientId)
+            .WithEnvironment("HOMEPORT_PORTAL_CLIENT_SECRET", portalClientSecret)
+            .WithEnvironment("HOMEPORT_PORTAL_ADDRESS", portalAddress)
+            .WithEnvironment("HOMEPORT_OPERATOR_PASSWORD", builder.AddParameter("operator-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
             .WithEnvironment("KC_HOSTNAME", keycloakHostAddress)
             .WithEnvironment("KC_HOSTNAME_BACKCHANNEL_DYNAMIC", bool.TrueString.ToLowerInvariant())
             .WithExternalHttpEndpoints()
@@ -268,6 +289,37 @@ public static class Program
         // destination address as it is, so it gets the endpoint itself rather
         // than a service name to discover.
         gateway.WithEnvironment("PlatformRoutes__MeteringUrl", metering.GetEndpoint(Uri.UriSchemeHttp));
+
+        // The admin portal (ADR-0020). The operator signs in at Keycloak,
+        // whose metadata the portal fetches over the network it shares with
+        // it, like the gateway. A local run serves it over HTTPS with the
+        // developer certificate. The compose file publishes plain HTTP: TLS
+        // ends at the operator's reverse proxy, whose forwarded headers the
+        // portal applies only once the operator trusts it.
+        var portal = builder.AddProject<Projects.Homeport_Platform_Portal>("portal", launchProfileName: null)
+            .DisableForwardedHeaders()
+            .WithEnvironment("OTEL_SERVICE_NAME", "homeport-portal")
+            .WithEnvironment("SignIn__Authority", ReferenceExpression.Create($"{keycloak.GetEndpoint(Uri.UriSchemeHttp)}/realms/{Realm}"))
+            .WithEnvironment("SignIn__ClientId", PortalClientId)
+            .WithEnvironment("SignIn__ClientSecret", portalClientSecret)
+            .WithEnvironment("SignIn__RequireHttpsMetadata", bool.FalseString)
+            .WaitFor(keycloak);
+        if (builder.ExecutionContext.IsRunMode)
+        {
+            // Development serves the static files from the build output, as
+            // a launch profile would; the portal has none here, so the
+            // endpoint is the AppHost's alone.
+            portal.WithHttpsEndpoint(port: PortalPort, name: PortalEndpoint)
+                .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath, endpointName: PortalEndpoint)
+                .WithEnvironment("ASPNETCORE_ENVIRONMENT", Environments.Development);
+        }
+        else
+        {
+            portal.WithHttpEndpoint()
+                .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
+        }
+
+        portal.WithExternalHttpEndpoints();
 
         builder.Build().Run();
     }

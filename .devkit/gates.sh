@@ -22,6 +22,7 @@ NOTICES_PROJECTS=(
   "src/Platform/ControlPlane/Homeport.Platform.ControlPlane.Api/Homeport.Platform.ControlPlane.Api.csproj"
   "src/Platform/Gateway/Homeport.Platform.Gateway.Api/Homeport.Platform.Gateway.Api.csproj"
   "src/Platform/Metering/Homeport.Platform.Metering.Api/Homeport.Platform.Metering.Api.csproj"
+  "src/Platform/Portal/Homeport.Platform.Portal/Homeport.Platform.Portal.csproj"
   "src/Platform/Registry/Homeport.Platform.Registry.Api/Homeport.Platform.Registry.Api.csproj"
 )
 

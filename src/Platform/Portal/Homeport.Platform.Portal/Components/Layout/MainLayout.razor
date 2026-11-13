@@ -19,18 +19,12 @@
         <MudIconButton Icon="@(_dark ? HomeportIcons.Lucide.Sun : HomeportIcons.Lucide.Moon)" Color="Color.Inherit"
                        aria-label="Switch light or dark theme" OnClick="ToggleDarkMode" />
         <AuthorizeView Context="auth">
-            <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" aria-label="Operator menu">
-                <ActivatorContent>
-                    <MudButton Variant="Variant.Text" Color="Color.Inherit" EndIcon="@HomeportIcons.Lucide.ChevronDown">
-                        @auth.User.Identity?.Name
-                    </MudButton>
-                </ActivatorContent>
-                <ChildContent>
-                    <form method="post" action="@PortalPaths.SignOut" class="px-2">
-                        <AntiforgeryToken />
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Text" FullWidth="true">Sign out</MudButton>
-                    </form>
-                </ChildContent>
+            <MudMenu Label="@auth.User.Identity?.Name" EndIcon="@HomeportIcons.Lucide.ChevronDown" Color="Color.Inherit"
+                     AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" aria-label="Operator menu">
+                <form method="post" action="@PortalPaths.SignOut" class="px-2">
+                    <AntiforgeryToken />
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Text" FullWidth="true">Sign out</MudButton>
+                </form>
             </MudMenu>
         </AuthorizeView>
     </MudAppBar>

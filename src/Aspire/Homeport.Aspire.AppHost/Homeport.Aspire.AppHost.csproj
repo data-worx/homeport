@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\Platform\ControlPlane\Homeport.Platform.ControlPlane.Api\Homeport.Platform.ControlPlane.Api.csproj" />
     <ProjectReference Include="..\..\Platform\Gateway\Homeport.Platform.Gateway.Api\Homeport.Platform.Gateway.Api.csproj" />
     <ProjectReference Include="..\..\Platform\Metering\Homeport.Platform.Metering.Api\Homeport.Platform.Metering.Api.csproj" />
+    <ProjectReference Include="..\..\Platform\Portal\Homeport.Platform.Portal\Homeport.Platform.Portal.csproj" />
     <ProjectReference Include="..\..\Platform\Registry\Homeport.Platform.Registry.Api\Homeport.Platform.Registry.Api.csproj" />
   </ItemGroup>
 

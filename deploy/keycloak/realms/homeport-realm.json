@@ -1,6 +1,14 @@
 {
   "realm": "homeport",
   "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "homeport-admin",
+        "description": "Operates Homeport through the admin portal"
+      }
+    ]
+  },
   "clientScopes": [
     {
       "name": "echo.invoke",
@@ -14,6 +22,15 @@
     {
       "name": "usage.read",
       "description": "Read the usage of the client's tenant",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
+      "name": "profile",
+      "description": "The user's name, which the portal shows and the audit records",
       "protocol": "openid-connect",
       "attributes": {
         "include.in.token.scope": "true",
@@ -79,6 +96,90 @@
           }
         }
       ]
+    },
+    {
+      "clientId": "${HOMEPORT_PORTAL_CLIENT_ID}",
+      "name": "Admin portal",
+      "description": "The admin portal, where the operator signs in (ADR-0020)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${HOMEPORT_PORTAL_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["${HOMEPORT_PORTAL_ADDRESS}/signin-oidc"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "${HOMEPORT_PORTAL_ADDRESS}/signout-callback-oidc"
+      },
+      "fullScopeAllowed": true,
+      "defaultClientScopes": ["profile"],
+      "optionalClientScopes": [],
+      "protocolMappers": [
+        {
+          "name": "subject",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-sub-mapper",
+          "config": {
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        },
+        {
+          "name": "name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-full-name-mapper",
+          "config": {
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "roles",
+            "multivalued": "true",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "homeport-admin-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "${HOMEPORT_ADMIN_AUDIENCE}",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "operator",
+      "firstName": "Dev",
+      "lastName": "Operator",
+      "email": "operator@homeport.localhost",
+      "emailVerified": true,
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${HOMEPORT_OPERATOR_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["homeport-admin"]
     }
   ]
 }
