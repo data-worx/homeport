@@ -1,0 +1,29 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@* A problem of the admin API: its title and detail, the errors no form field
+   shows, and the trace id the operator hands to whoever reads the logs. *@
+@if (State.ShowsAlert && State.Problem is { } problem)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4" data-problem>
+        <MudText Typo="Typo.subtitle2" data-problem-title>@problem.Title</MudText>
+        @if (!string.IsNullOrEmpty(problem.Detail))
+        {
+            <MudText Typo="Typo.body2" data-problem-detail>@problem.Detail</MudText>
+        }
+        @foreach (var error in State.OtherErrors)
+        {
+            <MudText Typo="Typo.body2"><span class="hp-mono">@error.Key</span>: @string.Join(" ", error.Value)</MudText>
+        }
+        @if (!string.IsNullOrEmpty(problem.TraceId))
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                Trace id <span class="hp-mono" data-trace-id>@problem.TraceId</span>
+            </MudText>
+        }
+    </MudAlert>
+}
+
+@code {
+    /// <summary>The problem to show.</summary>
+    [Parameter, EditorRequired]
+    public ProblemState State { get; set; } = default!;
+}

@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.ControlPlane.Api.Authentication;
 using Homeport.Platform.ControlPlane.Api.Errors;
+using Homeport.Platform.ControlPlane.Application.Tenants;
 using Homeport.Platform.ControlPlane.Infrastructure.Persistence;
 using Homeport.Shared.Authentication;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Homeport.Shared.ServiceDefaults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace Homeport.Platform.ControlPlane.Api;
@@ -42,9 +45,21 @@ public sealed class Program
         builder.AddServiceDefaults();
         builder.AddControlPlanePersistence(ControlPlanePersistenceExtensions.AppConnectionName);
 
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddScoped<TenantAdministration>();
+
+        // Only the gateway's tokens for the control plane; the admin endpoints
+        // also need the operator's caller token (ADR-0020).
         builder.Services.AddGatewayTokenAuthentication(ControlPlaneService.Audience);
-        builder.Services.AddAuthorization();
-        builder.Services.AddControllers();
+        builder.Services.AddSingleton<IAuthorizationHandler, AdminHandler>();
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(AdminRequirement.Policy, policy => policy
+                .RequireAuthenticatedUser()
+                .AddRequirements(new AdminRequirement()));
+
+        // A missing name is the domain's to judge, so the answer is the same
+        // whether the field is absent or empty.
+        builder.Services.AddControllers(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
         builder.Services.AddProblemDetails();
         builder.Services.AddSingleton<IConfigureOptions<ProblemDetailsOptions>, ControlPlaneProblemDetails>();
 

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Gateway.Api.Routing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -36,7 +37,7 @@ internal static class AdminApiServiceCollectionExtensions
         services.AddSingleton<AdminPort>();
         services.AddSingleton<OperatorTokenEvents>();
         services.AddSingleton<IAuthorizationHandler, AdminClaimHandler>();
-        services.AddSingleton(_ => AdminRoutes.Configured());
+        services.AddSingleton(provider => AdminRoutes.Configured(provider.GetRequiredService<IOptions<PlatformRoutesOptions>>().Value));
 
         services.AddOptions<JwtBearerOptions>(OperatorScheme)
             .Configure<IOptions<AdminApiOptions>>((bearer, admin) =>

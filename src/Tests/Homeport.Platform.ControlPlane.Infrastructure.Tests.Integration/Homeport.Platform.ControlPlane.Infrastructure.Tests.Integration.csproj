@@ -7,8 +7,14 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!-- For the generic host the persistence is wired on, without another package. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
@@ -16,6 +22,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Platform\ControlPlane\Homeport.Platform.ControlPlane.Infrastructure\Homeport.Platform.ControlPlane.Infrastructure.csproj" />
     <ProjectReference Include="..\Homeport.Testing\Homeport.Testing.csproj" />
+  </ItemGroup>
+
+  <!-- The database is prepared by the same script the AppHost runs. -->
+  <ItemGroup>
+    <None Include="..\..\..\deploy\postgres\init\init-homeport.sh" Link="init-homeport.sh" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

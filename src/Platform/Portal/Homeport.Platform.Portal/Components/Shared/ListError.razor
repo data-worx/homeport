@@ -1,0 +1,23 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@* The error state of a list (ListStates): what failed, why, the trace id,
+   and a way to try again. *@
+<div class="d-flex flex-column align-center pa-8 gap-2 text-center" data-list-state="error">
+    <MudIcon Icon="@HomeportIcons.Lucide.CircleX" Color="Color.Error" Size="Size.Large" />
+    <MudText Typo="Typo.h6" HtmlTag="h2">@Title</MudText>
+    <ProblemAlert State="State" />
+    <MudButton Variant="Variant.Outlined" StartIcon="@HomeportIcons.Lucide.RefreshCw" OnClick="OnRetry">Try again</MudButton>
+</div>
+
+@code {
+    /// <summary>What could not be done, such as <em>Could not load tenants</em>.</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>The problem that stopped it.</summary>
+    [Parameter, EditorRequired]
+    public ProblemState State { get; set; } = default!;
+
+    /// <summary>Loads the list again.</summary>
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+}

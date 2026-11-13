@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Homeport.Platform.Gateway.Api.Admin;
+using Homeport.Platform.Gateway.Api.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 
@@ -84,6 +85,35 @@ public sealed class AdminRoutesTests
             var forwarded = await client.GetFromJsonAsync<ForwardedRequest>(ForwardingGateway.AdminPath);
 
             return new JsonWebToken(AuthenticationHeaderValue.Parse(forwarded!.Headers["authorization"]).Parameter);
+        }
+    }
+
+    public sealed class Configured
+    {
+        [Fact]
+        public void Forwards_The_Tenant_Endpoints_To_The_Control_Plane()
+        {
+            var options = new PlatformRoutesOptions { ControlPlaneUrl = new Uri("http://control-plane:5000") };
+
+            var (routes, clusters) = AdminRoutes.Configured(options).Build();
+
+            Assert.Equal(
+                [
+                    "GET /platform/v1/admin/tenants",
+                    "POST /platform/v1/admin/tenants",
+                    "GET /platform/v1/admin/tenants/{tenantId}",
+                    "PUT /platform/v1/admin/tenants/{tenantId}",
+                ],
+                routes.Select(route => $"{Assert.Single(route.Match.Methods!)} {route.Match.Path}"));
+            Assert.Equal("http://control-plane:5000/", Assert.Single(Assert.Single(clusters).Destinations!.Values).Address);
+        }
+
+        [Fact]
+        public void Issues_The_Caller_Token_For_The_Control_Plane()
+        {
+            var (routes, _) = AdminRoutes.Configured(new PlatformRoutesOptions()).Build();
+
+            Assert.All(routes, route => Assert.Equal("homeport-control-plane", route.Metadata![AdminRoutes.AdminAudienceMetadata]));
         }
     }
 }

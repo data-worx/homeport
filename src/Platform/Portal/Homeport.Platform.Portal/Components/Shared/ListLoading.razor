@@ -1,0 +1,20 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@* The loading state of a list (ListStates): skeleton rows, no spinner. *@
+<div aria-busy="true" class="pa-4" data-list-state="loading">
+    @foreach (var width in Widths)
+    {
+        <div class="d-flex justify-space-between mb-3">
+            <MudSkeleton Width="@width" Height="14px" />
+            <MudSkeleton Width="16%" Height="14px" />
+        </div>
+    }
+    <span class="visually-hidden">@Label</span>
+</div>
+
+@code {
+    private static readonly string[] Widths = ["30%", "40%", "26%", "34%"];
+
+    /// <summary>What a screen reader announces, such as <em>Loading tenants</em>.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+}

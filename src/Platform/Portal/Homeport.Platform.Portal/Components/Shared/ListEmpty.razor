@@ -1,0 +1,27 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@* The empty state of a list (ListStates): an illustration, a title, one
+   sentence and one action. *@
+<div class="d-flex flex-column align-center pa-8 gap-2 text-center" data-list-state="empty">
+    <img src="@Assets[Illustration]" alt="" width="160" height="160" />
+    <MudText Typo="Typo.h6" HtmlTag="h2">@Title</MudText>
+    <MudText Class="mud-text-secondary">@Text</MudText>
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>The spot illustration of the design kit, such as <c>spot-crane-docking.svg</c>.</summary>
+    [Parameter, EditorRequired]
+    public string Illustration { get; set; } = string.Empty;
+
+    /// <summary>What is missing, such as <em>No tenants yet</em>.</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>One sentence on how to get the first one.</summary>
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    /// <summary>The one action.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

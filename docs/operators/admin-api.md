@@ -16,9 +16,9 @@ on, never by its `Host` header:
   `/platform/v1/admin/` answers `404`, exactly like a path nothing is
   mounted at, whatever token comes with it.
 
-The admin endpoints themselves are served by the platform services and
-arrive with the admin portal. Until then, every admin path answers `404` on
-the admin port, too.
+The admin endpoints themselves are served by the platform services; the
+ones there are so far are listed under [Endpoints](#endpoints). Any other
+admin path answers `404` on the admin port, too.
 
 ## Who gets in
 
@@ -45,6 +45,52 @@ code and PKCE. For each request the gateway
 
 An admin request is neither throttled nor metered: the operator acts for
 no tenant.
+
+The platform service checks the caller token once more: it serves its admin
+endpoints only on the scope `admin`, with a subject and without a tenant.
+Any other token of the gateway, such as the caller token of a client, is
+answered with `403` and the problem type
+[`insufficient-scope`](../reference/problems/insufficient-scope.md).
+
+## Endpoints
+
+The request and response types are in `Homeport.Shared.Client`, namespace
+`Homeport.Shared.Client.Platform.ControlPlane.V1`.
+
+| Method and path | Served by | Body | Answer |
+|---|---|---|---|
+| `GET /platform/v1/admin/tenants` | control plane | — | `200` with every tenant, ordered by name: id, name and number of clients |
+| `POST /platform/v1/admin/tenants` | control plane | `{ "name": "Sales" }` | `201` with the new tenant and its address in `Location` |
+| `GET /platform/v1/admin/tenants/{tenantId}` | control plane | — | `200` with the tenant, `404` for an unknown id |
+| `PUT /platform/v1/admin/tenants/{tenantId}` | control plane | `{ "name": "Sales EMEA" }` | `200` with the renamed tenant, `404` for an unknown id |
+
+A tenant's name is required, at most 200 characters, and unique among
+tenants. Surrounding whitespace is dropped. Names are compared
+case-sensitively: `Sales` and `sales` are two tenants. A name that breaks a
+rule is answered with `400` and the problem type
+[`validation`](../reference/problems/validation.md), the message under
+`errors.name`. A tenant is neither deleted nor suspended through the admin
+API.
+
+## Audit
+
+Every change through the admin API writes an entry into the audit table of
+the service that owns the data, in the same transaction as the change: so
+far `control_plane.audit_entries`. An entry records when, the operator's
+subject and display name as the caller token named them, what was done
+(`tenant.created`, `tenant.renamed`), what it was done to
+(`tenants/<id>`) and a sentence for the reader. Renaming a tenant to the
+name it already has changes nothing and writes no entry.
+
+The service's app role may only add entries and read them; it can neither
+change nor delete one. Homeport never deletes an entry. The entries hold
+personal data — the operator's subject and name — so delete them after a
+period of your own choosing, as the schema's owner role:
+
+```sql
+-- as control_plane_owner
+DELETE FROM control_plane.audit_entries WHERE "OccurredAt" < now() - interval '1 year';
+```
 
 ## Configuration
 
@@ -95,7 +141,11 @@ services:
 
 ## What is logged
 
-At Warning, without the token: a rejected operator token with the reason
+At Warning, at the platform service: a caller token refused for an admin
+endpoint, with the reason, never the token. At Information: a tenant created
+or renamed, with its id.
+
+At Warning, at the gateway, without the token: a rejected operator token with the reason
 (the type of the validation failure), and a token without the admin claim,
 with the claim it lacks, or without a subject. At Debug: a request answered
 `404` because it came to the wrong port, with its path and port, and a

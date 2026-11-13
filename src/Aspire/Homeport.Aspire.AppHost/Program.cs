@@ -262,8 +262,10 @@ public static class Program
             .WaitForCompletion(controlPlaneMigrate)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
 
-        // The gateway looks clients up at the control plane.
+        // The gateway looks clients up at the control plane, and forwards the
+        // admin API of tenants to it, which YARP needs the endpoint itself for.
         gateway.WithReference(controlPlane);
+        gateway.WithEnvironment("PlatformRoutes__ControlPlaneUrl", controlPlane.GetEndpoint(Uri.UriSchemeHttp));
 
         // Metering: `migrate` applies its migrations as the owner role; the
         // service starts after it completed, runs as the app role and
@@ -292,7 +294,8 @@ public static class Program
 
         // The admin portal (ADR-0020). The operator signs in at Keycloak,
         // whose metadata the portal fetches over the network it shares with
-        // it, like the gateway. A local run serves it over HTTPS with the
+        // it, like the gateway, and calls the admin API at the gateway's
+        // admin endpoint. A local run serves it over HTTPS with the
         // developer certificate. The compose file publishes plain HTTP: TLS
         // ends at the operator's reverse proxy, whose forwarded headers the
         // portal applies only once the operator trusts it.
@@ -303,6 +306,7 @@ public static class Program
             .WithEnvironment("SignIn__ClientId", PortalClientId)
             .WithEnvironment("SignIn__ClientSecret", portalClientSecret)
             .WithEnvironment("SignIn__RequireHttpsMetadata", bool.FalseString)
+            .WithEnvironment("AdminApi__Url", gateway.GetEndpoint(GatewayAdminEndpoint))
             .WaitFor(keycloak);
         if (builder.ExecutionContext.IsRunMode)
         {

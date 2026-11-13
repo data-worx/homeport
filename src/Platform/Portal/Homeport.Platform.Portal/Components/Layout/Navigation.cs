@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Portal.Theming;
+
 namespace Homeport.Platform.Portal.Components.Layout;
 
 /// <summary>
@@ -9,7 +11,10 @@ namespace Homeport.Platform.Portal.Components.Layout;
 internal static class Navigation
 {
     /// <summary>The pages of the platform's tenants, plans, clients, modules and usage.</summary>
-    internal static readonly IReadOnlyList<NavigationEntry> Main = [];
+    internal static readonly IReadOnlyList<NavigationEntry> Main =
+    [
+        new("Tenants", "tenants", HomeportIcons.Platform.Tenant),
+    ];
 
     /// <summary>The pages of the platform itself, shown under <em>Platform</em>.</summary>
     internal static readonly IReadOnlyList<NavigationEntry> Platform = [];

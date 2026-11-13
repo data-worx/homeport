@@ -25,3 +25,6 @@ extension `errors` lists every failure, keyed by field path:
 - Each field maps to one or more English messages, meant for a developer.
 - Correct the request before sending it again; the same request fails the
   same way.
+
+A rule of the domain answers the same way, such as a tenant's name that
+another tenant has: `"errors": { "name": ["A tenant named 'Sales' already exists."] }`.

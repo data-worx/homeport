@@ -16,6 +16,18 @@ internal static class ControlPlaneProblems
         "The request is not authenticated.",
         StatusCodes.Status401Unauthorized);
 
+    /// <summary>The token is not the operator's: it lacks the scope <c>admin</c> or names a tenant.</summary>
+    internal static readonly ControlPlaneProblem InsufficientScope = new(
+        "insufficient-scope",
+        "The client's token lacks the scope this route requires.",
+        StatusCodes.Status403Forbidden);
+
+    /// <summary>The request failed validation; <see cref="ProblemConventions.ErrorsExtension"/> says where.</summary>
+    internal static readonly ControlPlaneProblem Validation = new(
+        "validation",
+        "One or more validation errors occurred.",
+        StatusCodes.Status400BadRequest);
+
     /// <summary>An unexpected failure inside the control plane.</summary>
     internal static readonly ControlPlaneProblem Internal = new(
         "internal",

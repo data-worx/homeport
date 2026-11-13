@@ -1,0 +1,185 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/tenants"
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject IDialogService Dialogs
+@inject NavigationManager Navigation
+
+<PageTitle>Tenants · Homeport</PageTitle>
+
+<div class="d-flex align-center justify-space-between flex-wrap gap-4 mb-6">
+    <div>
+        <MudText Typo="Typo.h4" HtmlTag="h1">Tenants</MudText>
+        <MudText Class="mud-text-secondary">@Summary</MudText>
+    </div>
+    @if (_tenants is { Count: > 0 })
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@HomeportIcons.Lucide.Plus" OnClick="CreateAsync" data-action="create">Add tenant</MudButton>
+    }
+</div>
+
+<MudGrid Spacing="4">
+    <MudItem xs="12" lg="7">
+        <MudPaper Outlined="true">
+            @if (_problem.Problem is not null)
+            {
+                <ListError Title="Could not load tenants" State="_problem" OnRetry="LoadAsync" />
+            }
+            else if (_tenants is null)
+            {
+                <ListLoading Label="Loading tenants" />
+            }
+            else if (_tenants.Count == 0)
+            {
+                <ListEmpty Illustration="spot-crane-docking.svg"
+                           Title="No tenants yet"
+                           Text="A tenant is a department or customer of this installation. Add the first one, then register its clients.">
+                    <MudButton Variant="Variant.Outlined" StartIcon="@HomeportIcons.Lucide.Plus" OnClick="CreateAsync" data-action="create">Add tenant</MudButton>
+                </ListEmpty>
+            }
+            else
+            {
+                <div class="pa-3">
+                    <MudTextField @bind-Value="_search"
+                                  Placeholder="Search tenants"
+                                  aria-label="Search tenants"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@HomeportIcons.Lucide.Search"
+                                  Immediate="true"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </div>
+                <MudSimpleTable Hover="true" Dense="false" Elevation="0" data-tenants>
+                    <thead>
+                        <tr>
+                            <th>Tenant</th>
+                            <th class="hp-num">Clients</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tenant in Shown)
+                        {
+                            var selected = tenant.Id == _selected?.Id;
+                            <tr @key="tenant.Id" @onclick="() => Select(tenant)" aria-selected="@(selected ? "true" : "false")"
+                                class="@(selected ? "hp-selected" : null)" style="cursor:pointer" data-tenant="@tenant.Id">
+                                <td>
+                                    <MudLink OnClick="() => Select(tenant)">@tenant.Name</MudLink>
+                                    <div class="hp-mono mud-text-secondary hp-id">@tenant.Id</div>
+                                </td>
+                                <td class="hp-num">@tenant.ClientCount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+                @if (!Shown.Any())
+                {
+                    <MudText Class="pa-4 mud-text-secondary">No tenant matches “@_search”.</MudText>
+                }
+            }
+        </MudPaper>
+    </MudItem>
+    @if (_selected is { } selected)
+    {
+        <MudItem xs="12" lg="5">
+            <MudPaper Outlined="true" Class="pa-4" data-tenant-detail>
+                <div class="d-flex align-start justify-space-between gap-4 mb-4">
+                    <div>
+                        <MudText Typo="Typo.h5" HtmlTag="h2">@selected.Name</MudText>
+                        <MudText Typo="Typo.body2" Class="hp-mono mud-text-secondary">@selected.Id</MudText>
+                    </div>
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="() => RenameAsync(selected)" data-action="rename">Rename</MudButton>
+                </div>
+                <dl class="hp-kv">
+                    <dt>Name</dt>
+                    <dd>@selected.Name</dd>
+                    <dt>Id</dt>
+                    <dd class="hp-mono">@selected.Id</dd>
+                    <dt>Clients</dt>
+                    <dd>@selected.ClientCount</dd>
+                </dl>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private readonly ProblemState _problem = new();
+    private List<TenantResponse>? _tenants;
+    private TenantResponse? _selected;
+    private string _search = string.Empty;
+
+    private string Summary => _tenants is null
+        ? "Departments and customers of this installation"
+        : $"{_tenants.Count} {(_tenants.Count == 1 ? "tenant" : "tenants")} · departments and customers of this installation";
+
+    private IEnumerable<TenantResponse> Shown => string.IsNullOrWhiteSpace(_search)
+        ? _tenants ?? []
+        : (_tenants ?? []).Where(tenant =>
+            tenant.Name.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase)
+            || tenant.Id.ToString().Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    // After the first render, so the prerendered page shows the loading state
+    // and the list is read once, by the circuit.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _problem.Clear();
+        _tenants = null;
+        var result = await AdminApi.GetTenantsAsync(CancellationToken.None);
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+            return;
+        }
+
+        if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+            return;
+        }
+
+        _tenants = result.Value!.Tenants.ToList();
+        _selected = _tenants.FirstOrDefault(tenant => tenant.Id == _selected?.Id) ?? _tenants.FirstOrDefault();
+    }
+
+    private void Select(TenantResponse tenant) => _selected = tenant;
+
+    private async Task CreateAsync()
+    {
+        if (await AskAsync("Add tenant", tenant: null) is { } created)
+        {
+            _tenants!.Add(created);
+            _tenants.Sort((a, b) => StringComparer.InvariantCulture.Compare(a.Name, b.Name));
+            _selected = created;
+        }
+    }
+
+    private async Task RenameAsync(TenantResponse tenant)
+    {
+        if (await AskAsync($"Rename {tenant.Name}", tenant) is { } renamed)
+        {
+            _tenants![_tenants.FindIndex(t => t.Id == renamed.Id)] = renamed;
+            _tenants.Sort((a, b) => StringComparer.InvariantCulture.Compare(a.Name, b.Name));
+            _selected = renamed;
+        }
+    }
+
+    private async Task<TenantResponse?> AskAsync(string title, TenantResponse? tenant)
+    {
+        var parameters = new DialogParameters<TenantNameDialog> { { dialog => dialog.Tenant, tenant } };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, CloseOnEscapeKey = true };
+        var dialog = await Dialogs.ShowAsync<TenantNameDialog>(title, parameters, options);
+        var result = await dialog.Result;
+
+        return result is { Canceled: false, Data: TenantResponse changed } ? changed : null;
+    }
+}

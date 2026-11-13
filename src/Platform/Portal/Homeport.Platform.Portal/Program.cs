@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Portal.AdminApi;
 using Homeport.Platform.Portal.Components;
 using Homeport.Platform.Portal.SignIn;
 using Homeport.Shared.ServiceDefaults;
@@ -28,6 +29,7 @@ public sealed class Program
         builder.AddServiceDefaults();
         builder.Services.AddTrustedProxies();
         builder.Services.AddOperatorSignIn();
+        builder.Services.AddAdminApi();
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
@@ -69,15 +71,17 @@ public sealed class Program
         {
             var signIn = app.Services.GetRequiredService<IOptions<SignInOptions>>().Value;
             var proxies = app.Services.GetRequiredService<IOptions<TrustedProxiesOptions>>().Value;
+            var adminApi = app.Services.GetRequiredService<IOptions<AdminApiOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Portal started on {Urls}: operators sign in at {Authority} as client {ClientId}, access with the claim {ClaimType} = {ClaimValue}, names from {NameClaim}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}",
+                "Portal started on {Urls}: operators sign in at {Authority} as client {ClientId}, access with the claim {ClaimType} = {ClaimValue}, names from {NameClaim}, admin API at {AdminApiUrl}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}",
                 app.Urls,
                 signIn.Authority,
                 signIn.ClientId,
                 signIn.ClaimType,
                 signIn.ClaimValue,
                 signIn.NameClaim,
+                adminApi.Url,
                 proxies.Proxies,
                 proxies.Networks);
         });
