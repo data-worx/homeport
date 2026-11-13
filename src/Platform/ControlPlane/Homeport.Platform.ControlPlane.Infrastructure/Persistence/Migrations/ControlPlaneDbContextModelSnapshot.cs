@@ -102,6 +102,9 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Plans", "control_plane");
                 });
 

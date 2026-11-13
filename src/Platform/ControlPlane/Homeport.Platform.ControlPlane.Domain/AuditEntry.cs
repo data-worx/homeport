@@ -20,6 +20,15 @@ public sealed class AuditEntry
     /// <summary>A tenant was renamed.</summary>
     public const string TenantRenamed = "tenant.renamed";
 
+    /// <summary>A plan was created.</summary>
+    public const string PlanCreated = "plan.created";
+
+    /// <summary>A plan's name or limits were changed.</summary>
+    public const string PlanChanged = "plan.changed";
+
+    /// <summary>A plan was deleted.</summary>
+    public const string PlanDeleted = "plan.deleted";
+
     public required Guid Id { get; init; }
 
     /// <summary>When the change was made.</summary>
@@ -44,5 +53,11 @@ public sealed class AuditEntry
     public static string TenantTarget(Guid tenantId)
     {
         return $"tenants/{tenantId}";
+    }
+
+    /// <summary>The <see cref="Target"/> that names the plan <paramref name="planId"/>.</summary>
+    public static string PlanTarget(Guid planId)
+    {
+        return $"plans/{planId}";
     }
 }
