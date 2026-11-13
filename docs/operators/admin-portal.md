@@ -6,11 +6,12 @@ in at your own identity provider; the portal never sees your password. It is
 a Blazor Server application, so your tokens stay on its server and never
 reach the browser.
 
-So far the portal is its shell: you sign in, see who you are signed in as,
-and sign out. Its pages for tenants, plans, clients, modules, usage and the
-audit log follow, each with its own entry in the navigation.
+You sign in, see who you are signed in as, sign out, and manage the
+tenants. The pages for plans, clients, modules, usage and the audit log
+follow, each with its own entry in the navigation. Every page calls the
+[admin API](admin-api.md) at the gateway's admin port, as you.
 
-![The portal's shell after signing in: the app bar with the operator's name, an empty navigation and the start page](admin-portal-shell.png)
+![The portal's shell after signing in: the app bar with the operator's name, the navigation and the start page](admin-portal-shell.png)
 
 ## Signing in
 
@@ -32,6 +33,28 @@ audit log follow, each with its own entry in the navigation.
 *Sign out*, in the menu under your name, ends the session at the portal and
 at the provider, and returns to the sign-in page.
 
+## Tenants
+
+*Tenants* lists every tenant with its id and number of clients; the search
+field filters by name or id. Selecting a tenant shows its facts next to the
+list.
+
+![The tenant list with a search field, two tenants and the facts of the selected one](admin-portal-tenants.png)
+
+*Add tenant* asks for a name; *Rename* changes the selected tenant's name.
+A name must be unique among tenants, compared case-sensitively. When the
+admin API refuses one, the dialog puts the reason at the name field:
+
+![The rename dialog with the name of another tenant and the message that it already exists](admin-portal-tenants-rename.png)
+
+Every other problem of the admin API — the gateway or the control plane not
+answering, for example — appears as an alert with its title, its detail and
+the trace id, the same on every page. While the list loads it shows
+placeholder rows; when it cannot be loaded, the problem and *Try again*.
+
+Each change is recorded in the audit log with your subject and display name
+(see [the admin API](admin-api.md#audit)).
+
 ## Configuration
 
 | Setting | Environment variable | Default | Meaning |
@@ -43,12 +66,18 @@ at the provider, and returns to the sign-in page.
 | `SignIn:ClaimValue` | `SignIn__ClaimValue` | `homeport-admin` | The value that claim must carry |
 | `SignIn:NameClaim` | `SignIn__NameClaim` | `name` | The claim your display name is taken from, shown in the app bar |
 | `SignIn:RequireHttpsMetadata` | `SignIn__RequireHttpsMetadata` | `true` | Whether the metadata must be fetched over HTTPS. Turn it off only for a development provider without TLS |
+| `AdminApi:Url` | `AdminApi__Url` | — | The gateway's admin port, such as `http://gateway:8000` |
 | `TrustedProxies:Proxies:0`, … | `TrustedProxies__Proxies__0`, … | — | The reverse proxies whose forwarded headers the portal applies; see [below](#tls-and-the-reverse-proxy) |
 | `TrustedProxies:Networks:0`, … | `TrustedProxies__Networks__0`, … | — | The same, as networks in CIDR notation |
 
-The portal does not start without an authority, a client id and a secret.
-Its start is logged at Information with the authority, the client id, the
-claim, the name claim and the trusted proxies, never with the secret.
+The portal does not start without an authority, a client id, a secret and
+the address of the admin API. Its start is logged at Information with the
+authority, the client id, the claim, the name claim, the address of the
+admin API and the trusted proxies, never with the secret.
+
+The portal asks your provider for a refresh token with the scopes it
+requests by default; a provider that issues none ends a page's work when
+the access token expires, and you sign in again.
 
 Use the same claim as the gateway's admin API, `AdminApi:ClaimType` and
 `AdminApi:ClaimValue` (see [the admin API](admin-api.md)): the portal lets
@@ -90,6 +119,14 @@ can sign in.
 
 ## Sessions
 
+Your session keeps the tokens of the sign-in in its cookie. A page reads
+them once, when its connection to the portal opens, and from then on renews
+the access token with the refresh token shortly before it expires, so a
+page left open keeps working while your session at the identity provider
+lasts. Once the provider refuses the refresh — your session there has
+ended — or the gateway refuses the token, the portal sends you to sign in
+again and returns you to the page.
+
 The session cookie is protected with ASP.NET Core's data protection keys.
 The image keeps them inside the container, so a restart of the portal ends
 every session and the operators sign in again. Run one replica: a second one
@@ -127,5 +164,8 @@ services:
 ## What is logged
 
 At Warning: a signed-in user without the claim that grants access, with the
-claim they lack, and a sign-in refused over plain HTTP. Neither names the
-user.
+claim they lack, a sign-in refused over plain HTTP, a refresh the identity
+provider refused, with its status, an admin API the portal cannot reach,
+and an error of the admin API without Problem Details. None names the user
+or carries a token. At Debug: the problem type of each error the admin API
+answered with.

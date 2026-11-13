@@ -12,7 +12,7 @@ stores data owns one schema in it and nothing outside it:
 
 | Service | Schema | Tables |
 |---|---|---|
-| Control plane | `control_plane` | `Tenants`, `Plans`, `Clients`, and EF Core's `__EFMigrationsHistory` |
+| Control plane | `control_plane` | `Tenants`, `Plans`, `Clients`, `audit_entries`, and EF Core's `__EFMigrationsHistory` |
 | Metering | `metering` | `UsageEvents`, `UsageHourly`, `UsageDaily`, and EF Core's `__EFMigrationsHistory` |
 
 Each schema comes with two roles, which
@@ -32,10 +32,12 @@ only after it completed. A bug or a compromise in a running service
 therefore cannot change the schema, and an operator sees a failed migration
 as a failed step, not as a service that does not come up.
 
-The setup of schemas and roles is SQL only PostgreSQL understands. It is the
-one place besides row-level security where Homeport's data access is not
-provider-neutral, and it is kept in the init script rather than in the
-migrations, because creating a role needs rights no service holds.
+The setup of schemas and roles is SQL only PostgreSQL understands. Besides
+it, only row-level security and the privileges of an audit table are not
+provider-neutral. The setup is kept in the init script rather than in the
+migrations, because creating a role needs rights no service holds. Taking
+`UPDATE` and `DELETE` on an audit table back from the app role needs only
+the owner's rights, so the migration that creates the table does it.
 
 ## Tenant-owned and platform tables
 
@@ -53,7 +55,10 @@ A table is one of two kinds:
   tenant reads them, and the services that read them — the gateway, through
   the control plane — read them for every tenant alike. They have no query
   filter and no row-level security, even where a row names a tenant, as
-  `Clients` does.
+  `Clients` does. The audit tables, such as `control_plane.audit_entries`,
+  are platform tables too: they record what the operator did, and the
+  service's app role may only add to them and read them
+  ([ADR-0020](adr/0020-the-operator-as-a-caller.md)).
 
 The distinction is made per table, by asking whose data its rows are. A
 table whose rows a tenant created is tenant-owned, even if the operator also

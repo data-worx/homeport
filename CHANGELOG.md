@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The operator manages tenants in the admin portal: a list with search, and
+  dialogs to create and rename a tenant. A tenant's name is unique,
+  compared case-sensitively. The pages show every problem of the admin API
+  the same way, with the reason at the form field it belongs to and the
+  trace id. See [the admin portal](docs/operators/admin-portal.md#tenants).
+
+- The admin API serves `GET`, `POST` and `PUT` under
+  `/platform/v1/admin/tenants`. Every change writes an entry with the
+  operator's subject and display name into `control_plane.audit_entries`,
+  which the control plane can add to but never change or delete. See
+  [the admin API](docs/operators/admin-api.md#endpoints).
+
 - The admin portal, the new image `homeport-portal`: the operator signs in
   at their own identity provider with authorization code and PKCE, and needs
   a configurable claim, such as `roles` with `homeport-admin`, to get in.
