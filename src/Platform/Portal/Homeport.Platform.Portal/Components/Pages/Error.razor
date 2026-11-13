@@ -1,0 +1,27 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/error"
+@page "/error/{StatusCode:int}"
+@attribute [AllowAnonymous]
+@attribute [ExcludeFromInteractiveRouting]
+@layout PlainLayout
+
+@* An unhandled exception, and an error status without a page of its own,
+   re-executed here with its status code. *@
+<PageTitle>@Title · Homeport</PageTitle>
+
+<ErrorPanel Title="@Title" Message="@Message">
+    <MudButton Href="" Variant="Variant.Text" Color="Color.Primary">Back to Homeport</MudButton>
+</ErrorPanel>
+
+@code {
+    [Parameter]
+    public int? StatusCode { get; set; }
+
+    private bool IsNotFound => StatusCode == StatusCodes.Status404NotFound;
+
+    private string Title => IsNotFound ? ErrorTexts.NotFoundTitle : "Something went wrong";
+
+    private string Message => IsNotFound
+        ? ErrorTexts.NotFoundMessage
+        : "The portal could not complete the request. If it happens again, give your platform admin the trace id.";
+}

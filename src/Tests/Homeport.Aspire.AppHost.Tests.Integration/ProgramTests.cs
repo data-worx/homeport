@@ -42,6 +42,7 @@ public sealed class ProgramTests
         [InlineData("gateway")]
         [InlineData("control-plane")]
         [InlineData("metering")]
+        [InlineData("portal")]
         public async Task Starts_The_Resource_Healthy(string resource)
         {
             using var timeout = new CancellationTokenSource(RunningAppHost.StartTimeout);
@@ -111,7 +112,7 @@ public sealed class ProgramTests
         }
 
         [Fact]
-        public void Exposes_Only_The_Gateway_And_Keycloak_Externally()
+        public void Exposes_Only_The_Gateway_The_Portal_And_Keycloak_Externally()
         {
             var model = appHost.App.Services.GetRequiredService<DistributedApplicationModel>();
 
@@ -120,7 +121,7 @@ public sealed class ProgramTests
                 .Select(resource => resource.Name)
                 .Order(StringComparer.Ordinal);
 
-            Assert.Equal(["gateway", "keycloak"], external);
+            Assert.Equal(["gateway", "keycloak", "portal"], external);
         }
 
         [Fact]

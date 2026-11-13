@@ -9,3 +9,10 @@ const Homeport.Shared.ServiceDefaults.TelemetryAttributes.Meter = "homeport.mete
 const Homeport.Shared.ServiceDefaults.TelemetryAttributes.ModuleId = "homeport.module.id" -> string!
 const Homeport.Shared.ServiceDefaults.TelemetryAttributes.TenantId = "homeport.tenant.id" -> string!
 Homeport.Shared.ServiceDefaults.TelemetryAttributes
+const Homeport.Shared.ServiceDefaults.Proxies.TrustedProxiesOptions.SectionName = "TrustedProxies" -> string!
+Homeport.Shared.ServiceDefaults.Proxies.TrustedProxiesOptions
+Homeport.Shared.ServiceDefaults.Proxies.TrustedProxiesOptions.Networks.get -> System.Collections.Generic.IList<string!>!
+Homeport.Shared.ServiceDefaults.Proxies.TrustedProxiesOptions.Proxies.get -> System.Collections.Generic.IList<string!>!
+Homeport.Shared.ServiceDefaults.Proxies.TrustedProxiesOptions.TrustedProxiesOptions() -> void
+Homeport.Shared.ServiceDefaults.Proxies.TrustedProxiesServiceCollectionExtensions
+static Homeport.Shared.ServiceDefaults.Proxies.TrustedProxiesServiceCollectionExtensions.AddTrustedProxies(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Becomes an image: carries THIRD-PARTY-NOTICES.md (Directory.Build.targets). -->
+    <ShipsThirdPartyNotices>true</ShipsThirdPartyNotices>
+    <!-- The image name, locally and in GHCR: the service.name of the component. -->
+    <ContainerRepository>homeport-portal</ContainerRepository>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DesignKit>..\..\..\..\design\</DesignKit>
+  </PropertyGroup>
+
+  <!-- The design kit is the source of the theme, the stylesheet, the fonts,
+       the logos and the illustration; the portal links them rather than
+       keeping copies, and serves them itself, never from a CDN. ContentRoot
+       is the directory the published path is relative to, so the files are
+       served from design/ while developing. -->
+  <ItemGroup>
+    <Compile Include="$(DesignKit)dist\HomeportTheme.cs" Link="Theming\HomeportTheme.cs" />
+    <Compile Include="$(DesignKit)dist\HomeportIcons.cs" Link="Theming\HomeportIcons.cs" />
+    <Content Include="$(DesignKit)dist\portal.css" Link="wwwroot\portal.css" ContentRoot="$(DesignKit)dist\" />
+    <Content Include="$(DesignKit)fonts\*.woff2" Link="wwwroot\fonts\%(Filename)%(Extension)" ContentRoot="$(DesignKit)" />
+    <Content Include="$(DesignKit)assets\logos\favicon.svg;$(DesignKit)assets\logos\homeport-icon-mono-white.svg;$(DesignKit)assets\logos\homeport-lockup.svg" Link="wwwroot\%(Filename)%(Extension)" ContentRoot="$(DesignKit)assets\logos\" />
+    <Content Include="$(DesignKit)assets\illustrations\hero-home-port.svg" Link="wwwroot\%(Filename)%(Extension)" ContentRoot="$(DesignKit)assets\illustrations\" />
+  </ItemGroup>
+
+  <!-- The licence files of the fonts and icons travel with them, under
+       /app/licenses/ next to THIRD-PARTY-NOTICES.md, which lists them. -->
+  <ItemGroup>
+    <None Include="$(DesignKit)assets\licenses\*.txt"
+          Link="licenses\%(Filename)%(Extension)"
+          CopyToPublishDirectory="PreserveNewest"
+          CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+    <PackageReference Include="MudBlazor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Homeport.Shared.ServiceDefaults\Homeport.Shared.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

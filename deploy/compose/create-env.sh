@@ -4,8 +4,8 @@
 # Writes deploy/compose/.env for a local run of the compose file: the images
 # built from this checkout, a random password or secret for every variable
 # .env.example lists, a fresh signing key for the gateway, a registration key
-# for Echo, the directories of the init scripts and the Keycloak realm, and
-# the seed of the control plane.
+# for Echo, the directories of the init scripts and the Keycloak realm, the
+# portal's address, and the seed of the control plane.
 #
 # Refuses to overwrite an existing .env: the databases and the broker keep
 # the passwords they were first started with.
@@ -33,6 +33,10 @@ trap 'rm -f "$tmp"' EXIT
   printf 'CONTROL_PLANE_MIGRATE_IMAGE=homeport-control-plane:latest\n'
   printf 'METERING_IMAGE=homeport-metering:latest\nMETERING_PORT=8080\n'
   printf 'METERING_MIGRATE_IMAGE=homeport-metering:latest\n'
+  printf 'PORTAL_IMAGE=homeport-portal:latest\nPORTAL_PORT=8080\n'
+  # The portal's address in the browser, which a reverse proxy terminating
+  # TLS serves; the realm sends the operator back to it after signing in.
+  printf 'PORTAL_ADDRESS=https://localhost\n'
   printf 'POSTGRES_BINDMOUNT_0=../postgres/init\nKEYCLOAK_BINDMOUNT_0=../keycloak/realms\n'
   printf 'RABBITMQ_BINDMOUNT_0=../rabbitmq/init\n'
   sed -n 's/^\([A-Z_]*_\(PASSWORD\|SECRET\)\)=$/\1/p' .env.example | while read -r name; do

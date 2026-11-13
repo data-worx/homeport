@@ -1,0 +1,22 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+
+<div>
+    <MudText Typo="Typo.h4" HtmlTag="h1">@Title</MudText>
+    <MudText Class="mud-text-secondary">@Message</MudText>
+</div>
+@ChildContent
+<TraceIdLine />
+
+@code {
+    /// <summary>What went wrong, in a few words.</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>One sentence on what it means for the operator.</summary>
+    [Parameter, EditorRequired]
+    public string Message { get; set; } = string.Empty;
+
+    /// <summary>What the operator can do next, if anything.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

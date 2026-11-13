@@ -4,11 +4,11 @@ using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 
-namespace Homeport.Platform.Gateway.Api.Tests.Integration;
+namespace Homeport.Shared.ServiceDefaults.Tests.Integration;
 
 /// <summary>
 /// Gives every request the remote address <paramref name="address"/> before
-/// the gateway's own pipeline sees it. The in-memory test server sets none, so
+/// the service's own pipeline sees it. The in-memory test server sets none, so
 /// without it no request comes from anywhere a proxy could be trusted at.
 /// </summary>
 internal sealed class CallerAddress(IPAddress address) : IStartupFilter

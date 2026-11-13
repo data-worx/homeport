@@ -24,6 +24,7 @@ declare -A projects=(
   [ECHO]="src/Modules/Echo/Homeport.Modules.Echo.Api"
   [GATEWAY]="src/Platform/Gateway/Homeport.Platform.Gateway.Api"
   [METERING]="src/Platform/Metering/Homeport.Platform.Metering.Api"
+  [PORTAL]="src/Platform/Portal/Homeport.Platform.Portal"
   [REGISTRY]="src/Platform/Registry/Homeport.Platform.Registry.Api"
 )
 

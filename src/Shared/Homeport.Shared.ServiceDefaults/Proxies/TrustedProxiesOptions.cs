@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Homeport.Platform.Gateway.Api.Proxies;
+namespace Homeport.Shared.ServiceDefaults.Proxies;
 
 /// <summary>
-/// The reverse proxies in front of the gateway whose <c>X-Forwarded-For</c>
-/// and <c>X-Forwarded-Proto</c> it applies. Empty by default: the gateway
+/// The reverse proxies in front of a service whose <c>X-Forwarded-For</c>
+/// and <c>X-Forwarded-Proto</c> it applies. Empty by default: the service
 /// then ignores forwarded headers from every caller, loopback included.
 /// </summary>
 public sealed class TrustedProxiesOptions

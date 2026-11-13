@@ -72,6 +72,12 @@ reader it is written for:
 - A migration updates its schema's ER diagram,
   `docs/architecture/data-model-<schema>.drawio.svg` with `-` for `_`, in
   the same pull request. See [the data model](docs/architecture/data-model.md#schemas).
+- A change to what a page of the admin portal shows updates its
+  screenshot in the same pull request, and a new page gets one.
+  A screenshot is a PNG next to the document that embeds it, named
+  `<document>-<subject>.png`, taken from the running AppHost in the light
+  theme, without the mouse pointer. It is an image of the product, not a
+  diagram, so `core.diagrams` does not apply to it.
 - A change to the path of a call to a module, of a platform request, of an
   admin request or of a module's registration updates its sequence diagram,
   `docs/architecture/request-flow-<flow>.drawio.svg` or the one in

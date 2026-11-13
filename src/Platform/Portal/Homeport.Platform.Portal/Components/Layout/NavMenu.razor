@@ -1,0 +1,15 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+<MudNavMenu Class="pt-2">
+    @foreach (var entry in Navigation.Main)
+    {
+        <MudNavLink Href="@entry.Href" Icon="@entry.Icon" Match="NavLinkMatch.Prefix">@entry.Label</MudNavLink>
+    }
+    @if (Navigation.Platform.Count > 0)
+    {
+        <MudText Typo="Typo.overline" Class="px-4 pt-4">Platform</MudText>
+        @foreach (var entry in Navigation.Platform)
+        {
+            <MudNavLink Href="@entry.Href" Icon="@entry.Icon" Match="NavLinkMatch.Prefix">@entry.Label</MudNavLink>
+        }
+    }
+</MudNavMenu>

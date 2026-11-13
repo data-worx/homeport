@@ -38,6 +38,15 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: 10.0.x
+      # The AppHost serves the portal over HTTPS with the development
+      # certificate, which a developer's machine trusts (running-locally.md);
+      # the end-to-end tests reach it there. On Linux, --trust puts the
+      # certificate into a directory OpenSSL reads only through SSL_CERT_DIR,
+      # and exits with 4 because no browser trusts it: OpenSSL is the only
+      # client here, so 4 passes and every other failure does not.
+      - run: |
+          dotnet dev-certs https --trust || [ "$?" -eq 4 ]
+          echo "SSL_CERT_DIR=${HOME}/.aspnet/dev-certs/trust:/usr/lib/ssl/certs" >> "${GITHUB_ENV}"
       - run: bash .devkit/gates.sh
 
   release:

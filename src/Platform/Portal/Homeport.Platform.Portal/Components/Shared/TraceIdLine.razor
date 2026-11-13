@@ -1,0 +1,15 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@using System.Diagnostics
+
+@* The trace id of the request, which the operator hands to whoever reads the
+   logs and traces. *@
+<MudText Typo="Typo.body2" Class="mud-text-secondary">
+    Trace id <span class="hp-mono" data-trace-id>@TraceId</span>
+</MudText>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private string TraceId => Activity.Current?.TraceId.ToHexString() ?? HttpContext?.TraceIdentifier ?? string.Empty;
+}

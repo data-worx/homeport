@@ -49,7 +49,45 @@
       "source": "https://github.com/JasperFx/wolverine/blob/29806dd8a8180d165878a6dcb8f096abd782dc84/LICENSE"
     }
   },
-  "assets": [],
+  "assets": [
+    {
+      "name": "Instrument Sans",
+      "version": "Fontsource 5.3",
+      "license": "OFL-1.1",
+      "copyright": "Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans)",
+      "files": [
+        "design/fonts/InstrumentSans-Variable.woff2",
+        "design/fonts/InstrumentSans-Variable-Italic.woff2"
+      ]
+    },
+    {
+      "name": "JetBrains Mono",
+      "version": "Fontsource 5.3",
+      "license": "OFL-1.1",
+      "copyright": "Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)",
+      "files": [
+        "design/fonts/JetBrainsMono-Variable.woff2"
+      ]
+    },
+    {
+      "name": "Lucide icons",
+      "version": "1.59.0",
+      "license": "ISC",
+      "copyright": "Copyright (c) 2026 Lucide Icons and Contributors",
+      "files": [
+        "design/dist/HomeportIcons.cs"
+      ]
+    },
+    {
+      "name": "Lucide icons derived from Feather",
+      "version": "1.59.0",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2013-present Cole Bemis",
+      "files": [
+        "design/dist/HomeportIcons.cs"
+      ]
+    }
+  ],
   "license": {
     "RabbitMQ.Client": {
       "chosen": "Apache-2.0",
