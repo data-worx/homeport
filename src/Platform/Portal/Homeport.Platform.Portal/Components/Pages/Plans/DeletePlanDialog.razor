@@ -1,0 +1,56 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject NavigationManager Navigation
+
+@* Asks before a plan is deleted, and shows why when it was not - above all
+   that a client still uses it. *@
+<MudDialog>
+    <DialogContent>
+        <ProblemAlert State="_problem" />
+        <MudText>
+            Delete the plan <strong>@Plan.Name</strong>? This cannot be undone.
+            A plan can only be deleted while no client uses it.
+        </MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_deleting">Cancel</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="DeleteAsync" Disabled="_deleting" data-action="confirm-delete">Delete</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private readonly ProblemState _problem = new();
+    private bool _deleting;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = default!;
+
+    /// <summary>The plan to delete.</summary>
+    [Parameter, EditorRequired]
+    public PlanResponse Plan { get; set; } = default!;
+
+    private void Cancel() => Dialog.Cancel();
+
+    private async Task DeleteAsync()
+    {
+        _deleting = true;
+        _problem.Clear();
+        var result = await AdminApi.DeletePlanAsync(Plan.Id, CancellationToken.None);
+        _deleting = false;
+
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+        }
+        else if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+        }
+        else
+        {
+            Dialog.Close(DialogResult.Ok(Plan.Id));
+        }
+    }
+}

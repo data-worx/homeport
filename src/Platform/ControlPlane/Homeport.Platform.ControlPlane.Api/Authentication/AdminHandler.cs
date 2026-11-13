@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Security.Claims;
-using Homeport.Platform.ControlPlane.Application.Tenants;
+using Homeport.Platform.ControlPlane.Application;
 using Homeport.Shared.Authentication;
 using Microsoft.AspNetCore.Authorization;
 

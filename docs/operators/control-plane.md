@@ -67,7 +67,7 @@ It is configured by environment variables:
 | `Seed__PlanId` | `SEED_PLAN_ID` | The plan's id, a uuid |
 | `Seed__PlanName` | `SEED_PLAN_NAME` | The plan's name, at most 200 characters |
 | `Seed__RequestsPerSecond` | `SEED_PLAN_REQUESTS_PER_SECOND` | How fast the plan's token bucket refills; positive |
-| `Seed__Burst` | `SEED_PLAN_BURST` | How many requests the bucket holds; at least the rate |
+| `Seed__Burst` | `SEED_PLAN_BURST` | How many requests the bucket holds; positive, and may be below the rate |
 | `Seed__ClientId` | `SEED_CLIENT_ID` | The client id as your identity provider issues it |
 
 A missing or invalid value fails `migrate` with exit code `1`, and the

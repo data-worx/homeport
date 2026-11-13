@@ -36,6 +36,7 @@ gateway replaces, unless a type below applies; see
 | `https://homeport.data-worx.de/problems/module-timeout` | 504 | [module-timeout](module-timeout.md) |
 | `https://homeport.data-worx.de/problems/module-unavailable` | 503 | [module-unavailable](module-unavailable.md) |
 | `https://homeport.data-worx.de/problems/module-unreachable` | 502 | [module-unreachable](module-unreachable.md) |
+| `https://homeport.data-worx.de/problems/plan-in-use` | 409 | [plan-in-use](plan-in-use.md) |
 | `https://homeport.data-worx.de/problems/rate-limited` | 429 | [rate-limited](rate-limited.md) |
 | `https://homeport.data-worx.de/problems/unauthorized` | 401 | [unauthorized](unauthorized.md) |
 | `https://homeport.data-worx.de/problems/unknown-client` | 403 | [unknown-client](unknown-client.md) |

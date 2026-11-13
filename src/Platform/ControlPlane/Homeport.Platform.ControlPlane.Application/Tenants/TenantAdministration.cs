@@ -40,7 +40,7 @@ public sealed class TenantAdministration(ITenantStore store, TimeProvider clock)
 
         var tenant = created.Value;
         store.Add(tenant);
-        store.Add(Entry(now, by, AuditEntry.TenantCreated, tenant.Id, $"Created the tenant '{tenant.Name}'."));
+        store.Add(by.Audit(now, AuditEntry.TenantCreated, AuditEntry.TenantTarget(tenant.Id), $"Created the tenant '{tenant.Name}'."));
 
         return await SaveAsync(tenant, clientCount: 0, cancellationToken);
     }
@@ -67,7 +67,7 @@ public sealed class TenantAdministration(ITenantStore store, TimeProvider clock)
             return Result<TenantOverview>.Success(overview);
         }
 
-        store.Add(Entry(clock.GetUtcNow(), by, AuditEntry.TenantRenamed, id, $"Renamed the tenant '{oldName}' to '{tenant.Name}'."));
+        store.Add(by.Audit(clock.GetUtcNow(), AuditEntry.TenantRenamed, AuditEntry.TenantTarget(id), $"Renamed the tenant '{oldName}' to '{tenant.Name}'."));
 
         return await SaveAsync(tenant, overview.ClientCount, cancellationToken);
     }
@@ -82,20 +82,6 @@ public sealed class TenantAdministration(ITenantStore store, TimeProvider clock)
         }
 
         return Result<TenantOverview>.Success(new TenantOverview(tenant.Id, tenant.Name, clientCount));
-    }
-
-    private static AuditEntry Entry(DateTimeOffset now, Operator by, string action, Guid tenantId, string summary)
-    {
-        return new AuditEntry
-        {
-            Id = Guid.CreateVersion7(now),
-            OccurredAt = now,
-            OperatorSubject = by.Subject,
-            OperatorName = by.Name,
-            Action = action,
-            Target = AuditEntry.TenantTarget(tenantId),
-            Summary = summary,
-        };
     }
 
     private static Result<TenantOverview> NotFound(Guid id)

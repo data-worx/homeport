@@ -1,0 +1,27 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+
+/* The selected row, as the design kit marks it. */
+.hp-selected {
+    background: var(--mud-palette-primary-hover);
+}
+
+.hp-id {
+    font-size: 12px;
+}
+
+/* The facts of a plan: label and value side by side. */
+.hp-kv {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px 24px;
+    margin: 0;
+}
+
+.hp-kv dt {
+    color: var(--mud-palette-text-secondary);
+}
+
+.hp-kv dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}

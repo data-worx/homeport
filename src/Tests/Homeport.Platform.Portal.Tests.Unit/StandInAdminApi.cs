@@ -33,6 +33,26 @@ internal sealed class StandInAdminApi : IAdminApi
     public Task<AdminResult<TenantResponse>> RenameTenantAsync(Guid tenantId, RenameTenantRequest request, CancellationToken cancellationToken) =>
         Task.FromResult(Change ?? AdminResult<TenantResponse>.Success(new TenantResponse(tenantId, request.Name, 0)));
 
+    /// <summary>The answer to <see cref="GetPlansAsync"/>.</summary>
+    internal AdminResult<PlansResponse> Plans { get; set; } = AdminResult<PlansResponse>.Success(new PlansResponse([]));
+
+    /// <summary>The answer to a create or a change of a plan.</summary>
+    internal AdminResult<PlanResponse>? PlanChange { get; set; }
+
+    /// <summary>The answer to <see cref="DeletePlanAsync"/>.</summary>
+    internal AdminResult<Guid>? PlanDeletion { get; set; }
+
+    public Task<AdminResult<PlansResponse>> GetPlansAsync(CancellationToken cancellationToken) => Task.FromResult(Plans);
+
+    public Task<AdminResult<PlanResponse>> CreatePlanAsync(CreatePlanRequest request, CancellationToken cancellationToken) =>
+        Task.FromResult(PlanChange ?? AdminResult<PlanResponse>.Success(new PlanResponse(Guid.NewGuid(), request.Name, request.RequestsPerSecond, request.Burst, 0)));
+
+    public Task<AdminResult<PlanResponse>> ChangePlanAsync(Guid planId, ChangePlanRequest request, CancellationToken cancellationToken) =>
+        Task.FromResult(PlanChange ?? AdminResult<PlanResponse>.Success(new PlanResponse(planId, request.Name, request.RequestsPerSecond, request.Burst, 0)));
+
+    public Task<AdminResult<Guid>> DeletePlanAsync(Guid planId, CancellationToken cancellationToken) =>
+        Task.FromResult(PlanDeletion ?? AdminResult<Guid>.Success(planId));
+
     /// <summary>A validation problem with <paramref name="message"/> at <paramref name="field"/>.</summary>
     internal static ProblemResponse ValidationOf(string field, string message)
     {

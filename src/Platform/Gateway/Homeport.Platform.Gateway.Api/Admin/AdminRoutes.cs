@@ -42,6 +42,11 @@ public sealed class AdminRoutes(IReadOnlyList<AdminEndpoint> endpoints)
             new AdminEndpoint(HttpMethods.Post, TenantsApi.Path, controlPlane),
             new AdminEndpoint(HttpMethods.Get, TenantsApi.TenantPath, controlPlane),
             new AdminEndpoint(HttpMethods.Put, TenantsApi.TenantPath, controlPlane),
+            new AdminEndpoint(HttpMethods.Get, PlansApi.Path, controlPlane),
+            new AdminEndpoint(HttpMethods.Post, PlansApi.Path, controlPlane),
+            new AdminEndpoint(HttpMethods.Get, PlansApi.PlanPath, controlPlane),
+            new AdminEndpoint(HttpMethods.Put, PlansApi.PlanPath, controlPlane),
+            new AdminEndpoint(HttpMethods.Delete, PlansApi.PlanPath, controlPlane),
         ]);
     }
 

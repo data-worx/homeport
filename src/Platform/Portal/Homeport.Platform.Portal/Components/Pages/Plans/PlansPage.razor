@@ -1,0 +1,188 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/plans"
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject IDialogService Dialogs
+@inject NavigationManager Navigation
+
+<PageTitle>Plans · Homeport</PageTitle>
+
+<div class="d-flex align-center justify-space-between flex-wrap gap-4 mb-6">
+    <div>
+        <MudText Typo="Typo.h4" HtmlTag="h1">Plans</MudText>
+        <MudText Class="mud-text-secondary">@Summary</MudText>
+    </div>
+    @if (_plans is { Count: > 0 })
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@HomeportIcons.Lucide.Plus" OnClick="CreateAsync" data-action="create">Add plan</MudButton>
+    }
+</div>
+
+<MudGrid Spacing="4">
+    <MudItem xs="12" lg="7">
+        <MudPaper Outlined="true">
+            @if (_problem.Problem is not null)
+            {
+                <ListError Title="Could not load plans" State="_problem" OnRetry="LoadAsync" />
+            }
+            else if (_plans is null)
+            {
+                <ListLoading Label="Loading plans" />
+            }
+            else if (_plans.Count == 0)
+            {
+                <ListEmpty Illustration="spot-crane-docking.svg"
+                           Title="No plans yet"
+                           Text="A plan sets the rate limit a tenant's clients get. Add the first one, then register clients on it.">
+                    <MudButton Variant="Variant.Outlined" StartIcon="@HomeportIcons.Lucide.Plus" OnClick="CreateAsync" data-action="create">Add plan</MudButton>
+                </ListEmpty>
+            }
+            else
+            {
+                <MudSimpleTable Hover="true" Dense="false" Elevation="0" data-plans>
+                    <thead>
+                        <tr>
+                            <th>Plan</th>
+                            <th class="hp-num">Requests per second</th>
+                            <th class="hp-num">Burst</th>
+                            <th class="hp-num">Clients</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var plan in _plans)
+                        {
+                            var selected = plan.Id == _selected?.Id;
+                            <tr @key="plan.Id" @onclick="() => Select(plan)" aria-selected="@(selected ? "true" : "false")"
+                                class="@(selected ? "hp-selected" : null)" style="cursor:pointer" data-plan="@plan.Id">
+                                <td>
+                                    <MudLink OnClick="() => Select(plan)">@plan.Name</MudLink>
+                                    <div class="hp-mono mud-text-secondary hp-id">@plan.Id</div>
+                                </td>
+                                <td class="hp-num" data-rate>@plan.RequestsPerSecond</td>
+                                <td class="hp-num" data-burst>@plan.Burst</td>
+                                <td class="hp-num" data-clients>@plan.ClientCount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+        </MudPaper>
+    </MudItem>
+    @if (_selected is { } selected)
+    {
+        <MudItem xs="12" lg="5">
+            <MudPaper Outlined="true" Class="pa-4" data-plan-detail>
+                <div class="d-flex align-start justify-space-between gap-4 mb-4">
+                    <div>
+                        <MudText Typo="Typo.h5" HtmlTag="h2">@selected.Name</MudText>
+                        <MudText Typo="Typo.body2" Class="hp-mono mud-text-secondary">@selected.Id</MudText>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="() => ChangeAsync(selected)" data-action="change">Change</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" OnClick="() => DeleteAsync(selected)" data-action="delete">Delete</MudButton>
+                    </div>
+                </div>
+                <dl class="hp-kv">
+                    <dt>Requests per second</dt>
+                    <dd>@selected.RequestsPerSecond</dd>
+                    <dt>Burst</dt>
+                    <dd>@selected.Burst</dd>
+                    <dt>Clients</dt>
+                    <dd>@selected.ClientCount</dd>
+                </dl>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary mt-4">
+                    A change reaches the gateway once it looks the client up again: after the gateway's <span class="hp-mono">ControlPlane:ClientCacheLifetime</span>, one minute by default.
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private readonly ProblemState _problem = new();
+    private List<PlanResponse>? _plans;
+    private PlanResponse? _selected;
+
+    private string Summary => _plans is null
+        ? "The rate limits of the tenants' clients"
+        : $"{_plans.Count} {(_plans.Count == 1 ? "plan" : "plans")} · the rate limits of the tenants' clients";
+
+    // After the first render, so the prerendered page shows the loading state
+    // and the list is read once, by the circuit.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _problem.Clear();
+        _plans = null;
+        var result = await AdminApi.GetPlansAsync(CancellationToken.None);
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+            return;
+        }
+
+        if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+            return;
+        }
+
+        _plans = result.Value!.Plans.ToList();
+        _selected = _plans.FirstOrDefault(plan => plan.Id == _selected?.Id) ?? _plans.FirstOrDefault();
+    }
+
+    private void Select(PlanResponse plan) => _selected = plan;
+
+    private async Task CreateAsync()
+    {
+        if (await AskAsync("Add plan", plan: null) is { } created)
+        {
+            _plans!.Add(created);
+            Sort();
+            _selected = created;
+        }
+    }
+
+    private async Task ChangeAsync(PlanResponse plan)
+    {
+        if (await AskAsync($"Change {plan.Name}", plan) is { } changed)
+        {
+            _plans![_plans.FindIndex(p => p.Id == changed.Id)] = changed;
+            Sort();
+            _selected = changed;
+        }
+    }
+
+    private async Task DeleteAsync(PlanResponse plan)
+    {
+        var parameters = new DialogParameters<DeletePlanDialog> { { dialog => dialog.Plan, plan } };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, CloseOnEscapeKey = true };
+        var dialog = await Dialogs.ShowAsync<DeletePlanDialog>($"Delete {plan.Name}", parameters, options);
+        if (await dialog.Result is { Canceled: false })
+        {
+            _plans!.RemoveAll(p => p.Id == plan.Id);
+            _selected = _plans.FirstOrDefault();
+        }
+    }
+
+    private void Sort() => _plans!.Sort((a, b) => StringComparer.InvariantCulture.Compare(a.Name, b.Name));
+
+    private async Task<PlanResponse?> AskAsync(string title, PlanResponse? plan)
+    {
+        var parameters = new DialogParameters<PlanDialog> { { dialog => dialog.Plan, plan } };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, CloseOnEscapeKey = true };
+        var dialog = await Dialogs.ShowAsync<PlanDialog>(title, parameters, options);
+        var result = await dialog.Result;
+
+        return result is { Canceled: false, Data: PlanResponse changed } ? changed : null;
+    }
+}

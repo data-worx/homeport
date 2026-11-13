@@ -38,5 +38,23 @@ public sealed class MigrateCommandTests
 
             Assert.Equal(1, exitCode);
         }
+
+        [Fact]
+        public async Task Fails_With_A_Seed_Burst_Of_Zero()
+        {
+            var exitCode = await controlPlane.MigrateAsync($"--{SeedOptions.SectionName}:{nameof(SeedOptions.Burst)}=0");
+
+            Assert.Equal(1, exitCode);
+        }
+
+        [Fact]
+        public async Task Succeeds_With_A_Seed_Burst_Below_The_Rate()
+        {
+            var exitCode = await controlPlane.MigrateAsync(
+                $"--{SeedOptions.SectionName}:{nameof(SeedOptions.RequestsPerSecond)}=20",
+                $"--{SeedOptions.SectionName}:{nameof(SeedOptions.Burst)}=5");
+
+            Assert.Equal(0, exitCode);
+        }
     }
 }

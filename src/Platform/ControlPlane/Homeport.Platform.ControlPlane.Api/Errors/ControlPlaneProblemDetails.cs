@@ -11,7 +11,9 @@ namespace Homeport.Platform.ControlPlane.Api.Errors;
 /// where one applies, and <c>traceId</c>.
 /// </summary>
 /// <remarks>
-/// An error that needs no type of its own, such as an unknown client or tenant, keeps
+/// The only conflict the control plane answers is a plan in use, so the
+/// status alone picks every type. An error that needs no type of its own,
+/// such as an unknown client, tenant or plan, keeps
 /// ASP.NET's default, the RFC 9110 section of its status.
 /// </remarks>
 internal sealed class ControlPlaneProblemDetails : IConfigureOptions<ProblemDetailsOptions>
@@ -21,6 +23,7 @@ internal sealed class ControlPlaneProblemDetails : IConfigureOptions<ProblemDeta
         ControlPlaneProblems.Unauthorized,
         ControlPlaneProblems.InsufficientScope,
         ControlPlaneProblems.Validation,
+        ControlPlaneProblems.PlanInUse,
         ControlPlaneProblems.Internal,
     ];
 

@@ -151,7 +151,7 @@ public sealed class Program
             var admin = app.Services.GetRequiredService<IOptions<AdminApiOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, usage from {MeteringUrl}, admin API of tenants at {ControlPlaneAdminUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}, admin API {AdminApi}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, usage from {MeteringUrl}, admin API of the control plane at {ControlPlaneAdminUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}, admin API {AdminApi}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
