@@ -3,9 +3,9 @@
 using System.Net;
 using Microsoft.Extensions.Options;
 
-namespace Homeport.Platform.Gateway.Api.Proxies;
+namespace Homeport.Shared.ServiceDefaults.Proxies;
 
-/// <summary>Keeps the gateway from starting with a trusted proxy it cannot read.</summary>
+/// <summary>Keeps a service from starting with a trusted proxy it cannot read.</summary>
 internal sealed class TrustedProxiesOptionsValidator : IValidateOptions<TrustedProxiesOptions>
 {
     public ValidateOptionsResult Validate(string? name, TrustedProxiesOptions options)

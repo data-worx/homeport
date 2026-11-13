@@ -4,7 +4,6 @@ using Homeport.Platform.Gateway.Api.Admin;
 using Homeport.Platform.Gateway.Api.ApiDocs;
 using Homeport.Platform.Gateway.Api.Authentication;
 using Homeport.Platform.Gateway.Api.Errors;
-using Homeport.Platform.Gateway.Api.Proxies;
 using Homeport.Platform.Gateway.Api.Routing;
 using Homeport.Platform.Gateway.Api.Telemetry;
 using Homeport.Platform.Gateway.Api.Throttling;
@@ -15,6 +14,7 @@ using Homeport.Platform.Gateway.Infrastructure.Signing;
 using Homeport.Platform.Gateway.Infrastructure.Throttling;
 using Homeport.Platform.Gateway.Infrastructure.Usage;
 using Homeport.Shared.ServiceDefaults;
+using Homeport.Shared.ServiceDefaults.Proxies;
 using Microsoft.Extensions.Options;
 using Yarp.ReverseProxy.Configuration;
 
