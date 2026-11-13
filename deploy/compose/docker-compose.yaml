@@ -161,6 +161,7 @@ services:
       CONTROL_PLANE_HTTP: "http://control-plane:${CONTROL_PLANE_PORT}"
       services__control-plane__http__0: "http://control-plane:${CONTROL_PLANE_PORT}"
       CONTROL_PLANE_HTTPS: "https://control-plane:${CONTROL_PLANE_PORT}"
+      PlatformRoutes__ControlPlaneUrl: "http://control-plane:${CONTROL_PLANE_PORT}"
       PlatformRoutes__MeteringUrl: "http://metering:${METERING_PORT}"
     ports:
       - "${GATEWAY_PORT}"

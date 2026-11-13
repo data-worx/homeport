@@ -262,8 +262,10 @@ public static class Program
             .WaitForCompletion(controlPlaneMigrate)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
 
-        // The gateway looks clients up at the control plane.
+        // The gateway looks clients up at the control plane, and forwards the
+        // admin API of tenants to it, which YARP needs the endpoint itself for.
         gateway.WithReference(controlPlane);
+        gateway.WithEnvironment("PlatformRoutes__ControlPlaneUrl", controlPlane.GetEndpoint(Uri.UriSchemeHttp));
 
         // Metering: `migrate` applies its migrations as the owner role; the
         // service starts after it completed, runs as the app role and

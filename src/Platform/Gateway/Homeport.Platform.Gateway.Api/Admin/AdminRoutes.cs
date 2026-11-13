@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Platform.Gateway.Api.Routing;
+using Homeport.Shared.Client.Platform.ControlPlane.V1;
+using Homeport.Shared.Internal.Platform.ControlPlane;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
 
@@ -28,9 +30,20 @@ public sealed class AdminRoutes(IReadOnlyList<AdminEndpoint> endpoints)
 
     /// <summary>
     /// The admin endpoints of a release. Each one a platform service serves is
-    /// added here, with the service's address from configuration.
+    /// added here, with the service's address from <paramref name="options"/>.
     /// </summary>
-    internal static AdminRoutes Configured() => new([]);
+    internal static AdminRoutes Configured(PlatformRoutesOptions options)
+    {
+        var controlPlane = new AdminService(ControlPlaneService.ServiceName, ControlPlaneService.Audience, options.ControlPlaneUrl);
+
+        return new AdminRoutes(
+        [
+            new AdminEndpoint(HttpMethods.Get, TenantsApi.Path, controlPlane),
+            new AdminEndpoint(HttpMethods.Post, TenantsApi.Path, controlPlane),
+            new AdminEndpoint(HttpMethods.Get, TenantsApi.TenantPath, controlPlane),
+            new AdminEndpoint(HttpMethods.Put, TenantsApi.TenantPath, controlPlane),
+        ]);
+    }
 
     /// <summary>The routes and clusters of the admin endpoints, one cluster per service.</summary>
     internal (IReadOnlyList<RouteConfig> Routes, IReadOnlyList<ClusterConfig> Clusters) Build()
