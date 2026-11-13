@@ -28,6 +28,12 @@ internal static class ControlPlaneProblems
         "One or more validation errors occurred.",
         StatusCodes.Status400BadRequest);
 
+    /// <summary>A client uses the plan the operator tried to delete.</summary>
+    internal static readonly ControlPlaneProblem PlanInUse = new(
+        "plan-in-use",
+        "The plan is in use.",
+        StatusCodes.Status409Conflict);
+
     /// <summary>An unexpected failure inside the control plane.</summary>
     internal static readonly ControlPlaneProblem Internal = new(
         "internal",
