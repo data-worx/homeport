@@ -29,7 +29,7 @@ asset change; the `notices` gate fails while it is stale.
 | JasperFx.Events | 2.102.0 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
 | JasperFx.RuntimeCompiler | 5.1.0 | MIT | Copyright (c) 2024 The "Critter Stack" and JasperFx Tools |
 | Microsoft.AspNetCore.Authentication.JwtBearer | 10.0.15 | MIT | © Microsoft Corporation. All rights reserved. |
-| Microsoft.AspNetCore.OpenApi | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
+| Microsoft.AspNetCore.OpenApi | 10.0.15 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Bcl.AsyncInterfaces | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Bcl.Cryptography | 10.0.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.Bcl.TimeProvider | 10.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
@@ -64,7 +64,7 @@ asset change; the `notices` gate fails while it is stale.
 | Microsoft.IdentityModel.Protocols | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.IdentityModel.Protocols.OpenIdConnect | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.IdentityModel.Tokens | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
-| Microsoft.OpenApi | 2.12.2 | MIT | © Microsoft Corporation. All rights reserved. |
+| Microsoft.OpenApi | 2.13.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | NewId | 4.0.1 | Apache-2.0 | Copyright 2007-2019 Chris Patterson |
 | Newtonsoft.Json | 13.0.3 | MIT | Copyright © James Newton-King 2008 |
 | Npgsql | 10.0.3 | PostgreSQL | Copyright 2025 © The Npgsql Development Team |
