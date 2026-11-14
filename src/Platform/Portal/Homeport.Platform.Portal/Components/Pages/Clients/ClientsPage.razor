@@ -75,7 +75,7 @@
                 @foreach (var client in _clients)
                 {
                     <tr @key="client.ClientId" data-client="@client.ClientId">
-                        <td class="hp-mono" data-client-id>@client.ClientId</td>
+                        <td data-client-id><span class="hp-mono">@client.ClientId</span></td>
                         <td data-tenant>@client.TenantName</td>
                         <td data-plan>@client.PlanName</td>
                         <td class="hp-actions">
