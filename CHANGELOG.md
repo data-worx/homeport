@@ -66,6 +66,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   admin port. The admin endpoints of the services follow with the admin
   portal. See [the admin API](docs/operators/admin-api.md).
 
+### Security
+
+- The control plane's client lookup answers only the gateway's service
+  token. A caller token for the control plane, the operator's for the admin
+  API included, was let through and is now answered with `403`
+  `insufficient-scope`. See [the control plane](docs/operators/control-plane.md#the-service).
+
 ## [0.1.0] - 2026-11-11
 
 ### Added

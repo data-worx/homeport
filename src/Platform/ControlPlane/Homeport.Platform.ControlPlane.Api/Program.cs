@@ -52,11 +52,16 @@ public sealed class Program
         builder.Services.AddScoped<PlanAdministration>();
         builder.Services.AddScoped<ClientAdministration>();
 
-        // Only the gateway's tokens for the control plane; the admin endpoints
-        // also need the operator's caller token (ADR-0020).
+        // Only the gateway's tokens for the control plane; the client lookup
+        // also needs the gateway's service token (ADR-0014), the admin
+        // endpoints the operator's caller token (ADR-0020).
         builder.Services.AddGatewayTokenAuthentication(ControlPlaneService.Audience);
+        builder.Services.AddSingleton<IAuthorizationHandler, GatewayServiceHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, AdminHandler>();
         builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(GatewayServiceRequirement.Policy, policy => policy
+                .RequireAuthenticatedUser()
+                .AddRequirements(new GatewayServiceRequirement()))
             .AddPolicy(AdminRequirement.Policy, policy => policy
                 .RequireAuthenticatedUser()
                 .AddRequirements(new AdminRequirement()));

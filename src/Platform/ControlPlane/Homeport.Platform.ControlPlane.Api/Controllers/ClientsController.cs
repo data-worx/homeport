@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net.Mime;
+using Homeport.Platform.ControlPlane.Api.Authentication;
 using Homeport.Platform.ControlPlane.Application;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,7 @@ namespace Homeport.Platform.ControlPlane.Api.Controllers;
 /// gateway may ask, with a service token for the control plane (ADR-0014).
 /// </summary>
 [ApiController]
-[Authorize]
+[Authorize(Policy = GatewayServiceRequirement.Policy)]
 public sealed class ClientsController(IClientLookup clients, ILogger<ClientsController> logger) : ControllerBase
 {
     /// <summary>The tenant and the plan limits of a client.</summary>
@@ -21,10 +22,12 @@ public sealed class ClientsController(IClientLookup clients, ILogger<ClientsCont
     /// <param name="cancellationToken">Aborts the lookup.</param>
     /// <response code="200">The client's tenant and plan.</response>
     /// <response code="401">No valid service token for the control plane.</response>
+    /// <response code="403">A token of the gateway's that is not its service token, such as a caller token.</response>
     /// <response code="404">The control plane knows no such client.</response>
     [HttpGet(ControlPlaneService.ClientPath)]
     [ProducesResponseType<ClientResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, MediaTypeNames.Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, MediaTypeNames.Application.ProblemJson)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, MediaTypeNames.Application.ProblemJson)]
     public async Task<ActionResult<ClientResponse>> Get(string clientId, CancellationToken cancellationToken)
     {

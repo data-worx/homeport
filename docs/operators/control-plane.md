@@ -94,5 +94,8 @@ for a client it does not know. Only the gateway may ask: the control plane
 accepts a service token the gateway issued for the audience
 `homeport-control-plane`
 ([ADR-0014](../architecture/adr/0014-authentication-between-services.md))
-and answers anything else with `401`. It finds the gateway's keys the way
+and answers a request without a valid token with `401`. Any other token of
+the gateway's for that audience, such as the operator's caller token for
+the admin API, is answered with `403`
+[`insufficient-scope`](../reference/problems/insufficient-scope.md). It finds the gateway's keys the way
 the registry does, through the reference to the gateway.
