@@ -103,8 +103,9 @@ own.
 1. Under *Clients*, create a client with the protocol OpenID Connect and the
    client id you want the tenant's machine identity to have, such as
    `billing-service`.
-2. Turn *Client authentication* on, and of the grants leave only *Service
-   accounts roles* on: the client uses the client-credentials grant. Copy
+2. Turn *Client authentication* on, and of the authentication flows leave
+   only *Service account roles* on: the client uses the client-credentials
+   grant. Copy
    its secret from *Credentials* to the machine that runs the client.
 3. Under *Client scopes*, add the scopes of the routes the client may call,
    as *Default* to grant them on every token or as *Optional* to grant them
@@ -137,11 +138,11 @@ lists what it needs from any provider):
    are users of the realm, or come from your directory through Keycloak's
    user federation or an identity provider.
 2. Create a client `portal` with the protocol OpenID Connect, *Client
-   authentication* on and only *Standard flow* among the grants. Set *Valid
-   redirect URIs* to `https://<portal address>/signin-oidc` and *Valid post
-   logout redirect URIs* to `https://<portal address>/signout-callback-oidc`,
-   and under *Advanced* the *Proof Key for Code Exchange Code Challenge
-   Method* to `S256`. Copy its secret into the portal's `SignIn:ClientSecret`.
+   authentication* on, only *Standard flow* among the authentication flows,
+   and *Require PKCE* on with the *PKCE Method* `S256`. Set *Valid redirect
+   URIs* to `https://<portal address>/signin-oidc` and *Valid post logout
+   redirect URIs* to `https://<portal address>/signout-callback-oidc`. Copy
+   its secret into the portal's `SignIn:ClientSecret`.
 3. Under the client's dedicated scope, add the mappers *Subject (sub)*,
    *User's full name* as `name`, *User Realm Role* with the token claim name
    `roles`, multivalued, into the ID and the access token, and *Audience*
