@@ -13,7 +13,9 @@ lacks `usage.read` or names no tenant; through the gateway, a caller sees
 the gateway's answer first. The control plane answers with it on an
 [admin endpoint](../../operators/admin-api.md) for a token that is not the
 operator's caller token: one without the scope `admin`, or one that names a
-tenant.
+tenant. It answers with it on
+[the client lookup](../../operators/control-plane.md#the-service) for any
+token that is not the gateway's service token, a caller token included.
 
 ```json
 {

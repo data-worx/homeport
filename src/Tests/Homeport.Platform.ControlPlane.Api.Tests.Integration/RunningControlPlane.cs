@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
@@ -83,6 +85,9 @@ public sealed class RunningControlPlane : IAsyncLifetime
 
     private WebApplicationFactory<Program> Started =>
         controlPlane ?? throw new InvalidOperationException("The control plane has not been started.");
+
+    /// <summary>What the control plane logged.</summary>
+    internal FakeLogCollector Logs => Started.Services.GetFakeLogCollector();
 
     /// <summary>A client without credentials.</summary>
     internal HttpClient CreateClient() => Started.CreateClient();
@@ -156,7 +161,8 @@ public sealed class RunningControlPlane : IAsyncLifetime
         controlPlane = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(host => host
                 .UseSetting($"ConnectionStrings:{ControlPlanePersistenceExtensions.AppConnectionName}", AppConnectionString)
-                .UseSetting($"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}", $"{jwks.Urls.Single()}{GatewayTokens.JwksPath}"));
+                .UseSetting($"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}", $"{jwks.Urls.Single()}{GatewayTokens.JwksPath}")
+                .ConfigureLogging(logging => logging.AddFakeLogging()));
     }
 
     public async Task DisposeAsync()
