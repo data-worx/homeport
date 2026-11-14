@@ -7,7 +7,7 @@ a Blazor Server application, so your tokens stay on its server and never
 reach the browser.
 
 You sign in, see who you are signed in as, sign out, and manage the
-tenants and plans. The pages for clients, modules, usage and the audit log
+tenants, plans and clients. The pages for modules, usage and the audit log
 follow, each with its own entry in the navigation. Every page calls the
 [admin API](admin-api.md) at the gateway's admin port, as you.
 
@@ -39,7 +39,7 @@ at the provider, and returns to the sign-in page.
 field filters by name or id. Selecting a tenant shows its facts next to the
 list.
 
-![The tenant list with a search field, two tenants and the facts of the selected one](admin-portal-tenants.png)
+![The tenant list with a search field, three tenants and the facts of the selected one](admin-portal-tenants.png)
 
 *Add tenant* asks for a name; *Rename* changes the selected tenant's name.
 A name must be unique among tenants, compared case-sensitively. When the
@@ -79,6 +79,36 @@ A changed plan reaches the gateway once it looks a client up again, after
 the gateway's `ControlPlane:ClientCacheLifetime` — one minute by default.
 Until then the plan's clients keep their old limits. A deleted plan was used
 by no client, so nothing changes at the gateway.
+
+Each change is recorded in the audit log, as for tenants.
+
+## Clients
+
+*Clients* lists every registered client with its client id, its tenant and
+its plan. The tenant field above the list shows one tenant's clients only.
+
+![The client list with two clients, the tenant filter and the actions of each row](admin-portal-clients.png)
+
+A client is created at your identity provider, not here (see
+[Keycloak as your identity provider](identity-provider.md#keycloak-as-your-identity-provider)).
+*Register client* maps its client id to a tenant and a plan. The client id
+must be exactly the one the provider issued, and not registered yet. When
+the admin API refuses a value, the dialog puts the reason at its field:
+
+![The register dialog with a client id that is already registered and the message at its field](admin-portal-clients-register.png)
+
+*Change plan* holds a client to another plan. A client keeps its tenant; to
+move it to another tenant, remove it and register it again, so its usage
+stays with the tenant it was recorded for. *Remove* asks before it removes
+the client; the client stays at your identity provider, and its usage with
+its tenant.
+
+Until a tenant and a plan exist, the page points to *Tenants* and *Plans*
+instead of offering to register a client.
+
+A registered, moved or removed client reaches the gateway once it looks the
+client up again, after `ControlPlane:ClientCacheLifetime` — one minute by
+default. A removed client can still call for at most that long.
 
 Each change is recorded in the audit log, as for tenants.
 

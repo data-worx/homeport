@@ -4,7 +4,7 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Seeding;
 
 /// <summary>
 /// The one tenant, plan and client <c>migrate</c> keeps in the database, such
-/// as <c>Seed:TenantId</c>. Until the admin portal brings a write API, they
+/// as <c>Seed:TenantId</c>. Until the operator adds more in the admin portal, they
 /// are the control plane's whole content.
 /// </summary>
 public sealed class SeedOptions

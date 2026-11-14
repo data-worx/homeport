@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The operator registers clients in the admin portal: a list with the
+  tenant and plan of each client, filterable by tenant, a dialog to register
+  a client id of the identity provider for a tenant and a plan, changing a
+  client's plan, and remove with a confirmation. Homeport never creates
+  clients at the identity provider. A client keeps its tenant. See
+  [the admin portal](docs/operators/admin-portal.md#clients).
+
+- The admin API serves `GET`, `POST`, `PUT` and `DELETE` under
+  `/platform/v1/admin/clients`, each change with its audit entry. See
+  [the admin API](docs/operators/admin-api.md#endpoints).
+
+- The identity provider page shows how to set up Keycloak as the production
+  identity provider: the clients of the tenants and the portal's sign-in.
+  See [Keycloak as your identity provider](docs/operators/identity-provider.md#keycloak-as-your-identity-provider).
+
 - The operator manages plans in the admin portal: a list with the rate
   limit and the number of clients of each plan, dialogs to create and
   change one, and delete with a confirmation. A plan's name is unique,
