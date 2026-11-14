@@ -73,6 +73,25 @@ public sealed class ManifestRulesTests
         }
 
         [Fact]
+        public void Reports_An_Id_With_The_Reserved_Prefix()
+        {
+            var errors = ManifestRules.Validate("homeport-registry", Valid with { Id = "homeport-registry" });
+
+            Assert.Equal(["Id 'homeport-registry' starts with the reserved prefix 'homeport-'."], errors["id"]);
+        }
+
+        [Theory]
+        [InlineData("my-homeport")]
+        [InlineData("homeport")]
+        [InlineData("homeports")]
+        public void Accepts_An_Id_That_Contains_Homeport_Without_The_Prefix(string id)
+        {
+            var errors = ManifestRules.Validate(id, Valid with { Id = id });
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
         public void Reports_An_Id_Other_Than_The_Module_Id_Of_The_Registration()
         {
             var errors = ManifestRules.Validate("other", Valid);

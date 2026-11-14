@@ -14,6 +14,13 @@ public static partial class ManifestRules
     /// <summary>The module id no module may take: it names the platform's own endpoints.</summary>
     public const string ReservedId = "platform";
 
+    /// <summary>
+    /// The prefix no module id may start with: it names the audiences of the
+    /// platform services, and a module token carries its module id as its
+    /// audience.
+    /// </summary>
+    public const string ReservedPrefix = "homeport-";
+
     private const string RoutesField = "routes";
 
     private static readonly string[] Methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
@@ -80,6 +87,11 @@ public static partial class ManifestRules
         if (manifest.Id == ReservedId)
         {
             errors.Add(field, $"Id '{ReservedId}' is reserved.");
+        }
+
+        if (manifest.Id.StartsWith(ReservedPrefix, StringComparison.Ordinal))
+        {
+            errors.Add(field, $"Id '{manifest.Id}' starts with the reserved prefix '{ReservedPrefix}'.");
         }
 
         if (manifest.Id != moduleId)
