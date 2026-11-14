@@ -68,6 +68,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- The registry refuses a module id that starts with `homeport-`, in a
+  manifest and in its configured registration keys, and a registration key
+  for the reserved id `platform`. Such an id named the
+  audience of a platform service, so the module's tokens were valid there.
+  See [the module contract](docs/reference/module-contract/README.md).
+
 - The control plane's client lookup answers only the gateway's service
   token. A caller token for the control plane, the operator's for the admin
   API included, was let through and is now answered with `403`

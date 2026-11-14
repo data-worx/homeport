@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Homeport.Platform.Registry.Domain.Manifests;
 using Homeport.Platform.Registry.Domain.Registration;
 using Microsoft.Extensions.Options;
 
@@ -19,6 +20,18 @@ internal sealed class RegistrationKeyOptionsValidator : IValidateOptions<Registr
 
         foreach (var (moduleId, keys) in options.RegistrationKeys)
         {
+            // No manifest with a reserved id would pass, and a key for one hints
+            // at a module posing as the platform or one of its services.
+            if (moduleId == ManifestRules.ReservedId)
+            {
+                failures.Add($"{Section}:{moduleId} names the reserved module id '{ManifestRules.ReservedId}'.");
+            }
+
+            if (moduleId.StartsWith(ManifestRules.ReservedPrefix, StringComparison.Ordinal))
+            {
+                failures.Add($"{Section}:{moduleId} names a module id with the reserved prefix '{ManifestRules.ReservedPrefix}'.");
+            }
+
             if (keys.Length == 0 || keys.Any(string.IsNullOrWhiteSpace))
             {
                 failures.Add($"{Section}:{moduleId} holds an empty key.");

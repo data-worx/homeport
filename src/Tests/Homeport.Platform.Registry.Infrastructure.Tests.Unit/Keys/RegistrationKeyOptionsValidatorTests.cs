@@ -39,6 +39,26 @@ public sealed class RegistrationKeyOptionsValidatorTests
             Assert.Equal(["Registry:RegistrationKeys:echo holds 3 keys; at most 2 are valid at once."], result.Failures);
         }
 
+        [Fact]
+        public void Rejects_The_Reserved_Module_Id_Platform()
+        {
+            var options = new RegistrationKeyOptions { RegistrationKeys = { ["platform"] = ["current"] } };
+
+            var result = validator.Validate(null, options);
+
+            Assert.Equal(["Registry:RegistrationKeys:platform names the reserved module id 'platform'."], result.Failures);
+        }
+
+        [Fact]
+        public void Rejects_A_Module_Id_With_The_Reserved_Prefix()
+        {
+            var options = new RegistrationKeyOptions { RegistrationKeys = { ["homeport-metering"] = ["current"] } };
+
+            var result = validator.Validate(null, options);
+
+            Assert.Equal(["Registry:RegistrationKeys:homeport-metering names a module id with the reserved prefix 'homeport-'."], result.Failures);
+        }
+
         [Theory]
         [InlineData("")]
         [InlineData(" ")]

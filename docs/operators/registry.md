@@ -37,11 +37,13 @@ Configure it on both sides, the same value:
 | Registry | `Registry__RegistrationKeys__<moduleId>__0` | `<MODULEID>_REGISTRATION_KEY` |
 | Module | `Homeport__Registry__Key` | the same variable |
 
-`<moduleId>` is the module's id, such as `echo`. Each key belongs to exactly
-one module: a leaked key lets its holder register as that module, never as
-another. Homeport neither generates nor expires keys in a real installation;
-the AppHost generates one per module for a local run and keeps it in its user
-secrets, as it does the passwords.
+`<moduleId>` is the module's id, such as `echo`. The id `platform` and every
+id that starts with `homeport-` are reserved for the platform and its
+services, and the registry does not start with a key for one. Each key belongs to exactly one module: a leaked
+key lets its holder register as that module, never as another. Homeport
+neither generates nor expires keys in a real installation; the AppHost
+generates one per module for a local run and keeps it in its user secrets,
+as it does the passwords.
 
 The registry checks the keys at start-up and refuses to start with an empty
 key or more than two for one module id. Its start log lists the module ids it
