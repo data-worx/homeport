@@ -53,8 +53,8 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Target")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(263)
+                        .HasColumnType("character varying(263)");
 
                     b.HasKey("Id");
 
