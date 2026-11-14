@@ -2,6 +2,7 @@
 
 using Homeport.Platform.ControlPlane.Api.Authentication;
 using Homeport.Platform.ControlPlane.Api.Errors;
+using Homeport.Platform.ControlPlane.Application.Clients;
 using Homeport.Platform.ControlPlane.Application.Plans;
 using Homeport.Platform.ControlPlane.Application.Tenants;
 using Homeport.Platform.ControlPlane.Infrastructure.Persistence;
@@ -49,6 +50,7 @@ public sealed class Program
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddScoped<TenantAdministration>();
         builder.Services.AddScoped<PlanAdministration>();
+        builder.Services.AddScoped<ClientAdministration>();
 
         // Only the gateway's tokens for the control plane; the admin endpoints
         // also need the operator's caller token (ADR-0020).

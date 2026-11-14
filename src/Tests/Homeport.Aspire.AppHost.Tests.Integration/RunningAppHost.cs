@@ -33,6 +33,20 @@ public sealed class RunningAppHost : IAsyncLifetime
     /// <summary>A Keycloak client the control plane does not know.</summary>
     internal static readonly KeycloakClient UnmappedClient = new("unmapped-client", "unmapped-client-secret");
 
+    /// <summary>A Keycloak client the control plane does not seed, for the tests that register it through the admin API.</summary>
+    internal static readonly KeycloakClient RegisteredClient = new("registered-client", "registered-client-secret");
+
+    // The realm's client that signs the dev operator in by password: a test
+    // has no browser for the portal's sign-in (ADR-0020).
+    private static readonly KeycloakClient AdminApiTestClient = new("admin-api-test", "admin-api-test-secret");
+
+    // The dev operator of the realm, who holds the admin role, and the parameter that holds their password.
+    private const string OperatorUsername = "operator";
+    private const string OperatorPasswordParameter = "operator-password";
+
+    /// <summary>The prefix the gateway serves the admin API below.</summary>
+    internal const string PlatformPrefix = "/platform";
+
     /// <summary>The scope Echo's routes require, which the seeded client gets only on request.</summary>
     internal const string EchoInvokeScope = "echo.invoke";
 
@@ -117,7 +131,40 @@ public sealed class RunningAppHost : IAsyncLifetime
     /// </summary>
     internal Task<HttpClient> GatewayRoutingEchoAsync()
     {
-        return RoutingEchoAsync(new HttpClient(new RetryAfterHandler()) { BaseAddress = App.GetEndpoint("gateway", GatewayEndpoint) });
+        return GatewayRoutingEchoAsync(SeededClient);
+    }
+
+    /// <summary>
+    /// A client of the gateway with a token of <paramref name="client"/>
+    /// granting <see cref="EchoInvokeScope"/>, once the gateway routes to Echo.
+    /// </summary>
+    internal Task<HttpClient> GatewayRoutingEchoAsync(KeycloakClient client)
+    {
+        return RoutingEchoAsync(new HttpClient(new RetryAfterHandler()) { BaseAddress = App.GetEndpoint("gateway", GatewayEndpoint) }, client);
+    }
+
+    /// <summary>
+    /// A client of the gateway's admin endpoint with the dev operator's access
+    /// token, once the gateway, Keycloak and the control plane are healthy.
+    /// </summary>
+    internal async Task<HttpClient> AdminApiAsync()
+    {
+        using var timeout = new CancellationTokenSource(StartTimeout);
+        await App.ResourceNotifications.WaitForResourceHealthyAsync("gateway", timeout.Token);
+        await App.ResourceNotifications.WaitForResourceHealthyAsync("keycloak", timeout.Token);
+        await App.ResourceNotifications.WaitForResourceHealthyAsync("control-plane", timeout.Token);
+
+        var admin = new HttpClient { BaseAddress = App.GetEndpoint("gateway", "admin") };
+        admin.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await RequestTokenAsync(new Dictionary<string, string>
+        {
+            ["grant_type"] = "password",
+            ["client_id"] = AdminApiTestClient.ClientId,
+            ["client_secret"] = await ParameterAsync(AdminApiTestClient.SecretParameter),
+            ["username"] = OperatorUsername,
+            ["password"] = await ParameterAsync(OperatorPasswordParameter),
+        }));
+
+        return admin;
     }
 
     /// <summary>
@@ -126,7 +173,7 @@ public sealed class RunningAppHost : IAsyncLifetime
     /// </summary>
     internal Task<HttpClient> ThrottledGatewayRoutingEchoAsync()
     {
-        return RoutingEchoAsync(App.CreateHttpClient("gateway"));
+        return RoutingEchoAsync(App.CreateHttpClient("gateway"), SeededClient);
     }
 
     /// <summary>
@@ -166,13 +213,13 @@ public sealed class RunningAppHost : IAsyncLifetime
         var clients = new List<HttpClient>();
         foreach (var address in addresses.Values)
         {
-            clients.Add(await RoutingEchoAsync(new HttpClient { BaseAddress = address }));
+            clients.Add(await RoutingEchoAsync(new HttpClient { BaseAddress = address }, SeededClient));
         }
 
         return clients;
     }
 
-    private async Task<HttpClient> RoutingEchoAsync(HttpClient gateway)
+    private async Task<HttpClient> RoutingEchoAsync(HttpClient gateway, KeycloakClient client)
     {
         using var timeout = new CancellationTokenSource(StartTimeout);
         await App.ResourceNotifications.WaitForResourceHealthyAsync("echo", timeout.Token);
@@ -180,7 +227,7 @@ public sealed class RunningAppHost : IAsyncLifetime
         await App.ResourceNotifications.WaitForResourceHealthyAsync("keycloak", timeout.Token);
         await App.ResourceNotifications.WaitForResourceHealthyAsync("control-plane", timeout.Token);
 
-        gateway.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await TokenAsync(SeededClient, EchoInvokeScope));
+        gateway.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await TokenAsync(client, EchoInvokeScope));
         await StatusOnceAsync(gateway, status => status != HttpStatusCode.NotFound, RouteTimeout);
 
         return gateway;
@@ -193,24 +240,35 @@ public sealed class RunningAppHost : IAsyncLifetime
     /// </summary>
     internal async Task<string> TokenAsync(KeycloakClient client, string? scope = null)
     {
-        using var timeout = new CancellationTokenSource(StartTimeout);
-        var secret = await App.Services.GetRequiredService<DistributedApplicationModel>().Resources
-            .OfType<ParameterResource>()
-            .Single(parameter => parameter.Name == client.SecretParameter)
-            .GetValueAsync(timeout.Token);
-
-        using var keycloak = App.CreateHttpClient("keycloak");
         var form = new Dictionary<string, string>
         {
             ["grant_type"] = "client_credentials",
             ["client_id"] = client.ClientId,
-            ["client_secret"] = secret ?? string.Empty,
+            ["client_secret"] = await ParameterAsync(client.SecretParameter),
         };
         if (scope is not null)
         {
             form["scope"] = scope;
         }
 
+        return await RequestTokenAsync(form);
+    }
+
+    // The value of the AppHost parameter named <paramref name="name"/>.
+    private async Task<string> ParameterAsync(string name)
+    {
+        using var timeout = new CancellationTokenSource(StartTimeout);
+        return await App.Services.GetRequiredService<DistributedApplicationModel>().Resources
+            .OfType<ParameterResource>()
+            .Single(parameter => parameter.Name == name)
+            .GetValueAsync(timeout.Token) ?? string.Empty;
+    }
+
+    // An access token from Keycloak's token endpoint for the grant in <paramref name="form"/>.
+    private async Task<string> RequestTokenAsync(Dictionary<string, string> form)
+    {
+        using var timeout = new CancellationTokenSource(StartTimeout);
+        using var keycloak = App.CreateHttpClient("keycloak");
         using var request = new FormUrlEncodedContent(form);
         using var response = await keycloak.PostAsync(TokenPath, request, timeout.Token);
         response.EnsureSuccessStatusCode();

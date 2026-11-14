@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Platform.ControlPlane.Application;
+using Homeport.Platform.ControlPlane.Application.Clients;
 using Homeport.Platform.ControlPlane.Application.Plans;
 using Homeport.Platform.ControlPlane.Application.Tenants;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +20,8 @@ public static class ControlPlanePersistenceExtensions
     /// <summary>
     /// Adds <see cref="ControlPlaneDbContext"/> on the connection string
     /// <paramref name="connectionName"/>, with health check, tracing and
-    /// retries, and the <see cref="IClientLookup"/>, <see cref="ITenantStore"/> and
-    /// <see cref="IPlanStore"/> on it.
+    /// retries, and the <see cref="IClientLookup"/>, <see cref="ITenantStore"/>,
+    /// <see cref="IPlanStore"/> and <see cref="IClientStore"/> on it.
     /// </summary>
     public static IHostApplicationBuilder AddControlPlanePersistence(this IHostApplicationBuilder builder, string connectionName)
     {
@@ -30,6 +31,7 @@ public static class ControlPlanePersistenceExtensions
         builder.Services.AddScoped<IClientLookup, ClientLookup>();
         builder.Services.AddScoped<ITenantStore, TenantStore>();
         builder.Services.AddScoped<IPlanStore, PlanStore>();
+        builder.Services.AddScoped<IClientStore, ClientStore>();
 
         return builder;
     }

@@ -68,6 +68,11 @@ The request and response types are in `Homeport.Shared.Client`, namespace
 | `GET /platform/v1/admin/plans/{planId}` | control plane | — | `200` with the plan, `404` for an unknown id |
 | `PUT /platform/v1/admin/plans/{planId}` | control plane | `{ "name": "Gold", "requestsPerSecond": 80, "burst": 160 }` | `200` with the changed plan, `404` for an unknown id |
 | `DELETE /platform/v1/admin/plans/{planId}` | control plane | — | `204`, `404` for an unknown id, `409` for a plan a client uses |
+| `GET /platform/v1/admin/clients` | control plane | — | `200` with every registered client, ordered by client id: client id, tenant id and name, plan id and name. `?tenantId=<id>` lists one tenant's clients only |
+| `POST /platform/v1/admin/clients` | control plane | `{ "clientId": "billing-service", "tenantId": "…", "planId": "…" }` | `201` with the new client and its address in `Location` |
+| `GET /platform/v1/admin/clients/{clientId}` | control plane | — | `200` with the client, `404` for a client that is not registered |
+| `PUT /platform/v1/admin/clients/{clientId}` | control plane | `{ "planId": "…" }` | `200` with the client on its new plan, `404` for a client that is not registered |
+| `DELETE /platform/v1/admin/clients/{clientId}` | control plane | — | `204`, `404` for a client that is not registered |
 
 A tenant's name is required, at most 200 characters, and unique among
 tenants. Surrounding whitespace is dropped. Names are compared
@@ -85,7 +90,20 @@ A plan is deleted only while no client uses it; otherwise the answer is
 `409` with the problem type
 [`plan-in-use`](../reference/problems/plan-in-use.md) and nothing changes.
 
-A changed plan takes effect at the gateway once it looks the client up
+A client is created at your identity provider; the admin API only maps its
+client id to a tenant and a plan, and never creates, changes or deletes a
+client at the provider. The client id is required, at most 255 characters
+and not yet registered; it is taken exactly as given, without trimming,
+since a token names it exactly. The tenant and the plan must exist. A value
+that breaks a rule is answered with `400` and `validation`, the message
+under `errors.clientId`, `errors.tenantId` or `errors.planId`. In a path,
+the client id is escaped as a path segment. A client keeps its tenant: to
+move it to another one, remove it and register it again, so the usage it
+caused stays with the tenant it was recorded for. Removing a client keeps
+its usage, too.
+
+A changed plan, a client moved to another plan, and a client registered or
+removed take effect at the gateway once it looks the client up
 again: the gateway keeps the plan it looked up with a client for
 `ControlPlane:ClientCacheLifetime`, one minute by default (see
 [throttling](throttling.md#plan-limits)). Until then a client keeps the
@@ -98,9 +116,11 @@ the service that owns the data, in the same transaction as the change: so
 far `control_plane.audit_entries`. An entry records when, the operator's
 subject and display name as the caller token named them, what was done
 (`tenant.created`, `tenant.renamed`, `plan.created`, `plan.changed`,
-`plan.deleted`), what it was done to (`tenants/<id>`, `plans/<id>`) and a
-sentence for the reader with the values before and after. Renaming a tenant
-to the name it already has, or saving a plan unchanged, changes nothing and
+`plan.deleted`, `client.registered`, `client.plan-changed`,
+`client.removed`), what it was done to (`tenants/<id>`, `plans/<id>`,
+`clients/<client id>`) and a sentence for the reader with the values before
+and after. Renaming a tenant to the name it already has, saving a plan
+unchanged, or moving a client to the plan it is on changes nothing and
 writes no entry; neither does a change the admin API refuses.
 
 The service's app role may only add entries and read them; it can neither

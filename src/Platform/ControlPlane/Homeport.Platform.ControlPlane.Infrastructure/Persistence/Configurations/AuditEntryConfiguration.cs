@@ -20,7 +20,7 @@ internal sealed class AuditEntryConfiguration : IEntityTypeConfiguration<AuditEn
         entry.Property(e => e.OperatorSubject).HasMaxLength(AuditEntry.MaxFieldLength);
         entry.Property(e => e.OperatorName).HasMaxLength(AuditEntry.MaxFieldLength);
         entry.Property(e => e.Action).HasMaxLength(AuditEntry.MaxFieldLength);
-        entry.Property(e => e.Target).HasMaxLength(AuditEntry.MaxFieldLength);
+        entry.Property(e => e.Target).HasMaxLength(AuditEntry.MaxTargetLength);
         entry.Property(e => e.Summary).HasMaxLength(AuditEntry.MaxSummaryLength);
         entry.HasIndex(e => e.OccurredAt);
     }

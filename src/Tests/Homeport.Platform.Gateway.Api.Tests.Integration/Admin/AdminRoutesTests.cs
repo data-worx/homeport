@@ -91,7 +91,7 @@ public sealed class AdminRoutesTests
     public sealed class Configured
     {
         [Fact]
-        public void Forwards_The_Tenant_And_Plan_Endpoints_To_The_Control_Plane()
+        public void Forwards_The_Tenant_Plan_And_Client_Endpoints_To_The_Control_Plane()
         {
             var options = new PlatformRoutesOptions { ControlPlaneUrl = new Uri("http://control-plane:5000") };
 
@@ -108,6 +108,11 @@ public sealed class AdminRoutesTests
                     "GET /platform/v1/admin/plans/{planId}",
                     "PUT /platform/v1/admin/plans/{planId}",
                     "DELETE /platform/v1/admin/plans/{planId}",
+                    "GET /platform/v1/admin/clients",
+                    "POST /platform/v1/admin/clients",
+                    "GET /platform/v1/admin/clients/{clientId}",
+                    "PUT /platform/v1/admin/clients/{clientId}",
+                    "DELETE /platform/v1/admin/clients/{clientId}",
                 ],
                 routes.Select(route => $"{Assert.Single(route.Match.Methods!)} {route.Match.Path}"));
             Assert.Equal("http://control-plane:5000/", Assert.Single(Assert.Single(clusters).Destinations!.Values).Address);

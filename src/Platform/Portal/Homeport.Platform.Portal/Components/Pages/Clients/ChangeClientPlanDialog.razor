@@ -1,0 +1,69 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject NavigationManager Navigation
+
+@* Holds a client to another plan. Its tenant stays. *@
+<MudDialog>
+    <DialogContent>
+        <ProblemAlert State="_problem" />
+        <MudSelect T="Guid"
+                   @bind-Value="_planId"
+                   Label="Plan"
+                   Error="@_problem.HasError(ClientsApi.PlanIdField)"
+                   ErrorText="@_problem.ErrorOf(ClientsApi.PlanIdField)"
+                   data-field="@ClientsApi.PlanIdField">
+            @foreach (var plan in Plans)
+            {
+                <MudSelectItem T="Guid" Value="plan.Id" @key="plan.Id">@plan.Name</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveAsync" Disabled="_saving" data-action="save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private readonly ProblemState _problem = new(ClientsApi.PlanIdField);
+    private Guid _planId;
+    private bool _saving;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = default!;
+
+    /// <summary>The client whose plan changes.</summary>
+    [Parameter, EditorRequired]
+    public ClientResponse Client { get; set; } = default!;
+
+    /// <summary>The plans the client can be held to.</summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlanResponse> Plans { get; set; } = [];
+
+    protected override void OnParametersSet() => _planId = Client.PlanId;
+
+    private void Cancel() => Dialog.Cancel();
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+        _problem.Clear();
+        var result = await AdminApi.ChangeClientPlanAsync(Client.ClientId, new ChangeClientPlanRequest(_planId), CancellationToken.None);
+        _saving = false;
+
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+        }
+        else if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+        }
+        else
+        {
+            Dialog.Close(DialogResult.Ok(result.Value));
+        }
+    }
+}

@@ -67,6 +67,34 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
         return SendAsync(HttpMethod.Delete, PlanPathOf(planId), body: null, (_, _) => Task.FromResult(planId), cancellationToken);
     }
 
+    public Task<AdminResult<ClientsResponse>> GetClientsAsync(Guid? tenantId, CancellationToken cancellationToken)
+    {
+        var path = tenantId is { } id ? $"{ClientsApi.Path}?{ClientsApi.TenantIdQuery}={id}" : ClientsApi.Path;
+        return SendAsync<ClientsResponse>(HttpMethod.Get, path, body: null, cancellationToken);
+    }
+
+    public Task<AdminResult<ClientResponse>> RegisterClientAsync(RegisterClientRequest request, CancellationToken cancellationToken)
+    {
+        return SendAsync<ClientResponse>(HttpMethod.Post, ClientsApi.Path, JsonContent.Create(request), cancellationToken);
+    }
+
+    public Task<AdminResult<ClientResponse>> ChangeClientPlanAsync(string clientId, ChangeClientPlanRequest request, CancellationToken cancellationToken)
+    {
+        return SendAsync<ClientResponse>(HttpMethod.Put, ClientPathOf(clientId), JsonContent.Create(request), cancellationToken);
+    }
+
+    // The answer has no body; the removed client's id stands in for it.
+    public Task<AdminResult<string>> RemoveClientAsync(string clientId, CancellationToken cancellationToken)
+    {
+        return SendAsync(HttpMethod.Delete, ClientPathOf(clientId), body: null, (_, _) => Task.FromResult(clientId), cancellationToken);
+    }
+
+    // A client id is the identity provider's, so it may hold characters a path segment does not.
+    private static string ClientPathOf(string clientId)
+    {
+        return ClientsApi.ClientPath.Replace($"{{{ClientsApi.ClientIdRouteValue}}}", Uri.EscapeDataString(clientId), StringComparison.Ordinal);
+    }
+
     private static string PlanPathOf(Guid planId)
     {
         return PlansApi.PlanPath.Replace($"{{{PlansApi.PlanIdRouteValue}}}", planId.ToString(), StringComparison.Ordinal);

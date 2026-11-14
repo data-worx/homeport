@@ -8,8 +8,11 @@ namespace Homeport.Platform.ControlPlane.Domain;
 /// </summary>
 public sealed class AuditEntry
 {
-    /// <summary>The longest subject, display name, action or target.</summary>
+    /// <summary>The longest subject, display name or action.</summary>
     public const int MaxFieldLength = 255;
+
+    /// <summary>The longest target: the longest client id behind its prefix.</summary>
+    public const int MaxTargetLength = 263;
 
     /// <summary>The longest summary.</summary>
     public const int MaxSummaryLength = 1000;
@@ -28,6 +31,18 @@ public sealed class AuditEntry
 
     /// <summary>A plan was deleted.</summary>
     public const string PlanDeleted = "plan.deleted";
+
+    /// <summary>A client was registered for a tenant and a plan.</summary>
+    public const string ClientRegistered = "client.registered";
+
+    /// <summary>A client was moved to another plan.</summary>
+    public const string ClientPlanChanged = "client.plan-changed";
+
+    /// <summary>A client was removed.</summary>
+    public const string ClientRemoved = "client.removed";
+
+    // Its length and Client.MaxClientIdLength add up to MaxTargetLength.
+    private const string ClientTargetPrefix = "clients/";
 
     public required Guid Id { get; init; }
 
@@ -59,5 +74,11 @@ public sealed class AuditEntry
     public static string PlanTarget(Guid planId)
     {
         return $"plans/{planId}";
+    }
+
+    /// <summary>The <see cref="Target"/> that names the client <paramref name="clientId"/>.</summary>
+    public static string ClientTarget(string clientId)
+    {
+        return ClientTargetPrefix + clientId;
     }
 }

@@ -2,8 +2,10 @@
 
 The control plane knows the tenants of the installation, their plans and
 their clients, and tells the gateway which tenant and plan a client belongs
-to. In this release it is read-only: its content comes from one seeded
-tenant, plan and client. A write API follows with the admin portal.
+to. You manage tenants, plans and clients in
+[the admin portal](admin-portal.md), through
+[the admin API](admin-api.md); `migrate` seeds one tenant, plan and client
+to start with.
 
 It keeps its data in the schema `control_plane` of the Homeport database;
 see [the data model](../architecture/data-model.md).

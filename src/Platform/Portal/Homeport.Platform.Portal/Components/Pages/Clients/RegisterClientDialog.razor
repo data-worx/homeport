@@ -1,0 +1,102 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject NavigationManager Navigation
+
+@* Maps a client id of the identity provider to a tenant and a plan. The
+   control plane judges every value, so the fields take what is entered. *@
+<MudDialog>
+    <DialogContent>
+        <ProblemAlert State="_problem" />
+        <MudStack Spacing="4">
+            <MudTextField @bind-Value="_clientId"
+                          Label="Client ID"
+                          HelperText="Exactly as your identity provider issued it."
+                          Immediate="true"
+                          AutoFocus="true"
+                          Error="@_problem.HasError(ClientsApi.ClientIdField)"
+                          ErrorText="@_problem.ErrorOf(ClientsApi.ClientIdField)"
+                          data-field="@ClientsApi.ClientIdField" />
+            <MudSelect T="Guid"
+                       @bind-Value="_tenantId"
+                       Label="Tenant"
+                       HelperText="A client keeps its tenant for good."
+                       Error="@_problem.HasError(ClientsApi.TenantIdField)"
+                       ErrorText="@_problem.ErrorOf(ClientsApi.TenantIdField)"
+                       data-field="@ClientsApi.TenantIdField">
+                @foreach (var tenant in Tenants)
+                {
+                    <MudSelectItem T="Guid" Value="tenant.Id" @key="tenant.Id">@tenant.Name</MudSelectItem>
+                }
+            </MudSelect>
+            <MudSelect T="Guid"
+                       @bind-Value="_planId"
+                       Label="Plan"
+                       Error="@_problem.HasError(ClientsApi.PlanIdField)"
+                       ErrorText="@_problem.ErrorOf(ClientsApi.PlanIdField)"
+                       data-field="@ClientsApi.PlanIdField">
+                @foreach (var plan in Plans)
+                {
+                    <MudSelectItem T="Guid" Value="plan.Id" @key="plan.Id">@plan.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveAsync" Disabled="_saving" data-action="save">Register client</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private readonly ProblemState _problem = new(ClientsApi.ClientIdField, ClientsApi.TenantIdField, ClientsApi.PlanIdField);
+    private string _clientId = string.Empty;
+    private Guid _tenantId;
+    private Guid _planId;
+    private bool _saving;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = default!;
+
+    /// <summary>The tenants a client can be registered for.</summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TenantResponse> Tenants { get; set; } = [];
+
+    /// <summary>The plans a client can be held to.</summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlanResponse> Plans { get; set; } = [];
+
+    /// <summary>The tenant chosen at first, such as the one the list is filtered by; the first tenant otherwise.</summary>
+    [Parameter]
+    public Guid? TenantId { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _tenantId = TenantId ?? Tenants.FirstOrDefault()?.Id ?? Guid.Empty;
+        _planId = Plans.FirstOrDefault()?.Id ?? Guid.Empty;
+    }
+
+    private void Cancel() => Dialog.Cancel();
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+        _problem.Clear();
+        var result = await AdminApi.RegisterClientAsync(new RegisterClientRequest(_clientId, _tenantId, _planId), CancellationToken.None);
+        _saving = false;
+
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+        }
+        else if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+        }
+        else
+        {
+            Dialog.Close(DialogResult.Ok(result.Value));
+        }
+    }
+}
