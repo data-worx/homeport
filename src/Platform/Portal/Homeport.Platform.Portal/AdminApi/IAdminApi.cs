@@ -30,4 +30,16 @@ public interface IAdminApi
 
     /// <summary>Deletes the plan <paramref name="planId"/>; on success the value is its id.</summary>
     Task<AdminResult<Guid>> DeletePlanAsync(Guid planId, CancellationToken cancellationToken);
+
+    /// <summary>Every registered client, or every client of <paramref name="tenantId"/>, ordered by client id.</summary>
+    Task<AdminResult<ClientsResponse>> GetClientsAsync(Guid? tenantId, CancellationToken cancellationToken);
+
+    /// <summary>Registers a client of the identity provider for a tenant and a plan.</summary>
+    Task<AdminResult<ClientResponse>> RegisterClientAsync(RegisterClientRequest request, CancellationToken cancellationToken);
+
+    /// <summary>Holds the client <paramref name="clientId"/> to another plan.</summary>
+    Task<AdminResult<ClientResponse>> ChangeClientPlanAsync(string clientId, ChangeClientPlanRequest request, CancellationToken cancellationToken);
+
+    /// <summary>Removes the client <paramref name="clientId"/>; on success the value is its client id.</summary>
+    Task<AdminResult<string>> RemoveClientAsync(string clientId, CancellationToken cancellationToken);
 }

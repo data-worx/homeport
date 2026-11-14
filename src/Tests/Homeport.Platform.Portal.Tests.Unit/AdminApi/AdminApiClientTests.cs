@@ -162,4 +162,58 @@ public sealed class AdminApiClientTests
             return new AdminApiClient(new HttpClient(gateway) { BaseAddress = AdminEndpoint }, tokens, NullLogger<AdminApiClient>.Instance);
         }
     }
+
+    public sealed class GetClientsAsync
+    {
+        private readonly StandInIdentityProvider identityProvider = new();
+        private readonly StandInHandler gateway = new();
+
+        [Fact]
+        public async Task Asks_For_The_Clients_Of_The_Tenant_With_The_Tenant_Query()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(new ClientsResponse([])) };
+
+            await ClientOf(identityProvider, gateway).GetClientsAsync(TenantId, CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal($"http://gateway:8000/platform/v1/admin/clients?tenantId={TenantId}", request.RequestUri!.ToString());
+        }
+
+        [Fact]
+        public async Task Asks_For_Every_Client_Without_A_Tenant()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(new ClientsResponse([])) };
+
+            await ClientOf(identityProvider, gateway).GetClientsAsync(tenantId: null, CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal("http://gateway:8000/platform/v1/admin/clients", request.RequestUri!.ToString());
+        }
+    }
+
+    public sealed class RemoveClientAsync
+    {
+        private readonly StandInIdentityProvider identityProvider = new();
+        private readonly StandInHandler gateway = new();
+
+        [Fact]
+        public async Task Calls_Delete_On_The_Escaped_Client_Id_And_Returns_It_On_No_Content()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.NoContent);
+
+            var result = await ClientOf(identityProvider, gateway).RemoveClientAsync("billing service", CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal(
+                (HttpMethod.Delete, "http://gateway:8000/platform/v1/admin/clients/billing%20service", "billing service"),
+                (request.Method, request.RequestUri!.AbsoluteUri, result.Value));
+        }
+    }
+
+    private static AdminApiClient ClientOf(StandInIdentityProvider identityProvider, StandInHandler gateway)
+    {
+        var valid = identityProvider.Clock.GetUtcNow().AddMinutes(5);
+        var tokens = new OperatorTokens(new SignedInOperator("operator-token", "refresh-token", valid), identityProvider.Refresher(), identityProvider.Clock);
+        return new AdminApiClient(new HttpClient(gateway) { BaseAddress = AdminEndpoint }, tokens, NullLogger<AdminApiClient>.Instance);
+    }
 }

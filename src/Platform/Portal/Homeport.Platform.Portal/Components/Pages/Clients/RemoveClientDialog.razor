@@ -1,0 +1,56 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject NavigationManager Navigation
+
+@* Asks before a client is removed, and shows why when it was not. *@
+<MudDialog>
+    <DialogContent>
+        <ProblemAlert State="_problem" />
+        <MudText>
+            Remove the client <strong class="hp-mono">@Client.ClientId</strong> of <strong>@Client.TenantName</strong>?
+            The gateway refuses its tokens once it looks the client up again. The client stays at your identity provider,
+            and its usage stays with the tenant.
+        </MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_removing">Cancel</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="RemoveAsync" Disabled="_removing" data-action="confirm-remove">Remove</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private readonly ProblemState _problem = new();
+    private bool _removing;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = default!;
+
+    /// <summary>The client to remove.</summary>
+    [Parameter, EditorRequired]
+    public ClientResponse Client { get; set; } = default!;
+
+    private void Cancel() => Dialog.Cancel();
+
+    private async Task RemoveAsync()
+    {
+        _removing = true;
+        _problem.Clear();
+        var result = await AdminApi.RemoveClientAsync(Client.ClientId, CancellationToken.None);
+        _removing = false;
+
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+        }
+        else if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+        }
+        else
+        {
+            Dialog.Close(DialogResult.Ok(Client.ClientId));
+        }
+    }
+}

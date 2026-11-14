@@ -15,6 +15,7 @@ internal static class Navigation
     [
         new("Tenants", "tenants", HomeportIcons.Platform.Tenant),
         new("Plans", "plans", HomeportIcons.Platform.Plan),
+        new("Clients", "clients", HomeportIcons.Platform.Client),
     ];
 
     /// <summary>The pages of the platform itself, shown under <em>Platform</em>.</summary>

@@ -1,0 +1,210 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/clients"
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@inject IAdminApi AdminApi
+@inject IDialogService Dialogs
+@inject NavigationManager Navigation
+
+<PageTitle>Clients · Homeport</PageTitle>
+
+<div class="d-flex align-center justify-space-between flex-wrap gap-4 mb-6">
+    <div>
+        <MudText Typo="Typo.h4" HtmlTag="h1">Clients</MudText>
+        <MudText Class="mud-text-secondary">@Summary</MudText>
+    </div>
+    @if (_clients is { Count: > 0 })
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@HomeportIcons.Lucide.Plus" OnClick="RegisterAsync" data-action="register">Register client</MudButton>
+    }
+</div>
+
+@if (_tenants is { Count: > 0 })
+{
+    <div class="hp-filter mb-4">
+        <MudSelect T="Guid" Value="_tenantFilter" ValueChanged="FilterAsync" Label="Tenant" Variant="Variant.Outlined" Dense="true" data-filter="tenant">
+            <MudSelectItem T="Guid" Value="Guid.Empty">All tenants</MudSelectItem>
+            @foreach (var tenant in _tenants)
+            {
+                <MudSelectItem T="Guid" Value="tenant.Id" @key="tenant.Id">@tenant.Name</MudSelectItem>
+            }
+        </MudSelect>
+    </div>
+}
+
+<MudPaper Outlined="true">
+    @if (_problem.Problem is not null)
+    {
+        <ListError Title="Could not load clients" State="_problem" OnRetry="LoadAsync" />
+    }
+    else if (_clients is null)
+    {
+        <ListLoading Label="Loading clients" />
+    }
+    else if (_tenants!.Count == 0 || _plans!.Count == 0)
+    {
+        <ListEmpty Illustration="spot-empty-berth.svg"
+                   Title="No clients yet"
+                   Text="A client belongs to a tenant and is held to a plan. Add a tenant and a plan first, then register the client.">
+            <div class="d-flex gap-2">
+                <MudButton Variant="Variant.Outlined" Href="tenants">Tenants</MudButton>
+                <MudButton Variant="Variant.Outlined" Href="plans">Plans</MudButton>
+            </div>
+        </ListEmpty>
+    }
+    else if (_clients.Count == 0)
+    {
+        <ListEmpty Illustration="spot-empty-berth.svg"
+                   Title="@(_tenantFilter == Guid.Empty ? "No clients yet" : "No clients of this tenant")"
+                   Text="Create the client at your identity provider, then register its client id here for a tenant and a plan.">
+            <MudButton Variant="Variant.Outlined" StartIcon="@HomeportIcons.Lucide.Plus" OnClick="RegisterAsync" data-action="register">Register client</MudButton>
+        </ListEmpty>
+    }
+    else
+    {
+        <MudSimpleTable Hover="true" Dense="false" Elevation="0" data-clients>
+            <thead>
+                <tr>
+                    <th>Client ID</th>
+                    <th>Tenant</th>
+                    <th>Plan</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var client in _clients)
+                {
+                    <tr @key="client.ClientId" data-client="@client.ClientId">
+                        <td class="hp-mono" data-client-id>@client.ClientId</td>
+                        <td data-tenant>@client.TenantName</td>
+                        <td data-plan>@client.PlanName</td>
+                        <td class="hp-actions">
+                            <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="() => ChangePlanAsync(client)" data-action="change-plan">Change plan</MudButton>
+                            <MudButton Variant="Variant.Text" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveAsync(client)" data-action="remove">Remove</MudButton>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
+    }
+</MudPaper>
+
+<MudText Typo="Typo.body2" Class="mud-text-secondary mt-4">
+    A change reaches the gateway once it looks the client up again: after the gateway's <span class="hp-mono">ControlPlane:ClientCacheLifetime</span>, one minute by default.
+</MudText>
+
+@code {
+    private readonly ProblemState _problem = new();
+    private List<ClientResponse>? _clients;
+    private IReadOnlyList<TenantResponse>? _tenants;
+    private IReadOnlyList<PlanResponse>? _plans;
+    private Guid _tenantFilter = Guid.Empty;
+
+    private string Summary => _clients is null
+        ? "The identity provider's clients, mapped to a tenant and a plan"
+        : $"{_clients.Count} {(_clients.Count == 1 ? "client" : "clients")} · mapped to a tenant and a plan";
+
+    private Guid? TenantFilter => _tenantFilter == Guid.Empty ? null : _tenantFilter;
+
+    // After the first render, so the prerendered page shows the loading state
+    // and the lists are read once, by the circuit.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadAsync();
+            StateHasChanged();
+        }
+    }
+
+    // The tenants and plans are read with the clients: the filter and the
+    // dialogs offer them.
+    private async Task LoadAsync()
+    {
+        _problem.Clear();
+        _clients = null;
+        var tenants = AdminApi.GetTenantsAsync(CancellationToken.None);
+        var plans = AdminApi.GetPlansAsync(CancellationToken.None);
+        var clients = AdminApi.GetClientsAsync(TenantFilter, CancellationToken.None);
+        await Task.WhenAll(tenants, plans, clients);
+
+        if (tenants.Result.SignInRequired || plans.Result.SignInRequired || clients.Result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+            return;
+        }
+
+        if ((tenants.Result.Problem ?? plans.Result.Problem ?? clients.Result.Problem) is { } problem)
+        {
+            _problem.Show(problem);
+            return;
+        }
+
+        _tenants = tenants.Result.Value!.Tenants;
+        _plans = plans.Result.Value!.Plans;
+        _clients = clients.Result.Value!.Clients.ToList();
+    }
+
+    private async Task FilterAsync(Guid tenantId)
+    {
+        _tenantFilter = tenantId;
+        _problem.Clear();
+        _clients = null;
+        var result = await AdminApi.GetClientsAsync(TenantFilter, CancellationToken.None);
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+        }
+        else if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+        }
+        else
+        {
+            _clients = result.Value!.Clients.ToList();
+        }
+    }
+
+    private async Task RegisterAsync()
+    {
+        var parameters = new DialogParameters<RegisterClientDialog>
+        {
+            { dialog => dialog.Tenants, _tenants },
+            { dialog => dialog.Plans, _plans },
+            { dialog => dialog.TenantId, TenantFilter },
+        };
+        var dialog = await Dialogs.ShowAsync<RegisterClientDialog>("Register client", parameters, Options);
+        if (await dialog.Result is { Canceled: false, Data: ClientResponse registered }
+            && (TenantFilter is null || TenantFilter == registered.TenantId))
+        {
+            _clients!.Add(registered);
+            _clients.Sort((a, b) => StringComparer.Ordinal.Compare(a.ClientId, b.ClientId));
+        }
+    }
+
+    private async Task ChangePlanAsync(ClientResponse client)
+    {
+        var parameters = new DialogParameters<ChangeClientPlanDialog>
+        {
+            { dialog => dialog.Client, client },
+            { dialog => dialog.Plans, _plans },
+        };
+        var dialog = await Dialogs.ShowAsync<ChangeClientPlanDialog>($"Change the plan of {client.ClientId}", parameters, Options);
+        if (await dialog.Result is { Canceled: false, Data: ClientResponse changed })
+        {
+            _clients![_clients.FindIndex(c => c.ClientId == changed.ClientId)] = changed;
+        }
+    }
+
+    private async Task RemoveAsync(ClientResponse client)
+    {
+        var parameters = new DialogParameters<RemoveClientDialog> { { dialog => dialog.Client, client } };
+        var dialog = await Dialogs.ShowAsync<RemoveClientDialog>($"Remove {client.ClientId}", parameters, Options);
+        if (await dialog.Result is { Canceled: false })
+        {
+            _clients!.RemoveAll(c => c.ClientId == client.ClientId);
+        }
+    }
+
+    private static DialogOptions Options => new() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseOnEscapeKey = true };
+}

@@ -1,0 +1,12 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+
+/* The tenant filter, no wider than a tenant's name needs. */
+.hp-filter {
+    max-width: 320px;
+}
+
+/* The row's actions, at its end, as the design kit places them. */
+.hp-actions {
+    text-align: right;
+    white-space: nowrap;
+}

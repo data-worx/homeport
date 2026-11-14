@@ -53,6 +53,33 @@ internal sealed class StandInAdminApi : IAdminApi
     public Task<AdminResult<Guid>> DeletePlanAsync(Guid planId, CancellationToken cancellationToken) =>
         Task.FromResult(PlanDeletion ?? AdminResult<Guid>.Success(planId));
 
+    /// <summary>The answer to <see cref="GetClientsAsync"/> by the tenant asked for; every client under <see cref="Guid.Empty"/>.</summary>
+    internal Dictionary<Guid, AdminResult<ClientsResponse>> Clients { get; } = new()
+    {
+        [Guid.Empty] = AdminResult<ClientsResponse>.Success(new ClientsResponse([])),
+    };
+
+    /// <summary>The answer to a registration or a change of a client's plan.</summary>
+    internal AdminResult<ClientResponse>? ClientChange { get; set; }
+
+    /// <summary>The client ids <see cref="RemoveClientAsync"/> was called for.</summary>
+    internal List<string> RemovedClients { get; } = [];
+
+    public Task<AdminResult<ClientsResponse>> GetClientsAsync(Guid? tenantId, CancellationToken cancellationToken) =>
+        Task.FromResult(Clients[tenantId ?? Guid.Empty]);
+
+    public Task<AdminResult<ClientResponse>> RegisterClientAsync(RegisterClientRequest request, CancellationToken cancellationToken) =>
+        Task.FromResult(ClientChange ?? AdminResult<ClientResponse>.Success(new ClientResponse(request.ClientId, request.TenantId, "Tenant", request.PlanId, "Plan")));
+
+    public Task<AdminResult<ClientResponse>> ChangeClientPlanAsync(string clientId, ChangeClientPlanRequest request, CancellationToken cancellationToken) =>
+        Task.FromResult(ClientChange ?? AdminResult<ClientResponse>.Success(new ClientResponse(clientId, Guid.Empty, "Tenant", request.PlanId, "Plan")));
+
+    public Task<AdminResult<string>> RemoveClientAsync(string clientId, CancellationToken cancellationToken)
+    {
+        RemovedClients.Add(clientId);
+        return Task.FromResult(AdminResult<string>.Success(clientId));
+    }
+
     /// <summary>A validation problem with <paramref name="message"/> at <paramref name="field"/>.</summary>
     internal static ProblemResponse ValidationOf(string field, string message)
     {
