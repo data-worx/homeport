@@ -116,8 +116,10 @@ public static class Program
         // Development and tests only. An operator brings their own identity
         // provider (ADR-0006), so the compose file runs Keycloak in development
         // mode as the AppHost does, rather than in production mode without TLS.
-        // The realm holds the client the control plane seeds and one it does not
-        // know; their secrets are generated and never written into the realm file.
+        // The realm holds the client the control plane seeds, one it does not
+        // know, one the tests register through the admin API, and one that signs
+        // the dev operator in by password for the tests; their secrets are
+        // generated and never written into the realm file.
         // Keycloak is reachable from the host, where clients ask it for tokens.
         // Its issuer is always the host address, while the gateway fetches the
         // metadata and keys over the network it shares with it. It serves plain
@@ -139,6 +141,8 @@ public static class Program
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_ID", seedClientId)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_SECRET", builder.AddParameter("local-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
             .WithEnvironment("HOMEPORT_UNMAPPED_CLIENT_SECRET", builder.AddParameter("unmapped-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
+            .WithEnvironment("HOMEPORT_REGISTERED_CLIENT_SECRET", builder.AddParameter("registered-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
+            .WithEnvironment("HOMEPORT_ADMIN_API_TEST_SECRET", builder.AddParameter("admin-api-test-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))
             .WithEnvironment("HOMEPORT_AUDIENCE", Audience)
             .WithEnvironment("HOMEPORT_ADMIN_AUDIENCE", AdminAudience)
             .WithEnvironment("HOMEPORT_PORTAL_CLIENT_ID", PortalClientId)

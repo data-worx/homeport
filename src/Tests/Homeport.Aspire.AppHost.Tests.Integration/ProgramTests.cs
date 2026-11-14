@@ -11,6 +11,7 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Homeport.Shared.Client.ModuleContract;
 using Homeport.Shared.Client.Modules.Echo.V1;
+using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualBasic.FileIO;
@@ -291,6 +292,22 @@ public sealed class ProgramTests
             Assert.Equal(RunningAppHost.SeededClient.ClientId, caller?.ClientId);
         }
 
+        // A tenant and a plan of its own, so the seeded plan's small limit
+        // and the seeded tenant's usage stay the other tests'.
+        [Fact]
+        public async Task Reaches_Echo_With_A_Client_Registered_Through_The_Admin_Api()
+        {
+            using var admin = await appHost.AdminApiAsync();
+            var tenant = await CreatedAsync<TenantResponse>(admin, TenantsApi.Path, new CreateTenantRequest("Registered tenant"));
+            var plan = await CreatedAsync<PlanResponse>(admin, PlansApi.Path, new CreatePlanRequest("Registered plan", 100, 100));
+            await CreatedAsync<ClientResponse>(admin, ClientsApi.Path, new RegisterClientRequest(RunningAppHost.RegisteredClient.ClientId, tenant.Id, plan.Id));
+            var gateway = await appHost.GatewayRoutingEchoAsync(RunningAppHost.RegisteredClient);
+
+            var caller = await gateway.GetFromJsonAsync<CallerResponse>("/modules/echo/v1/caller");
+
+            Assert.Equal((tenant.Id, RunningAppHost.RegisteredClient.ClientId), (caller?.TenantId, caller?.ClientId));
+        }
+
         [Fact]
         public async Task Answers_A_Request_Sent_To_Echo_Without_The_Gateway_With_Unauthorized()
         {
@@ -382,6 +399,14 @@ public sealed class ProgramTests
         }
 
         private Task<HttpClient> Gateway() => appHost.GatewayRoutingEchoAsync();
+
+        // Posts <paramref name="request"/> to the admin API at <paramref name="path"/> and returns what it created.
+        private static async Task<TResponse> CreatedAsync<TResponse>(HttpClient admin, string path, object request)
+        {
+            using var response = await admin.PostAsJsonAsync(RunningAppHost.PlatformPrefix + path, request);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return (await response.Content.ReadFromJsonAsync<TResponse>())!;
+        }
 
         private static DateTimeOffset UsageHour()
         {
