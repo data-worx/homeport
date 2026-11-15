@@ -88,10 +88,11 @@ internal sealed record ProjectFile(
     internal bool IsSharedClient => Location == ProjectLocation.Shared && Name == $"{GroupingName}.Client";
 
     /// <summary>
-    /// <c>Homeport.Shared.Internal</c>: what services share and Homeport never
-    /// ships (ADR-0018).
+    /// <c>Homeport.Shared.Internal</c> or a <c>Homeport.Shared.Internal.&lt;Topic&gt;</c>:
+    /// what services share and Homeport never ships (ADR-0018).
     /// </summary>
-    internal bool IsSharedInternal => Location == ProjectLocation.Shared && Name == $"{GroupingName}.Internal";
+    internal bool IsSharedInternal => Location == ProjectLocation.Shared
+        && (Name == $"{GroupingName}.Internal" || Name.StartsWith($"{GroupingName}.Internal.", StringComparison.Ordinal));
 
     /// <summary>
     /// Whether a segment of the name after the grouping directories is a layer

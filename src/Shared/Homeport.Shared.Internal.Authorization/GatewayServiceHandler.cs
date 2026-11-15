@@ -2,8 +2,9 @@
 
 using Homeport.Shared.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
-namespace Homeport.Platform.ControlPlane.Api.Authentication;
+namespace Homeport.Shared.Internal.Authorization;
 
 /// <summary>
 /// Checks <see cref="GatewayServiceRequirement"/> on the gateway's token. A

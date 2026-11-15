@@ -63,7 +63,7 @@ public sealed class ClientsControllerTests
             var logged = controlPlane.Logs.GetSnapshot();
             Assert.Contains(
                 logged,
-                entry => entry.Category == "Homeport.Platform.ControlPlane.Api.Authentication.GatewayServiceHandler"
+                entry => entry.Category == "Homeport.Shared.Internal.Authorization.GatewayServiceHandler"
                     && entry.Level == LogLevel.Warning
                     && entry.Message.Contains("subject is not the gateway", StringComparison.Ordinal));
             Assert.DoesNotContain(logged, entry => entry.Message.Contains(token, StringComparison.Ordinal));

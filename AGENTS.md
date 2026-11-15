@@ -125,6 +125,7 @@ src/
   Shared/Homeport.Shared.Contracts
   Shared/Homeport.Shared.Client
   Shared/Homeport.Shared.Internal
+  Shared/Homeport.Shared.Internal.Authorization
   Shared/Homeport.Shared.ServiceDefaults
   Shared/Homeport.Shared.Authentication
   Sdk/Homeport.Sdk
@@ -185,6 +186,11 @@ See [ADR-0018](docs/architecture/adr/0018-where-wire-types-live.md).
   ships: messages between services (for example `UsageRecorded`),
   integration events and the like. Changing one is a breaking change for
   every consumer. The project is created with its first type.
+- `Homeport.Shared.Internal.<Topic>` holds code services share and Homeport
+  never ships, such as `Homeport.Shared.Internal.Authorization` with the
+  policies a platform service holds the gateway's tokens to. Unlike
+  `Homeport.Shared.Internal` it may reference packages and frameworks. Each
+  rule below that names `Homeport.Shared.Internal` holds for every topic too.
 - Domain references neither `Homeport.Shared.Client` nor
   `Homeport.Shared.Internal`. Infrastructure and a `.Worker` do not reference
   `Homeport.Shared.Client`. `Homeport.Sdk` references

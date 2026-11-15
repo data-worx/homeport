@@ -6,6 +6,7 @@ using Homeport.Platform.ControlPlane.Application.Clients;
 using Homeport.Platform.ControlPlane.Domain;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Contracts;
+using Homeport.Shared.Internal.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -20,7 +21,7 @@ namespace Homeport.Platform.ControlPlane.Api.Controllers;
 /// <see cref="ClientsController"/>.
 /// </summary>
 [ApiController]
-[Authorize(Policy = AdminRequirement.Policy)]
+[Authorize(Policy = PlatformPolicies.Admin)]
 public sealed class AdminClientsController(ClientAdministration clients, ILogger<AdminClientsController> logger) : ControllerBase
 {
     /// <summary>Returns every registered client, or every client of one tenant, ordered by client id.</summary>
@@ -70,7 +71,7 @@ public sealed class AdminClientsController(ClientAdministration clients, ILogger
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, MediaTypeNames.Application.ProblemJson)]
     public async Task<ActionResult<ClientResponse>> Register(RegisterClientRequest request, CancellationToken cancellationToken)
     {
-        var registered = await clients.RegisterAsync(request.ClientId, request.TenantId, request.PlanId, AdminHandler.OperatorOf(User), cancellationToken);
+        var registered = await clients.RegisterAsync(request.ClientId, request.TenantId, request.PlanId, OperatorClaims.OperatorOf(User), cancellationToken);
         if (!registered.IsSuccess)
         {
             return ToActionResult(registered);
@@ -98,7 +99,7 @@ public sealed class AdminClientsController(ClientAdministration clients, ILogger
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, MediaTypeNames.Application.ProblemJson)]
     public async Task<ActionResult<ClientResponse>> ChangePlan(string clientId, ChangeClientPlanRequest request, CancellationToken cancellationToken)
     {
-        var changed = await clients.ChangePlanAsync(clientId, request.PlanId, AdminHandler.OperatorOf(User), cancellationToken);
+        var changed = await clients.ChangePlanAsync(clientId, request.PlanId, OperatorClaims.OperatorOf(User), cancellationToken);
         if (changed.IsSuccess)
         {
             logger.LogInformation("Client {ClientId} moved to plan {PlanId}", clientId, request.PlanId);
@@ -124,7 +125,7 @@ public sealed class AdminClientsController(ClientAdministration clients, ILogger
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, MediaTypeNames.Application.ProblemJson)]
     public async Task<IActionResult> Remove(string clientId, CancellationToken cancellationToken)
     {
-        var removed = await clients.RemoveAsync(clientId, AdminHandler.OperatorOf(User), cancellationToken);
+        var removed = await clients.RemoveAsync(clientId, OperatorClaims.OperatorOf(User), cancellationToken);
         if (!removed.IsSuccess)
         {
             return ToActionResult(removed).Result!;

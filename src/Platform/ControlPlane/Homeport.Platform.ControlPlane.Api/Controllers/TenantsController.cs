@@ -6,6 +6,7 @@ using Homeport.Platform.ControlPlane.Application.Tenants;
 using Homeport.Platform.ControlPlane.Domain;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Contracts;
+using Homeport.Shared.Internal.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -18,7 +19,7 @@ namespace Homeport.Platform.ControlPlane.Api.Controllers;
 /// caller token of scope <c>admin</c> (ADR-0020).
 /// </summary>
 [ApiController]
-[Authorize(Policy = AdminRequirement.Policy)]
+[Authorize(Policy = PlatformPolicies.Admin)]
 public sealed class TenantsController(TenantAdministration tenants, ILogger<TenantsController> logger) : ControllerBase
 {
     /// <summary>Returns every tenant, ordered by name.</summary>
@@ -67,7 +68,7 @@ public sealed class TenantsController(TenantAdministration tenants, ILogger<Tena
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, MediaTypeNames.Application.ProblemJson)]
     public async Task<ActionResult<TenantResponse>> Create(CreateTenantRequest request, CancellationToken cancellationToken)
     {
-        var created = await tenants.CreateAsync(request.Name, AdminHandler.OperatorOf(User), cancellationToken);
+        var created = await tenants.CreateAsync(request.Name, OperatorClaims.OperatorOf(User), cancellationToken);
         if (!created.IsSuccess)
         {
             return ToActionResult(created);
@@ -95,7 +96,7 @@ public sealed class TenantsController(TenantAdministration tenants, ILogger<Tena
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, MediaTypeNames.Application.ProblemJson)]
     public async Task<ActionResult<TenantResponse>> Rename(Guid tenantId, RenameTenantRequest request, CancellationToken cancellationToken)
     {
-        var renamed = await tenants.RenameAsync(tenantId, request.Name, AdminHandler.OperatorOf(User), cancellationToken);
+        var renamed = await tenants.RenameAsync(tenantId, request.Name, OperatorClaims.OperatorOf(User), cancellationToken);
         if (renamed.IsSuccess)
         {
             logger.LogInformation("Tenant {TenantId} renamed", tenantId);

@@ -70,7 +70,7 @@ internal static class ReferenceRules
     }
 
     /// <summary>
-    /// References to <c>Homeport.Shared.Internal</c> from a Domain, from
+    /// References to <c>Homeport.Shared.Internal</c> or one of its topics from a Domain, from
     /// <c>src/Sdk/</c> or from <c>Homeport.Shared.Client</c>: what Homeport
     /// never ships stays out of what it ships (ADR-0018).
     /// </summary>

@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Security.Claims;
-using Homeport.Platform.ControlPlane.Application;
 using Homeport.Shared.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
-namespace Homeport.Platform.ControlPlane.Api.Authentication;
+namespace Homeport.Shared.Internal.Authorization;
 
 /// <summary>
 /// Checks <see cref="AdminRequirement"/> on the gateway's token. A failure is
@@ -13,19 +12,6 @@ namespace Homeport.Platform.ControlPlane.Api.Authentication;
 /// </summary>
 internal sealed class AdminHandler(ILogger<AdminHandler> logger) : AuthorizationHandler<AdminRequirement>
 {
-    /// <summary>
-    /// The operator a caller token names, for the audit entry. Without a
-    /// display name, the subject stands in for it.
-    /// </summary>
-    internal static Operator OperatorOf(ClaimsPrincipal user)
-    {
-        // The policy has made sure the token names one.
-        var subject = user.FindFirst(GatewayTokens.SubjectClaim)?.Value
-            ?? throw new InvalidOperationException("An admin request reached the controller without a subject.");
-
-        return new Operator(subject, user.FindFirst(GatewayTokens.NameClaim)?.Value ?? subject);
-    }
-
     /// <summary>Succeeds for a caller token with the admin scope and no tenant.</summary>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminRequirement requirement)
     {
