@@ -116,6 +116,17 @@ emit() {   # <pack> <src> <target> <mode>
   printf '%s|%s|%s|%s|%s|%s\n' "${pack}/${src}" "${target}" "${mode}" "${marker}" "${up}" "${inst}"
 }
 
+# Every target a non-dir entry installs. A pack may put a file of its own into a
+# directory another pack ships as a whole - a stack's checks next to a core
+# skill - and that file is installed, not an orphan.
+FILE_TARGETS="$(
+  while IFS= read -r pack; do
+    while IFS='|' read -r p src target mode; do
+      [ "${mode}" = "dir" ] || printf '%s\n' "${target}"
+    done < <(manifest_lines "${pack}")
+  done < <(manifest_packs "${DEVKIT_FORGE}" ${DEVKIT_STACKS})
+)"
+
 while IFS= read -r pack; do
   while IFS='|' read -r p src target mode; do
     if [ "${mode}" = "dir" ]; then
@@ -128,6 +139,7 @@ while IFS= read -r pack; do
       while IFS= read -r f; do
         rel="${f#"${REPO}/${target}/"}"
         [ -f "${DEVKIT_PROJECT_DIR}/${p}/${src}/${rel}" ] && continue
+        printf '%s\n' "${FILE_TARGETS}" | grep -Fxq -- "${target}/${rel}" && continue
         printf '%s|%s|%s||%s|%s\n' "-" "${target}/${rel}" "orphan" "-" "$(hash_of "${f}")"
       done < <(find "${REPO}/${target}" -type f 2>/dev/null | sort)
     else

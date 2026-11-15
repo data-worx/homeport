@@ -194,6 +194,34 @@ In addition to the ones in `AGENTS.core.md`:
 - `DateTime.Now` or `DateTime.UtcNow` in domain code. Inject a clock.
 - `Task.Run` to make synchronous code look asynchronous.
 
+## XML documentation {#dotnet.docs}
+
+**Every type and every member of a production project carries an XML doc
+comment, whatever its visibility** — methods, properties, events, constructors
+and constants, private ones included. A production project is every project
+under `src/` except those under `src/Tests/`, so test projects and
+`<Name>.Testing` are exempt. So are private fields, local functions, lambdas,
+and generated code such as EF migrations and source-generator output.
+
+**Comments stay short.**
+
+- A `<summary>` is ideally one sentence that says what the member is or does.
+- A complex or critical member — a security check, a concurrency guarantee, a
+  non-obvious invariant — gets what it needs to be used correctly: why it
+  exists, what it guarantees, what breaks if it is changed. Where that would
+  grow the summary beyond a few lines, it goes into `<remarks>`.
+- `<param>`, `<returns>` and `<remarks>` otherwise only where they add
+  something the name does not say.
+
+**The build enforces it, not the review.** The compiler's own CS1591 only
+reaches public members, so the packs use StyleCop.Analyzers (MIT) for SA1600
+alone; every other StyleCop rule is switched off in `.editorconfig`, and CS1591
+with them, so a public member is not reported twice. `src/stylecop.json`
+documents private elements but not private fields. `src/Directory.Build.props`
+writes the documentation file and adds the analyzer to every production
+project, and `TreatWarningsAsErrors` turns a missing comment into a failed
+build. How each runtime wires it in is in its own pack.
+
 ## Tests {#dotnet.tests}
 
 **A test project belongs to exactly one production project and is named

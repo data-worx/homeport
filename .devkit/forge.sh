@@ -108,6 +108,11 @@ forge_pr_view() {
     -q '"#\(.number) state=\(.state) draft=\(.isDraft) review=\(.reviewDecision)\n\(.url)"'
 }
 
+# forge_pr_body <branch or number> -> raw body
+forge_pr_body() {
+  gh pr view "$1" --json body -q .body
+}
+
 # forge_pr_comments <number> -> review and issue comments, one block each
 forge_pr_comments() {
   gh pr view "$1" --json comments,reviews \

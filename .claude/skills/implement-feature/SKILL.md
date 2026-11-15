@@ -66,8 +66,10 @@ but nothing forces a name.
 ## 4. Changelog — `full` only
 
 See `forge.changelog`. A user-visible change needs an entry under
-`## [Unreleased]` in the right category. Purely internal work may skip it —
-and when it is skipped, one line in the request body says why.
+`## [Unreleased]` in the right category — or where a deviation from
+`forge.changelog` recorded in the project `AGENTS.md` puts it instead. Purely
+internal work may skip it — and when it is skipped, one line in the request
+body says why.
 
 ## 5. Gates — both modes
 
