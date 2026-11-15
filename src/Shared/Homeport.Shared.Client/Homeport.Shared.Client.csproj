@@ -8,9 +8,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TrackPublicApi>true</TrackPublicApi>
-    <!-- The XML docs travel with the package to every caller, and module
-         hosts take them into their OpenAPI documents. -->
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
 </Project>

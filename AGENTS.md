@@ -199,6 +199,10 @@ See [ADR-0018](docs/architecture/adr/0018-where-wire-types-live.md).
   it on with `<TrackPublicApi>true</TrackPublicApi>`, and
   `Directory.Build.targets` adds the analyzer. It flows to no caller, so it
   is not a reference in the sense of the rules above.
+- `src/Directory.Build.props` adds `StyleCop.Analyzers` to every production
+  project for SA1600 (`dotnet.docs`). Like `PublicApiAnalyzers` it flows to
+  no caller, so it is no reference of `Homeport.Shared.Contracts` or any
+  other project in the sense of the rules above.
 - `Homeport.Shared.Client` is published with `Homeport.Sdk`, under the same
   version.
 - The code follows these rules from #105 on.
