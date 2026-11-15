@@ -8,9 +8,10 @@ namespace Homeport.Platform.Registry.Application;
 
 /// <summary>
 /// The registry's use cases: module instances register and keep themselves
-/// registered, and the gateway reads the routes of the live ones (ADR-0004).
+/// registered, the gateway reads the routes of the live ones (ADR-0004), and
+/// the operator reads the modules (ADR-0020).
 /// </summary>
-public sealed class Registrations(IInstanceStore store, IRegistrationKeySource keys)
+public sealed class Registrations(IInstanceStore store, IRegistrationKeySource keys, TimeProvider clock)
 {
     /// <summary>
     /// How long an instance stays registered without a heartbeat. The SDK
@@ -56,6 +57,43 @@ public sealed class Registrations(IInstanceStore store, IRegistrationKeySource k
     /// <summary>The routes of every module with at least one live instance.</summary>
     public async Task<IReadOnlyList<ModuleRoutes>> RoutesAsync(CancellationToken cancellationToken)
     {
-        return RouteTable.Build(await store.ListAsync(cancellationToken));
+        var stored = await store.ListAsync(cancellationToken);
+        return RouteTable.Build(stored.Select(kept => kept.Instance));
+    }
+
+    /// <summary>
+    /// Every module with at least one live instance, ordered by module id,
+    /// with its instances and the routes the gateway serves for it.
+    /// </summary>
+    /// <remarks>
+    /// Every registration and heartbeat keeps an instance for
+    /// <see cref="InstanceLifetime"/>, so its last heartbeat lies that long
+    /// before its registration ends.
+    /// </remarks>
+    public async Task<IReadOnlyList<RegisteredModule>> ModulesAsync(CancellationToken cancellationToken)
+    {
+        var stored = await store.ListAsync(cancellationToken);
+        var now = clock.GetUtcNow();
+        var routes = RouteTable.Build(stored.Select(kept => kept.Instance))
+            .ToDictionary(module => module.ModuleId, module => module.Routes, StringComparer.Ordinal);
+
+        return stored
+            .GroupBy(kept => kept.Instance.Manifest.Id, StringComparer.Ordinal)
+            .OrderBy(module => module.Key, StringComparer.Ordinal)
+            .Select(module => new RegisteredModule(
+                module.Key,
+                module
+                    .OrderBy(kept => kept.Instance.InstanceId, StringComparer.Ordinal)
+                    .Select(kept => Registered(kept, now))
+                    .ToList(),
+                routes[module.Key]))
+            .ToList();
+    }
+
+    /// <summary>An instance with the moments its registration started and ends, seen at <paramref name="now"/>.</summary>
+    private static RegisteredInstance Registered(StoredInstance kept, DateTimeOffset now)
+    {
+        var expiresAt = now + kept.TimeToLive;
+        return new RegisteredInstance(kept.Instance, expiresAt - InstanceLifetime, expiresAt);
     }
 }

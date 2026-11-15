@@ -2,6 +2,7 @@
 
 using Homeport.Platform.Registry.Domain.Manifests;
 using Homeport.Platform.Registry.Domain.Routing;
+using Microsoft.Extensions.Time.Testing;
 
 namespace Homeport.Platform.Registry.Application.Tests.Unit;
 
@@ -14,12 +15,14 @@ public sealed class RegistrationsTests
         new Uri("http://things-1:8080"),
         new Manifest(ModuleId, "Things", "1.0.0", 1, [new ManifestRoute("GET", "/v1/things", "things.read", "requests", 1)], ["things.read"], ["requests"], "/openapi/v1.json"));
 
+    private static readonly DateTimeOffset Now = new(2026, 11, 15, 12, 0, 0, TimeSpan.Zero);
+
     private readonly InMemoryStore store = new();
     private readonly Registrations registrations;
 
     public RegistrationsTests()
     {
-        registrations = new Registrations(store, new Keys(new Dictionary<string, string[]> { [ModuleId] = ["key"] }));
+        registrations = new Registrations(store, new Keys(new Dictionary<string, string[]> { [ModuleId] = ["key"] }), new FakeTimeProvider(Now));
     }
 
     public sealed class IsAuthorized
@@ -101,11 +104,62 @@ public sealed class RegistrationsTests
         [Fact]
         public async Task Builds_The_Routes_Of_The_Kept_Instances()
         {
-            context.store.Listed.Add(Valid);
+            context.store.Listed.Add(new StoredInstance(Valid, Registrations.InstanceLifetime));
 
             var routes = await context.registrations.RoutesAsync(CancellationToken.None);
 
             Assert.Equal([Valid.Address], Assert.Single(Assert.Single(routes).Routes).Instances);
+        }
+    }
+
+    public sealed class ModulesAsync
+    {
+        private readonly RegistrationsTests context = new();
+
+        [Fact]
+        public async Task Lists_Each_Module_Once_Ordered_By_Module_Id()
+        {
+            context.store.Listed.Add(new StoredInstance(Valid with { Manifest = Valid.Manifest with { Id = "zebra" } }, Registrations.InstanceLifetime));
+            context.store.Listed.Add(new StoredInstance(Valid, Registrations.InstanceLifetime));
+            context.store.Listed.Add(new StoredInstance(Valid with { InstanceId = "instance-2" }, Registrations.InstanceLifetime));
+
+            var modules = await context.registrations.ModulesAsync(CancellationToken.None);
+
+            Assert.Equal([ModuleId, "zebra"], modules.Select(module => module.ModuleId));
+        }
+
+        [Fact]
+        public async Task Orders_The_Instances_Of_A_Module_By_Instance_Id()
+        {
+            context.store.Listed.Add(new StoredInstance(Valid with { InstanceId = "instance-2" }, Registrations.InstanceLifetime));
+            context.store.Listed.Add(new StoredInstance(Valid, Registrations.InstanceLifetime));
+
+            var modules = await context.registrations.ModulesAsync(CancellationToken.None);
+
+            Assert.Equal(["instance-1", "instance-2"], Assert.Single(modules).Instances.Select(registered => registered.Instance.InstanceId));
+        }
+
+        [Fact]
+        public async Task Dates_An_Instance_From_The_Time_It_Has_Left()
+        {
+            var left = TimeSpan.FromSeconds(20);
+            context.store.Listed.Add(new StoredInstance(Valid, left));
+
+            var modules = await context.registrations.ModulesAsync(CancellationToken.None);
+
+            var registered = Assert.Single(Assert.Single(modules).Instances);
+            Assert.Equal((Now + left - Registrations.InstanceLifetime, Now + left), (registered.LastHeartbeatAt, registered.ExpiresAt));
+        }
+
+        [Fact]
+        public async Task Gives_A_Route_The_Version_Of_The_Newest_Instance_That_Declares_It()
+        {
+            context.store.Listed.Add(new StoredInstance(Valid, Registrations.InstanceLifetime));
+            context.store.Listed.Add(new StoredInstance(Valid with { InstanceId = "instance-2", Manifest = Valid.Manifest with { Version = "1.1.0" } }, Registrations.InstanceLifetime));
+
+            var modules = await context.registrations.ModulesAsync(CancellationToken.None);
+
+            Assert.Equal("1.1.0", Assert.Single(Assert.Single(modules).Routes).Version);
         }
     }
 
@@ -122,7 +176,7 @@ public sealed class RegistrationsTests
 
         internal List<TimeSpan> Renewals { get; } = [];
 
-        internal List<Instance> Listed { get; } = [];
+        internal List<StoredInstance> Listed { get; } = [];
 
         public Task SaveAsync(Instance instance, TimeSpan lifetime, CancellationToken cancellationToken)
         {
@@ -136,9 +190,9 @@ public sealed class RegistrationsTests
             return Task.FromResult(Kept.Contains((moduleId, instanceId)));
         }
 
-        public Task<IReadOnlyList<Instance>> ListAsync(CancellationToken cancellationToken)
+        public Task<IReadOnlyList<StoredInstance>> ListAsync(CancellationToken cancellationToken)
         {
-            return Task.FromResult<IReadOnlyList<Instance>>(Listed);
+            return Task.FromResult<IReadOnlyList<StoredInstance>>(Listed);
         }
     }
 }

@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Homeport.Platform.ControlPlane.Api.Authentication;
 using Homeport.Platform.ControlPlane.Api.Errors;
 using Homeport.Platform.ControlPlane.Application.Clients;
 using Homeport.Platform.ControlPlane.Application.Plans;
 using Homeport.Platform.ControlPlane.Application.Tenants;
 using Homeport.Platform.ControlPlane.Infrastructure.Persistence;
 using Homeport.Shared.Authentication;
+using Homeport.Shared.Internal.Authorization;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Homeport.Shared.ServiceDefaults;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace Homeport.Platform.ControlPlane.Api;
@@ -57,15 +56,7 @@ public sealed class Program
         // also needs the gateway's service token (ADR-0014), the admin
         // endpoints the operator's caller token (ADR-0020).
         builder.Services.AddGatewayTokenAuthentication(ControlPlaneService.Audience);
-        builder.Services.AddSingleton<IAuthorizationHandler, GatewayServiceHandler>();
-        builder.Services.AddSingleton<IAuthorizationHandler, AdminHandler>();
-        builder.Services.AddAuthorizationBuilder()
-            .AddPolicy(GatewayServiceRequirement.Policy, policy => policy
-                .RequireAuthenticatedUser()
-                .AddRequirements(new GatewayServiceRequirement()))
-            .AddPolicy(AdminRequirement.Policy, policy => policy
-                .RequireAuthenticatedUser()
-                .AddRequirements(new AdminRequirement()));
+        builder.Services.AddPlatformPolicies();
 
         // A missing name is the domain's to judge, so the answer is the same
         // whether the field is absent or empty.

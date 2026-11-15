@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net.Mime;
-using Homeport.Platform.ControlPlane.Api.Authentication;
 using Homeport.Platform.ControlPlane.Application;
+using Homeport.Shared.Internal.Authorization;
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +14,7 @@ namespace Homeport.Platform.ControlPlane.Api.Controllers;
 /// gateway may ask, with a service token for the control plane (ADR-0014).
 /// </summary>
 [ApiController]
-[Authorize(Policy = GatewayServiceRequirement.Policy)]
+[Authorize(Policy = PlatformPolicies.GatewayService)]
 public sealed class ClientsController(IClientLookup clients, ILogger<ClientsController> logger) : ControllerBase
 {
     /// <summary>The tenant and the plan limits of a client.</summary>

@@ -2,6 +2,7 @@
 
 using Homeport.Shared.Internal.Platform.ControlPlane;
 using Homeport.Shared.Internal.Platform.Metering;
+using Homeport.Shared.Internal.Platform.Registry;
 
 namespace Homeport.Platform.Gateway.Api.Routing;
 
@@ -25,4 +26,12 @@ public sealed class PlatformRoutesOptions
     /// of its endpoint.
     /// </summary>
     public Uri ControlPlaneUrl { get; set; } = new($"{Uri.UriSchemeHttp}://{ControlPlaneService.ServiceName}");
+
+    /// <summary>
+    /// The registry, which serves <c>/platform/v1/admin/modules</c>. The
+    /// default names it by its service name, which the compose network
+    /// resolves; the AppHost sets the address of its endpoint. The route
+    /// table is read through <c>Registry:Url</c>, not through this address.
+    /// </summary>
+    public Uri RegistryUrl { get; set; } = new($"{Uri.UriSchemeHttp}://{RegistryService.ServiceName}");
 }

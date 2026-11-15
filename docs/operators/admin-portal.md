@@ -6,9 +6,9 @@ in at your own identity provider; the portal never sees your password. It is
 a Blazor Server application, so your tokens stay on its server and never
 reach the browser.
 
-You sign in, see who you are signed in as, sign out, and manage the
-tenants, plans and clients. The pages for modules, usage and the audit log
-follow, each with its own entry in the navigation. Every page calls the
+You sign in, see who you are signed in as, sign out, manage the tenants,
+plans and clients, and see the registered modules. The pages for usage and
+the audit log follow, each with its own entry in the navigation. Every page calls the
 [admin API](admin-api.md) at the gateway's admin port, as you.
 
 ![The portal's shell after signing in: the app bar with the operator's name, the navigation and the start page](admin-portal-shell.png)
@@ -112,6 +112,26 @@ default. A removed client can still call for at most that long.
 
 Each change is recorded in the audit log, as for tenants.
 
+## Modules
+
+*Modules*, under *Platform*, lists every module with at least one live
+instance: its module id, the versions and contract versions its instances
+run, how many instances there are, how long ago the most recent heartbeat
+arrived, how many routes the gateway serves for it, and — where the API
+docs are linked — its OpenAPI document. Select a module to see each
+instance with its address, version and last heartbeat, and each route with
+its scope, meter and the version of the instance whose declaration
+applies.
+
+![The module list with Echo, one instance and four routes, and the instances and routes of Echo](admin-portal-modules.png)
+
+The page only reads what the [registry](registry.md) holds. Modules
+register themselves when they start, and an instance drops out 30 seconds
+after its last heartbeat; there is nothing to remove by hand. The
+heartbeat ages are those of the moment the list was read: *Refresh* reads
+it again. Reading the modules writes no audit entry, since a registration
+is the platform's data, not a tenant's.
+
 ## Configuration
 
 | Setting | Environment variable | Default | Meaning |
@@ -124,13 +144,15 @@ Each change is recorded in the audit log, as for tenants.
 | `SignIn:NameClaim` | `SignIn__NameClaim` | `name` | The claim your display name is taken from, shown in the app bar |
 | `SignIn:RequireHttpsMetadata` | `SignIn__RequireHttpsMetadata` | `true` | Whether the metadata must be fetched over HTTPS. Turn it off only for a development provider without TLS |
 | `AdminApi:Url` | `AdminApi__Url` | — | The gateway's admin port, such as `http://gateway:8000` |
+| `ApiDocs:Url` | `ApiDocs__Url` | — | The gateway's API docs as your browser reaches them, such as `https://api.example.com/platform/docs`. Set it only where `Gateway:Docs:Enabled` is on; unset, *Modules* links no document |
 | `TrustedProxies:Proxies:0`, … | `TrustedProxies__Proxies__0`, … | — | The reverse proxies whose forwarded headers the portal applies; see [below](#tls-and-the-reverse-proxy) |
 | `TrustedProxies:Networks:0`, … | `TrustedProxies__Networks__0`, … | — | The same, as networks in CIDR notation |
 
 The portal does not start without an authority, a client id, a secret and
 the address of the admin API. Its start is logged at Information with the
 authority, the client id, the claim, the name claim, the address of the
-admin API and the trusted proxies, never with the secret.
+admin API, the API docs and the trusted proxies, never with the secret. An
+`ApiDocs:Url` that is not an absolute address stops the start.
 
 The portal asks your provider for a refresh token with the scopes it
 requests by default; a provider that issues none ends a page's work when
@@ -203,7 +225,9 @@ The AppHost runs the portal at <https://localhost:7400> with the
 development certificate, against Keycloak. The realm holds the client
 `portal` and the user `operator` with the role `homeport-admin`; its
 password is the parameter `operator-password` (see
-[running locally](running-locally.md#signing-in-to-the-portal)).
+[running locally](running-locally.md#signing-in-to-the-portal)). It links
+the modules to the gateway's API docs, which a local run serves; the
+compose file does not, since the docs are off outside Development.
 
 The compose file runs the image `homeport-portal` and publishes its plain
 HTTP port, `PORTAL_PORT`, for your reverse proxy to terminate TLS in front

@@ -14,6 +14,6 @@ public interface IInstanceStore
     /// <returns>Whether the instance was still kept; <c>false</c> once it has expired.</returns>
     Task<bool> RenewAsync(string moduleId, string instanceId, TimeSpan lifetime, CancellationToken cancellationToken);
 
-    /// <summary>Every instance that has not expired.</summary>
-    Task<IReadOnlyList<Instance>> ListAsync(CancellationToken cancellationToken);
+    /// <summary>Every instance that has not expired, with the time it has left.</summary>
+    Task<IReadOnlyList<StoredInstance>> ListAsync(CancellationToken cancellationToken);
 }

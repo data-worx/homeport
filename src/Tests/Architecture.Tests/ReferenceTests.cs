@@ -263,6 +263,20 @@ public sealed class ReferenceTests
         }
 
         [Fact]
+        public void Reports_A_Domain_That_References_An_Internal_Topic()
+        {
+            ProjectFile[] projects =
+            [
+                Fixture.Project("Modules/Echo/Homeport.Modules.Echo.Domain", "Homeport.Shared.Internal.Authorization"),
+                Fixture.Project("Shared/Homeport.Shared.Internal.Authorization"),
+            ];
+
+            var offenders = ReferenceRules.SharedInternalReferrers(projects);
+
+            Assert.Equal(["Homeport.Modules.Echo.Domain -> Homeport.Shared.Internal.Authorization"], offenders);
+        }
+
+        [Fact]
         public void Accepts_Infrastructure()
         {
             ProjectFile[] projects =

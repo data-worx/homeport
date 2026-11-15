@@ -59,11 +59,34 @@ public sealed class RunningRegistry : IAsyncLifetime
     }
 
     /// <summary>A client that sends a gateway service token for the registry.</summary>
-    internal HttpClient CreateGatewayClient()
+    internal HttpClient CreateGatewayClient() =>
+        CreateTokenClient(new Claim(JwtRegisteredClaimNames.Sub, GatewayTokens.GatewaySubject));
+
+    /// <summary>A client that sends the operator's caller token for the registry, of scope <c>admin</c>.</summary>
+    internal HttpClient CreateOperatorClient() =>
+        CreateTokenClient(
+            new Claim(JwtRegisteredClaimNames.Sub, "operator"),
+            new Claim(GatewayTokens.ScopeClaim, GatewayTokens.AdminScope));
+
+    /// <summary>A client that sends a client's caller token for the registry, with a tenant and the scope <c>admin</c>.</summary>
+    internal HttpClient CreateTenantClient() =>
+        CreateTokenClient(
+            new Claim(JwtRegisteredClaimNames.Sub, "billing-service"),
+            new Claim(GatewayTokens.TenantIdClaim, Guid.NewGuid().ToString()),
+            new Claim(GatewayTokens.ScopeClaim, GatewayTokens.AdminScope));
+
+    /// <summary>
+    /// Lets the registration of <paramref name="instanceId"/> expire now, as
+    /// it would once its heartbeats stopped, without waiting for it.
+    /// </summary>
+    internal async Task ExpireAsync(string instanceId)
     {
-        var client = Started.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, ServiceToken());
-        return client;
+        await using var connection = await ConnectionMultiplexer.ConnectAsync(valkey.GetConnectionString());
+        var database = connection.GetDatabase();
+        await foreach (var key in connection.GetServers().Single().KeysAsync(pattern: $"*:{instanceId}"))
+        {
+            await database.KeyExpireAsync(key, DateTime.UnixEpoch);
+        }
     }
 
     /// <summary>Removes every registered instance, so a test starts from an empty registry.</summary>
@@ -112,7 +135,14 @@ public sealed class RunningRegistry : IAsyncLifetime
         await valkey.DisposeAsync();
     }
 
-    private string ServiceToken()
+    private HttpClient CreateTokenClient(params Claim[] claims)
+    {
+        var client = Started.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, Token(claims));
+        return client;
+    }
+
+    private string Token(Claim[] claims)
     {
         var now = TimeProvider.System.GetUtcNow().UtcDateTime;
 
@@ -120,7 +150,7 @@ public sealed class RunningRegistry : IAsyncLifetime
         {
             Issuer = GatewayTokens.Issuer,
             Audience = RegistryService.Audience,
-            Subject = new ClaimsIdentity([new Claim(JwtRegisteredClaimNames.Sub, GatewayTokens.GatewaySubject)]),
+            Subject = new ClaimsIdentity(claims),
             IssuedAt = now,
             NotBefore = now,
             Expires = now + GatewayTokens.MaximumLifetime,

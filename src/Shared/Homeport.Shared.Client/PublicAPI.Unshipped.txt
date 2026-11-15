@@ -12,6 +12,7 @@ const Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsApi.Path = "/v1/adm
 const Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsApi.PlanIdField = "planId" -> string!
 const Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsApi.TenantIdField = "tenantId" -> string!
 const Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsApi.TenantIdQuery = "tenantId" -> string!
+const Homeport.Shared.Client.Platform.Registry.V1.ModulesApi.Path = "/v1/admin/modules" -> string!
 const Homeport.Shared.Client.Problems.ProblemConventions.ErrorsExtension = "errors" -> string!
 const Homeport.Shared.Client.Problems.ProblemConventions.TraceIdExtension = "traceId" -> string!
 const Homeport.Shared.Client.Problems.ProblemConventions.TypePrefix = "https://homeport.data-worx.de/problems/" -> string!
@@ -110,6 +111,59 @@ Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.PlanId.ini
 Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.RegisterClientRequest(string! ClientId, System.Guid TenantId, System.Guid PlanId) -> void
 Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.TenantId.get -> System.Guid
 Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.TenantId.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.Address.get -> System.Uri!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.Address.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.ContractVersion.get -> int
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.ContractVersion.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.Deconstruct(out string! InstanceId, out System.Uri! Address, out string! Version, out int ContractVersion, out System.DateTimeOffset LastHeartbeatAt, out System.DateTimeOffset ExpiresAt) -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.Equals(Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse? other) -> bool
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.ExpiresAt.get -> System.DateTimeOffset
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.ExpiresAt.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.InstanceId.get -> string!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.InstanceId.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.LastHeartbeatAt.get -> System.DateTimeOffset
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.LastHeartbeatAt.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.ModuleInstanceResponse(string! InstanceId, System.Uri! Address, string! Version, int ContractVersion, System.DateTimeOffset LastHeartbeatAt, System.DateTimeOffset ExpiresAt) -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.Version.get -> string!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.Version.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.Deconstruct(out string! ModuleId, out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse!>! Instances, out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse!>! Routes) -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.Equals(Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse? other) -> bool
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.Instances.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse!>!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.Instances.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.ModuleId.get -> string!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.ModuleId.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.ModuleResponse(string! ModuleId, System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse!>! Instances, System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse!>! Routes) -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.Routes.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse!>!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.Routes.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Deconstruct(out string! Method, out string! Path, out string! Scope, out string! Meter, out int Quantity, out string! Version) -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Equals(Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse? other) -> bool
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Meter.get -> string!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Meter.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Method.get -> string!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Method.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.ModuleRouteResponse(string! Method, string! Path, string! Scope, string! Meter, int Quantity, string! Version) -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Path.get -> string!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Path.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Quantity.get -> int
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Quantity.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Scope.get -> string!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Scope.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Version.get -> string!
+Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Version.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModulesApi
+Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse
+Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse!
+Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.Deconstruct(out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse!>! Modules) -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.Equals(Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse? other) -> bool
+Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.Modules.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse!>!
+Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.Modules.init -> void
+Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.ModulesResponse(System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse!>! Modules) -> void
 Homeport.Shared.Client.Problems.ProblemConventions
 Homeport.Shared.Client.Problems.ProblemResponse
 Homeport.Shared.Client.Problems.ProblemResponse.<Clone>$() -> Homeport.Shared.Client.Problems.ProblemResponse!
@@ -156,6 +210,18 @@ override Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsResponse.ToStrin
 override Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.Equals(object? obj) -> bool
 override Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.GetHashCode() -> int
 override Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.ToString() -> string!
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.ToString() -> string!
 override Homeport.Shared.Client.Problems.ProblemResponse.Equals(object? obj) -> bool
 override Homeport.Shared.Client.Problems.ProblemResponse.GetHashCode() -> int
 override Homeport.Shared.Client.Problems.ProblemResponse.ToString() -> string!
@@ -175,6 +241,14 @@ static Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsResponse.operator 
 static Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.ClientsResponse? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.RegisterClientRequest? right) -> bool
+static Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.operator !=(Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse? left, Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse.operator ==(Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse? left, Homeport.Shared.Client.Platform.Registry.V1.ModuleInstanceResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.operator !=(Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse? left, Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse.operator ==(Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse? left, Homeport.Shared.Client.Platform.Registry.V1.ModuleResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.operator !=(Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse? left, Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse.operator ==(Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse? left, Homeport.Shared.Client.Platform.Registry.V1.ModuleRouteResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.operator !=(Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse? left, Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse.operator ==(Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse? left, Homeport.Shared.Client.Platform.Registry.V1.ModulesResponse? right) -> bool
 static Homeport.Shared.Client.Problems.ProblemResponse.operator !=(Homeport.Shared.Client.Problems.ProblemResponse? left, Homeport.Shared.Client.Problems.ProblemResponse? right) -> bool
 static Homeport.Shared.Client.Problems.ProblemResponse.operator ==(Homeport.Shared.Client.Problems.ProblemResponse? left, Homeport.Shared.Client.Problems.ProblemResponse? right) -> bool
 Homeport.Shared.Client.Modules.Echo.V1.CallerResponse

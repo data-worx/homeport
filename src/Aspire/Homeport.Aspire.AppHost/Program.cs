@@ -272,6 +272,11 @@ public static class Program
         gateway.WithReference(controlPlane);
         gateway.WithEnvironment("PlatformRoutes__ControlPlaneUrl", controlPlane.GetEndpoint(Uri.UriSchemeHttp));
 
+        // The gateway forwards the admin API of modules to the registry. It
+        // reads the route table through service discovery, but YARP takes a
+        // destination address as it is.
+        gateway.WithEnvironment("PlatformRoutes__RegistryUrl", registry.GetEndpoint(Uri.UriSchemeHttp));
+
         // Metering: `migrate` applies its migrations as the owner role; the
         // service starts after it completed, runs as the app role and
         // consumes the gateway's usage events with a broker user of its own.
@@ -320,7 +325,12 @@ public static class Program
             // endpoint is the AppHost's alone.
             portal.WithHttpsEndpoint(port: PortalPort, name: PortalEndpoint)
                 .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath, endpointName: PortalEndpoint)
-                .WithEnvironment("ASPNETCORE_ENVIRONMENT", Environments.Development);
+                .WithEnvironment("ASPNETCORE_ENVIRONMENT", Environments.Development)
+
+                // The gateway serves its API docs in a local run only
+                // (ADR-0017), so only there the portal links a module to its
+                // document, at the address the browser reaches the gateway at.
+                .WithEnvironment("ApiDocs__Url", ReferenceExpression.Create($"{gateway.GetEndpoint(Uri.UriSchemeHttp)}{ApiDocsPath}"));
         }
         else
         {

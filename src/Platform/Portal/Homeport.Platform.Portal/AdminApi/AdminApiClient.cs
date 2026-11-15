@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
+using Homeport.Shared.Client.Platform.Registry.V1;
 using Homeport.Shared.Client.Problems;
 
 namespace Homeport.Platform.Portal.AdminApi;
@@ -98,6 +99,12 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
     public Task<AdminResult<string>> RemoveClientAsync(string clientId, CancellationToken cancellationToken)
     {
         return SendAsync(HttpMethod.Delete, ClientPathOf(clientId), body: null, (_, _) => Task.FromResult(clientId), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<AdminResult<ModulesResponse>> GetModulesAsync(CancellationToken cancellationToken)
+    {
+        return SendAsync<ModulesResponse>(HttpMethod.Get, ModulesApi.Path, body: null, cancellationToken);
     }
 
     /// <summary>

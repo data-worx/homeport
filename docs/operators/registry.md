@@ -107,6 +107,12 @@ not ready (`/health/ready`) and answers with `500` until Valkey answers.
 the gateway may read it: the registry accepts a service token the gateway
 issued for the audience `homeport-registry`
 ([ADR-0014](../architecture/adr/0014-authentication-between-services.md))
-and answers anything else with `401`. To see what is registered, read the
-registry's log: every registration is logged at Information with the module
-id, version, address and route count.
+and answers a request without one with `401`, and any other token of the
+gateway, a caller token included, with `403`
+([`insufficient-scope`](../reference/problems/insufficient-scope.md)).
+
+To see what is registered, open *Modules* in the
+[admin portal](admin-portal.md), or read
+`GET /platform/v1/admin/modules` from the [admin API](admin-api.md). Every
+registration is also logged at Information with the module id, version,
+address and route count.

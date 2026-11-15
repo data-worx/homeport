@@ -5,8 +5,8 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Homeport.Platform.Registry.Application;
 using Homeport.Platform.Registry.Domain.Routing;
+using Homeport.Shared.Internal.Authorization;
 using Homeport.Shared.Internal.Platform.Registry;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -15,10 +15,11 @@ namespace Homeport.Platform.Registry.Api.Controllers;
 
 /// <summary>
 /// The routes of the live instances, for the gateway. Only the gateway may
-/// read them, with a service token for the registry (ADR-0014).
+/// read them, with a service token for the registry (ADR-0014); a caller
+/// token, the operator's included, is refused.
 /// </summary>
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(Policy = PlatformPolicies.GatewayService)]
 public sealed class RoutesController(Registrations registrations) : ControllerBase
 {
     /// <summary>The routes of every module with at least one live instance.</summary>
@@ -29,11 +30,13 @@ public sealed class RoutesController(Registrations registrations) : ControllerBa
     /// <param name="cancellationToken">Aborts reading the routes.</param>
     /// <response code="200">The routes, with an <c>ETag</c>.</response>
     /// <response code="304">The routes have not changed since the <c>ETag</c> in <c>If-None-Match</c>.</response>
-    /// <response code="401">No valid service token for the registry.</response>
+    /// <response code="401">No valid gateway token for the registry.</response>
+    /// <response code="403">The token is not the gateway's service token.</response>
     [HttpGet(RegistryService.RoutesPath)]
     [ProducesResponseType<RouteTableResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, MediaTypeNames.Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, MediaTypeNames.Application.ProblemJson)]
     public async Task<ActionResult<RouteTableResponse>> Get(CancellationToken cancellationToken)
     {
         var routes = ToResponse(await registrations.RoutesAsync(cancellationToken));

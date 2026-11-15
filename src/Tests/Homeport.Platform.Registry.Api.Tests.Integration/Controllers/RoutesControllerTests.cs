@@ -34,6 +34,16 @@ public sealed class RoutesControllerTests
         }
 
         [Fact]
+        public async Task Answers_Forbidden_For_The_Operators_Caller_Token()
+        {
+            var response = await registry.CreateOperatorClient().GetAsync(RegistryService.RoutesPath);
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            var problem = await response.Content.ReadFromJsonAsync<ProblemResponse>();
+            Assert.Equal(new Uri(ProblemConventions.TypePrefix + "insufficient-scope"), problem?.Type);
+        }
+
+        [Fact]
         public async Task Returns_The_Routes_Of_A_Registered_Instance()
         {
             await registry.CreateModuleClient().PutAsJsonAsync(InstancesControllerTests.InstancePath("routes-1"), InstancesControllerTests.Registration);

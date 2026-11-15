@@ -6,6 +6,7 @@ using Homeport.Platform.ControlPlane.Application.Plans;
 using Homeport.Platform.ControlPlane.Domain;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Contracts;
+using Homeport.Shared.Internal.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -18,7 +19,7 @@ namespace Homeport.Platform.ControlPlane.Api.Controllers;
 /// caller token of scope <c>admin</c> (ADR-0020).
 /// </summary>
 [ApiController]
-[Authorize(Policy = AdminRequirement.Policy)]
+[Authorize(Policy = PlatformPolicies.Admin)]
 public sealed class PlansController(PlanAdministration plans, ILogger<PlansController> logger) : ControllerBase
 {
     /// <summary>Returns every plan, ordered by name.</summary>
@@ -67,7 +68,7 @@ public sealed class PlansController(PlanAdministration plans, ILogger<PlansContr
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, MediaTypeNames.Application.ProblemJson)]
     public async Task<ActionResult<PlanResponse>> Create(CreatePlanRequest request, CancellationToken cancellationToken)
     {
-        var created = await plans.CreateAsync(request.Name, request.RequestsPerSecond, request.Burst, AdminHandler.OperatorOf(User), cancellationToken);
+        var created = await plans.CreateAsync(request.Name, request.RequestsPerSecond, request.Burst, OperatorClaims.OperatorOf(User), cancellationToken);
         if (!created.IsSuccess)
         {
             return ToActionResult(created);
@@ -95,7 +96,7 @@ public sealed class PlansController(PlanAdministration plans, ILogger<PlansContr
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, MediaTypeNames.Application.ProblemJson)]
     public async Task<ActionResult<PlanResponse>> Change(Guid planId, ChangePlanRequest request, CancellationToken cancellationToken)
     {
-        var changed = await plans.ChangeAsync(planId, request.Name, request.RequestsPerSecond, request.Burst, AdminHandler.OperatorOf(User), cancellationToken);
+        var changed = await plans.ChangeAsync(planId, request.Name, request.RequestsPerSecond, request.Burst, OperatorClaims.OperatorOf(User), cancellationToken);
         if (changed.IsSuccess)
         {
             logger.LogInformation("Plan {PlanId} changed", planId);
@@ -120,7 +121,7 @@ public sealed class PlansController(PlanAdministration plans, ILogger<PlansContr
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, MediaTypeNames.Application.ProblemJson)]
     public async Task<IActionResult> Delete(Guid planId, CancellationToken cancellationToken)
     {
-        var deleted = await plans.DeleteAsync(planId, AdminHandler.OperatorOf(User), cancellationToken);
+        var deleted = await plans.DeleteAsync(planId, OperatorClaims.OperatorOf(User), cancellationToken);
         if (!deleted.IsSuccess)
         {
             return ToActionResult(deleted).Result!;

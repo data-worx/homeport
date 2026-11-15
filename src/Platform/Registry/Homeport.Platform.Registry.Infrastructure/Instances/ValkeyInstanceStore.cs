@@ -31,7 +31,7 @@ internal sealed class ValkeyInstanceStore(IConnectionMultiplexer valkey) : IInst
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Instance>> ListAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<StoredInstance>> ListAsync(CancellationToken cancellationToken)
     {
         var keys = new List<RedisKey>();
         foreach (var server in valkey.GetServers().Where(server => !server.IsReplica))
@@ -47,12 +47,17 @@ internal sealed class ValkeyInstanceStore(IConnectionMultiplexer valkey) : IInst
             return [];
         }
 
-        // A key that expired between listing and reading comes back empty.
-        var values = await valkey.GetDatabase().StringGetAsync([.. keys]);
+        // Value and time to live per key, sent together through the one
+        // connection. A key that expired between listing and reading comes
+        // back empty; every key the registry writes has a time to live.
+        var database = valkey.GetDatabase();
+        var values = await Task.WhenAll(keys.Select(key => database.StringGetWithExpiryAsync(key)));
 
         return values
-            .Where(value => value.HasValue)
-            .Select(value => JsonSerializer.Deserialize<Instance>((byte[])value!)!)
+            .Where(value => value.Value.HasValue)
+            .Select(value => new StoredInstance(
+                JsonSerializer.Deserialize<Instance>((byte[])value.Value!)!,
+                value.Expiry ?? TimeSpan.Zero))
             .ToList();
     }
 

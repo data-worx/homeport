@@ -19,7 +19,10 @@ internal static class Navigation
     ];
 
     /// <summary>The pages of the platform itself, shown under <em>Platform</em>.</summary>
-    internal static readonly IReadOnlyList<NavigationEntry> Platform = [];
+    internal static readonly IReadOnlyList<NavigationEntry> Platform =
+    [
+        new("Modules", "modules", HomeportIcons.Platform.Module),
+    ];
 }
 
 /// <summary>One entry of the drawer.</summary>

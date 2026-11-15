@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 
-namespace Homeport.Platform.ControlPlane.Api.Authentication;
+namespace Homeport.Shared.Internal.Authorization;
 
 /// <summary>
 /// The caller is the operator: a caller token with the scope <c>admin</c>, a
@@ -11,6 +11,4 @@ namespace Homeport.Platform.ControlPlane.Api.Authentication;
 /// </summary>
 internal sealed class AdminRequirement : IAuthorizationRequirement
 {
-    /// <summary>The policy that requires it.</summary>
-    internal const string Policy = "admin";
 }

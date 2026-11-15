@@ -114,8 +114,12 @@ public sealed class AdminRoutesTests
                     "PUT /platform/v1/admin/clients/{clientId}",
                     "DELETE /platform/v1/admin/clients/{clientId}",
                 ],
-                routes.Select(route => $"{Assert.Single(route.Match.Methods!)} {route.Match.Path}"));
-            Assert.Equal("http://control-plane:5000/", Assert.Single(Assert.Single(clusters).Destinations!.Values).Address);
+                routes
+                    .Where(route => route.ClusterId?.EndsWith("control-plane", StringComparison.Ordinal) == true)
+                    .Select(route => $"{Assert.Single(route.Match.Methods!)} {route.Match.Path}"));
+            Assert.Equal(
+                "http://control-plane:5000/",
+                Assert.Single(Assert.Single(clusters, cluster => cluster.ClusterId.EndsWith("control-plane", StringComparison.Ordinal)).Destinations!.Values).Address);
         }
 
         [Fact]
@@ -123,7 +127,22 @@ public sealed class AdminRoutesTests
         {
             var (routes, _) = AdminRoutes.Configured(new PlatformRoutesOptions()).Build();
 
-            Assert.All(routes, route => Assert.Equal("homeport-control-plane", route.Metadata![AdminRoutes.AdminAudienceMetadata]));
+            Assert.All(
+                routes.Where(route => route.ClusterId?.EndsWith("control-plane", StringComparison.Ordinal) == true),
+                route => Assert.Equal("homeport-control-plane", route.Metadata![AdminRoutes.AdminAudienceMetadata]));
+        }
+
+        [Fact]
+        public void Forwards_The_Modules_To_The_Registry_With_A_Caller_Token_For_It()
+        {
+            var options = new PlatformRoutesOptions { RegistryUrl = new Uri("http://registry:5100") };
+
+            var (routes, clusters) = AdminRoutes.Configured(options).Build();
+
+            var route = Assert.Single(routes, route => route.Match.Path == "/platform/v1/admin/modules");
+            Assert.Equal((HttpMethods.Get, "homeport-registry"), (Assert.Single(route.Match.Methods!), route.Metadata![AdminRoutes.AdminAudienceMetadata]));
+            var cluster = Assert.Single(clusters, cluster => cluster.ClusterId == route.ClusterId);
+            Assert.Equal("http://registry:5100/", Assert.Single(cluster.Destinations!.Values).Address);
         }
     }
 }

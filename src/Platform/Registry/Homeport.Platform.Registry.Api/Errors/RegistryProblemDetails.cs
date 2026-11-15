@@ -21,6 +21,7 @@ internal sealed class RegistryProblemDetails : IConfigureOptions<ProblemDetailsO
     private static readonly RegistryProblem[] ByStatus =
     [
         RegistryProblems.Unauthorized,
+        RegistryProblems.InsufficientScope,
         RegistryProblems.InvalidManifest,
         RegistryProblems.Validation,
         RegistryProblems.Internal,

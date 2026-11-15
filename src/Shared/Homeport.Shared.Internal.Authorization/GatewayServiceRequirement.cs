@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 
-namespace Homeport.Platform.ControlPlane.Api.Authentication;
+namespace Homeport.Shared.Internal.Authorization;
 
 /// <summary>
 /// The caller is the gateway itself: its service token, with the subject
@@ -11,6 +11,4 @@ namespace Homeport.Platform.ControlPlane.Api.Authentication;
 /// </summary>
 internal sealed class GatewayServiceRequirement : IAuthorizationRequirement
 {
-    /// <summary>The policy that requires it.</summary>
-    internal const string Policy = "gateway-service";
 }

@@ -45,9 +45,19 @@ public sealed class ValkeyInstanceStoreTests : IClassFixture<ValkeyContainer>, I
 
         var instances = await store.ListAsync(CancellationToken.None);
 
-        var listed = Assert.Single(instances);
+        var listed = Assert.Single(instances).Instance;
         Assert.Equal((Echo.InstanceId, Echo.Address), (listed.InstanceId, listed.Address));
         Assert.Equal(Echo.Manifest.Routes, listed.Manifest.Routes);
+    }
+
+    [Fact]
+    public async Task Lists_The_Time_A_Saved_Instance_Has_Left()
+    {
+        await store.SaveAsync(Echo, Lifetime, CancellationToken.None);
+
+        var instances = await store.ListAsync(CancellationToken.None);
+
+        Assert.InRange(Assert.Single(instances).TimeToLive, TimeSpan.FromTicks(1), Lifetime);
     }
 
     [Fact]
@@ -58,7 +68,7 @@ public sealed class ValkeyInstanceStoreTests : IClassFixture<ValkeyContainer>, I
 
         await store.SaveAsync(moved, Lifetime, CancellationToken.None);
 
-        Assert.Equal(moved.Address, Assert.Single(await store.ListAsync(CancellationToken.None)).Address);
+        Assert.Equal(moved.Address, Assert.Single(await store.ListAsync(CancellationToken.None)).Instance.Address);
     }
 
     [Fact]

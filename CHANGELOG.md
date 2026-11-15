@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The operator sees the registered modules in the admin portal: each
+  module with its versions, contract versions, instances, last heartbeat,
+  routes and a link to its API docs where they are served, and per module
+  its instances and its routes with the version whose declaration applies.
+  The admin API serves them at `GET /platform/v1/admin/modules`, from the
+  registry. See [the admin portal](docs/operators/admin-portal.md#modules).
+
 - The operator registers clients in the admin portal: a list with the
   tenant and plan of each client, filterable by tenant, a dialog to register
   a client id of the identity provider for a tenant and a plan, changing a
@@ -78,6 +85,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   token. A caller token for the control plane, the operator's for the admin
   API included, was let through and is now answered with `403`
   `insufficient-scope`. See [the control plane](docs/operators/control-plane.md#the-service).
+
+- The registry's route table answers only the gateway's service token. Any
+  other token of the gateway for the registry, a caller token included, is
+  answered with `403` `insufficient-scope`. See
+  [the registry](docs/operators/registry.md#reading-the-routes).
 
 ## [0.1.0] - 2026-11-11
 
