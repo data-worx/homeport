@@ -56,6 +56,7 @@ public static class ModuleOpenApi
         return problems;
     }
 
+    /// <summary>Lists what an operation of the document lacks.</summary>
     private static IEnumerable<string> ValidateOperation(string operation, JsonElement element)
     {
         if (!HasText(element, SummaryProperty))
@@ -77,6 +78,7 @@ public static class ModuleOpenApi
         }
     }
 
+    /// <summary>Whether the element has the property with a non-blank string value.</summary>
     private static bool HasText(JsonElement element, string property)
     {
         return element.TryGetProperty(property, out var value)

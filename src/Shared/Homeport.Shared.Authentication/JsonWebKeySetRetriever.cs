@@ -21,6 +21,10 @@ internal sealed class JsonWebKeySetRetriever(IHttpClientFactory clients, ILogger
     /// <summary>The named client the JWKS is fetched with.</summary>
     internal const string ClientName = "homeport-gateway-jwks";
 
+    /// <summary>
+    /// Fetches the gateway's JWKS and wraps its signing keys as a configuration; logs a failed
+    /// fetch before the caller handles it.
+    /// </summary>
     public async Task<OpenIdConnectConfiguration> GetConfigurationAsync(
         string address,
         IDocumentRetriever retriever,

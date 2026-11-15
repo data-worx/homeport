@@ -14,13 +14,16 @@ namespace Homeport.Aspire.AppHost;
 /// <param name="value">The value of the parameter while nothing configures one.</param>
 internal sealed class LocalDefault(string value) : ParameterDefault
 {
+    /// <summary>Returns the local value.</summary>
     public override string GetDefaultValue()
     {
         return value;
     }
 
-    // Writes no default: a published deployment takes every value from its
-    // environment, as it did before the parameter had a default.
+    /// <summary>
+    /// Writes no default: a published deployment takes every value from its
+    /// environment, as it did before the parameter had a default.
+    /// </summary>
     public override void WriteToManifest(ManifestPublishingContext context)
     {
     }

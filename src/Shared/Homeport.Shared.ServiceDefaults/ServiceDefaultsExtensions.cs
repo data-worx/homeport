@@ -68,6 +68,9 @@ public static class ServiceDefaultsExtensions
         return app;
     }
 
+    /// <summary>
+    /// Wires logs, metrics and traces to OpenTelemetry, exported over OTLP when an endpoint is set.
+    /// </summary>
     private static void ConfigureOpenTelemetry(IHostApplicationBuilder builder)
     {
         builder.Logging.AddOpenTelemetry(logging =>

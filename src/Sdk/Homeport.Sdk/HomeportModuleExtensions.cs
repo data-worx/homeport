@@ -123,6 +123,9 @@ public static class HomeportModuleExtensions
         return app;
     }
 
+    /// <summary>
+    /// Logs, once the module serves, its addresses, contract version and route count.
+    /// </summary>
     private static void LogStart(WebApplication app)
     {
         var manifest = app.Services.GetRequiredService<ModuleManifest>();
@@ -137,6 +140,10 @@ public static class HomeportModuleExtensions
             manifest.Routes.Count));
     }
 
+    /// <summary>
+    /// Registers the module with the registry and keeps it there with heartbeats, its options
+    /// validated on start.
+    /// </summary>
     private static void AddRegistration(IServiceCollection services)
     {
         services.AddOptions<RegistrationOptions>()
@@ -148,6 +155,10 @@ public static class HomeportModuleExtensions
         services.AddHostedService<ModuleRegistration>();
     }
 
+    /// <summary>
+    /// Accepts only the gateway's module token, closes every endpoint not marked otherwise and adds
+    /// a policy per declared scope.
+    /// </summary>
     private static void AddModuleToken(IServiceCollection services, ModuleManifest manifest)
     {
         services.AddGatewayTokenAuthentication(manifest.Id);
@@ -167,6 +178,10 @@ public static class HomeportModuleExtensions
         }
     }
 
+    /// <summary>
+    /// Answers every error, unhandled exceptions and invalid requests included, with Problem
+    /// Details that carry the W3C trace id.
+    /// </summary>
     private static void AddProblemDetails(IServiceCollection services)
     {
         // The W3C trace id, rather than ASP.NET's default of the whole traceparent,

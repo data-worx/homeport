@@ -333,16 +333,20 @@ public static class Program
         builder.Build().Run();
     }
 
-    // A role's connection to the Homeport database, built from the server's
-    // endpoint, so it resolves locally and in the compose file alike.
+    /// <summary>
+    /// A role's connection to the Homeport database, built from the server's
+    /// endpoint, so it resolves locally and in the compose file alike.
+    /// </summary>
     private static ReferenceExpression ConnectionString(EndpointReference postgres, string role, IResourceBuilder<ParameterResource> password)
     {
         return ReferenceExpression.Create(
             $"Host={postgres.Property(EndpointProperty.Host)};Port={postgres.Property(EndpointProperty.Port)};Database={Database};Username={role};Password={password}");
     }
 
-    // A service's connection to the broker as its own user, built from the
-    // broker's endpoint like the database connections.
+    /// <summary>
+    /// A service's connection to the broker as its own user, built from the
+    /// broker's endpoint like the database connections.
+    /// </summary>
     private static ReferenceExpression BrokerConnectionString(EndpointReference rabbitMq, string user, IResourceBuilder<ParameterResource> password)
     {
         return ReferenceExpression.Create(

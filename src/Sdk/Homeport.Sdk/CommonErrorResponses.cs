@@ -30,6 +30,9 @@ internal sealed class CommonErrorResponses : IOpenApiOperationTransformer
         (StatusCodes.Status500InternalServerError, "The request failed for a reason the caller cannot influence."),
     ];
 
+    /// <summary>
+    /// Adds every common error response the operation does not declare itself, as Problem Details.
+    /// </summary>
     public async Task TransformAsync(
         OpenApiOperation operation,
         OpenApiOperationTransformerContext context,
@@ -57,6 +60,9 @@ internal sealed class CommonErrorResponses : IOpenApiOperationTransformer
         }
     }
 
+    /// <summary>
+    /// Returns the schema of Problem Details, registering it with the document on first use.
+    /// </summary>
     private static async Task<IOpenApiSchema> ProblemDetailsSchemaAsync(
         OpenApiOperationTransformerContext context,
         CancellationToken cancellationToken)

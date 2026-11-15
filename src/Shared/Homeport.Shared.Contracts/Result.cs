@@ -13,6 +13,7 @@ public sealed class Result<TValue>
     private readonly TValue? _value;
     private readonly Error? _error;
 
+    /// <summary>Creates a result that holds either a value or an error.</summary>
     private Result(TValue? value, Error? error)
     {
         _value = value;

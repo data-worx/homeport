@@ -14,6 +14,7 @@ namespace Homeport.Sdk;
 internal sealed class InternalErrorHandler(IProblemDetailsService problemDetails, ILogger<InternalErrorHandler> logger)
     : IExceptionHandler
 {
+    /// <summary>Logs an unhandled exception and answers with the internal error problem.</summary>
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         // The endpoint names the action; the path is left out, since it can carry

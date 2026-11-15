@@ -44,6 +44,10 @@ internal sealed class ModuleRegistration(
 
     private bool registered;
 
+    /// <summary>
+    /// Registers once the module serves requests, then sends a heartbeat each interval; stops the
+    /// application when the registry refuses the instance for good.
+    /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var settings = options.Value;
@@ -73,8 +77,10 @@ internal sealed class ModuleRegistration(
         while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
-    // Registers only once the module serves requests, so the gateway never
-    // forwards to an instance that is not listening yet.
+    /// <summary>
+    /// Registers only once the module serves requests, so the gateway never
+    /// forwards to an instance that is not listening yet.
+    /// </summary>
     private async Task<bool> StartedAsync(CancellationToken stoppingToken)
     {
         var started = new TaskCompletionSource();
@@ -92,7 +98,10 @@ internal sealed class ModuleRegistration(
         }
     }
 
-    // False when the registry refused the instance for good.
+    /// <summary>
+    /// Sends a heartbeat, or registers while there is none to send; false when the registry refused
+    /// the instance for good. An unreachable registry is tried again on the next tick.
+    /// </summary>
     private async Task<bool> TickAsync(RegistrationOptions settings, CancellationToken stoppingToken)
     {
         try
@@ -117,7 +126,7 @@ internal sealed class ModuleRegistration(
         }
     }
 
-    // False when the registry no longer knows the instance.
+    /// <summary>Sends a heartbeat; false when the registry no longer knows the instance.</summary>
     private async Task<bool> HeartbeatAsync(RegistrationOptions settings, CancellationToken stoppingToken)
     {
         using var response = await Client(settings).PostAsync(Path(RegistryPaths.Heartbeat), content: null, stoppingToken);
@@ -132,7 +141,7 @@ internal sealed class ModuleRegistration(
         return true;
     }
 
-    // False when the registry refused the instance for good.
+    /// <summary>Registers the instance; false when the registry refused it for good.</summary>
     private async Task<bool> RegisterAsync(RegistrationOptions settings, CancellationToken stoppingToken)
     {
         var request = new RegisterInstanceRequest(settings.InstanceAddress!, manifest);
@@ -163,6 +172,7 @@ internal sealed class ModuleRegistration(
         return true;
     }
 
+    /// <summary>Logs why the registry refused the instance.</summary>
     private async Task LogRefusalAsync(HttpResponseMessage response, CancellationToken stoppingToken)
     {
         var problem = await response.Content.ReadFromJsonAsync<ProblemResponse>(stoppingToken);
@@ -176,6 +186,9 @@ internal sealed class ModuleRegistration(
             errors);
     }
 
+    /// <summary>
+    /// Creates the client for the registry, authenticated with the registration key.
+    /// </summary>
     private HttpClient Client(RegistrationOptions settings)
     {
         var client = clients.CreateClient(ClientName);
@@ -184,6 +197,7 @@ internal sealed class ModuleRegistration(
         return client;
     }
 
+    /// <summary>Fills the module and instance into a registry path template.</summary>
     private string Path(string template)
     {
         return template
