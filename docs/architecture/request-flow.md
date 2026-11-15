@@ -183,6 +183,10 @@ one successful request and no error path. The admin endpoints of the
 services arrive with the admin portal; the gateway's side is in place
 ([the admin API](../operators/admin-api.md)).
 
+The registry, which serves the modules, reads Valkey in place of PostgreSQL
+and writes no audit entry: a registration is the platform's data, not a
+tenant's.
+
 The operator acts for no tenant. The gateway forwards with a **caller
 token** of scope `admin` that names the operator instead of a tenant and a
 client, and neither throttles nor meters the request.
