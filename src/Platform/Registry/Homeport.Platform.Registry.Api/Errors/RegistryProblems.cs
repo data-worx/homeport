@@ -16,6 +16,15 @@ internal static class RegistryProblems
         "The request is not authenticated.",
         StatusCodes.Status401Unauthorized);
 
+    /// <summary>
+    /// The token is not the one the endpoint requires: the operator's caller
+    /// token for the admin endpoints, the gateway's service token for the routes.
+    /// </summary>
+    internal static readonly RegistryProblem InsufficientScope = new(
+        "insufficient-scope",
+        "The client's token lacks the scope this route requires.",
+        StatusCodes.Status403Forbidden);
+
     /// <summary>The manifest breaks the module contract; <see cref="ProblemConventions.ErrorsExtension"/> says where.</summary>
     internal static readonly RegistryProblem InvalidManifest = new(
         "invalid-manifest",

@@ -55,7 +55,8 @@ answered with `403` and the problem type
 ## Endpoints
 
 The request and response types are in `Homeport.Shared.Client`, namespace
-`Homeport.Shared.Client.Platform.ControlPlane.V1`.
+`Homeport.Shared.Client.Platform.ControlPlane.V1` for the control plane and
+`Homeport.Shared.Client.Platform.Registry.V1` for the registry.
 
 | Method and path | Served by | Body | Answer |
 |---|---|---|---|
@@ -73,6 +74,7 @@ The request and response types are in `Homeport.Shared.Client`, namespace
 | `GET /platform/v1/admin/clients/{clientId}` | control plane | — | `200` with the client, `404` for a client that is not registered |
 | `PUT /platform/v1/admin/clients/{clientId}` | control plane | `{ "planId": "…" }` | `200` with the client on its new plan, `404` for a client that is not registered |
 | `DELETE /platform/v1/admin/clients/{clientId}` | control plane | — | `204`, `404` for a client that is not registered |
+| `GET /platform/v1/admin/modules` | registry | — | `200` with every module that has a live instance, ordered by module id: its instances with instance id, address, version, contract version, last heartbeat and when the registration ends, and the routes the gateway serves for it with method, path, scope, meter, quantity and the version of the instance whose declaration applies |
 
 A tenant's name is required, at most 200 characters, and unique among
 tenants. Surrounding whitespace is dropped. Names are compared
@@ -109,6 +111,12 @@ again: the gateway keeps the plan it looked up with a client for
 [throttling](throttling.md#plan-limits)). Until then a client keeps the
 limits it had.
 
+Modules register themselves
+([ADR-0004](../architecture/adr/0004-gateway-and-service-discovery.md)); the admin API
+only reads what the [registry](registry.md) holds and neither removes an
+instance nor manages registration keys. An instance drops out of the list
+once its registration ends, 30 seconds after its last heartbeat.
+
 ## Audit
 
 Every change through the admin API writes an entry into the audit table of
@@ -121,7 +129,9 @@ subject and display name as the caller token named them, what was done
 `clients/<client id>`) and a sentence for the reader with the values before
 and after. Renaming a tenant to the name it already has, saving a plan
 unchanged, or moving a client to the plan it is on changes nothing and
-writes no entry; neither does a change the admin API refuses.
+writes no entry; neither does a change the admin API refuses. Reading the
+modules writes none either: a registration is the platform's data, not a
+tenant's.
 
 The service's app role may only add entries and read them; it can neither
 change nor delete one. Homeport never deletes an entry. The entries hold
@@ -144,6 +154,8 @@ DELETE FROM control_plane.audit_entries WHERE "OccurredAt" < now() - interval '1
 | `AdminApi:ClaimValue` | `AdminApi__ClaimValue` | `homeport-admin` | The value that claim must carry |
 | `AdminApi:NameClaim` | `AdminApi__NameClaim` | `name` | The claim the operator's display name is taken from. Without it in a token, the subject stands in |
 | `AdminApi:RequireHttpsMetadata` | `AdminApi__RequireHttpsMetadata` | `true` | Whether the metadata must be fetched over HTTPS. Turn it off only for a development provider without TLS |
+| `PlatformRoutes:ControlPlaneUrl` | `PlatformRoutes__ControlPlaneUrl` | `http://control-plane` | Where the gateway forwards the tenants, plans and clients. The AppHost and the compose file set the control plane's endpoint |
+| `PlatformRoutes:RegistryUrl` | `PlatformRoutes__RegistryUrl` | `http://registry` | Where the gateway forwards the modules. The AppHost and the compose file set the registry's endpoint |
 
 With a port, the gateway does not start without an authority and an
 audience. Its start is logged at Information with the admin port, the

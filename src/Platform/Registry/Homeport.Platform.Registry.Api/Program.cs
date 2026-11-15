@@ -6,9 +6,11 @@ using Homeport.Platform.Registry.Application;
 using Homeport.Platform.Registry.Infrastructure;
 using Homeport.Platform.Registry.Infrastructure.Keys;
 using Homeport.Shared.Authentication;
+using Homeport.Shared.Internal.Authorization;
 using Homeport.Shared.Internal.Platform.Registry;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 
 namespace Homeport.Platform.Registry.Api;
@@ -30,6 +32,7 @@ public sealed class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
         builder.AddRegistryInfrastructure();
+        builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddSingleton<Registrations>();
 
         // Two schemes and no default: every endpoint names the one it accepts,
@@ -38,7 +41,7 @@ public sealed class Program
         builder.Services.AddGatewayTokenAuthentication(RegistryService.Audience)
             .AddScheme<AuthenticationSchemeOptions, RegistrationKeyHandler>(RegistrationKeyHandler.SchemeName, configureOptions: null);
         builder.Services.Configure<AuthenticationOptions>(options => options.DefaultScheme = null);
-        builder.Services.AddAuthorization();
+        builder.Services.AddPlatformPolicies(JwtBearerDefaults.AuthenticationScheme);
         builder.Services.AddControllers();
         builder.Services.AddProblemDetails();
         builder.Services.AddSingleton<IConfigureOptions<ProblemDetailsOptions>, RegistryProblemDetails>();

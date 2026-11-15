@@ -272,6 +272,11 @@ public static class Program
         gateway.WithReference(controlPlane);
         gateway.WithEnvironment("PlatformRoutes__ControlPlaneUrl", controlPlane.GetEndpoint(Uri.UriSchemeHttp));
 
+        // The gateway forwards the admin API of modules to the registry. It
+        // reads the route table through service discovery, but YARP takes a
+        // destination address as it is.
+        gateway.WithEnvironment("PlatformRoutes__RegistryUrl", registry.GetEndpoint(Uri.UriSchemeHttp));
+
         // Metering: `migrate` applies its migrations as the owner role; the
         // service starts after it completed, runs as the app role and
         // consumes the gateway's usage events with a broker user of its own.
