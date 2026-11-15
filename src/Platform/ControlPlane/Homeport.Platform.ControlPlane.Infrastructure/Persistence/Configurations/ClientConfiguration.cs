@@ -12,6 +12,7 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence.Configuratio
 /// </summary>
 internal sealed class ClientConfiguration : IEntityTypeConfiguration<Client>
 {
+    /// <summary>Maps the client onto its table.</summary>
     public void Configure(EntityTypeBuilder<Client> client)
     {
         client.HasKey(c => c.ClientId);

@@ -44,6 +44,7 @@ public sealed class AuditEntry
     // Its length and Client.MaxClientIdLength add up to MaxTargetLength.
     private const string ClientTargetPrefix = "clients/";
 
+    /// <summary>The entry's id.</summary>
     public required Guid Id { get; init; }
 
     /// <summary>When the change was made.</summary>

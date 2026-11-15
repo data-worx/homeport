@@ -13,6 +13,7 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence.Configuratio
 /// </summary>
 internal sealed class AuditEntryConfiguration : IEntityTypeConfiguration<AuditEntry>
 {
+    /// <summary>Maps the audit entry onto its table.</summary>
     public void Configure(EntityTypeBuilder<AuditEntry> entry)
     {
         entry.ToTable(ControlPlaneDbContext.AuditEntriesTable);

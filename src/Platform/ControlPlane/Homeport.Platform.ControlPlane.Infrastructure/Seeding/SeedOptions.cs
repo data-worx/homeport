@@ -12,12 +12,16 @@ public sealed class SeedOptions
     /// <summary>The configuration section these options are bound from.</summary>
     public const string SectionName = "Seed";
 
+    /// <summary>The id of the seeded tenant.</summary>
     public Guid TenantId { get; set; }
 
+    /// <summary>The name of the seeded tenant.</summary>
     public string TenantName { get; set; } = string.Empty;
 
+    /// <summary>The id of the seeded plan.</summary>
     public Guid PlanId { get; set; }
 
+    /// <summary>The name of the seeded plan.</summary>
     public string PlanName { get; set; } = string.Empty;
 
     /// <summary>How fast the plan's token bucket refills.</summary>

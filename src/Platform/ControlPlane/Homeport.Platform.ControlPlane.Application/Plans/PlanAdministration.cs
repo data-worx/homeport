@@ -95,6 +95,9 @@ public sealed class PlanAdministration(IPlanStore store, TimeProvider clock)
         return await SaveAsync(plan, clientCount: 0, cancellationToken);
     }
 
+    /// <summary>
+    /// Stores the change; a name taken or a plan assigned since the checks is caught by the store.
+    /// </summary>
     private async Task<Result<PlanOverview>> SaveAsync(Plan plan, int clientCount, CancellationToken cancellationToken)
     {
         // The name was free and the plan unused when they were checked;
@@ -109,11 +112,13 @@ public sealed class PlanAdministration(IPlanStore store, TimeProvider clock)
         };
     }
 
+    /// <summary>The plan's name and limits, as an audit entry states them.</summary>
     private static string Describe(Plan plan)
     {
         return $"'{plan.Name}' with {plan.RequestsPerSecond} requests per second and a burst of {plan.Burst}";
     }
 
+    /// <summary>The failure for a plan that does not exist.</summary>
     private static Result<PlanOverview> NotFound(Guid id)
     {
         return Result<PlanOverview>.Failure(new Error(NotFoundCode, $"There is no plan {id}."));

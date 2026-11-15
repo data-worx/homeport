@@ -25,5 +25,6 @@ internal static class AuditPrivileges
         migrationBuilder.Sql($"REVOKE UPDATE, DELETE ON {QualifiedName(table)} FROM {AppRole};");
     }
 
+    /// <summary>The table's name, qualified with the control plane's schema.</summary>
     private static string QualifiedName(string table) => $"{ControlPlaneDbContext.Schema}.\"{table}\"";
 }

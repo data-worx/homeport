@@ -60,8 +60,10 @@ internal sealed class OperatorTokens(
         }
     }
 
+    /// <summary>Disposes the gate that lets one renewal run at a time.</summary>
     public void Dispose() => gate.Dispose();
 
+    /// <summary>The operator's tokens from the sign-in cookie, or null without one.</summary>
     private async Task<OperatorTokenSet?> FromCookieAsync()
     {
         if (accessor.HttpContext is not { } context)

@@ -9,6 +9,7 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence;
 /// <summary>Finds a client in <see cref="ControlPlaneDbContext"/>, read only.</summary>
 internal sealed class ClientLookup(ControlPlaneDbContext database) : IClientLookup
 {
+    /// <inheritdoc />
     public Task<Client?> FindAsync(string clientId, CancellationToken cancellationToken)
     {
         return database.Clients

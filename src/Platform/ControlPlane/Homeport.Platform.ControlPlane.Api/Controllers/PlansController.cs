@@ -130,6 +130,9 @@ public sealed class PlansController(PlanAdministration plans, ILogger<PlansContr
         return NoContent();
     }
 
+    /// <summary>
+    /// Answers a result with the plan, 404, 409 for a plan in use, or a validation problem.
+    /// </summary>
     private ActionResult<PlanResponse> ToActionResult(Result<PlanOverview> result)
     {
         if (result.IsSuccess)
@@ -151,6 +154,7 @@ public sealed class PlansController(PlanAdministration plans, ILogger<PlansContr
         return ValidationProblem(fields);
     }
 
+    /// <summary>The request field an error code is about.</summary>
     private static string FieldOf(string errorCode) => errorCode switch
     {
         Plan.NameRequiredCode or Plan.NameTooLongCode or Plan.NameTakenCode => PlansApi.NameField,
@@ -159,6 +163,7 @@ public sealed class PlansController(PlanAdministration plans, ILogger<PlansContr
         _ => throw new ArgumentOutOfRangeException(nameof(errorCode), errorCode, "Every error of a plan change names its field."),
     };
 
+    /// <summary>The wire type of a plan.</summary>
     private static PlanResponse ToResponse(PlanOverview plan)
     {
         return new PlanResponse(plan.Id, plan.Name, plan.RequestsPerSecond, plan.Burst, plan.ClientCount);

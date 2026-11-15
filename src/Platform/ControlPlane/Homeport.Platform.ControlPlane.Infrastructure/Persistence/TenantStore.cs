@@ -11,23 +11,27 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence;
 /// <summary>The tenants and their audit entries in <see cref="ControlPlaneDbContext"/>.</summary>
 internal sealed class TenantStore(ControlPlaneDbContext database, ILogger<TenantStore> logger) : ITenantStore
 {
+    /// <inheritdoc />
     public async Task<IReadOnlyList<TenantOverview>> ListAsync(CancellationToken cancellationToken)
     {
         return await Overviews(database.Tenants.OrderBy(t => t.Name))
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<TenantOverview?> FindOverviewAsync(Guid id, CancellationToken cancellationToken)
     {
         return Overviews(database.Tenants.Where(t => t.Id == id))
             .SingleOrDefaultAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<Tenant?> FindAsync(Guid id, CancellationToken cancellationToken)
     {
         return database.Tenants.SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<string>> NamesAsync(Guid? except, CancellationToken cancellationToken)
     {
         return await database.Tenants
@@ -36,16 +40,19 @@ internal sealed class TenantStore(ControlPlaneDbContext database, ILogger<Tenant
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public void Add(Tenant tenant)
     {
         database.Tenants.Add(tenant);
     }
 
+    /// <inheritdoc />
     public void Add(AuditEntry entry)
     {
         database.AuditEntries.Add(entry);
     }
 
+    /// <inheritdoc />
     public async Task<bool> TrySaveAsync(CancellationToken cancellationToken)
     {
         try
@@ -62,7 +69,10 @@ internal sealed class TenantStore(ControlPlaneDbContext database, ILogger<Tenant
         }
     }
 
-    // Filtered and ordered before the projection, which EF cannot see into.
+    /// <summary>
+    /// The tenants as overviews, filtered and ordered before the projection, which EF cannot see
+    /// into.
+    /// </summary>
     private IQueryable<TenantOverview> Overviews(IQueryable<Tenant> tenants)
     {
         return tenants

@@ -31,10 +31,13 @@ public sealed class Client
     /// <summary>The client id as the identity provider issued it.</summary>
     public required string ClientId { get; init; }
 
+    /// <summary>The tenant the client belongs to.</summary>
     public required Guid TenantId { get; set; }
 
+    /// <summary>The plan the client's requests are held to.</summary>
     public required Guid PlanId { get; set; }
 
+    /// <summary>The plan, where it was loaded with the client.</summary>
     public Plan? Plan { get; set; }
 
     /// <summary>

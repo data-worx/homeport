@@ -27,11 +27,15 @@ internal sealed class ControlPlaneProblemDetails : IConfigureOptions<ProblemDeta
         ControlPlaneProblems.Internal,
     ];
 
+    /// <summary>Customises every problem the control plane answers.</summary>
     public void Configure(ProblemDetailsOptions options)
     {
         options.CustomizeProblemDetails = Customize;
     }
 
+    /// <summary>
+    /// Adds the trace id and the control plane's problem type and title for the status.
+    /// </summary>
     private static void Customize(ProblemDetailsContext context)
     {
         var details = context.ProblemDetails;

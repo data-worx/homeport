@@ -30,76 +30,92 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
     // type of Homeport's: RFC 9457's default says the status is all there is.
     private static readonly Uri UntypedProblem = new("about:blank");
 
+    /// <inheritdoc />
     public Task<AdminResult<TenantsResponse>> GetTenantsAsync(CancellationToken cancellationToken)
     {
         return SendAsync<TenantsResponse>(HttpMethod.Get, TenantsApi.Path, body: null, cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<AdminResult<TenantResponse>> CreateTenantAsync(CreateTenantRequest request, CancellationToken cancellationToken)
     {
         return SendAsync<TenantResponse>(HttpMethod.Post, TenantsApi.Path, JsonContent.Create(request), cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<AdminResult<TenantResponse>> RenameTenantAsync(Guid tenantId, RenameTenantRequest request, CancellationToken cancellationToken)
     {
         var path = TenantsApi.TenantPath.Replace($"{{{TenantsApi.TenantIdRouteValue}}}", tenantId.ToString(), StringComparison.Ordinal);
         return SendAsync<TenantResponse>(HttpMethod.Put, path, JsonContent.Create(request), cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<AdminResult<PlansResponse>> GetPlansAsync(CancellationToken cancellationToken)
     {
         return SendAsync<PlansResponse>(HttpMethod.Get, PlansApi.Path, body: null, cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<AdminResult<PlanResponse>> CreatePlanAsync(CreatePlanRequest request, CancellationToken cancellationToken)
     {
         return SendAsync<PlanResponse>(HttpMethod.Post, PlansApi.Path, JsonContent.Create(request), cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<AdminResult<PlanResponse>> ChangePlanAsync(Guid planId, ChangePlanRequest request, CancellationToken cancellationToken)
     {
         return SendAsync<PlanResponse>(HttpMethod.Put, PlanPathOf(planId), JsonContent.Create(request), cancellationToken);
     }
 
-    // The answer has no body; the deleted plan's id stands in for it.
+    /// <inheritdoc />
+    /// <remarks>The answer has no body; the deleted plan's id stands in for it.</remarks>
     public Task<AdminResult<Guid>> DeletePlanAsync(Guid planId, CancellationToken cancellationToken)
     {
         return SendAsync(HttpMethod.Delete, PlanPathOf(planId), body: null, (_, _) => Task.FromResult(planId), cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<AdminResult<ClientsResponse>> GetClientsAsync(Guid? tenantId, CancellationToken cancellationToken)
     {
         var path = tenantId is { } id ? $"{ClientsApi.Path}?{ClientsApi.TenantIdQuery}={id}" : ClientsApi.Path;
         return SendAsync<ClientsResponse>(HttpMethod.Get, path, body: null, cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<AdminResult<ClientResponse>> RegisterClientAsync(RegisterClientRequest request, CancellationToken cancellationToken)
     {
         return SendAsync<ClientResponse>(HttpMethod.Post, ClientsApi.Path, JsonContent.Create(request), cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<AdminResult<ClientResponse>> ChangeClientPlanAsync(string clientId, ChangeClientPlanRequest request, CancellationToken cancellationToken)
     {
         return SendAsync<ClientResponse>(HttpMethod.Put, ClientPathOf(clientId), JsonContent.Create(request), cancellationToken);
     }
 
-    // The answer has no body; the removed client's id stands in for it.
+    /// <inheritdoc />
+    /// <remarks>The answer has no body; the removed client's id stands in for it.</remarks>
     public Task<AdminResult<string>> RemoveClientAsync(string clientId, CancellationToken cancellationToken)
     {
         return SendAsync(HttpMethod.Delete, ClientPathOf(clientId), body: null, (_, _) => Task.FromResult(clientId), cancellationToken);
     }
 
-    // A client id is the identity provider's, so it may hold characters a path segment does not.
+    /// <summary>
+    /// The path of a client. A client id is the identity provider's, so it may hold characters a
+    /// path segment does not.
+    /// </summary>
     private static string ClientPathOf(string clientId)
     {
         return ClientsApi.ClientPath.Replace($"{{{ClientsApi.ClientIdRouteValue}}}", Uri.EscapeDataString(clientId), StringComparison.Ordinal);
     }
 
+    /// <summary>The path of a plan.</summary>
     private static string PlanPathOf(Guid planId)
     {
         return PlansApi.PlanPath.Replace($"{{{PlansApi.PlanIdRouteValue}}}", planId.ToString(), StringComparison.Ordinal);
     }
 
+    /// <summary>Sends the request and reads the value from the JSON body of a success.</summary>
     private Task<AdminResult<TValue>> SendAsync<TValue>(HttpMethod method, string path, HttpContent? body, CancellationToken cancellationToken)
     {
         return SendAsync(
@@ -111,6 +127,10 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
             cancellationToken);
     }
 
+    /// <summary>
+    /// Sends the request with the operator's access token; a missing or refused token asks for a
+    /// new sign-in, and every error becomes a problem.
+    /// </summary>
     private async Task<AdminResult<TValue>> SendAsync<TValue>(
         HttpMethod method,
         string path,
@@ -155,8 +175,11 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
         }
     }
 
-    // The gateway answers every error with Problem Details; a body that is
-    // not one is described by its status rather than trusted.
+    /// <summary>
+    /// The problem of an error response. The gateway answers every error with
+    /// Problem Details; a body that is not one is described by its status rather
+    /// than trusted.
+    /// </summary>
     private async Task<ProblemResponse> ProblemOfAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
         if (response.Content.Headers.ContentType?.MediaType == MediaTypeNames.Application.ProblemJson
@@ -177,6 +200,7 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
             Errors: null);
     }
 
+    /// <summary>The portal's own problem for an admin API it could not reach.</summary>
     private static ProblemResponse Unreachable()
     {
         return new ProblemResponse(
@@ -189,5 +213,6 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
             Errors: null);
     }
 
+    /// <summary>The W3C trace id of the current activity, empty without one.</summary>
     private static string CurrentTraceId() => Activity.Current?.TraceId.ToHexString() ?? string.Empty;
 }

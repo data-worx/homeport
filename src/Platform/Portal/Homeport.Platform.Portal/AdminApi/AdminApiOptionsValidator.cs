@@ -7,6 +7,7 @@ namespace Homeport.Platform.Portal.AdminApi;
 /// <summary>Refuses to start without an absolute address of the admin API.</summary>
 internal sealed class AdminApiOptionsValidator : IValidateOptions<AdminApiOptions>
 {
+    /// <summary>Requires an absolute address of the admin API.</summary>
     public ValidateOptionsResult Validate(string? name, AdminApiOptions options)
     {
         return options.Url is { IsAbsoluteUri: true }

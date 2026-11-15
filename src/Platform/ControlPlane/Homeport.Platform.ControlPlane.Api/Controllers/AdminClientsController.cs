@@ -134,6 +134,7 @@ public sealed class AdminClientsController(ClientAdministration clients, ILogger
         return NoContent();
     }
 
+    /// <summary>Answers a result with the client, 404 or a validation problem.</summary>
     private ActionResult<ClientResponse> ToActionResult(Result<ClientOverview> result)
     {
         if (result.IsSuccess)
@@ -152,6 +153,7 @@ public sealed class AdminClientsController(ClientAdministration clients, ILogger
         return ValidationProblem(fields);
     }
 
+    /// <summary>The request field an error code is about.</summary>
     private static string FieldOf(string errorCode) => errorCode switch
     {
         Client.ClientIdRequiredCode or Client.ClientIdTooLongCode or Client.ClientIdTakenCode => ClientsApi.ClientIdField,
@@ -160,6 +162,7 @@ public sealed class AdminClientsController(ClientAdministration clients, ILogger
         _ => throw new ArgumentOutOfRangeException(nameof(errorCode), errorCode, "Every error of a client change names its field."),
     };
 
+    /// <summary>The wire type of a client.</summary>
     private static ClientResponse ToResponse(ClientOverview client)
     {
         return new ClientResponse(client.ClientId, client.TenantId, client.TenantName, client.PlanId, client.PlanName);

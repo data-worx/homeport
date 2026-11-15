@@ -10,6 +10,7 @@ internal sealed class SeedOptionsValidator : IValidateOptions<SeedOptions>
 {
     private const string Section = SeedOptions.SectionName;
 
+    /// <summary>Requires the ids, names, client id and positive limits of the seed.</summary>
     public ValidateOptionsResult Validate(string? name, SeedOptions options)
     {
         var failures = new List<string>();
@@ -42,6 +43,7 @@ internal sealed class SeedOptionsValidator : IValidateOptions<SeedOptions>
         return failures.Count == 0 ? ValidateOptionsResult.Success : ValidateOptionsResult.Fail(failures);
     }
 
+    /// <summary>Adds a failure when the value is empty or longer than the maximum.</summary>
     private static void RequireText(List<string> failures, string key, string value, int maxLength)
     {
         if (string.IsNullOrWhiteSpace(value))

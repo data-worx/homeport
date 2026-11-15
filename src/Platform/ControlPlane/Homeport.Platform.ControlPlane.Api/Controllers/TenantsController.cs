@@ -104,6 +104,7 @@ public sealed class TenantsController(TenantAdministration tenants, ILogger<Tena
         return ToActionResult(renamed);
     }
 
+    /// <summary>Answers a result with the tenant, 404 or a validation problem.</summary>
     private ActionResult<TenantResponse> ToActionResult(Result<TenantOverview> result)
     {
         if (result.IsSuccess)
@@ -122,12 +123,14 @@ public sealed class TenantsController(TenantAdministration tenants, ILogger<Tena
         return ValidationProblem(fields);
     }
 
+    /// <summary>The request field an error code is about.</summary>
     private static string FieldOf(string errorCode) => errorCode switch
     {
         Tenant.NameRequiredCode or Tenant.NameTooLongCode or Tenant.NameTakenCode => TenantsApi.NameField,
         _ => throw new ArgumentOutOfRangeException(nameof(errorCode), errorCode, "Every error of a tenant change names its field."),
     };
 
+    /// <summary>The wire type of a tenant.</summary>
     private static TenantResponse ToResponse(TenantOverview tenant)
     {
         return new TenantResponse(tenant.Id, tenant.Name, tenant.ClientCount);

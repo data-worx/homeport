@@ -17,7 +17,7 @@ namespace Homeport.Platform.Portal;
 /// </summary>
 public sealed class Program
 {
-    // Not static, so the integration tests can name it as their entry point.
+    /// <summary>Not static, so the integration tests can name it as their entry point.</summary>
     private Program()
     {
     }
@@ -63,8 +63,10 @@ public sealed class Program
         app.Run();
     }
 
-    // Once started, so the options have passed validation. No client secret:
-    // it is a secret.
+    /// <summary>
+    /// Once started, so the options have passed validation. No client secret:
+    /// it is a secret.
+    /// </summary>
     private static void LogStart(WebApplication app)
     {
         app.Lifetime.ApplicationStarted.Register(() =>

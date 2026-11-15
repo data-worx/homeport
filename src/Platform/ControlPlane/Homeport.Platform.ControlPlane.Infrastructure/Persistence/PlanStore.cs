@@ -11,23 +11,27 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence;
 /// <summary>The plans and their audit entries in <see cref="ControlPlaneDbContext"/>.</summary>
 internal sealed class PlanStore(ControlPlaneDbContext database, ILogger<PlanStore> logger) : IPlanStore
 {
+    /// <inheritdoc />
     public async Task<IReadOnlyList<PlanOverview>> ListAsync(CancellationToken cancellationToken)
     {
         return await Overviews(database.Plans.OrderBy(p => p.Name))
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<PlanOverview?> FindOverviewAsync(Guid id, CancellationToken cancellationToken)
     {
         return Overviews(database.Plans.Where(p => p.Id == id))
             .SingleOrDefaultAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<Plan?> FindAsync(Guid id, CancellationToken cancellationToken)
     {
         return database.Plans.SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<string>> NamesAsync(Guid? except, CancellationToken cancellationToken)
     {
         return await database.Plans
@@ -36,21 +40,25 @@ internal sealed class PlanStore(ControlPlaneDbContext database, ILogger<PlanStor
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public void Add(Plan plan)
     {
         database.Plans.Add(plan);
     }
 
+    /// <inheritdoc />
     public void Remove(Plan plan)
     {
         database.Plans.Remove(plan);
     }
 
+    /// <inheritdoc />
     public void Add(AuditEntry entry)
     {
         database.AuditEntries.Add(entry);
     }
 
+    /// <inheritdoc />
     public async Task<PlanSaveOutcome> TrySaveAsync(CancellationToken cancellationToken)
     {
         try
@@ -75,7 +83,10 @@ internal sealed class PlanStore(ControlPlaneDbContext database, ILogger<PlanStor
         }
     }
 
-    // Filtered and ordered before the projection, which EF cannot see into.
+    /// <summary>
+    /// The plans as overviews, filtered and ordered before the projection, which EF cannot see
+    /// into.
+    /// </summary>
     private IQueryable<PlanOverview> Overviews(IQueryable<Plan> plans)
     {
         return plans

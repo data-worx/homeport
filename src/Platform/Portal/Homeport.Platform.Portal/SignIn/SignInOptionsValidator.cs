@@ -7,6 +7,10 @@ namespace Homeport.Platform.Portal.SignIn;
 /// <summary>Keeps the portal from starting without an identity provider to sign operators in at.</summary>
 internal sealed class SignInOptionsValidator : IValidateOptions<SignInOptions>
 {
+    /// <summary>
+    /// Requires the issuer's absolute URI, the portal's client, the operator claim and the name
+    /// claim.
+    /// </summary>
     public ValidateOptionsResult Validate(string? name, SignInOptions options)
     {
         var failures = new List<string>();

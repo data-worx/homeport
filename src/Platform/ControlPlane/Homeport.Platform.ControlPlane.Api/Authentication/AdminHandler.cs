@@ -26,6 +26,7 @@ internal sealed class AdminHandler(ILogger<AdminHandler> logger) : Authorization
         return new Operator(subject, user.FindFirst(GatewayTokens.NameClaim)?.Value ?? subject);
     }
 
+    /// <summary>Succeeds for a caller token with the admin scope and no tenant.</summary>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminRequirement requirement)
     {
         // An anonymous request fails the authenticated-user requirement and is challenged.
