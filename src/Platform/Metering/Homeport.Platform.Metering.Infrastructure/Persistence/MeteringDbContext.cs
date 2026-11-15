@@ -15,21 +15,33 @@ internal sealed class MeteringDbContext(DbContextOptions<MeteringDbContext> opti
     /// <summary>The schema metering owns; the migration history lives there too.</summary>
     internal const string Schema = "metering";
 
+    /// <summary>The table of the usage events.</summary>
     internal const string UsageEventsTable = "UsageEvents";
 
+    /// <summary>The table of the hourly aggregates.</summary>
     internal const string UsageHourlyTable = "UsageHourly";
 
+    /// <summary>The table of the daily aggregates.</summary>
     internal const string UsageDailyTable = "UsageDaily";
 
+    /// <summary>The usage events, one per metered request.</summary>
     public DbSet<UsageEvent> UsageEvents => Set<UsageEvent>();
 
+    /// <summary>The usage per tenant, module, meter and hour.</summary>
     public DbSet<HourlyUsage> UsageHourly => Set<HourlyUsage>();
 
+    /// <summary>The usage per tenant, module, meter and day.</summary>
     public DbSet<DailyUsage> UsageDaily => Set<DailyUsage>();
 
-    // Read by the query filters each time a query runs, so they follow the tenant.
+    /// <summary>
+    /// The current tenant. Read by the query filters each time a query runs, so they follow the
+    /// tenant.
+    /// </summary>
     private Guid? TenantId => tenant.Id;
 
+    /// <summary>
+    /// Maps the usage tables into metering's schema, each with the tenant query filter.
+    /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(Schema);

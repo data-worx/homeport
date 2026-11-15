@@ -75,6 +75,9 @@ public static partial class ManifestRules
         return errors.ToDictionary();
     }
 
+    /// <summary>
+    /// Checks the id's format, the reserved id and prefix, and that it is the module's.
+    /// </summary>
     private static void ValidateId(string moduleId, Manifest manifest, Errors errors)
     {
         const string field = "id";
@@ -100,6 +103,7 @@ public static partial class ManifestRules
         }
     }
 
+    /// <summary>Checks a route's method, path, scope, meter and quantity.</summary>
     private static void ValidateRoute(Manifest manifest, int index, Errors errors)
     {
         var route = manifest.Routes[index];
@@ -141,11 +145,12 @@ public static partial class ManifestRules
     [GeneratedRegex(@"^/(?![/\\])[^\\?#]*$")]
     private static partial Regex OpenApiUrlPattern();
 
-    // The messages per field, in the order they were found.
+    /// <summary>The messages per field, in the order they were found.</summary>
     private sealed class Errors
     {
         private readonly Dictionary<string, List<string>> messages = new(StringComparer.Ordinal);
 
+        /// <summary>Adds a message to the field.</summary>
         internal void Add(string field, string message)
         {
             if (!messages.TryGetValue(field, out var list))
@@ -157,6 +162,7 @@ public static partial class ManifestRules
             list.Add(message);
         }
 
+        /// <summary>The messages per field.</summary>
         internal IReadOnlyDictionary<string, string[]> ToDictionary()
         {
             return messages.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray(), StringComparer.Ordinal);

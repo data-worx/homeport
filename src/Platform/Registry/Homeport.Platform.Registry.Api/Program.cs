@@ -19,7 +19,7 @@ namespace Homeport.Platform.Registry.Api;
 /// </summary>
 public sealed class Program
 {
-    // Not static, so the integration tests can name it as their entry point.
+    /// <summary>Not static, so the integration tests can name it as their entry point.</summary>
     private Program()
     {
     }
@@ -59,8 +59,10 @@ public sealed class Program
         app.Run();
     }
 
-    // Once started, so the registration keys have passed validation. Module
-    // ids and key counts only: the keys are secrets.
+    /// <summary>
+    /// Once started, so the registration keys have passed validation. Module
+    /// ids and key counts only: the keys are secrets.
+    /// </summary>
     private static void LogStart(WebApplication app)
     {
         app.Lifetime.ApplicationStarted.Register(() =>

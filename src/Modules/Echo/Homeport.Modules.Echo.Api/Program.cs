@@ -11,7 +11,7 @@ namespace Homeport.Modules.Echo.Api;
 /// </summary>
 public sealed class Program
 {
-    // Not static, so the integration tests can name it as their entry point.
+    /// <summary>Not static, so the integration tests can name it as their entry point.</summary>
     private Program()
     {
     }

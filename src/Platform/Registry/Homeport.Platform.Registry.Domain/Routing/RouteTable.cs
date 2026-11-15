@@ -31,6 +31,9 @@ public static class RouteTable
             .ToList();
     }
 
+    /// <summary>
+    /// One route per method and path the instances declare, ordered by path and method.
+    /// </summary>
     private static List<Route> Merge(IEnumerable<Instance> instances)
     {
         return instances
@@ -42,6 +45,10 @@ public static class RouteTable
             .ToList();
     }
 
+    /// <summary>
+    /// The route of one method and path: declared by the instance with the highest version, served
+    /// by every instance that declares it.
+    /// </summary>
     private static Route ToRoute(IEnumerable<(Instance Instance, ManifestRoute Route)> declarations)
     {
         var declared = declarations.ToList();

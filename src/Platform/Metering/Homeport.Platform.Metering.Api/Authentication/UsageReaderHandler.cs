@@ -19,6 +19,7 @@ internal sealed class UsageReaderHandler(ILogger<UsageReaderHandler> logger) : A
         return Guid.TryParse(user.FindFirst(GatewayTokens.TenantIdClaim)?.Value, out var tenantId) ? tenantId : null;
     }
 
+    /// <summary>Succeeds for a caller token with a tenant and the usage read scope.</summary>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, UsageReaderRequirement requirement)
     {
         // An anonymous request fails the authenticated-user requirement and is challenged.

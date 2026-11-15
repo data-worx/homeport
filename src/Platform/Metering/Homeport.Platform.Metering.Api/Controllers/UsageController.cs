@@ -68,6 +68,7 @@ public sealed class UsageController(UsageExport export, ILogger<UsageController>
         return ToResponse(query.Value, totals);
     }
 
+    /// <summary>The query parameter an error code is about.</summary>
     private static string FieldOf(string errorCode) => errorCode switch
     {
         UsageQuery.UnknownGranularityCode => UsageApi.GranularityParameter,
@@ -75,6 +76,7 @@ public sealed class UsageController(UsageExport export, ILogger<UsageController>
         _ => throw new ArgumentOutOfRangeException(nameof(errorCode), errorCode, "Every error of a usage query names its field."),
     };
 
+    /// <summary>The wire type of the totals the query read.</summary>
     private static UsageResponse ToResponse(UsageQuery query, IReadOnlyList<UsageTotal> totals)
     {
         var granularity = query.Granularity switch

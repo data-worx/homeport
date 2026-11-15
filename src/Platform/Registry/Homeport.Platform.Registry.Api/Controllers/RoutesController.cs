@@ -48,13 +48,17 @@ public sealed class RoutesController(Registrations registrations) : ControllerBa
         return routes;
     }
 
-    // The table is ordered, so the same routes always serialize to the same bytes.
+    /// <summary>
+    /// The entity tag of the routing table. The table is ordered, so the same
+    /// routes always serialize to the same bytes.
+    /// </summary>
     private static EntityTagHeaderValue ETagOf(RouteTableResponse routes)
     {
         var hash = SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(routes));
         return new EntityTagHeaderValue($"\"{Convert.ToHexStringLower(hash)}\"");
     }
 
+    /// <summary>The wire type of the routing table.</summary>
     private static RouteTableResponse ToResponse(IReadOnlyList<ModuleRoutes> modules)
     {
         return new RouteTableResponse(modules

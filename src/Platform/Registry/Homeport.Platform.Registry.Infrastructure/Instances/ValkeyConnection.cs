@@ -17,6 +17,7 @@ namespace Homeport.Platform.Registry.Infrastructure.Instances;
 /// </summary>
 internal sealed class ValkeyConnection(IConnectionMultiplexer valkey, ILogger<ValkeyConnection> logger) : IHostedService
 {
+    /// <summary>Logs whether Valkey answered at start, and so whether registrations work.</summary>
     public Task StartAsync(CancellationToken cancellationToken)
     {
         if (valkey.IsConnected)
@@ -31,6 +32,7 @@ internal sealed class ValkeyConnection(IConnectionMultiplexer valkey, ILogger<Va
         return Task.CompletedTask;
     }
 
+    /// <summary>Does nothing.</summary>
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;

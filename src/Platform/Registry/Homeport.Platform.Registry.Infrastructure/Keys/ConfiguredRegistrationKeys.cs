@@ -8,6 +8,7 @@ namespace Homeport.Platform.Registry.Infrastructure.Keys;
 /// <summary>The registration keys from <see cref="RegistrationKeyOptions"/>.</summary>
 internal sealed class ConfiguredRegistrationKeys(IOptions<RegistrationKeyOptions> options) : IRegistrationKeySource
 {
+    /// <inheritdoc />
     public IReadOnlyList<string> KeysFor(string moduleId)
     {
         return options.Value.RegistrationKeys.TryGetValue(moduleId, out var keys) ? keys : [];

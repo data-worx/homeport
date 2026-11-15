@@ -20,11 +20,13 @@ internal sealed class MeteringProblemDetails : IConfigureOptions<ProblemDetailsO
         MeteringProblems.Internal,
     ];
 
+    /// <summary>Customises every problem metering answers.</summary>
     public void Configure(ProblemDetailsOptions options)
     {
         options.CustomizeProblemDetails = Customize;
     }
 
+    /// <summary>Adds the trace id and metering's problem type and title for the status.</summary>
     private static void Customize(ProblemDetailsContext context)
     {
         var details = context.ProblemDetails;
