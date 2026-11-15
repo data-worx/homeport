@@ -31,6 +31,9 @@ wins over it.
   that targets another is a deviation and needs a reason.
 - Language version and version number are set once in `Directory.Build.props`.
   No project file sets them; one that does is a deviation and needs a reason.
+- The documentation file and the StyleCop.Analyzers reference that
+  `dotnet.docs` needs are set there too, for every project outside
+  `src/Tests/`. No project file references the analyzer itself.
 
 ## Language style {#dotnet-core.style}
 
@@ -84,12 +87,9 @@ Endpoints the framework maps itself, such as `MapHealthChecks` and
 Every API endpoint is documented where it is declared:
 
 - XML doc comments on every action — `<summary>`, a `<param>` per parameter
-  and a `<response>` per status code. They reach the OpenAPI document through
-  `<GenerateDocumentationFile>true</GenerateDocumentationFile>` in the API
-  project's file. CS1591 stays off: the rule covers API endpoints, not every
-  public member, so the warning is suppressed in that project with
-  `<NoWarn>$(NoWarn);CS1591</NoWarn>` rather than raised to an error by
-  `TreatWarningsAsErrors`.
+  and a `<response>` per status code, stricter than `dotnet.docs` asks of any
+  other member. They reach the OpenAPI document through the documentation
+  file `src/Directory.Build.props` writes for every production project.
 - Every status code an action can return is declared with
   `[ProducesResponseType]`. Error responses declare `ProblemDetails` with
   `MediaTypeNames.Application.ProblemJson`.

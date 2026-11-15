@@ -57,7 +57,10 @@ The three that get skipped and should not be:
   `forge_issue_reply`. The one later edit is ticking the Definition of Done
   after the merge, which `implement-feature` does (`forge.review`).
 - **Verifiable acceptance criteria.** A concrete command and its expected
-  result beats a sentence about things being set up correctly.
+  result beats a sentence about things being set up correctly. A criterion
+  that names a place a rule prescribes, such as the changelog section, names
+  it as the project has it: read the *Deviations* table of the project
+  `AGENTS.md` first, or the box can never truthfully be ticked.
 
 Then ask for the **blockers**: the tickets that must be done before this one
 can start. Only the direct ones — a ticket blocked by a ticket that is itself
