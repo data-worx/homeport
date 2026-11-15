@@ -42,6 +42,8 @@ public sealed class RunningMetering : IAsyncLifetime
 
     private const string AppRole = "metering_app";
 
+    private const string AdminRole = "metering_admin";
+
     private const string OwnerPassword = "owner-password";
 
     private const string AppPassword = "app-password";
@@ -119,6 +121,30 @@ public sealed class RunningMetering : IAsyncLifetime
         });
     }
 
+    /// <summary>
+    /// A caller token as the gateway forwards the operator (ADR-0020): subject
+    /// <paramref name="subject"/>, scope <c>admin</c>, no tenant.
+    /// </summary>
+    internal string OperatorToken(string subject)
+    {
+        return Token(MeteringService.Audience, new Dictionary<string, object>
+        {
+            [GatewayTokens.SubjectClaim] = subject,
+            [GatewayTokens.NameClaim] = "Olivia Operator",
+            [GatewayTokens.ScopeClaim] = GatewayTokens.AdminScope,
+        });
+    }
+
+    /// <summary>The audit entries of <paramref name="subject"/>, read as the app role.</summary>
+    internal async Task<long> AuditEntriesOfAsync(string subject)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString(AppRole, AppPassword));
+        await connection.OpenAsync();
+        await using var count = new NpgsqlCommand("SELECT count(*) FROM metering.audit_entries WHERE \"OperatorSubject\" = @subject", connection);
+        count.Parameters.AddWithValue("subject", subject);
+        return (long)(await count.ExecuteScalarAsync())!;
+    }
+
     /// <summary>A service token, as the gateway calls metering as itself (ADR-0014).</summary>
     internal string ServiceToken()
     {
@@ -182,6 +208,7 @@ public sealed class RunningMetering : IAsyncLifetime
         metering = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(host => host
                 .UseSetting($"ConnectionStrings:{MeteringPersistenceExtensions.AppConnectionName}", ConnectionString(AppRole, AppPassword))
+                .UseSetting($"ConnectionStrings:{MeteringPersistenceExtensions.AdminConnectionName}", ConnectionString(AdminRole, AdminPassword))
                 .UseSetting($"ConnectionStrings:{MeteringMessagingExtensions.ConnectionName}", rabbitMq.GetConnectionString())
                 .UseSetting($"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}", $"{jwks.Urls.Single()}{GatewayTokens.JwksPath}"));
 

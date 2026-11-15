@@ -8,7 +8,8 @@ namespace Homeport.Platform.Metering.Api.Export;
 
 /// <summary>
 /// Answers a request for <see cref="UsageApi.CsvMediaType"/> with
-/// <see cref="UsageCsv"/>. Writes nothing but a <see cref="UsageResponse"/>.
+/// <see cref="UsageCsv"/>. Writes nothing but a <see cref="UsageResponse"/>
+/// or an <see cref="AdminUsageResponse"/>.
 /// </summary>
 internal sealed class UsageCsvOutputFormatter : TextOutputFormatter
 {
@@ -22,10 +23,15 @@ internal sealed class UsageCsvOutputFormatter : TextOutputFormatter
     /// <summary>Writes the usage as CSV.</summary>
     public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
     {
-        var usage = (UsageResponse)context.Object!;
-        await context.HttpContext.Response.WriteAsync(UsageCsv.Write(usage), selectedEncoding, context.HttpContext.RequestAborted);
+        var csv = context.Object switch
+        {
+            UsageResponse usage => UsageCsv.Write(usage),
+            AdminUsageResponse usage => UsageCsv.Write(usage),
+            _ => throw new InvalidOperationException("CanWriteType admits only the usage responses."),
+        };
+        await context.HttpContext.Response.WriteAsync(csv, selectedEncoding, context.HttpContext.RequestAborted);
     }
 
-    /// <summary>Writes the usage response only.</summary>
-    protected override bool CanWriteType(Type? type) => type == typeof(UsageResponse);
+    /// <summary>Writes the usage responses only.</summary>
+    protected override bool CanWriteType(Type? type) => type == typeof(UsageResponse) || type == typeof(AdminUsageResponse);
 }

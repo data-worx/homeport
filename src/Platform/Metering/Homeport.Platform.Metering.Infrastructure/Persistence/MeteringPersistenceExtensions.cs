@@ -16,6 +16,12 @@ public static class MeteringPersistenceExtensions
     public const string AppConnectionName = "metering";
 
     /// <summary>
+    /// The connection the operator's reads run on, as the admin role: it reads
+    /// every tenant's aggregates and adds audit entries, nothing else (ADR-0020).
+    /// </summary>
+    public const string AdminConnectionName = "metering-admin";
+
+    /// <summary>
     /// Adds the metering database on the connection string
     /// <paramref name="connectionName"/>, with health check, tracing and retries.
     /// </summary>
@@ -35,6 +41,31 @@ public static class MeteringPersistenceExtensions
         builder.EnrichNpgsqlDbContext<MeteringDbContext>();
         builder.Services.AddScoped<IUsageStore, UsageStore>();
         builder.Services.AddScoped<IUsageReader, UsageReader>();
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the operator's reads of every tenant's usage on the connection
+    /// string <see cref="AdminConnectionName"/>, with retries. Needs
+    /// <see cref="AddMeteringPersistence"/> first.
+    /// </summary>
+    /// <remarks>
+    /// The context on that connection is keyed, so nothing but
+    /// <see cref="AdminUsageReader"/> reaches it, and carries no tenant
+    /// session setting: the admin role reads through its own policy.
+    /// </remarks>
+    public static IHostApplicationBuilder AddMeteringAdministration(this IHostApplicationBuilder builder)
+    {
+        var connectionString = builder.Configuration.GetConnectionString(AdminConnectionName)
+            ?? throw new InvalidOperationException($"The connection string '{AdminConnectionName}' is missing.");
+
+        var options = ConfigureNpgsql(new DbContextOptionsBuilder<MeteringDbContext>()
+            .UseNpgsql(connectionString, npgsql => npgsql.EnableRetryOnFailure()));
+        var adminOptions = (DbContextOptions<MeteringDbContext>)options.Options;
+
+        builder.Services.AddKeyedScoped(AdminConnectionName, (_, _) => new MeteringDbContext(adminOptions, new CurrentTenant()));
+        builder.Services.AddScoped<IAdminUsageReader, AdminUsageReader>();
 
         return builder;
     }
