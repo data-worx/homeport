@@ -23,6 +23,9 @@ namespace Homeport.Platform.Gateway.Api.Usage;
 /// </summary>
 internal sealed class UsageEvents(RequestDelegate next, TimeProvider time, UsageMetrics metrics, ILogger<UsageEvents> logger)
 {
+    /// <summary>
+    /// Publishes a usage event for every module request once it has been answered.
+    /// </summary>
     public async Task InvokeAsync(HttpContext context, UsagePublisher publisher)
     {
         var route = context.GetReverseProxyFeature().Route.Config.Metadata
@@ -54,6 +57,10 @@ internal sealed class UsageEvents(RequestDelegate next, TimeProvider time, Usage
             Activity.Current?.TraceId.ToHexString() ?? context.TraceIdentifier));
     }
 
+    /// <summary>
+    /// The quantity the module reported for the route's meter, or the route's own when there is no
+    /// valid report.
+    /// </summary>
     private int Quantity(HttpContext context, IReadOnlyDictionary<string, string> route)
     {
         var meter = route[ModuleRoutes.MeterMetadata];

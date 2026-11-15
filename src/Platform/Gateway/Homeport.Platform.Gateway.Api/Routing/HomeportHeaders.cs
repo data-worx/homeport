@@ -15,14 +15,17 @@ internal sealed class HomeportHeaders(ILogger<HomeportHeaders> logger) : ITransf
     /// <summary>The prefix every Homeport header starts with.</summary>
     internal const string Prefix = "X-Homeport-";
 
+    /// <summary>Nothing to validate.</summary>
     public void ValidateRoute(TransformRouteValidationContext context)
     {
     }
 
+    /// <summary>Nothing to validate.</summary>
     public void ValidateCluster(TransformClusterValidationContext context)
     {
     }
 
+    /// <summary>Strips the Homeport headers from the requests of every route.</summary>
     public void Apply(TransformBuilderContext context)
     {
         context.AddRequestTransform(StripAsync);

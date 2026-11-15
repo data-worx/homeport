@@ -30,6 +30,7 @@ internal sealed class ValkeyTokenBuckets(
 
     private readonly OutageWarnings warnings = new(time);
 
+    /// <inheritdoc />
     public async Task<Result<BucketState>> TakeAsync(Guid tenantId, RateLimit limit, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(limit);
@@ -61,6 +62,7 @@ internal sealed class ValkeyTokenBuckets(
             TimeSpan.FromMilliseconds(values[3])));
     }
 
+    /// <summary>Reads the embedded token bucket script.</summary>
     private static string ReadScript()
     {
         using var stream = typeof(ValkeyTokenBuckets).Assembly.GetManifestResourceStream(ScriptResource)

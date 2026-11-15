@@ -43,6 +43,7 @@ public sealed class ControlPlaneClient(IHttpClientFactory clients, IMemoryCache 
         return client;
     }
 
+    /// <summary>Asks the control plane for the client; null when it does not know it.</summary>
     private async Task<ClientResponse?> ReadAsync(string clientId, CancellationToken cancellationToken)
     {
         var path = ControlPlaneService.ClientPath.Replace(

@@ -37,6 +37,9 @@ internal sealed class ApiDocsRefresher(
         }
     }
 
+    /// <summary>
+    /// Rebuilds the module and the platform docs side by side while the docs are enabled.
+    /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         if (!options.Value.Enabled)
@@ -48,6 +51,9 @@ internal sealed class ApiDocsRefresher(
         await Task.WhenAll(RefreshModulesAsync(stoppingToken), RefreshPlatformAsync(stoppingToken));
     }
 
+    /// <summary>
+    /// Rebuilds the module docs on every changed routing table; a failure keeps the last ones.
+    /// </summary>
     private async Task RefreshModulesAsync(CancellationToken stoppingToken)
     {
         await foreach (var table in tables.Reader.ReadAllAsync(stoppingToken))
@@ -64,6 +70,7 @@ internal sealed class ApiDocsRefresher(
         }
     }
 
+    /// <summary>Rebuilds the platform docs each interval; a failure keeps the last ones.</summary>
     private async Task RefreshPlatformAsync(CancellationToken stoppingToken)
     {
         using var timer = new PeriodicTimer(PlatformInterval, time);

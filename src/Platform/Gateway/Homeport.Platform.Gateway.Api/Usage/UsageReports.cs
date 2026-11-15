@@ -14,14 +14,17 @@ namespace Homeport.Platform.Gateway.Api.Usage;
 /// </summary>
 internal sealed class UsageReports : ITransformProvider
 {
+    /// <summary>Nothing to validate.</summary>
     public void ValidateRoute(TransformRouteValidationContext context)
     {
     }
 
+    /// <summary>Nothing to validate.</summary>
     public void ValidateCluster(TransformClusterValidationContext context)
     {
     }
 
+    /// <summary>Takes the usage report from the responses of every route.</summary>
     public void Apply(TransformBuilderContext context)
     {
         context.AddResponseTransform(TakeAsync);

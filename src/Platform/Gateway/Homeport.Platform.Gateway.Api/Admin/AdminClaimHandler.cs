@@ -15,6 +15,9 @@ namespace Homeport.Platform.Gateway.Api.Admin;
 internal sealed class AdminClaimHandler(IOptions<AdminApiOptions> options, ILogger<AdminClaimHandler> logger)
     : AuthorizationHandler<AdminClaimRequirement>
 {
+    /// <summary>
+    /// Succeeds for an operator token that carries the admin claim and a subject.
+    /// </summary>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminClaimRequirement requirement)
     {
         // An anonymous request fails the authenticated-user requirement and is challenged.

@@ -27,14 +27,20 @@ internal sealed class ModuleTokens(
     ILogger<ModuleTokens> logger)
     : ITransformProvider
 {
+    /// <summary>Nothing to validate.</summary>
     public void ValidateRoute(TransformRouteValidationContext context)
     {
     }
 
+    /// <summary>Nothing to validate.</summary>
     public void ValidateCluster(TransformClusterValidationContext context)
     {
     }
 
+    /// <summary>
+    /// Replaces the caller's token with one for the route's audience: a module, a platform service,
+    /// or a service on behalf of the operator.
+    /// </summary>
     public void Apply(TransformBuilderContext context)
     {
         if (context.Route.Metadata?.TryGetValue(AdminRoutes.AdminAudienceMetadata, out var service) == true)

@@ -19,6 +19,10 @@ namespace Homeport.Platform.Gateway.Api.Telemetry;
 /// </summary>
 internal sealed class ModuleRequestTelemetry(RequestDelegate next, RequestMetrics metrics)
 {
+    /// <summary>
+    /// Tags the activity of a module request with tenant, client, module and meter, and counts its
+    /// answer.
+    /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
         var route = context.GetReverseProxyFeature().Route.Config.Metadata;

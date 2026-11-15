@@ -17,6 +17,7 @@ public sealed class ThrottlingMetrics
     private readonly Counter<long> throttled;
     private readonly Counter<long> unavailable;
 
+    /// <summary>Creates the counters on the gateway's meter.</summary>
     public ThrottlingMetrics(IMeterFactory meters)
     {
         var meter = meters.Create(UsageMetrics.MeterName);

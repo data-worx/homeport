@@ -27,14 +27,17 @@ internal sealed class ModuleErrors(ILogger<ModuleErrors> logger) : ITransformPro
     // Problem Details, whatever its media type says.
     private const int MaxProblemBytes = 64 * 1024;
 
+    /// <summary>Nothing to validate.</summary>
     public void ValidateRoute(TransformRouteValidationContext context)
     {
     }
 
+    /// <summary>Nothing to validate.</summary>
     public void ValidateCluster(TransformClusterValidationContext context)
     {
     }
 
+    /// <summary>Rewrites the error responses of every route.</summary>
     public void Apply(TransformBuilderContext context)
     {
         context.AddResponseTransform(RewriteAsync);
@@ -77,8 +80,10 @@ internal sealed class ModuleErrors(ILogger<ModuleErrors> logger) : ITransformPro
         await response.WriteAsync(problem.ToJsonString(), context.CancellationToken);
     }
 
-    // The module's content headers describe the body that is dropped, and the
-    // status code pages write a body only while the response has no content type.
+    /// <summary>
+    /// The module's content headers describe the body that is dropped, and the
+    /// status code pages write a body only while the response has no content type.
+    /// </summary>
     private static void RemoveContentHeaders(HttpResponse response, HttpContent content)
     {
         foreach (var header in content.Headers)
@@ -87,6 +92,10 @@ internal sealed class ModuleErrors(ILogger<ModuleErrors> logger) : ITransformPro
         }
     }
 
+    /// <summary>
+    /// Reads the body as a JSON object when it claims to be Problem Details and fits the size
+    /// limit; null otherwise.
+    /// </summary>
     private static async Task<JsonObject?> ReadProblemAsync(HttpContent content, CancellationToken cancellationToken)
     {
         if (content.Headers.ContentType?.MediaType != MediaTypeNames.Application.ProblemJson

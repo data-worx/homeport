@@ -42,6 +42,7 @@ public sealed record ThrottleDecision(
             WholeSeconds(state.Full));
     }
 
+    /// <summary>The duration in whole seconds, rounded up; zero when it has passed.</summary>
     private static int WholeSeconds(TimeSpan duration)
     {
         return duration <= TimeSpan.Zero ? 0 : (int)Math.Ceiling(duration.TotalSeconds);

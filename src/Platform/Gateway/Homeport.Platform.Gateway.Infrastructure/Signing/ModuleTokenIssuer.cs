@@ -51,6 +51,9 @@ public sealed class ModuleTokenIssuer(SigningKeys keys, IOptions<ModuleTokenOpti
         });
     }
 
+    /// <summary>
+    /// Signs a token for the audience with the claims, valid for the configured lifetime.
+    /// </summary>
     private string Issue(string audience, Dictionary<string, object> claims)
     {
         var now = time.GetUtcNow();

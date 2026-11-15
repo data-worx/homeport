@@ -31,6 +31,7 @@ public sealed class UsageMetrics
     private readonly Counter<long> dropped;
     private readonly Counter<long> rejected;
 
+    /// <summary>Creates the counters on the gateway's meter.</summary>
     public UsageMetrics(IMeterFactory meters)
     {
         var meter = meters.Create(MeterName);

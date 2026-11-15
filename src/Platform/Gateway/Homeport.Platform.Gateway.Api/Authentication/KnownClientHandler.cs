@@ -23,6 +23,7 @@ internal sealed class KnownClientHandler(
     ILogger<KnownClientHandler> logger)
     : AuthorizationHandler<KnownClientRequirement>
 {
+    /// <summary>Succeeds for a client token whose client the control plane knows.</summary>
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, KnownClientRequirement requirement)
     {
         // An anonymous request fails the authenticated-user requirement and is

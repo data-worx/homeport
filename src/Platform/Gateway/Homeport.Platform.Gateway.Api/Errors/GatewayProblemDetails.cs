@@ -28,6 +28,7 @@ namespace Homeport.Platform.Gateway.Api.Errors;
 internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logger)
     : IConfigureOptions<ProblemDetailsOptions>
 {
+    /// <summary>Customises every problem the gateway answers.</summary>
     public void Configure(ProblemDetailsOptions options)
     {
         options.CustomizeProblemDetails = Customize;
@@ -39,6 +40,9 @@ internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logge
         return Activity.Current?.TraceId.ToHexString() ?? context.TraceIdentifier;
     }
 
+    /// <summary>
+    /// Adds the trace id and, where the gateway knows the error, its problem type and title.
+    /// </summary>
     private void Customize(ProblemDetailsContext context)
     {
         var details = context.ProblemDetails;
@@ -51,6 +55,9 @@ internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logge
         }
     }
 
+    /// <summary>
+    /// The gateway's problem for the response, or null when it is none of the gateway's own.
+    /// </summary>
     private GatewayProblem? Match(HttpContext context, int? status)
     {
         if (context.Features.Get<IForwarderErrorFeature>() is { } failure)

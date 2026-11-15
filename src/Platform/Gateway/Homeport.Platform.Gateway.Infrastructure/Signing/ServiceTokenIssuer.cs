@@ -39,6 +39,7 @@ public sealed class ServiceTokenIssuer(SigningKeys keys, TimeProvider time)
         return renewed.Value;
     }
 
+    /// <summary>Signs a service token for the audience, valid for the maximum lifetime.</summary>
     private IssuedToken Create(string audience, DateTimeOffset now)
     {
         var expiresAt = now + GatewayTokens.MaximumLifetime;
@@ -56,5 +57,8 @@ public sealed class ServiceTokenIssuer(SigningKeys keys, TimeProvider time)
         return new IssuedToken(value, expiresAt);
     }
 
+    /// <summary>A signed token and when it expires.</summary>
+    /// <param name="Value">The token.</param>
+    /// <param name="ExpiresAt">When it expires.</param>
     private sealed record IssuedToken(string Value, DateTimeOffset ExpiresAt);
 }

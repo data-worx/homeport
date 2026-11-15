@@ -10,6 +10,9 @@ namespace Homeport.Platform.Gateway.Api.Admin;
 /// </summary>
 internal sealed class AdminPortBoundary(RequestDelegate next, AdminPort adminPort, ILogger<AdminPortBoundary> logger)
 {
+    /// <summary>
+    /// Answers 404 to an admin request off the admin port and to every other request on it.
+    /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
         var onAdminPort = adminPort.Serves(context);

@@ -49,6 +49,7 @@ public sealed class SigningOptionsValidator : IValidateOptions<SigningOptions>
         return failures.Count == 0 ? ValidateOptionsResult.Success : ValidateOptionsResult.Fail(failures);
     }
 
+    /// <summary>Whether the PEM holds a private P-256 key.</summary>
     private static bool IsPrivateKey(string pem)
     {
         if (!SigningKeyPem.TryReadPrivate(pem, out var key))
@@ -60,6 +61,7 @@ public sealed class SigningOptionsValidator : IValidateOptions<SigningOptions>
         return true;
     }
 
+    /// <summary>Whether the PEM holds a public P-256 key.</summary>
     private static bool IsPublicKey(string pem)
     {
         if (!SigningKeyPem.TryReadPublic(pem, out var key))

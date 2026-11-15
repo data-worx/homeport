@@ -27,6 +27,7 @@ internal sealed class RouteTablePoller(
 
     private string? etag;
 
+    /// <summary>Polls the registry for the routing table each interval.</summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var timer = new PeriodicTimer(PollInterval, time);
@@ -37,6 +38,7 @@ internal sealed class RouteTablePoller(
         while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
+    /// <summary>Applies a changed routing table; on failure the last known routes stay.</summary>
     private async Task PollAsync(CancellationToken stoppingToken)
     {
         try

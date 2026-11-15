@@ -7,6 +7,7 @@ namespace Homeport.Platform.Gateway.Api.Admin;
 /// <summary>Logs every operator token the gateway rejects on the admin port.</summary>
 internal sealed class OperatorTokenEvents(ILogger<OperatorTokenEvents> logger) : JwtBearerEvents
 {
+    /// <summary>Logs the rejected token's failure reason, never the token.</summary>
     public override Task AuthenticationFailed(AuthenticationFailedContext context)
     {
         // The exception's type is the reason. Its message is left out, so

@@ -63,8 +63,10 @@ public static class UsageServiceCollectionExtensions
         return builder;
     }
 
-    // After the last retry: counted, logged, and completed, so Wolverine
-    // neither sends it again nor trips the circuit breaker over it.
+    /// <summary>
+    /// After the last retry: counted, logged, and completed, so Wolverine
+    /// neither sends it again nor trips the circuit breaker over it.
+    /// </summary>
     private static async ValueTask DropAsync(Wolverine.Runtime.IWolverineRuntime runtime, IEnvelopeLifecycle lifecycle, Exception exception)
     {
         runtime.Services.GetRequiredService<UsageMetrics>().Dropped(UsageMetrics.RetriesExhausted);

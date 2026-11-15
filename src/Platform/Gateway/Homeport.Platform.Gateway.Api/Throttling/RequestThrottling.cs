@@ -22,6 +22,10 @@ namespace Homeport.Platform.Gateway.Api.Throttling;
 /// </summary>
 internal sealed class RequestThrottling(RequestDelegate next, ThrottlingMetrics metrics, ILogger<RequestThrottling> logger)
 {
+    /// <summary>
+    /// Holds the request to its tenant's rate limit with RateLimit headers and answers 429 once it
+    /// is exceeded; an operator request passes.
+    /// </summary>
     public async Task InvokeAsync(HttpContext context, RequestThrottle throttle, IProblemDetailsService problems)
     {
         // The operator acts for no tenant, so there is no plan to hold it to (ADR-0020).

@@ -76,6 +76,10 @@ public sealed class AdminRoutes(IReadOnlyList<AdminEndpoint> endpoints)
         return (routes, clusters.Values.ToList());
     }
 
+    /// <summary>
+    /// The route of an admin endpoint, held to the admin policy and stripped of the platform
+    /// prefix.
+    /// </summary>
     private static RouteConfig Route(AdminEndpoint endpoint, string clusterId)
     {
         return new RouteConfig
@@ -92,8 +96,10 @@ public sealed class AdminRoutes(IReadOnlyList<AdminEndpoint> endpoints)
         .WithTransformPathRemovePrefix(PlatformRoutes.PlatformPrefix);
     }
 
-    // Its own cluster id, so it never collides with the platform route's
-    // cluster of the same service, whose address may differ.
+    /// <summary>
+    /// Its own cluster id, so it never collides with the platform route's
+    /// cluster of the same service, whose address may differ.
+    /// </summary>
     private static ClusterConfig Cluster(string service, Uri address)
     {
         var id = $"{AdminPrefix} {service}";

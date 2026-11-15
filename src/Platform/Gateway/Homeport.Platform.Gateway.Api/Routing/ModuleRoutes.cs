@@ -52,6 +52,9 @@ internal static class ModuleRoutes
         return (routes, clusters);
     }
 
+    /// <summary>
+    /// The route of a module route, held to the client policy and stripped of the module's prefix.
+    /// </summary>
     private static RouteConfig Route(string id, string moduleId, RouteResponse route)
     {
         var prefix = $"{ModulesPrefix}/{moduleId}";
@@ -74,6 +77,7 @@ internal static class ModuleRoutes
         .WithTransformPathRemovePrefix(prefix);
     }
 
+    /// <summary>The cluster of a module's instances.</summary>
     private static ClusterConfig Cluster(string id, IReadOnlyList<Uri> instances)
     {
         return new ClusterConfig

@@ -7,6 +7,9 @@ namespace Homeport.Platform.Gateway.Api.Authentication;
 /// <summary>Keeps the gateway from starting without an identity provider to accept tokens from.</summary>
 internal sealed class ClientAuthenticationOptionsValidator : IValidateOptions<ClientAuthenticationOptions>
 {
+    /// <summary>
+    /// Requires the issuer's absolute URI, an audience and the claims of client id and scopes.
+    /// </summary>
     public ValidateOptionsResult Validate(string? name, ClientAuthenticationOptions options)
     {
         var failures = new List<string>();

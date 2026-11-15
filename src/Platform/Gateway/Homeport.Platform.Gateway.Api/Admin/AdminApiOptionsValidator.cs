@@ -12,6 +12,10 @@ namespace Homeport.Platform.Gateway.Api.Admin;
 /// </summary>
 internal sealed class AdminApiOptionsValidator : IValidateOptions<AdminApiOptions>
 {
+    /// <summary>
+    /// Checks nothing without an admin port; with one, requires a valid port, the issuer's absolute
+    /// URI and an audience.
+    /// </summary>
     public ValidateOptionsResult Validate(string? name, AdminApiOptions options)
     {
         if (options.Port is null)
