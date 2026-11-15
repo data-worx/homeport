@@ -21,12 +21,14 @@ internal sealed class TenantSessionInterceptor(CurrentTenant tenant) : DbConnect
 
     private const string TenantParameter = "tenant";
 
+    /// <summary>Sets the current tenant on the opened connection.</summary>
     public override void ConnectionOpened(DbConnection connection, ConnectionEndEventData eventData)
     {
         using var command = CreateCommand(connection);
         command.ExecuteNonQuery();
     }
 
+    /// <summary>Sets the current tenant on the opened connection.</summary>
     public override async Task ConnectionOpenedAsync(
         DbConnection connection,
         ConnectionEndEventData eventData,
@@ -36,6 +38,9 @@ internal sealed class TenantSessionInterceptor(CurrentTenant tenant) : DbConnect
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// The parameterised command that sets the tenant's session setting, empty without a tenant.
+    /// </summary>
     private DbCommand CreateCommand(DbConnection connection)
     {
         var command = connection.CreateCommand();

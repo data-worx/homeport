@@ -21,11 +21,15 @@ namespace Homeport.Platform.Gateway.Api.Errors;
 /// </remarks>
 internal sealed class AnyAcceptProblemDetailsWriter : IProblemDetailsWriter
 {
+    /// <summary>Writes every problem, whatever the request accepts.</summary>
     public bool CanWrite(ProblemDetailsContext context)
     {
         return true;
     }
 
+    /// <summary>
+    /// Writes the problem as Problem Details JSON, as if the request had asked for it.
+    /// </summary>
     public ValueTask WriteAsync(ProblemDetailsContext context)
     {
         context.HttpContext.Request.Headers.Accept = MediaTypeNames.Application.ProblemJson;

@@ -28,8 +28,10 @@ public sealed class Plan
     /// <summary>A client uses the plan, so it cannot be deleted.</summary>
     public const string InUseCode = "plan.in-use";
 
+    /// <summary>The plan's id.</summary>
     public required Guid Id { get; init; }
 
+    /// <summary>The plan's name, unique among plans.</summary>
     public required string Name { get; set; }
 
     /// <summary>How fast the bucket refills.</summary>
@@ -103,7 +105,10 @@ public sealed class Plan
         return new Error(InUseCode, $"The plan '{name}' is used by at least one client. Move its clients to another plan first.");
     }
 
-    // Unique compared case-sensitively: "Gold" and "gold" are two plans.
+    /// <summary>
+    /// The trimmed name, unless it or the limits break a rule. Unique compared
+    /// case-sensitively: "Gold" and "gold" are two plans.
+    /// </summary>
     private static Result<string> Check(string name, int requestsPerSecond, int burst, IEnumerable<string> takenNames)
     {
         var trimmed = name?.Trim() ?? string.Empty;

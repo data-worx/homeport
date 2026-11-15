@@ -10,6 +10,21 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <!-- Every production project - everything outside src/Tests/ - writes its
+       documentation file and runs StyleCop.Analyzers for SA1600 alone
+       (dotnet.docs). .editorconfig switches every other StyleCop rule off.
+       The version lives in Directory.Packages.props: central package
+       management refuses a Version attribute here (NU1008). The analyzer
+       flows to no caller, so it is no reference of the project. -->
+  <PropertyGroup Condition="!$(MSBuildProjectDirectory.StartsWith('$(MSBuildThisFileDirectory)Tests'))">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(GenerateDocumentationFile)' == 'true'">
+    <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
   <!-- Own images are built on chiseled .NET base images (ADR-0009): no shell,
        no package manager, non-root by default. Without InvariantGlobalization
        the SDK picks the -extra variant, which keeps ICU and time zone data.

@@ -24,6 +24,7 @@ public sealed class MeteringMetrics
 
     private readonly Counter<long> events;
 
+    /// <summary>Creates the counter on metering's meter.</summary>
     public MeteringMetrics(IMeterFactory meters)
     {
         events = meters.Create(MeterName).CreateCounter<long>(EventsInstrument, description: "Usage events metering consumed.");

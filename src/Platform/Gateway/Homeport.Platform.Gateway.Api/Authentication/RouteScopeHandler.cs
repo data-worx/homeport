@@ -17,6 +17,7 @@ internal sealed class RouteScopeHandler(
     ILogger<RouteScopeHandler> logger)
     : AuthorizationHandler<RouteScopeRequirement>
 {
+    /// <summary>Succeeds for a client token that carries the scope its route declares.</summary>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RouteScopeRequirement requirement)
     {
         // An anonymous request fails the authenticated-user requirement and is challenged.

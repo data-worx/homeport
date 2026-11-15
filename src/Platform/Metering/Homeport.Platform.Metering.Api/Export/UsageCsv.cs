@@ -47,6 +47,7 @@ internal static class UsageCsv
         return csv.ToString();
     }
 
+    /// <summary>Appends one row of escaped fields and a line break.</summary>
     private static void AppendRow(StringBuilder csv, IReadOnlyList<string> fields)
     {
         for (var i = 0; i < fields.Count; i++)
@@ -62,6 +63,9 @@ internal static class UsageCsv
         csv.Append(LineBreak);
     }
 
+    /// <summary>
+    /// Quotes a field that holds a separator, a quote or a line break, doubling its quotes.
+    /// </summary>
     private static string Escape(string field)
     {
         return field.IndexOfAny(NeedsQuoting) < 0

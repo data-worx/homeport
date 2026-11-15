@@ -8,6 +8,9 @@ namespace Homeport.Shared.ServiceDefaults.Proxies;
 /// <summary>Keeps a service from starting with a trusted proxy it cannot read.</summary>
 internal sealed class TrustedProxiesOptionsValidator : IValidateOptions<TrustedProxiesOptions>
 {
+    /// <summary>
+    /// Fails on every proxy that is not an IP address and every network not in CIDR notation.
+    /// </summary>
     public ValidateOptionsResult Validate(string? name, TrustedProxiesOptions options)
     {
         var failures = new List<string>();

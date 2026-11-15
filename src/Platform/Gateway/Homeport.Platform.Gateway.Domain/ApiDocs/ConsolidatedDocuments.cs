@@ -105,6 +105,10 @@ public static partial class ConsolidatedDocuments
         return Consolidate(moduleId, string.Join(VersionSeparator, versions), publicPrefix, routes, sources);
     }
 
+    /// <summary>
+    /// Builds one document from the routes' operations in their sources, with the components and
+    /// tags they use.
+    /// </summary>
     private static JsonObject Consolidate(
         string title,
         string version,
@@ -141,6 +145,9 @@ public static partial class ConsolidatedDocuments
         return document;
     }
 
+    /// <summary>
+    /// An empty document with the gateway as its server and the bearer scheme as its security.
+    /// </summary>
     private static JsonObject Skeleton(string title, string version)
     {
         return new JsonObject
@@ -166,8 +173,10 @@ public static partial class ConsolidatedDocuments
         };
     }
 
-    // The operation of route in source, matching the path as a route template:
-    // parameter names count, constraints and case do not.
+    /// <summary>
+    /// The operation of route in source, matching the path as a route template:
+    /// parameter names count, constraints and case do not.
+    /// </summary>
     private static Operation? Find(JsonObject source, DocumentedRoute route)
     {
         if (source[PathsKey] is not JsonObject paths)
@@ -189,11 +198,16 @@ public static partial class ConsolidatedDocuments
         return null;
     }
 
+    /// <summary>Reduces every route parameter to its name and drops a trailing slash.</summary>
     private static string Normalize(string path)
     {
         return Parameter().Replace(path, "{$1}").TrimEnd(ReferenceSeparator);
     }
 
+    /// <summary>
+    /// Adds the operation under its public path, its references renamed and its own security
+    /// removed.
+    /// </summary>
     private static void Add(JsonObject paths, string publicPath, Operation operation, IReadOnlyDictionary<string, string> renames)
     {
         if (paths[publicPath] is not JsonObject item)
@@ -216,6 +230,7 @@ public static partial class ConsolidatedDocuments
         item[operation.Method] = node;
     }
 
+    /// <summary>Replaces every renamed reference in the node, in place.</summary>
     private static JsonNode Rewrite(JsonNode node, IReadOnlyDictionary<string, string> renames)
     {
         switch (node)
@@ -251,6 +266,7 @@ public static partial class ConsolidatedDocuments
         return node;
     }
 
+    /// <summary>Collects every component reference in the node.</summary>
     private static void CollectReferences(JsonNode? node, ICollection<string> references)
     {
         switch (node)
@@ -288,21 +304,31 @@ public static partial class ConsolidatedDocuments
     [GeneratedRegex(@"[^A-Za-z0-9.\-_]")]
     private static partial Regex NotAllowedInName();
 
+    /// <summary>An operation of a source document with the path item it belongs to.</summary>
+    /// <param name="PathKey">The path as the source spells it.</param>
+    /// <param name="Method">The method, lowercase as OpenAPI keys it.</param>
+    /// <param name="Item">The path item.</param>
+    /// <param name="Node">The operation.</param>
     private sealed record Operation(string PathKey, string Method, JsonObject Item, JsonObject Node)
     {
-        // Everything of the source the operation takes along.
+        /// <summary>Everything of the source the operation takes along.</summary>
         internal IEnumerable<JsonNode> Roots =>
             PathItemFields.Select(name => Item[name]).OfType<JsonNode>().Append(Node);
     }
 
-    // The components every source's kept operations reference, transitively,
-    // under one name each. Equal components under one name are shared; a
-    // different one under a taken name is prefixed with its source's version.
+    /// <summary>
+    /// The components every source's kept operations reference, transitively,
+    /// under one name each. Equal components under one name are shared; a
+    /// different one under a taken name is prefixed with its source's version.
+    /// </summary>
     private sealed class Components
     {
         private readonly Dictionary<(string Section, string Name), JsonNode> taken = [];
         private readonly JsonObject merged = [];
 
+        /// <summary>
+        /// Takes the components the roots reference and returns the references it renamed.
+        /// </summary>
         internal IReadOnlyDictionary<string, string> Merge(JsonObject source, string version, IEnumerable<JsonNode> roots)
         {
             var renames = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -345,6 +371,10 @@ public static partial class ConsolidatedDocuments
             return renames;
         }
 
+        /// <summary>
+        /// Copies the merged components into the document, every security scheme but its own left
+        /// out.
+        /// </summary>
         internal void CopyTo(JsonObject components)
         {
             foreach (var (section, names) in merged)
@@ -359,6 +389,9 @@ public static partial class ConsolidatedDocuments
             }
         }
 
+        /// <summary>
+        /// Every component reference the roots reach, directly or through other components.
+        /// </summary>
         private static HashSet<string> Closure(JsonObject source, IEnumerable<JsonNode> roots)
         {
             var found = new HashSet<string>(StringComparer.Ordinal);
@@ -381,6 +414,9 @@ public static partial class ConsolidatedDocuments
             return found;
         }
 
+        /// <summary>
+        /// The section, name and content a reference points at, or null when the source lacks it.
+        /// </summary>
         private static (string Section, string Name, JsonNode Content)? Resolve(JsonObject source, string reference)
         {
             var parts = reference[ComponentsReference.Length..].Split(ReferenceSeparator, 2);
@@ -393,12 +429,18 @@ public static partial class ConsolidatedDocuments
         }
     }
 
-    // The top-level tags the kept operations use, each taken from the first source that describes it.
+    /// <summary>
+    /// The top-level tags the kept operations use, each taken from the first source that describes
+    /// it.
+    /// </summary>
     private sealed class Tags
     {
         private readonly JsonArray described = [];
         private readonly HashSet<string> names = new(StringComparer.Ordinal);
 
+        /// <summary>
+        /// Takes the description of every tag the operation uses and no source has described yet.
+        /// </summary>
         internal void Add(JsonObject source, JsonObject operation)
         {
             if (operation[TagsKey] is not JsonArray used || source[TagsKey] is not JsonArray available)
@@ -416,6 +458,7 @@ public static partial class ConsolidatedDocuments
             }
         }
 
+        /// <summary>Sets the document's tags, when there are any.</summary>
         internal void CopyTo(JsonObject document)
         {
             if (described.Count > 0)

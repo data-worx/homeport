@@ -26,11 +26,15 @@ internal sealed class RegistryProblemDetails : IConfigureOptions<ProblemDetailsO
         RegistryProblems.Internal,
     ];
 
+    /// <summary>Customises every problem the registry answers.</summary>
     public void Configure(ProblemDetailsOptions options)
     {
         options.CustomizeProblemDetails = Customize;
     }
 
+    /// <summary>
+    /// Adds the trace id and the registry's problem type and title for the status.
+    /// </summary>
     private static void Customize(ProblemDetailsContext context)
     {
         var details = context.ProblemDetails;

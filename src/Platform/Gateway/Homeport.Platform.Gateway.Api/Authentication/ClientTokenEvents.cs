@@ -7,6 +7,7 @@ namespace Homeport.Platform.Gateway.Api.Authentication;
 /// <summary>Logs every client token the gateway rejects.</summary>
 internal sealed class ClientTokenEvents(ILogger<ClientTokenEvents> logger) : JwtBearerEvents
 {
+    /// <summary>Logs the rejected token's failure reason, never the token.</summary>
     public override Task AuthenticationFailed(AuthenticationFailedContext context)
     {
         // The exception's type is the reason. Its message is left out, so

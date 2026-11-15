@@ -11,10 +11,12 @@ internal sealed class OperatorSignInEvents(ILogger<OperatorSignInEvents> logger)
     internal static readonly string HttpsRequiredPage =
         new PathString(PortalPaths.SignIn).Add(QueryString.Create(PortalPaths.ReasonParameter, PortalPaths.HttpsRequiredReason));
 
-    // TLS ends at the operator's reverse proxy, which says so in
-    // X-Forwarded-Proto (ADR-0020). A sign-in that would come back over
-    // plain HTTP is not started: the identity provider would send the code
-    // in the clear, and the Secure cookies would never arrive.
+    /// <summary>
+    /// TLS ends at the operator's reverse proxy, which says so in
+    /// X-Forwarded-Proto (ADR-0020). A sign-in that would come back over
+    /// plain HTTP is not started: the identity provider would send the code
+    /// in the clear, and the Secure cookies would never arrive.
+    /// </summary>
     public override Task RedirectToIdentityProvider(RedirectContext context)
     {
         if (!context.Request.IsHttps)

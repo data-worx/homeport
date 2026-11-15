@@ -28,6 +28,7 @@ internal static class EchoManifest
 
     private const string RequestsMeter = "requests";
 
+    /// <summary>The manifest the Echo module registers with.</summary>
     internal static ModuleManifest Create()
     {
         return new ModuleManifest(

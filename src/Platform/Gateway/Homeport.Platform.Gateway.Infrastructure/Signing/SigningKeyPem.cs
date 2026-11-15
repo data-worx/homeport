@@ -24,6 +24,7 @@ internal static class SigningKeyPem
         return TryRead(pem, expectPrivate: false, out key);
     }
 
+    /// <summary>Reads a P-256 key that has a private part exactly when one is expected.</summary>
     private static bool TryRead(string pem, bool expectPrivate, [NotNullWhen(true)] out ECDsa? key)
     {
         var candidate = ECDsa.Create();
@@ -46,12 +47,14 @@ internal static class SigningKeyPem
         return false;
     }
 
+    /// <summary>Whether the key is on the P-256 curve.</summary>
     private static bool IsP256(ECDsa key)
     {
         return key.ExportParameters(includePrivateParameters: false).Curve.Oid.Value
             == ECCurve.NamedCurves.nistP256.Oid.Value;
     }
 
+    /// <summary>Whether the key has a private part.</summary>
     private static bool HasPrivateKey(ECDsa key)
     {
         try

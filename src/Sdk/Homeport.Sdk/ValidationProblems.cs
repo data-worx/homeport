@@ -28,6 +28,7 @@ internal static class ValidationProblems
     private const string JsonPathRootPrefix = "$.";
     private const char SegmentSeparator = '.';
 
+    /// <summary>Turns the model state of a rejected request into the validation problem.</summary>
     internal static IActionResult Create(ActionContext context)
     {
         var problem = HomeportProblems.Validation;
@@ -51,6 +52,7 @@ internal static class ValidationProblems
         return new BadRequestObjectResult(details) { ContentTypes = { MediaTypeNames.Application.ProblemJson } };
     }
 
+    /// <summary>Turns a model state key into a field path in the request's JSON notation.</summary>
     private static string FieldPath(string key)
     {
         if (key == JsonPathRoot)

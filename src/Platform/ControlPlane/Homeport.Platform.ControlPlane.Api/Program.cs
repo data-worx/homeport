@@ -20,7 +20,7 @@ namespace Homeport.Platform.ControlPlane.Api;
 /// </summary>
 public sealed class Program
 {
-    // Not static, so the integration tests can name it as their entry point.
+    /// <summary>Not static, so the integration tests can name it as their entry point.</summary>
     private Program()
     {
     }
@@ -41,6 +41,7 @@ public sealed class Program
         return 0;
     }
 
+    /// <summary>Builds and runs the web host of the control plane.</summary>
     private static async Task RunAsync(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);

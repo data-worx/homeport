@@ -20,6 +20,7 @@ internal sealed class RequestMetrics
 
     private readonly Counter<long> requests;
 
+    /// <summary>Creates the counter on the gateway's meter.</summary>
     public RequestMetrics(IMeterFactory meters)
     {
         requests = meters.Create(UsageMetrics.MeterName)

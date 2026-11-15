@@ -12,6 +12,10 @@ internal sealed class RegistrationOptionsValidator : IValidateOptions<Registrati
 {
     private const string Section = RegistrationOptions.SectionName;
 
+    /// <summary>
+    /// Checks nothing without a registry URL; with one, requires the key and an absolute instance
+    /// address.
+    /// </summary>
     public ValidateOptionsResult Validate(string? name, RegistrationOptions options)
     {
         if (options.Url is null)

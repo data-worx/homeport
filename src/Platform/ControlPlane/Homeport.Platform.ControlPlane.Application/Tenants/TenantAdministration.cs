@@ -72,6 +72,7 @@ public sealed class TenantAdministration(ITenantStore store, TimeProvider clock)
         return await SaveAsync(tenant, overview.ClientCount, cancellationToken);
     }
 
+    /// <summary>Stores the change; a name taken since the check is caught by the store.</summary>
     private async Task<Result<TenantOverview>> SaveAsync(Tenant tenant, int clientCount, CancellationToken cancellationToken)
     {
         // The name was free when it was checked; another change may have
@@ -84,6 +85,7 @@ public sealed class TenantAdministration(ITenantStore store, TimeProvider clock)
         return Result<TenantOverview>.Success(new TenantOverview(tenant.Id, tenant.Name, clientCount));
     }
 
+    /// <summary>The failure for a tenant that does not exist.</summary>
     private static Result<TenantOverview> NotFound(Guid id)
     {
         return Result<TenantOverview>.Failure(new Error(NotFoundCode, $"There is no tenant {id}."));

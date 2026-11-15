@@ -61,6 +61,20 @@ csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
 
+# XML documentation (dotnet.docs): StyleCop.Analyzers is there for SA1600
+# alone, so every one of its categories is off and only that rule is on.
+# CS1591 reaches public members only and would report them a second time.
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = none
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.LayoutRules.severity = none
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severity = none
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.NamingRules.severity = none
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.OrderingRules.severity = none
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.ReadabilityRules.severity = none
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.SpacingRules.severity = none
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.SpecialRules.severity = none
+dotnet_diagnostic.SA1600.severity = warning
+dotnet_diagnostic.CS1591.severity = none
+
 # EF writes these files and rewrites them whenever the model changes, so
 # formatting or style rules would fight the tool rather than help a reader.
 [**/Migrations/*.cs]

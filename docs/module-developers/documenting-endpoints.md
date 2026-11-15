@@ -8,13 +8,12 @@ answer with. The Echo module in `src/Modules/Echo/` is the reference.
 
 ## Set it up
 
-The module's API project switches on its XML docs and references
+The module's API project writes its XML documentation file and references
 `Microsoft.AspNetCore.OpenApi` directly:
 
 ```xml
 <PropertyGroup>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  <NoWarn>$(NoWarn);CS1591</NoWarn>
 </PropertyGroup>
 
 <ItemGroup>
@@ -33,9 +32,14 @@ builder.Services.AddControllers();
 Both are needed because of how ASP.NET reads XML docs: a source generator
 intercepts the `AddOpenApi` call and takes in the XML docs of the project it
 is called from. The direct package reference switches that generator on. A
-call inside the SDK would only see the SDK's own docs. `CS1591` stays off,
-so a public member without an XML doc does not fail the build; the rule
-covers endpoints, not every type.
+call inside the SDK would only see the SDK's own docs.
+
+The OpenAPI document needs XML docs on the endpoints only. Whether a member
+without one fails the build is the module's own choice: switching on the
+documentation file also reports every undocumented public member as
+`CS1591`. Inside the Homeport repository, `src/Directory.Build.props` writes
+the documentation file for every production project, the Echo module's
+included, and SA1600 requires an XML doc on every member.
 
 ## Document an action
 

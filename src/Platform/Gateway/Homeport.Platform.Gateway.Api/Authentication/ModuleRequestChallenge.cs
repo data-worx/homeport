@@ -14,6 +14,9 @@ namespace Homeport.Platform.Gateway.Api.Authentication;
 /// </summary>
 internal sealed class ModuleRequestChallenge(RequestDelegate next, ILogger<ModuleRequestChallenge> logger)
 {
+    /// <summary>
+    /// Challenges a module request without a valid client token before it is routed.
+    /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
         if (context.Request.Path.StartsWithSegments(ModuleRoutes.ModulesPrefix)

@@ -114,7 +114,7 @@ public sealed class ApiDocsCatalog(
             unread);
     }
 
-    // Reads one document into sources; one that fails keeps the last one read.
+    /// <summary>Reads one document into sources; one that fails keeps the last one read.</summary>
     private async Task<bool> TryReadAsync(
         Dictionary<Uri, JsonObject> sources,
         Uri url,

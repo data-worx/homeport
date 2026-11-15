@@ -33,6 +33,7 @@ public sealed class UsageRecordedHandler(UsageRecording recording, MeteringMetri
         }
     }
 
+    /// <summary>The usage event a message records.</summary>
     private static UsageEvent ToUsage(UsageRecorded message)
     {
         return new UsageEvent(

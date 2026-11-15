@@ -17,6 +17,7 @@ internal sealed class OperatorRequirement : IAuthorizationRequirement;
 internal sealed class OperatorRequirementHandler(IOptions<SignInOptions> options, ILogger<OperatorRequirementHandler> logger)
     : AuthorizationHandler<OperatorRequirement>
 {
+    /// <summary>Succeeds for a signed-in user who carries the configured operator claim.</summary>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperatorRequirement requirement)
     {
         // An anonymous request fails the authenticated-user requirement and is challenged.

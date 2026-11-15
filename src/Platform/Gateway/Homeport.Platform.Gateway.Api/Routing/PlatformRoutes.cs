@@ -58,7 +58,7 @@ public sealed class PlatformRoutes(IOptions<PlatformRoutesOptions> options, Admi
             .ToList();
     }
 
-    // Every platform endpoint, in one place for routing and docs alike.
+    /// <summary>Every platform endpoint, in one place for routing and docs alike.</summary>
     private List<PlatformEndpoint> Endpoints()
     {
         var metering = new PlatformService(MeteringService.ServiceName, MeteringService.Audience, options.Value.MeteringUrl, MeteringService.OpenApiPath);
@@ -66,6 +66,10 @@ public sealed class PlatformRoutes(IOptions<PlatformRoutesOptions> options, Admi
         return [new PlatformEndpoint(HttpMethods.Get, UsageApi.Path, UsageApi.ReadScope, metering)];
     }
 
+    /// <summary>
+    /// The route of a platform endpoint, held to the client policy and stripped of the platform
+    /// prefix.
+    /// </summary>
     private static RouteConfig Route(string method, string path, string scope, string audience, string clusterId)
     {
         return new RouteConfig
@@ -83,6 +87,7 @@ public sealed class PlatformRoutes(IOptions<PlatformRoutesOptions> options, Admi
         .WithTransformPathRemovePrefix(PlatformPrefix);
     }
 
+    /// <summary>The cluster of a platform service.</summary>
     private static ClusterConfig Cluster(string service, Uri address)
     {
         var id = $"{PlatformPrefix} {service}";
@@ -97,7 +102,17 @@ public sealed class PlatformRoutes(IOptions<PlatformRoutesOptions> options, Admi
         };
     }
 
+    /// <summary>A platform service the gateway forwards to.</summary>
+    /// <param name="Name">The service name.</param>
+    /// <param name="Audience">The audience of its tokens.</param>
+    /// <param name="Address">Where the gateway reaches it.</param>
+    /// <param name="OpenApiPath">The path of its OpenAPI document.</param>
     private sealed record PlatformService(string Name, string Audience, Uri Address, string OpenApiPath);
 
+    /// <summary>An endpoint of a platform service and the scope it requires.</summary>
+    /// <param name="Method">The HTTP method.</param>
+    /// <param name="Path">The path below the platform prefix.</param>
+    /// <param name="Scope">The scope a caller needs.</param>
+    /// <param name="Service">The service that serves it.</param>
     private sealed record PlatformEndpoint(string Method, string Path, string Scope, PlatformService Service);
 }

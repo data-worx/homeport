@@ -33,7 +33,7 @@ public sealed class Program
 {
     private const string None = "none";
 
-    // Not static, so the integration tests can name it as their entry point.
+    /// <summary>Not static, so the integration tests can name it as their entry point.</summary>
     private Program()
     {
     }
@@ -133,8 +133,10 @@ public sealed class Program
         app.Run();
     }
 
-    // Once started, so the signing options have passed validation and the
-    // addresses are bound. Key ids only: the keys are secrets.
+    /// <summary>
+    /// Once started, so the signing options have passed validation and the
+    /// addresses are bound. Key ids only: the keys are secrets.
+    /// </summary>
     private static void LogStart(WebApplication app)
     {
         app.Lifetime.ApplicationStarted.Register(() =>

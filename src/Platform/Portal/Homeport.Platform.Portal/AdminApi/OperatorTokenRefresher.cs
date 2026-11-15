@@ -65,6 +65,10 @@ internal sealed class OperatorTokenRefresher(
             clock.GetUtcNow().AddSeconds(tokens.ExpiresIn));
     }
 
+    /// <summary>The identity provider's answer to a refresh token request.</summary>
+    /// <param name="AccessToken">The new access token.</param>
+    /// <param name="RefreshToken">The new refresh token, where the identity provider rotates it.</param>
+    /// <param name="ExpiresIn">The access token's lifetime in seconds.</param>
     private sealed record TokenResponse(
         [property: JsonPropertyName("access_token")] string? AccessToken,
         [property: JsonPropertyName("refresh_token")] string? RefreshToken,

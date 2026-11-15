@@ -41,5 +41,6 @@ internal static class RowLevelSecurity
         migrationBuilder.Sql($"ALTER TABLE {name} DISABLE ROW LEVEL SECURITY;");
     }
 
+    /// <summary>The table's name, qualified with metering's schema.</summary>
     private static string QualifiedName(string table) => $"{MeteringDbContext.Schema}.\"{table}\"";
 }

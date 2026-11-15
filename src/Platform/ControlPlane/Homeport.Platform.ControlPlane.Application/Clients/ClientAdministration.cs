@@ -108,6 +108,10 @@ public sealed class ClientAdministration(IClientStore store, TimeProvider clock)
         return await SaveAsync(overview, cancellationToken);
     }
 
+    /// <summary>
+    /// Stores the change; a client id registered or a plan deleted since the checks is caught by
+    /// the store.
+    /// </summary>
     private async Task<Result<ClientOverview>> SaveAsync(ClientOverview client, CancellationToken cancellationToken)
     {
         // The client id was free and the plan there when they were checked;
@@ -122,6 +126,7 @@ public sealed class ClientAdministration(IClientStore store, TimeProvider clock)
         };
     }
 
+    /// <summary>The failure for a client that is not registered.</summary>
     private static Result<ClientOverview> NotFound(string clientId)
     {
         return Result<ClientOverview>.Failure(new Error(NotFoundCode, $"The client '{clientId}' is not registered."));

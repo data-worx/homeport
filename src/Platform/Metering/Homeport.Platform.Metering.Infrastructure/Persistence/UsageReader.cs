@@ -12,6 +12,7 @@ namespace Homeport.Platform.Metering.Infrastructure.Persistence;
 /// </summary>
 internal sealed class UsageReader(MeteringDbContext database, CurrentTenant tenant) : IUsageReader
 {
+    /// <inheritdoc />
     public async Task<IReadOnlyList<UsageTotal>> ReadAsync(Guid tenantId, UsageQuery query, CancellationToken cancellationToken)
     {
         // Before the first connection opens, which the session setting is set on.
@@ -25,6 +26,7 @@ internal sealed class UsageReader(MeteringDbContext database, CurrentTenant tena
         };
     }
 
+    /// <summary>The hourly totals in the query's range.</summary>
     private async Task<IReadOnlyList<UsageTotal>> ReadHoursAsync(UsageQuery query, CancellationToken cancellationToken)
     {
         var hours = database.UsageHourly.AsNoTracking().Where(h => h.Hour >= query.From && h.Hour < query.To);
@@ -45,6 +47,7 @@ internal sealed class UsageReader(MeteringDbContext database, CurrentTenant tena
         return rows.Select(h => new UsageTotal(h.Hour, h.ModuleId, h.Meter, h.Quantity)).ToList();
     }
 
+    /// <summary>The daily totals in the query's range.</summary>
     private async Task<IReadOnlyList<UsageTotal>> ReadDaysAsync(UsageQuery query, CancellationToken cancellationToken)
     {
         var days = database.UsageDaily.AsNoTracking().Where(d => d.Day >= query.FirstDay && d.Day < query.EndDay);

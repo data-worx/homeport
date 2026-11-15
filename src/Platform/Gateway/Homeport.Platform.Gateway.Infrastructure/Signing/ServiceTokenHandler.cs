@@ -12,6 +12,7 @@ namespace Homeport.Platform.Gateway.Infrastructure.Signing;
 /// </summary>
 internal sealed class ServiceTokenHandler(ServiceTokenIssuer issuer, string audience) : DelegatingHandler
 {
+    /// <summary>Sends the request with a service token for the audience.</summary>
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         request.Headers.Authorization = new AuthenticationHeaderValue(

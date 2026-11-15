@@ -101,6 +101,7 @@ public sealed class InstancesController(Registrations registrations, ILogger<Ins
             statusCode: StatusCodes.Status404NotFound);
     }
 
+    /// <summary>The domain manifest of a registration's manifest.</summary>
     private static Manifest ToManifest(ModuleManifest manifest)
     {
         var routes = manifest.Routes

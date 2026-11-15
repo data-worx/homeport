@@ -22,6 +22,9 @@ public static partial class SemanticVersions
         return VersionPattern().IsMatch(version);
     }
 
+    /// <summary>
+    /// Compares two versions by precedence: major, minor, patch, then pre-release.
+    /// </summary>
     private static int Compare(string? left, string? right)
     {
         var a = Parse(left);
@@ -34,8 +37,10 @@ public static partial class SemanticVersions
         return result != 0 ? result : ComparePreRelease(a.PreRelease, b.PreRelease);
     }
 
-    // A version without a pre-release ranks above one with it; otherwise the
-    // identifiers decide from left to right, and more identifiers rank higher.
+    /// <summary>
+    /// A version without a pre-release ranks above one with it; otherwise the
+    /// identifiers decide from left to right, and more identifiers rank higher.
+    /// </summary>
     private static int ComparePreRelease(string[] left, string[] right)
     {
         if (left.Length == 0 || right.Length == 0)
@@ -55,8 +60,10 @@ public static partial class SemanticVersions
         return Math.Sign(left.Length.CompareTo(right.Length));
     }
 
-    // Numeric identifiers compare numerically and rank below alphanumeric ones,
-    // which compare in ASCII order.
+    /// <summary>
+    /// Numeric identifiers compare numerically and rank below alphanumeric ones,
+    /// which compare in ASCII order.
+    /// </summary>
     private static int CompareIdentifier(string left, string right)
     {
         var leftIsNumeric = left.All(char.IsAsciiDigit);
@@ -71,14 +78,17 @@ public static partial class SemanticVersions
         };
     }
 
-    // Without leading zeros the longer number is the larger one, so numbers of
-    // any length compare without parsing.
+    /// <summary>
+    /// Without leading zeros the longer number is the larger one, so numbers of
+    /// any length compare without parsing.
+    /// </summary>
     private static int CompareNumeric(string left, string right)
     {
         var byLength = left.Length.CompareTo(right.Length);
         return Math.Sign(byLength != 0 ? byLength : string.CompareOrdinal(left, right));
     }
 
+    /// <summary>Splits a version into its parts; throws when it is none.</summary>
     private static Parts Parse(string? version)
     {
         var match = VersionPattern().Match(version ?? string.Empty);
@@ -99,5 +109,10 @@ public static partial class SemanticVersions
         + @"(?:\+[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)?$")]
     private static partial Regex VersionPattern();
 
+    /// <summary>The parts of a version that decide its precedence.</summary>
+    /// <param name="Major">The major version.</param>
+    /// <param name="Minor">The minor version.</param>
+    /// <param name="Patch">The patch version.</param>
+    /// <param name="PreRelease">The pre-release identifiers, empty for a release.</param>
     private sealed record Parts(string Major, string Minor, string Patch, string[] PreRelease);
 }

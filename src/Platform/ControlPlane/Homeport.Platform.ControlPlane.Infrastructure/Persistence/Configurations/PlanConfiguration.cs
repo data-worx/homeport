@@ -13,6 +13,7 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence.Configuratio
 /// </summary>
 internal sealed class PlanConfiguration : IEntityTypeConfiguration<Plan>
 {
+    /// <summary>Maps the plan onto its table.</summary>
     public void Configure(EntityTypeBuilder<Plan> plan)
     {
         plan.Property(p => p.Id).ValueGeneratedNever();

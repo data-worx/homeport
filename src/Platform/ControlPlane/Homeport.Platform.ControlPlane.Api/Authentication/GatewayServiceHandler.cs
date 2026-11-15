@@ -11,6 +11,7 @@ namespace Homeport.Platform.ControlPlane.Api.Authentication;
 /// </summary>
 internal sealed class GatewayServiceHandler(ILogger<GatewayServiceHandler> logger) : AuthorizationHandler<GatewayServiceRequirement>
 {
+    /// <summary>Succeeds for a service token of the gateway that carries no tenant.</summary>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, GatewayServiceRequirement requirement)
     {
         // An anonymous request fails the authenticated-user requirement and is challenged.

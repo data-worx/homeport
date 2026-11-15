@@ -13,6 +13,7 @@ namespace Homeport.Sdk;
 /// </summary>
 internal sealed class ProblemTypeResult(ProblemType problemType, string detail) : ActionResult
 {
+    /// <summary>Writes the problem as Problem Details.</summary>
     public override Task ExecuteResultAsync(ActionContext context)
     {
         var factory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();

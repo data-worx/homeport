@@ -11,6 +11,9 @@ namespace Homeport.Platform.Portal.AdminApi;
 /// <typeparam name="TValue">The type of the value on success.</typeparam>
 public sealed class AdminResult<TValue>
 {
+    /// <summary>
+    /// Creates a result; the factories set exactly one of value, problem and sign-in.
+    /// </summary>
     private AdminResult(TValue? value, ProblemResponse? problem, bool signInRequired)
     {
         Value = value;

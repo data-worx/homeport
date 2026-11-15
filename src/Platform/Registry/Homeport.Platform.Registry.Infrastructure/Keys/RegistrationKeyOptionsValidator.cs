@@ -14,6 +14,9 @@ internal sealed class RegistrationKeyOptionsValidator : IValidateOptions<Registr
 {
     private const string Section = $"{RegistrationKeyOptions.SectionName}:{nameof(RegistrationKeyOptions.RegistrationKeys)}";
 
+    /// <summary>
+    /// Fails on a reserved module id and on an empty key or too many keys for one module.
+    /// </summary>
     public ValidateOptionsResult Validate(string? name, RegistrationKeyOptions options)
     {
         var failures = new List<string>();

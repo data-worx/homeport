@@ -47,6 +47,7 @@ public sealed class SigningKeys : IDisposable
     /// <summary>The public keys the gateway publishes, the signing key first.</summary>
     public JsonWebKeySetResponse Jwks { get; }
 
+    /// <summary>Disposes the keys.</summary>
     public void Dispose()
     {
         current.Dispose();

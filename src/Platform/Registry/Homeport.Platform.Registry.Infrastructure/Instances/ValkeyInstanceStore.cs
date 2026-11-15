@@ -17,17 +17,20 @@ internal sealed class ValkeyInstanceStore(IConnectionMultiplexer valkey) : IInst
     /// <summary>The prefix of every key the registry writes.</summary>
     internal const string KeyPrefix = "homeport:registry:instances:";
 
+    /// <inheritdoc />
     public async Task SaveAsync(Instance instance, TimeSpan lifetime, CancellationToken cancellationToken)
     {
         var value = JsonSerializer.SerializeToUtf8Bytes(instance);
         await valkey.GetDatabase().StringSetAsync(Key(instance.Manifest.Id, instance.InstanceId), value, lifetime);
     }
 
+    /// <inheritdoc />
     public Task<bool> RenewAsync(string moduleId, string instanceId, TimeSpan lifetime, CancellationToken cancellationToken)
     {
         return valkey.GetDatabase().KeyExpireAsync(Key(moduleId, instanceId), lifetime);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<Instance>> ListAsync(CancellationToken cancellationToken)
     {
         var keys = new List<RedisKey>();
@@ -53,6 +56,7 @@ internal sealed class ValkeyInstanceStore(IConnectionMultiplexer valkey) : IInst
             .ToList();
     }
 
+    /// <summary>The key of an instance.</summary>
     private static string Key(string moduleId, string instanceId)
     {
         return $"{KeyPrefix}{moduleId}:{instanceId}";

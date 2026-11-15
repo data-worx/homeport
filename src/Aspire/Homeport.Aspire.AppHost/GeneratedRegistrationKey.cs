@@ -14,13 +14,16 @@ internal sealed class GeneratedRegistrationKey : ParameterDefault
 {
     private const int KeyBytes = 32;
 
+    /// <summary>Generates a random key, hex-encoded.</summary>
     public override string GetDefaultValue()
     {
         return Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(KeyBytes));
     }
 
-    // Writes no default: a published deployment never gets a generated key,
-    // the operator supplies their own (ADR-0012).
+    /// <summary>
+    /// Writes no default: a published deployment never gets a generated key,
+    /// the operator supplies their own (ADR-0012).
+    /// </summary>
     public override void WriteToManifest(ManifestPublishingContext context)
     {
     }

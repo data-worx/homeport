@@ -30,6 +30,10 @@ internal sealed class RegistrationKeyHandler(
 
     private readonly ILogger logger = loggerFactory.CreateLogger<RegistrationKeyHandler>();
 
+    /// <summary>
+    /// Authenticates a request for a module whose bearer token is one of that module's registration
+    /// keys.
+    /// </summary>
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (Context.GetRouteValue(ModuleIdRouteValue) is not string moduleId)

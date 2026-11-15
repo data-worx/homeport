@@ -15,6 +15,7 @@ namespace Homeport.Platform.Metering.Infrastructure.Persistence;
 /// </summary>
 internal sealed class UsageStore(MeteringDbContext database, CurrentTenant tenant) : IUsageStore
 {
+    /// <inheritdoc />
     public async Task<bool> RecordAsync(UsageEvent usage, HourlyUsage hourly, DailyUsage daily, CancellationToken cancellationToken)
     {
         // Before the first connection opens, which the session setting is set on.

@@ -19,8 +19,10 @@ public sealed class Tenant
     /// <summary>Another tenant has the same name.</summary>
     public const string NameTakenCode = "tenant.name-taken";
 
+    /// <summary>The tenant's id.</summary>
     public required Guid Id { get; init; }
 
+    /// <summary>The tenant's name, unique among tenants.</summary>
     public required string Name { get; set; }
 
     /// <summary>
@@ -64,7 +66,10 @@ public sealed class Tenant
         return new Error(NameTakenCode, $"A tenant named '{name}' already exists.");
     }
 
-    // Unique compared case-sensitively: "Sales" and "sales" are two tenants.
+    /// <summary>
+    /// The trimmed name, unless it is empty, too long or taken. Unique compared
+    /// case-sensitively: "Sales" and "sales" are two tenants.
+    /// </summary>
     private static Result<string> CheckName(string name, IEnumerable<string> takenNames)
     {
         var trimmed = name?.Trim() ?? string.Empty;

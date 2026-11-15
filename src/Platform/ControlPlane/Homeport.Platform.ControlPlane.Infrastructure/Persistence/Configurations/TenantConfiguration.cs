@@ -13,6 +13,7 @@ namespace Homeport.Platform.ControlPlane.Infrastructure.Persistence.Configuratio
 /// </summary>
 internal sealed class TenantConfiguration : IEntityTypeConfiguration<Tenant>
 {
+    /// <summary>Maps the tenant onto its table.</summary>
     public void Configure(EntityTypeBuilder<Tenant> tenant)
     {
         tenant.Property(t => t.Id).ValueGeneratedNever();

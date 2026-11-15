@@ -23,6 +23,7 @@ public sealed record UsageQuery
     /// <summary>The name of <see cref="UsageGranularity.Day"/> in a query.</summary>
     public const string DayName = "day";
 
+    /// <summary>Creates a query from parts that passed the checks.</summary>
     private UsageQuery(DateTimeOffset from, DateTimeOffset to, UsageGranularity granularity, string? moduleId, string? meter)
     {
         From = from;
@@ -86,7 +87,9 @@ public sealed record UsageQuery
             string.IsNullOrEmpty(meter) ? null : meter));
     }
 
-    // A day starts at UTC midnight: the day of the moment if it is midnight, else the next.
+    /// <summary>
+    /// A day starts at UTC midnight: the day of the moment if it is midnight, else the next.
+    /// </summary>
     private static DateOnly DayStartingAtOrAfter(DateTimeOffset moment)
     {
         var day = UsageBuckets.DayOf(moment);

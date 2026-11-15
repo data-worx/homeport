@@ -14,6 +14,9 @@ internal sealed class ControlPlaneDesignTimeDbContextFactory : IDesignTimeDbCont
 {
     private const string PlaceholderConnectionString = "Host=localhost";
 
+    /// <summary>
+    /// Creates the context for the EF tools, with a placeholder connection string.
+    /// </summary>
     public ControlPlaneDbContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<ControlPlaneDbContext>();
