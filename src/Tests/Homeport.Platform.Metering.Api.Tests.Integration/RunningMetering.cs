@@ -46,6 +46,8 @@ public sealed class RunningMetering : IAsyncLifetime
 
     private const string AppPassword = "app-password";
 
+    private const string AdminPassword = "admin-password";
+
     private const string InitScript = "init-homeport.sh";
 
     private const string InitDirectory = "/docker-entrypoint-initdb.d/";
@@ -68,6 +70,7 @@ public sealed class RunningMetering : IAsyncLifetime
         .WithDatabase(Database)
         .WithEnvironment("METERING_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("METERING_APP_PASSWORD", AppPassword)
+        .WithEnvironment("METERING_ADMIN_PASSWORD", AdminPassword)
         // The script prepares every service's schema; this fixture uses only metering's.
         .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", AppPassword)
