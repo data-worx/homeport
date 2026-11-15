@@ -2,6 +2,7 @@
 
 using Homeport.Platform.Portal.AdminApi;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
+using Homeport.Shared.Client.Platform.Registry.V1;
 using Homeport.Shared.Client.Problems;
 
 namespace Homeport.Platform.Portal.Tests.Unit;
@@ -92,4 +93,9 @@ internal sealed class StandInAdminApi : IAdminApi
             "0af7651916cd43dd8448eb211c80319c",
             new Dictionary<string, string[]> { [field] = [message] });
     }
+
+    /// <summary>The answer to <see cref="GetModulesAsync"/>.</summary>
+    internal AdminResult<ModulesResponse> Modules { get; set; } = AdminResult<ModulesResponse>.Success(new ModulesResponse([]));
+
+    public Task<AdminResult<ModulesResponse>> GetModulesAsync(CancellationToken cancellationToken) => Task.FromResult(Modules);
 }

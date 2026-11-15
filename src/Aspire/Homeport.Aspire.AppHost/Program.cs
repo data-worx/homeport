@@ -325,7 +325,12 @@ public static class Program
             // endpoint is the AppHost's alone.
             portal.WithHttpsEndpoint(port: PortalPort, name: PortalEndpoint)
                 .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath, endpointName: PortalEndpoint)
-                .WithEnvironment("ASPNETCORE_ENVIRONMENT", Environments.Development);
+                .WithEnvironment("ASPNETCORE_ENVIRONMENT", Environments.Development)
+
+                // The gateway serves its API docs in a local run only
+                // (ADR-0017), so only there the portal links a module to its
+                // document, at the address the browser reaches the gateway at.
+                .WithEnvironment("ApiDocs__Url", ReferenceExpression.Create($"{gateway.GetEndpoint(Uri.UriSchemeHttp)}{ApiDocsPath}"));
         }
         else
         {

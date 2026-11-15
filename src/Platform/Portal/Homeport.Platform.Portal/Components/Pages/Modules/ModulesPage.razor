@@ -1,0 +1,199 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/modules"
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Platform.Portal.ApiDocs
+@using Homeport.Shared.Client.Platform.Registry.V1
+@using Microsoft.Extensions.Options
+@inject IAdminApi AdminApi
+@inject IOptions<ApiDocsOptions> ApiDocs
+@inject TimeProvider Clock
+@inject NavigationManager Navigation
+
+<PageTitle>Modules · Homeport</PageTitle>
+
+<div class="d-flex align-center justify-space-between flex-wrap gap-4 mb-6">
+    <div>
+        <MudText Typo="Typo.h4" HtmlTag="h1">Modules</MudText>
+        <MudText Class="mud-text-secondary">@Summary</MudText>
+    </div>
+    @if (_modules is not null || _problem.Problem is not null)
+    {
+        <MudButton Variant="Variant.Outlined" StartIcon="@HomeportIcons.Lucide.RefreshCw" OnClick="LoadAsync" data-action="refresh">Refresh</MudButton>
+    }
+</div>
+
+<MudGrid Spacing="4">
+    <MudItem xs="12" lg="7">
+        <MudPaper Outlined="true">
+            @if (_problem.Problem is not null)
+            {
+                <ListError Title="Could not load modules" State="_problem" OnRetry="LoadAsync" />
+            }
+            else if (_modules is null)
+            {
+                <ListLoading Label="Loading modules" />
+            }
+            else if (_modules.Count == 0)
+            {
+                <ListEmpty Illustration="spot-empty-berth.svg"
+                           Title="No modules registered"
+                           Text="A module registers itself with the registry when it starts, with its registration key, and stays listed while it sends heartbeats." />
+            }
+            else
+            {
+                <MudSimpleTable Hover="true" Dense="false" Elevation="0" data-modules>
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Version</th>
+                            <th>Contract</th>
+                            <th class="hp-num">Instances</th>
+                            <th class="hp-num">Heartbeat</th>
+                            <th class="hp-num">Routes</th>
+                            @if (ApiDocs.Value.Url is not null)
+                            {
+                                <th>API docs</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var module in _modules)
+                        {
+                            var selected = module.ModuleId == _selected?.ModuleId;
+                            <tr @key="module.ModuleId" @onclick="() => Select(module)" aria-selected="@(selected ? "true" : "false")"
+                                class="@(selected ? "hp-selected" : null)" style="cursor:pointer" data-module="@module.ModuleId">
+                                <td><MudLink Class="hp-mono" OnClick="() => Select(module)">@module.ModuleId</MudLink></td>
+                                <td class="hp-mono" style="word-break:break-all" data-version>@VersionsOf(module)</td>
+                                <td class="hp-mono" data-contract>@ContractsOf(module)</td>
+                                <td class="hp-num" data-instances>@module.Instances.Count</td>
+                                <td class="hp-num" data-heartbeat>@AgeOf(module.Instances.Max(instance => instance.LastHeartbeatAt))</td>
+                                <td class="hp-num" data-routes>@module.Routes.Count</td>
+                                @if (ApiDocs.Value.DocumentOf(module.ModuleId) is { } document)
+                                {
+                                    <td>
+                                        <MudLink Href="@document.ToString()" Target="_blank" rel="noopener" data-docs @onclick:stopPropagation="true">
+                                            OpenAPI <MudIcon Icon="@HomeportIcons.Lucide.ExternalLink" Size="Size.Small" Style="vertical-align:middle" />
+                                        </MudLink>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+        </MudPaper>
+    </MudItem>
+    @if (_selected is { } selected)
+    {
+        <MudItem xs="12" lg="5">
+            <MudPaper Outlined="true" Class="pa-4" data-module-detail>
+                <MudText Typo="Typo.h5" HtmlTag="h2" Class="hp-mono mb-1">@selected.ModuleId</MudText>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary mb-4">Reached at <span class="hp-mono">/modules/@selected.ModuleId/</span></MudText>
+
+                <MudText Typo="Typo.h6" HtmlTag="h3" Class="mb-2">Instances</MudText>
+                <MudSimpleTable Dense="true" Elevation="0" Class="mb-4" data-instances-of="@selected.ModuleId">
+                    <thead>
+                        <tr>
+                            <th>Instance</th>
+                            <th>Version</th>
+                            <th class="hp-num">Heartbeat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var instance in selected.Instances)
+                        {
+                            <tr @key="instance.InstanceId" data-instance="@instance.InstanceId">
+                                <td>
+                                    <span class="hp-mono">@instance.InstanceId</span>
+                                    <div class="hp-mono mud-text-secondary hp-id">@instance.Address</div>
+                                </td>
+                                <td class="hp-mono" style="word-break:break-all" data-version>@instance.Version · v@(instance.ContractVersion)</td>
+                                <td class="hp-num" data-heartbeat>@AgeOf(instance.LastHeartbeatAt)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+
+                <MudText Typo="Typo.h6" HtmlTag="h3" Class="mb-2">Routes</MudText>
+                <MudSimpleTable Dense="true" Elevation="0" data-routes-of="@selected.ModuleId">
+                    <thead>
+                        <tr>
+                            <th>Route</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var route in selected.Routes)
+                        {
+                            <tr @key="(route.Method, route.Path)" data-route="@($"{route.Method} {route.Path}")">
+                                <td>
+                                    <span class="hp-mono">@route.Method @route.Path</span>
+                                    <div class="hp-mono mud-text-secondary hp-id">@route.Scope · @route.Meter × @route.Quantity</div>
+                                </td>
+                                <td class="hp-mono" style="word-break:break-all" data-version>@route.Version</td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary mt-4">
+                    Where instances declare a route differently, the newest version's declaration applies. An instance drops out 30 s after its last heartbeat.
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private readonly ProblemState _problem = new();
+    private List<ModuleResponse>? _modules;
+    private ModuleResponse? _selected;
+    private DateTimeOffset _loadedAt;
+
+    private string Summary => _modules is null
+        ? "The modules registered with the registry"
+        : $"{_modules.Count} {(_modules.Count == 1 ? "module" : "modules")} · registered with the registry";
+
+    // After the first render, so the prerendered page shows the loading state
+    // and the list is read once, by the circuit.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _problem.Clear();
+        _modules = null;
+        var result = await AdminApi.GetModulesAsync(CancellationToken.None);
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+            return;
+        }
+
+        if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+            return;
+        }
+
+        _loadedAt = Clock.GetUtcNow();
+        _modules = result.Value!.Modules.ToList();
+        _selected = _modules.FirstOrDefault(module => module.ModuleId == _selected?.ModuleId) ?? _modules.FirstOrDefault();
+    }
+
+    private void Select(ModuleResponse module) => _selected = module;
+
+    // The age when the list was read: it does not tick, Refresh reads it again.
+    private string AgeOf(DateTimeOffset heartbeat) => $"{Math.Max(0, (int)(_loadedAt - heartbeat).TotalSeconds)} s";
+
+    private static string VersionsOf(ModuleResponse module) =>
+        string.Join(", ", module.Instances.Select(instance => instance.Version).Distinct(StringComparer.Ordinal));
+
+    private static string ContractsOf(ModuleResponse module) =>
+        string.Join(", ", module.Instances.Select(instance => instance.ContractVersion).Distinct().Order().Select(version => $"v{version}"));
+}

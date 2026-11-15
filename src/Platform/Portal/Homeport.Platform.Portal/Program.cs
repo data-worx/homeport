@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Platform.Portal.AdminApi;
+using Homeport.Platform.Portal.ApiDocs;
 using Homeport.Platform.Portal.Components;
 using Homeport.Platform.Portal.SignIn;
 using Homeport.Shared.ServiceDefaults;
@@ -30,6 +31,7 @@ public sealed class Program
         builder.Services.AddTrustedProxies();
         builder.Services.AddOperatorSignIn();
         builder.Services.AddAdminApi();
+        builder.Services.AddApiDocsLink();
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
@@ -74,9 +76,10 @@ public sealed class Program
             var signIn = app.Services.GetRequiredService<IOptions<SignInOptions>>().Value;
             var proxies = app.Services.GetRequiredService<IOptions<TrustedProxiesOptions>>().Value;
             var adminApi = app.Services.GetRequiredService<IOptions<AdminApiOptions>>().Value;
+            var apiDocs = app.Services.GetRequiredService<IOptions<ApiDocsOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Portal started on {Urls}: operators sign in at {Authority} as client {ClientId}, access with the claim {ClaimType} = {ClaimValue}, names from {NameClaim}, admin API at {AdminApiUrl}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}",
+                "Portal started on {Urls}: operators sign in at {Authority} as client {ClientId}, access with the claim {ClaimType} = {ClaimValue}, names from {NameClaim}, admin API at {AdminApiUrl}, API docs {ApiDocs}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}",
                 app.Urls,
                 signIn.Authority,
                 signIn.ClientId,
@@ -84,6 +87,7 @@ public sealed class Program
                 signIn.ClaimValue,
                 signIn.NameClaim,
                 adminApi.Url,
+                apiDocs.Url?.ToString() ?? "not linked",
                 proxies.Proxies,
                 proxies.Networks);
         });

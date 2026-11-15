@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
+using Homeport.Shared.Client.Platform.Registry.V1;
 
 namespace Homeport.Platform.Portal.AdminApi;
 
@@ -42,4 +43,7 @@ public interface IAdminApi
 
     /// <summary>Removes the client <paramref name="clientId"/>; on success the value is its client id.</summary>
     Task<AdminResult<string>> RemoveClientAsync(string clientId, CancellationToken cancellationToken);
+
+    /// <summary>Every module with at least one live instance, ordered by module id.</summary>
+    Task<AdminResult<ModulesResponse>> GetModulesAsync(CancellationToken cancellationToken);
 }
