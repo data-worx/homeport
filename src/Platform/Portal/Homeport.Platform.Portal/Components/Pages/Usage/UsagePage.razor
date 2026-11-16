@@ -154,6 +154,7 @@
     private string _meter = AllValues;
     private string _exportGranularity = UsageApi.Day;
     private bool _exporting;
+    private int _reads;
     private IJSObjectReference? _download;
 
     private string Summary => _table is null
@@ -185,9 +186,14 @@
     {
         _problem.Clear();
         _table = null;
+        var read = ++_reads;
         var tenants = AdminApi.GetTenantsAsync(CancellationToken.None);
         var usage = AdminApi.GetUsageAsync(FilterOf(UsageApi.Day), CancellationToken.None);
         await Task.WhenAll(tenants, usage);
+        if (read != _reads)
+        {
+            return;
+        }
 
         if (tenants.Result.SignInRequired || usage.Result.SignInRequired)
         {
@@ -205,12 +211,20 @@
         Show(usage.Result.Value!);
     }
 
-    // A changed filter reads the usage again, without the tenants.
+    // A changed filter reads the usage again, without the tenants. Only the
+    // latest read is shown: an earlier one that answers later is of filters
+    // the page no longer shows.
     private async Task ReloadAsync()
     {
         _problem.Clear();
         _table = null;
+        var read = ++_reads;
         var result = await AdminApi.GetUsageAsync(FilterOf(UsageApi.Day), CancellationToken.None);
+        if (read != _reads)
+        {
+            return;
+        }
+
         if (result.SignInRequired)
         {
             Navigation.SignInAgain();

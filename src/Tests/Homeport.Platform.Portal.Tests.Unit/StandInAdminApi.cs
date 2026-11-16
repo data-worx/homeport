@@ -104,6 +104,9 @@ internal sealed class StandInAdminApi : IAdminApi
     internal AdminResult<AdminUsageResponse> Usage { get; set; } =
         AdminResult<AdminUsageResponse>.Success(new AdminUsageResponse(DateTime.UnixEpoch, DateTime.UnixEpoch, UsageApi.Day, []));
 
+    /// <summary>The answer to <see cref="GetUsageAsync"/> by its filter, where a test sets one; <see cref="Usage"/> otherwise.</summary>
+    internal Func<UsageFilter, Task<AdminResult<AdminUsageResponse>>>? UsageFor { get; set; }
+
     /// <summary>The filters <see cref="GetUsageAsync"/> was called with, in order.</summary>
     internal List<UsageFilter> UsageReads { get; } = [];
 
@@ -116,7 +119,7 @@ internal sealed class StandInAdminApi : IAdminApi
     public Task<AdminResult<AdminUsageResponse>> GetUsageAsync(UsageFilter filter, CancellationToken cancellationToken)
     {
         UsageReads.Add(filter);
-        return Task.FromResult(Usage);
+        return UsageFor?.Invoke(filter) ?? Task.FromResult(Usage);
     }
 
     public Task<AdminResult<byte[]>> ExportUsageAsync(UsageFilter filter, string mediaType, CancellationToken cancellationToken)

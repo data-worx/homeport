@@ -145,6 +145,25 @@ public sealed class UsagePageTests : PortalTestContext
     }
 
     [Fact]
+    public void Shows_The_Usage_Of_The_Latest_Filters_When_An_Earlier_Read_Answers_Later()
+    {
+        UsageOf(new AdminUsageEntryResponse(November3, Sales.Id, "echo", "requests", 5));
+        var (page, _) = RenderWithProviders<UsagePage>();
+        page.WaitForElement("[data-tenant]");
+        var earlier = new TaskCompletionSource<AdminResult<AdminUsageResponse>>();
+        var latest = ResultOf(new AdminUsageEntryResponse(November3, Support.Id, "echo", "requests", 7));
+        Api.UsageFor = filter => filter.Meter is null ? earlier.Task : Task.FromResult(latest);
+
+        var selects = page.FindComponents<MudSelect<string>>();
+        page.InvokeAsync(() => selects.Single(select => select.Instance.Label == "Module").Instance.ValueChanged.InvokeAsync("echo"));
+        page.InvokeAsync(() => selects.Single(select => select.Instance.Label == "Meter").Instance.ValueChanged.InvokeAsync("requests"));
+        page.WaitForElement($"[data-tenant='{Support.Id}']");
+        page.InvokeAsync(() => earlier.SetResult(ResultOf(new AdminUsageEntryResponse(November3, Sales.Id, "echo", "requests", 5))));
+
+        Assert.Equal([Support.Id.ToString()], page.FindAll("[data-tenant]").Select(row => row.GetAttribute("data-tenant")));
+    }
+
+    [Fact]
     public void Downloads_The_Csv_Of_The_Filters_Per_Hour_When_Hour_Is_Chosen()
     {
         UsageOf(new AdminUsageEntryResponse(November3, Sales.Id, "echo", "requests", 5));
@@ -211,8 +230,11 @@ public sealed class UsagePageTests : PortalTestContext
 
     private void UsageOf(params AdminUsageEntryResponse[] entries)
     {
-        Api.Usage = AdminResult<AdminUsageResponse>.Success(new AdminUsageResponse(November3, November4.AddDays(1), UsageApi.Day, entries));
+        Api.Usage = ResultOf(entries);
     }
+
+    private static AdminResult<AdminUsageResponse> ResultOf(params AdminUsageEntryResponse[] entries) =>
+        AdminResult<AdminUsageResponse>.Success(new AdminUsageResponse(November3, November4.AddDays(1), UsageApi.Day, entries));
 
     // The tenant's name, or the label of the totals, and the quantity of each column.
     private static string RowOf(AngleSharp.Dom.IElement row) => string.Join(
