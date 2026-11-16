@@ -31,6 +31,8 @@ public sealed class ControlPlaneDatabase : IAsyncLifetime
 
     private const string AppPassword = "app-password";
 
+    private const string AdminPassword = "admin-password";
+
     private const string InitScript = "init-homeport.sh";
 
     private const string InitDirectory = "/docker-entrypoint-initdb.d/";
@@ -47,6 +49,7 @@ public sealed class ControlPlaneDatabase : IAsyncLifetime
         // The script prepares every service's schema; this fixture uses only the control plane's.
         .WithEnvironment("METERING_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("METERING_APP_PASSWORD", AppPassword)
+        .WithEnvironment("METERING_ADMIN_PASSWORD", AdminPassword)
         .WithResourceMapping(new FileInfo(Path.Combine(AppContext.BaseDirectory, InitScript)), InitDirectory, fileMode: Executable)
         .Build();
 

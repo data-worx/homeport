@@ -6,6 +6,7 @@ using System.Net.Mime;
 using System.Text;
 using Homeport.Platform.Portal.AdminApi;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
+using Homeport.Shared.Client.Platform.Metering.V1;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Homeport.Platform.Portal.Tests.Unit.AdminApi;
@@ -15,6 +16,8 @@ public sealed class AdminApiClientTests
     private static readonly Uri AdminEndpoint = new("http://gateway:8000");
 
     private static readonly Guid TenantId = Guid.Parse("0193a5f0-0000-7000-8000-000000000001");
+
+    private static readonly DateTimeOffset Day = new(2026, 11, 4, 0, 0, 0, TimeSpan.Zero);
 
     private static readonly Guid PlanId = Guid.Parse("0193a5f0-0000-7000-8000-0000000000b1");
 
@@ -207,6 +210,60 @@ public sealed class AdminApiClientTests
             Assert.Equal(
                 (HttpMethod.Delete, "http://gateway:8000/platform/v1/admin/clients/billing%20service", "billing service"),
                 (request.Method, request.RequestUri!.AbsoluteUri, result.Value));
+        }
+    }
+
+    public sealed class GetUsageAsync
+    {
+        private readonly StandInIdentityProvider identityProvider = new();
+        private readonly StandInHandler gateway = new();
+
+        [Fact]
+        public async Task Asks_For_The_Period_Granularity_And_Every_Filter_Set()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(new AdminUsageResponse(DateTime.UnixEpoch, DateTime.UnixEpoch, UsageApi.Day, [])) };
+            var filter = new UsageFilter(Day, Day.AddDays(1), UsageApi.Day, TenantId, "echo", "requests");
+
+            await ClientOf(identityProvider, gateway).GetUsageAsync(filter, CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal(
+                $"http://gateway:8000/platform/v1/admin/usage?from=2026-11-04T00:00:00Z&to=2026-11-05T00:00:00Z&granularity=day&tenant={TenantId}&module=echo&meter=requests",
+                Uri.UnescapeDataString(request.RequestUri!.AbsoluteUri));
+        }
+
+        [Fact]
+        public async Task Leaves_Out_The_Filters_That_Are_Not_Set()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(new AdminUsageResponse(DateTime.UnixEpoch, DateTime.UnixEpoch, UsageApi.Hour, [])) };
+            var filter = new UsageFilter(Day, Day.AddDays(1), UsageApi.Hour, Tenant: null, Module: null, Meter: null);
+
+            await ClientOf(identityProvider, gateway).GetUsageAsync(filter, CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal(
+                "http://gateway:8000/platform/v1/admin/usage?from=2026-11-04T00:00:00Z&to=2026-11-05T00:00:00Z&granularity=hour",
+                Uri.UnescapeDataString(request.RequestUri!.AbsoluteUri));
+        }
+    }
+
+    public sealed class ExportUsageAsync
+    {
+        private readonly StandInIdentityProvider identityProvider = new();
+        private readonly StandInHandler gateway = new();
+
+        [Fact]
+        public async Task Asks_For_The_Media_Type_And_Returns_The_Body_As_It_Is()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("period,tenant,module,meter,quantity\r\n", Encoding.UTF8, UsageApi.CsvMediaType) };
+            var filter = new UsageFilter(Day, Day.AddDays(1), UsageApi.Hour, Tenant: null, Module: null, Meter: null);
+
+            var result = await ClientOf(identityProvider, gateway).ExportUsageAsync(filter, UsageApi.CsvMediaType, CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal(
+                (UsageApi.CsvMediaType, "period,tenant,module,meter,quantity\r\n"),
+                (Assert.Single(request.Headers.Accept).MediaType, Encoding.UTF8.GetString(result.Value!)));
         }
     }
 

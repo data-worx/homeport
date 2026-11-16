@@ -1,0 +1,31 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+
+/* The filters in one row that wraps, each no wider than its values need. */
+.hp-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    max-width: 1000px;
+}
+
+/* A table with many modules and meters scrolls on its own, not the page. */
+.hp-scroll {
+    overflow-x: auto;
+}
+
+.hp-id {
+    font-size: 12px;
+}
+
+/* The totals, set apart from the tenants above them. */
+.hp-totals td {
+    font-weight: 600;
+    border-top: 2px solid var(--mud-palette-divider);
+}
+
+/* Quantities to the right, as portal.css means .hp-num; MudBlazor's own
+   rule for a cell of a simple table outranks the global one. */
+th.hp-num,
+td.hp-num {
+    text-align: right;
+}

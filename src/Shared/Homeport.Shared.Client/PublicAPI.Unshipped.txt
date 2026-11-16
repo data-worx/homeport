@@ -468,3 +468,44 @@ static Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.operator !=(
 static Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.PlanResponse? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.PlansResponse? right) -> bool
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageApi
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse!
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.AdminUsageEntryResponse(System.DateTime Period, System.Guid Tenant, string! Module, string! Meter, long Quantity) -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Deconstruct(out System.DateTime Period, out System.Guid Tenant, out string! Module, out string! Meter, out long Quantity) -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Equals(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse? other) -> bool
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Meter.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Meter.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Module.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Module.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Period.get -> System.DateTime
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Period.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Quantity.get -> long
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Quantity.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Tenant.get -> System.Guid
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Tenant.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse!
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.AdminUsageResponse(System.DateTime From, System.DateTime To, string! Granularity, System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse!>! Usage) -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.Deconstruct(out System.DateTime From, out System.DateTime To, out string! Granularity, out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse!>! Usage) -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.Equals(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? other) -> bool
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.From.get -> System.DateTime
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.From.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.Granularity.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.Granularity.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.To.get -> System.DateTime
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.To.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.Usage.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse!>!
+Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.Usage.init -> void
+const Homeport.Shared.Client.Platform.Metering.V1.AdminUsageApi.Path = "/v1/admin/usage" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.AdminUsageApi.TenantParameter = "tenant" -> string!
+override Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.ToString() -> string!
+static Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? right) -> bool

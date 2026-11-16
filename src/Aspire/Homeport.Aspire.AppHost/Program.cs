@@ -80,11 +80,13 @@ public static class Program
         // them (ADR-0009).
         // One database for all of Homeport (ADR-0005). The init script gives each
         // service a schema, an owner role for its migrations and an app role to
-        // run as; the passwords are generated like the server's own.
+        // run as, and metering the admin role it reads every tenant's usage
+        // as (ADR-0020); the passwords are generated like the server's own.
         var controlPlaneOwnerPassword = builder.AddParameter("control-plane-owner-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var controlPlaneAppPassword = builder.AddParameter("control-plane-app-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var meteringOwnerPassword = builder.AddParameter("metering-owner-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var meteringAppPassword = builder.AddParameter("metering-app-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
+        var meteringAdminPassword = builder.AddParameter("metering-admin-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
 
         var postgres = builder.AddPostgres("postgres")
             .WithImageTag("18.6-alpine@sha256:123b17998ccaf47e53b502e8c6a1e79afd8f579c6f3eec83c563da026f957395")
@@ -94,6 +96,7 @@ public static class Program
             .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", controlPlaneAppPassword)
             .WithEnvironment("METERING_OWNER_PASSWORD", meteringOwnerPassword)
             .WithEnvironment("METERING_APP_PASSWORD", meteringAppPassword)
+            .WithEnvironment("METERING_ADMIN_PASSWORD", meteringAdminPassword)
             .WithInitFiles(InitFiles);
         var postgresEndpoint = postgres.Resource.PrimaryEndpoint;
 
@@ -281,7 +284,8 @@ public static class Program
         // service starts after it completed, runs as the app role and
         // consumes the gateway's usage events with a broker user of its own.
         // It serves the usage export the gateway forwards, with caller tokens
-        // it validates against the gateway's JWKS (ADR-0019).
+        // it validates against the gateway's JWKS (ADR-0019), and reads the
+        // usage of every tenant for the operator as the admin role (ADR-0020).
         var meteringMigrate = builder.AddProject<Projects.Homeport_Platform_Metering_Api>("metering-migrate", launchProfileName: null)
             .WithArgs("migrate")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-metering-migrate")
@@ -291,6 +295,7 @@ public static class Program
         var metering = builder.AddProject<Projects.Homeport_Platform_Metering_Api>("metering")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-metering")
             .WithEnvironment("ConnectionStrings__metering", ConnectionString(postgresEndpoint, "metering_app", meteringAppPassword))
+            .WithEnvironment("ConnectionStrings__metering-admin", ConnectionString(postgresEndpoint, "metering_admin", meteringAdminPassword))
             .WithEnvironment("ConnectionStrings__rabbitmq", BrokerConnectionString(rabbitMqEndpoint, "metering", meteringRabbitMqPassword))
             .WithReference(gateway)
             .WaitForCompletion(meteringMigrate)

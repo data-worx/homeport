@@ -3,7 +3,10 @@
 #
 # Prepares the Homeport database: per service a schema, an owner role that
 # runs the migrations and holds the DDL rights, and an app role the service
-# connects as, which reads and writes the tables but cannot change them.
+# connects as, which reads and writes the tables but cannot change them. A
+# service that serves the operator tenant data also gets an admin role: it
+# may use the schema, and the service's migrations grant it what it reads
+# and its row-level security policies (ADR-0020).
 #
 # The PostgreSQL image runs it once, when it initialises an empty data
 # directory. Against a server of your own, run it once as a superuser with
@@ -31,5 +34,18 @@ ALTER DEFAULT PRIVILEGES FOR ROLE :"owner" IN SCHEMA :"schema"
 SQL
 }
 
+create_admin_role() {
+  local schema="$1" admin_password="$2"
+
+  psql --no-psqlrc --set ON_ERROR_STOP=1 \
+    --username "${POSTGRES_USER}" --dbname "${POSTGRES_DB}" \
+    --set schema="${schema}" \
+    --set admin="${schema}_admin" --set admin_password="${admin_password}" <<'SQL'
+CREATE ROLE :"admin" LOGIN PASSWORD :'admin_password';
+GRANT USAGE ON SCHEMA :"schema" TO :"admin";
+SQL
+}
+
 create_service_schema control_plane "${CONTROL_PLANE_OWNER_PASSWORD:?}" "${CONTROL_PLANE_APP_PASSWORD:?}"
 create_service_schema metering "${METERING_OWNER_PASSWORD:?}" "${METERING_APP_PASSWORD:?}"
+create_admin_role metering "${METERING_ADMIN_PASSWORD:?}"

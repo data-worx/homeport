@@ -32,9 +32,13 @@ public sealed class MeteringDatabase : IAsyncLifetime
 
     private const string AppRole = "metering_app";
 
+    private const string AdminRole = "metering_admin";
+
     private const string OwnerPassword = "owner-password";
 
     private const string AppPassword = "app-password";
+
+    private const string AdminPassword = "admin-password";
 
     private const string InitScript = "init-homeport.sh";
 
@@ -49,6 +53,7 @@ public sealed class MeteringDatabase : IAsyncLifetime
         .WithDatabase(Database)
         .WithEnvironment("METERING_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("METERING_APP_PASSWORD", AppPassword)
+        .WithEnvironment("METERING_ADMIN_PASSWORD", AdminPassword)
         // The script prepares every service's schema; this fixture uses only metering's.
         .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", AppPassword)
@@ -59,6 +64,9 @@ public sealed class MeteringDatabase : IAsyncLifetime
 
     /// <summary>The app role's connection string, which the service runs on.</summary>
     internal string AppConnectionString => ConnectionString(AppRole, AppPassword);
+
+    /// <summary>The admin role's connection string, which the operator's reads run on.</summary>
+    internal string AdminConnectionString => ConnectionString(AdminRole, AdminPassword);
 
     private IHost App => app ?? throw new InvalidOperationException("The database has not been prepared.");
 
@@ -85,6 +93,25 @@ public sealed class MeteringDatabase : IAsyncLifetime
             200,
             5,
             "0af7651916cd43dd8448eb211c80319c");
+    }
+
+    /// <summary>
+    /// Runs <paramref name="sql"/> on <paramref name="connectionString"/>,
+    /// without a session tenant, with <paramref name="parameters"/> as
+    /// <c>$1</c>, <c>$2</c>, and so on.
+    /// </summary>
+    internal static async Task<object?> ExecuteScalarAsync(string connectionString, string sql, params object[] parameters)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        await using var command = new NpgsqlCommand(sql, connection);
+        foreach (var parameter in parameters)
+        {
+            command.Parameters.Add(new NpgsqlParameter { Value = parameter });
+        }
+
+        return await command.ExecuteScalarAsync();
     }
 
     public async Task InitializeAsync()

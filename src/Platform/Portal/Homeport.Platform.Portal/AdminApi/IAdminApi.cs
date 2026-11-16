@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
+using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Client.Platform.Registry.V1;
 
 namespace Homeport.Platform.Portal.AdminApi;
@@ -46,4 +47,13 @@ public interface IAdminApi
 
     /// <summary>Every module with at least one live instance, ordered by module id.</summary>
     Task<AdminResult<ModulesResponse>> GetModulesAsync(CancellationToken cancellationToken);
+
+    /// <summary>The usage of every tenant, or of the one <paramref name="filter"/> names; every read is audited.</summary>
+    Task<AdminResult<AdminUsageResponse>> GetUsageAsync(UsageFilter filter, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The usage as the admin API writes it in <paramref name="mediaType"/>, JSON or
+    /// <see cref="UsageApi.CsvMediaType"/>, for a download; every read is audited.
+    /// </summary>
+    Task<AdminResult<byte[]>> ExportUsageAsync(UsageFilter filter, string mediaType, CancellationToken cancellationToken);
 }

@@ -11,6 +11,7 @@ services:
       CONTROL_PLANE_APP_PASSWORD: "${CONTROL_PLANE_APP_PASSWORD}"
       METERING_OWNER_PASSWORD: "${METERING_OWNER_PASSWORD}"
       METERING_APP_PASSWORD: "${METERING_APP_PASSWORD}"
+      METERING_ADMIN_PASSWORD: "${METERING_ADMIN_PASSWORD}"
     expose:
       - "5432"
     volumes:
@@ -240,6 +241,7 @@ services:
       HTTP_PORTS: "${METERING_PORT}"
       OTEL_SERVICE_NAME: "homeport-metering"
       ConnectionStrings__metering: "Host=postgres;Port=5432;Database=homeport;Username=metering_app;Password=${METERING_APP_PASSWORD}"
+      ConnectionStrings__metering-admin: "Host=postgres;Port=5432;Database=homeport;Username=metering_admin;Password=${METERING_ADMIN_PASSWORD}"
       ConnectionStrings__rabbitmq: "amqp://metering:${METERING_RABBITMQ_PASSWORD}@rabbitmq:5672"
       GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
       services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"

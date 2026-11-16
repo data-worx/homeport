@@ -7,13 +7,17 @@ using Homeport.Shared.Client.Platform.Metering.V1;
 namespace Homeport.Platform.Metering.Api.Export;
 
 /// <summary>
-/// Writes a <see cref="UsageResponse"/> as CSV (RFC 4180): a header row, one
-/// row per entry, CRLF line breaks, and a field quoted where it needs it.
+/// Writes a <see cref="UsageResponse"/> or an <see cref="AdminUsageResponse"/>
+/// as CSV (RFC 4180): a header row, one row per entry, CRLF line breaks, and a
+/// field quoted where it needs it.
 /// </summary>
 internal static class UsageCsv
 {
-    /// <summary>The header row's columns, in order.</summary>
+    /// <summary>The header row's columns of a tenant's own usage, in order.</summary>
     internal static readonly string[] Columns = ["period", "module", "meter", "quantity"];
+
+    /// <summary>The header row's columns of the usage of every tenant, in order.</summary>
+    internal static readonly string[] AdminColumns = ["period", "tenant", "module", "meter", "quantity"];
 
     private const string LineBreak = "\r\n";
 
@@ -38,6 +42,26 @@ internal static class UsageCsv
         {
             AppendRow(csv, [
                 entry.Period.ToString(PeriodFormat, CultureInfo.InvariantCulture),
+                entry.Module,
+                entry.Meter,
+                entry.Quantity.ToString(CultureInfo.InvariantCulture),
+            ]);
+        }
+
+        return csv.ToString();
+    }
+
+    /// <summary>The CSV text of <paramref name="usage"/>, with the tenant in every row.</summary>
+    internal static string Write(AdminUsageResponse usage)
+    {
+        var csv = new StringBuilder();
+        AppendRow(csv, AdminColumns);
+
+        foreach (var entry in usage.Usage)
+        {
+            AppendRow(csv, [
+                entry.Period.ToString(PeriodFormat, CultureInfo.InvariantCulture),
+                entry.Tenant.ToString(),
                 entry.Module,
                 entry.Meter,
                 entry.Quantity.ToString(CultureInfo.InvariantCulture),

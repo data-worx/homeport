@@ -7,6 +7,7 @@ using Homeport.Platform.Metering.Api.Messaging;
 using Homeport.Platform.Metering.Application;
 using Homeport.Platform.Metering.Infrastructure.Persistence;
 using Homeport.Shared.Authentication;
+using Homeport.Shared.Internal.Authorization;
 using Homeport.Shared.Internal.Platform.Metering;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +18,8 @@ namespace Homeport.Platform.Metering.Api;
 /// <summary>
 /// Metering: consumes the gateway's usage events and aggregates them per
 /// tenant, module, meter, hour and day, each event exactly once (ADR-0007),
-/// and exports a tenant's own usage to the gateway's forwarded requests.
+/// exports a tenant's own usage to the gateway's forwarded requests, and the
+/// usage of every tenant to the operator (ADR-0020).
 /// </summary>
 public sealed class Program
 {
@@ -48,15 +50,19 @@ public sealed class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
         builder.AddMeteringPersistence(MeteringPersistenceExtensions.AppConnectionName);
+        builder.AddMeteringAdministration();
+        builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddScoped<UsageRecording>();
         builder.Services.AddScoped<UsageExport>();
+        builder.Services.AddScoped<UsageAdministration>();
         builder.AddMeteringMessaging();
 
         // Only the gateway's tokens for metering; the export also needs the
-        // tenant and scope of a caller token (ADR-0019).
+        // tenant and scope of a caller token (ADR-0019), the admin endpoint
+        // the operator's caller token (ADR-0020).
         builder.Services.AddGatewayTokenAuthentication(MeteringService.Audience);
         builder.Services.AddSingleton<IAuthorizationHandler, UsageReaderHandler>();
-        builder.Services.AddAuthorizationBuilder()
+        builder.Services.AddPlatformPolicies()
             .AddPolicy(UsageReaderRequirement.Policy, policy => policy
                 .RequireAuthenticatedUser()
                 .AddRequirements(new UsageReaderRequirement()));

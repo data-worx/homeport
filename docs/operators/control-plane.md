@@ -12,7 +12,7 @@ see [the data model](../architecture/data-model.md).
 
 ## Preparing the database
 
-The database needs a schema and two roles per service before anything
+The database needs a schema and its roles per service before anything
 starts. [`deploy/postgres/init/init-homeport.sh`](../../deploy/postgres/init/init-homeport.sh)
 creates them, the control plane's and [metering's](metering.md#preparing-the-database):
 
@@ -35,6 +35,7 @@ export CONTROL_PLANE_OWNER_PASSWORD="$(openssl rand -hex 24)"
 export CONTROL_PLANE_APP_PASSWORD="$(openssl rand -hex 24)"
 export METERING_OWNER_PASSWORD="$(openssl rand -hex 24)"
 export METERING_APP_PASSWORD="$(openssl rand -hex 24)"
+export METERING_ADMIN_PASSWORD="$(openssl rand -hex 24)"
 createdb --username "${POSTGRES_USER}" "${POSTGRES_DB}"
 bash deploy/postgres/init/init-homeport.sh
 ```

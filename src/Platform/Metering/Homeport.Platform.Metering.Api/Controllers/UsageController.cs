@@ -73,6 +73,8 @@ public sealed class UsageController(UsageExport export, ILogger<UsageController>
     {
         UsageQuery.UnknownGranularityCode => UsageApi.GranularityParameter,
         UsageQuery.EmptyPeriodCode => UsageApi.ToParameter,
+        UsageQuery.ModuleTooLongCode => UsageApi.ModuleParameter,
+        UsageQuery.MeterTooLongCode => UsageApi.MeterParameter,
         _ => throw new ArgumentOutOfRangeException(nameof(errorCode), errorCode, "Every error of a usage query names its field."),
     };
 
