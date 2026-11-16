@@ -91,7 +91,7 @@ public sealed class AdminRoutesTests
     public sealed class Configured
     {
         [Fact]
-        public void Forwards_The_Tenant_Plan_And_Client_Endpoints_To_The_Control_Plane()
+        public void Forwards_The_Tenant_Plan_Client_And_Audit_Endpoints_To_The_Control_Plane()
         {
             var options = new PlatformRoutesOptions { ControlPlaneUrl = new Uri("http://control-plane:5000") };
 
@@ -113,6 +113,7 @@ public sealed class AdminRoutesTests
                     "GET /platform/v1/admin/clients/{clientId}",
                     "PUT /platform/v1/admin/clients/{clientId}",
                     "DELETE /platform/v1/admin/clients/{clientId}",
+                    "GET /platform/v1/admin/control-plane/audit",
                 ],
                 routes
                     .Where(route => route.ClusterId?.EndsWith("control-plane", StringComparison.Ordinal) == true)
@@ -153,6 +154,19 @@ public sealed class AdminRoutesTests
             var (routes, clusters) = AdminRoutes.Configured(options).Build();
 
             var route = Assert.Single(routes, route => route.Match.Path == "/platform/v1/admin/usage");
+            Assert.Equal((HttpMethods.Get, "homeport-metering"), (Assert.Single(route.Match.Methods!), route.Metadata![AdminRoutes.AdminAudienceMetadata]));
+            var cluster = Assert.Single(clusters, cluster => cluster.ClusterId == route.ClusterId);
+            Assert.Equal("http://metering:5200/", Assert.Single(cluster.Destinations!.Values).Address);
+        }
+
+        [Fact]
+        public void Forwards_The_Audit_Log_To_Metering_With_A_Caller_Token_For_It()
+        {
+            var options = new PlatformRoutesOptions { MeteringUrl = new Uri("http://metering:5200") };
+
+            var (routes, clusters) = AdminRoutes.Configured(options).Build();
+
+            var route = Assert.Single(routes, route => route.Match.Path == "/platform/v1/admin/metering/audit");
             Assert.Equal((HttpMethods.Get, "homeport-metering"), (Assert.Single(route.Match.Methods!), route.Metadata![AdminRoutes.AdminAudienceMetadata]));
             var cluster = Assert.Single(clusters, cluster => cluster.ClusterId == route.ClusterId);
             Assert.Equal("http://metering:5200/", Assert.Single(cluster.Destinations!.Values).Address);

@@ -9,6 +9,8 @@ using Homeport.Shared.Internal.Platform.Metering;
 using Homeport.Shared.Internal.Platform.Registry;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
+using ControlPlaneAuditApi = Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi;
+using MeteringAuditApi = Homeport.Shared.Client.Platform.Metering.V1.AuditApi;
 
 namespace Homeport.Platform.Gateway.Api.Admin;
 
@@ -58,8 +60,10 @@ public sealed class AdminRoutes(IReadOnlyList<AdminEndpoint> endpoints)
             new AdminEndpoint(HttpMethods.Get, ClientsApi.ClientPath, controlPlane),
             new AdminEndpoint(HttpMethods.Put, ClientsApi.ClientPath, controlPlane),
             new AdminEndpoint(HttpMethods.Delete, ClientsApi.ClientPath, controlPlane),
+            new AdminEndpoint(HttpMethods.Get, ControlPlaneAuditApi.Path, controlPlane),
             new AdminEndpoint(HttpMethods.Get, ModulesApi.Path, registry),
             new AdminEndpoint(HttpMethods.Get, AdminUsageApi.Path, metering),
+            new AdminEndpoint(HttpMethods.Get, MeteringAuditApi.Path, metering),
         ]);
     }
 
