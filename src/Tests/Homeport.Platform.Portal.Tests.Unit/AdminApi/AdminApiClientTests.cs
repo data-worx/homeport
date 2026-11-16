@@ -8,6 +8,7 @@ using Homeport.Platform.Portal.AdminApi;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Microsoft.Extensions.Logging.Abstractions;
+using Polly.Timeout;
 
 namespace Homeport.Platform.Portal.Tests.Unit.AdminApi;
 
@@ -86,6 +87,37 @@ public sealed class AdminApiClientTests
             var result = await ClientOf("operator-token").RenameTenantAsync(TenantId, new RenameTenantRequest("Sales"), CancellationToken.None);
 
             Assert.Equal(AdminApiClient.UnreachableTitle, result.Problem!.Title);
+        }
+
+        [Fact]
+        public async Task Describes_An_Admin_Api_That_Did_Not_Answer_In_Time_As_A_Problem()
+        {
+            gateway.Failure = new TimeoutRejectedException();
+
+            var result = await ClientOf("operator-token").RenameTenantAsync(TenantId, new RenameTenantRequest("Sales"), CancellationToken.None);
+
+            Assert.Equal((AdminApiClient.TimedOutTitle, 504), (result.Problem!.Title, result.Problem.Status));
+        }
+
+        [Fact]
+        public async Task Describes_A_Timeout_Of_The_Client_Itself_As_A_Problem()
+        {
+            gateway.Failure = new TaskCanceledException("The request was canceled due to the configured HttpClient.Timeout.");
+
+            var result = await ClientOf("operator-token").RenameTenantAsync(TenantId, new RenameTenantRequest("Sales"), CancellationToken.None);
+
+            Assert.Equal(AdminApiClient.TimedOutTitle, result.Problem!.Title);
+        }
+
+        [Fact]
+        public async Task Passes_On_A_Cancellation_The_Caller_Asked_For()
+        {
+            using var cancellation = new CancellationTokenSource();
+            await cancellation.CancelAsync();
+            gateway.Failure = new TaskCanceledException();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => ClientOf("operator-token").RenameTenantAsync(TenantId, new RenameTenantRequest("Sales"), cancellation.Token));
         }
 
         [Fact]

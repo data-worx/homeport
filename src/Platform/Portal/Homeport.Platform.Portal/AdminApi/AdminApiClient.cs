@@ -8,6 +8,7 @@ using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Client.Platform.Registry.V1;
 using Homeport.Shared.Client.Problems;
+using Polly.Timeout;
 
 namespace Homeport.Platform.Portal.AdminApi;
 
@@ -27,6 +28,9 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
 
     /// <summary>The title of the problem the portal describes an unreachable admin API with.</summary>
     internal const string UnreachableTitle = "The admin API is not reachable.";
+
+    /// <summary>The title of the problem the portal describes an admin API that did not answer in time with.</summary>
+    internal const string TimedOutTitle = "The admin API did not answer in time.";
 
     // A problem the portal describes itself never leaves it, so it takes no
     // type of Homeport's: RFC 9457's default says the status is all there is.
@@ -191,6 +195,14 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
             logger.LogWarning(exception, "The admin API at {BaseAddress} is not reachable", http.BaseAddress);
             return AdminResult<TValue>.Failure(Unreachable());
         }
+        catch (Exception exception) when (exception is TimeoutRejectedException
+            || (exception is TaskCanceledException && !cancellationToken.IsCancellationRequested))
+        {
+            // The resilience handler's timeout, or the client's own: the
+            // operator's page shows a problem rather than losing its circuit.
+            logger.LogWarning(exception, "The admin API at {BaseAddress} did not answer in time", http.BaseAddress);
+            return AdminResult<TValue>.Failure(TimedOut());
+        }
 
         using (response)
         {
@@ -242,6 +254,19 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
             UnreachableTitle,
             StatusCodes.Status503ServiceUnavailable,
             "The portal could not connect to the gateway's admin endpoint. Nothing was changed.",
+            Instance: null,
+            CurrentTraceId(),
+            Errors: null);
+    }
+
+    /// <summary>The portal's own problem for an admin API that did not answer in time.</summary>
+    private static ProblemResponse TimedOut()
+    {
+        return new ProblemResponse(
+            UntypedProblem,
+            TimedOutTitle,
+            StatusCodes.Status504GatewayTimeout,
+            "The gateway's admin endpoint did not answer in time. A change may have been made all the same; reload the page to see.",
             Instance: null,
             CurrentTraceId(),
             Errors: null);
