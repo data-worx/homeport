@@ -3,6 +3,8 @@
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Client.Platform.Registry.V1;
+using ControlPlaneAudit = Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse;
+using MeteringAudit = Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse;
 
 namespace Homeport.Platform.Portal.AdminApi;
 
@@ -56,4 +58,16 @@ public interface IAdminApi
     /// <see cref="UsageApi.CsvMediaType"/>, for a download; every read is audited.
     /// </summary>
     Task<AdminResult<byte[]>> ExportUsageAsync(UsageFilter filter, string mediaType, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// One page of the control plane's audit log that <paramref name="filter"/>
+    /// selects, newest first, after <paramref name="before"/> or the first.
+    /// </summary>
+    Task<AdminResult<ControlPlaneAudit>> GetControlPlaneAuditAsync(AuditFilter filter, string? before, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// One page of metering's audit log that <paramref name="filter"/>
+    /// selects, newest first, after <paramref name="before"/> or the first.
+    /// </summary>
+    Task<AdminResult<MeteringAudit>> GetMeteringAuditAsync(AuditFilter filter, string? before, CancellationToken cancellationToken);
 }

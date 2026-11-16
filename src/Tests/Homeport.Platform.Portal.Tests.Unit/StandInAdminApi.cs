@@ -5,6 +5,8 @@ using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Client.Platform.Registry.V1;
 using Homeport.Shared.Client.Problems;
+using ControlPlaneAudit = Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse;
+using MeteringAudit = Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse;
 
 namespace Homeport.Platform.Portal.Tests.Unit;
 
@@ -126,5 +128,34 @@ internal sealed class StandInAdminApi : IAdminApi
     {
         Exports.Add((filter, mediaType));
         return Task.FromResult(Export);
+    }
+
+    /// <summary>The answer to <see cref="GetControlPlaneAuditAsync"/> by the cursor asked for.</summary>
+    internal Func<string?, AdminResult<ControlPlaneAudit>> ControlPlaneAudit { get; set; } =
+        _ => AdminResult<ControlPlaneAudit>.Success(new ControlPlaneAudit([], Next: null));
+
+    /// <summary>The filters and cursors <see cref="GetControlPlaneAuditAsync"/> was called with, in order.</summary>
+    internal List<(AuditFilter Filter, string? Before)> ControlPlaneAuditReads { get; } = [];
+
+    /// <summary>The answer to <see cref="GetMeteringAuditAsync"/> by the cursor asked for.</summary>
+    internal Func<string?, AdminResult<MeteringAudit>> MeteringAudit { get; set; } =
+        _ => AdminResult<MeteringAudit>.Success(new MeteringAudit([], Next: null));
+
+    /// <summary>The filters and cursors <see cref="GetMeteringAuditAsync"/> was called with, in order.</summary>
+    internal List<(AuditFilter Filter, string? Before)> MeteringAuditReads { get; } = [];
+
+    /// <summary>The answer to <see cref="GetControlPlaneAuditAsync"/> by its filter, where a test sets one; <see cref="ControlPlaneAudit"/> otherwise.</summary>
+    internal Func<AuditFilter, Task<AdminResult<ControlPlaneAudit>>>? ControlPlaneAuditFor { get; set; }
+
+    public Task<AdminResult<ControlPlaneAudit>> GetControlPlaneAuditAsync(AuditFilter filter, string? before, CancellationToken cancellationToken)
+    {
+        ControlPlaneAuditReads.Add((filter, before));
+        return ControlPlaneAuditFor?.Invoke(filter) ?? Task.FromResult(ControlPlaneAudit(before));
+    }
+
+    public Task<AdminResult<MeteringAudit>> GetMeteringAuditAsync(AuditFilter filter, string? before, CancellationToken cancellationToken)
+    {
+        MeteringAuditReads.Add((filter, before));
+        return Task.FromResult(MeteringAudit(before));
     }
 }

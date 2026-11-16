@@ -186,6 +186,13 @@ words. A read that is refused, such as one with an invalid period, writes
 none. Metering never deletes an entry; neither the app role nor the admin
 role may change or delete one.
 
+Metering serves its audit log at `GET /v1/admin/metering/audit`, which the
+gateway forwards from `/platform/v1/admin/metering/audit` on its admin
+endpoint only, on the same caller token. It reads the entries as the app
+role, not the admin role: they are the platform's data, not a tenant's, and
+reading them writes no entry. Its parameters are those of
+[the admin API](admin-api.md#audit).
+
 ## Metrics and logs
 
 | Metric | Service | Counts |

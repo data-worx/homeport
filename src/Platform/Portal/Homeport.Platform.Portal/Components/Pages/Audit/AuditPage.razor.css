@@ -1,0 +1,18 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+
+/* The filters in one row that wraps, each no wider than its values need. */
+.hp-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    max-width: 1000px;
+}
+
+/* A wide table scrolls on its own, not the page. */
+.hp-scroll {
+    overflow-x: auto;
+}
+
+.hp-id {
+    font-size: 12px;
+}

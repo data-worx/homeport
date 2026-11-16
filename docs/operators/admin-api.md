@@ -77,6 +77,8 @@ The request and response types are in `Homeport.Shared.Client`, namespace
 | `DELETE /platform/v1/admin/clients/{clientId}` | control plane | — | `204`, `404` for a client that is not registered |
 | `GET /platform/v1/admin/modules` | registry | — | `200` with every module that has a live instance, ordered by module id: its instances with instance id, address, version, contract version, last heartbeat and when the registration ends, and the routes the gateway serves for it with method, path, scope, meter, quantity and the version of the instance whose declaration applies |
 | `GET /platform/v1/admin/usage` | metering | — | `200` with the usage of every tenant per hour or day, as JSON or, with `Accept: text/csv`, as CSV: period, tenant, module, meter and quantity per row. `?tenant=<id>` reads one tenant's usage only |
+| `GET /platform/v1/admin/control-plane/audit` | control plane | — | `200` with one page of the control plane's audit entries, newest first, and `next` for the page after it; see [audit](#audit) |
+| `GET /platform/v1/admin/metering/audit` | metering | — | `200` with one page of metering's audit entries, newest first, and `next` for the page after it; see [audit](#audit) |
 
 A tenant's name is required, at most 200 characters, and unique among
 tenants. Surrounding whitespace is dropped. Names are compared
@@ -156,6 +158,20 @@ DELETE FROM control_plane.audit_entries WHERE "OccurredAt" < now() - interval '1
 -- as metering_owner
 DELETE FROM metering.audit_entries WHERE "OccurredAt" < now() - interval '1 year';
 ```
+
+Each service serves its own audit log, at
+`GET /platform/v1/admin/control-plane/audit` and
+`GET /platform/v1/admin/metering/audit`, newest first. Both take the same
+optional parameters: `from` and `to`, ISO 8601, for entries at or after
+`from` and before `to`; `actor`, an operator's subject; `target`, such as
+`tenants/<id>`; `limit`, 1 to 200 entries per page, 50 by default; and
+`before`, the `next` of the page before. `actor` and `target` are matched
+exactly. A page ends with `next: null` when no older entry follows, and a
+page stays stable while new entries arrive. A parameter that breaks a rule
+is answered with `400` and `validation`, the message under its name.
+Reading the audit log writes no entry: the entries are the platform's data,
+not a tenant's. The [admin portal](admin-portal.md#audit-log) merges both
+logs into one list.
 
 ## Configuration
 

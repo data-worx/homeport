@@ -8,8 +8,7 @@ reach the browser.
 
 You sign in, see who you are signed in as, sign out, manage the tenants,
 plans and clients, see the registered modules, and read and download the
-usage of every tenant. The audit log follows, with its own entry in the
-navigation. Every page calls the
+usage of every tenant, and read the audit log. Every page calls the
 [admin API](admin-api.md) at the gateway's admin port, as you.
 
 ![The portal's shell after signing in: the app bar with the operator's name, the navigation and the start page](admin-portal-shell.png)
@@ -156,6 +155,26 @@ Usage is tenant data. Every read — the page, each change of a filter and
 each download — writes an entry into metering's audit log under your
 subject and name, with the filter it read
 ([metering](metering.md#the-operators-usage-read)).
+
+## Audit log
+
+*Audit log*, under *Platform*, shows who changed what and who read which
+tenant's usage: the entries of the control plane and of metering in one
+list, newest first, each with its time in UTC, the service that recorded it,
+the operator's name and subject, the action with its sentence, and the
+target, such as `tenants/<id>`. Filter by a period of whole UTC days, by an
+operator's subject or by a target; both are matched exactly. The page shows
+50 entries; *Load more* adds the next 50.
+
+![The audit log with the creation and renaming of tenants in the control plane and a usage read in metering, newest first, with the period, operator and target filters](admin-portal-audit.png)
+
+Each service keeps its own audit log; the page merges them by time. When
+one service does not answer, the page shows the entries of the others and
+names the missing one above the list, with the trace id of the failed
+read. An entry is written in the same transaction as what it records, so
+the log holds what was done, never an attempt that failed. Reading the
+audit log writes no entry itself. What each action means is in
+[the admin API](admin-api.md#audit).
 
 ## Configuration
 

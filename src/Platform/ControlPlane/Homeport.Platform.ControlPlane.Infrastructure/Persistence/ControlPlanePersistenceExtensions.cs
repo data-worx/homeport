@@ -21,7 +21,8 @@ public static class ControlPlanePersistenceExtensions
     /// Adds <see cref="ControlPlaneDbContext"/> on the connection string
     /// <paramref name="connectionName"/>, with health check, tracing and
     /// retries, and the <see cref="IClientLookup"/>, <see cref="ITenantStore"/>,
-    /// <see cref="IPlanStore"/> and <see cref="IClientStore"/> on it.
+    /// <see cref="IPlanStore"/>, <see cref="IClientStore"/> and
+    /// <see cref="IAuditReader"/> on it.
     /// </summary>
     public static IHostApplicationBuilder AddControlPlanePersistence(this IHostApplicationBuilder builder, string connectionName)
     {
@@ -32,6 +33,7 @@ public static class ControlPlanePersistenceExtensions
         builder.Services.AddScoped<ITenantStore, TenantStore>();
         builder.Services.AddScoped<IPlanStore, PlanStore>();
         builder.Services.AddScoped<IClientStore, ClientStore>();
+        builder.Services.AddScoped<IAuditReader, AuditReader>();
 
         return builder;
     }

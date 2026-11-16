@@ -163,6 +163,27 @@ public sealed class RunningMetering : IAsyncLifetime
         return (long)(await count.ExecuteScalarAsync())!;
     }
 
+    /// <summary>
+    /// Adds a read of <paramref name="target"/> by <paramref name="subject"/>
+    /// at <paramref name="occurredAt"/> to the audit log, as the app role.
+    /// </summary>
+    internal async Task<Guid> AddAuditEntryAsync(string subject, DateTime occurredAt, string target)
+    {
+        var id = Guid.NewGuid();
+        await using var connection = new NpgsqlConnection(ConnectionString(AppRole, AppPassword));
+        await connection.OpenAsync();
+        await using var insert = new NpgsqlCommand(
+            "INSERT INTO metering.audit_entries (\"Id\", \"OccurredAt\", \"OperatorSubject\", \"OperatorName\", \"Action\", \"Target\", \"Summary\") "
+            + "VALUES (@id, @occurredAt, @subject, 'Olivia Operator', 'usage.read', @target, 'Read the usage.')",
+            connection);
+        insert.Parameters.AddWithValue("id", id);
+        insert.Parameters.AddWithValue("occurredAt", occurredAt);
+        insert.Parameters.AddWithValue("subject", subject);
+        insert.Parameters.AddWithValue("target", target);
+        await insert.ExecuteNonQueryAsync();
+        return id;
+    }
+
     /// <summary>A service token, as the gateway calls metering as itself (ADR-0014).</summary>
     internal string ServiceToken()
     {
