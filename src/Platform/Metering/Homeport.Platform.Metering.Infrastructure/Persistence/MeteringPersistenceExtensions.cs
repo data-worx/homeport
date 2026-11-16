@@ -23,7 +23,10 @@ public static class MeteringPersistenceExtensions
 
     /// <summary>
     /// Adds the metering database on the connection string
-    /// <paramref name="connectionName"/>, with health check, tracing and retries.
+    /// <paramref name="connectionName"/>, with health check, tracing and retries,
+    /// and the <see cref="IUsageStore"/>, <see cref="IUsageReader"/> and
+    /// <see cref="IAuditReader"/> on it. The audit entries are platform data,
+    /// so the app role reads them, not the admin role.
     /// </summary>
     /// <remarks>
     /// Not pooled, unlike Aspire's default: each scope carries the tenant it
@@ -41,6 +44,7 @@ public static class MeteringPersistenceExtensions
         builder.EnrichNpgsqlDbContext<MeteringDbContext>();
         builder.Services.AddScoped<IUsageStore, UsageStore>();
         builder.Services.AddScoped<IUsageReader, UsageReader>();
+        builder.Services.AddScoped<IAuditReader, AuditReader>();
 
         return builder;
     }
