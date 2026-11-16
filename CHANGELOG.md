@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The operator reads the audit log in the admin portal: who changed which
+  tenant, plan or client and who read which tenant's usage, from the
+  control plane and metering in one list, newest first, filterable by
+  period, operator and target, page by page. When one service does not
+  answer, the page shows the others' entries and names the missing one.
+  The admin API serves each log at `GET /platform/v1/admin/control-plane/audit`
+  and `GET /platform/v1/admin/metering/audit`; reading it writes no entry.
+  See [the admin portal](docs/operators/admin-portal.md#audit-log) and
+  [the admin API](docs/operators/admin-api.md#audit).
+
 - The operator reads the usage of every tenant in the admin portal: one row
   per tenant and one column per module and meter, summed over a period and
   filterable by tenant, module and meter, with totals, and downloads it per
