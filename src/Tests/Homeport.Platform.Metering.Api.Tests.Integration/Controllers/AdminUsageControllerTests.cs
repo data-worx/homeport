@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
@@ -150,29 +149,19 @@ public sealed class AdminUsageControllerTests
         }
 
         [Fact]
-        public async Task Traces_The_Query_On_The_Hourly_Aggregates()
+        public async Task Exports_A_Span_Of_The_Query_On_The_Hourly_Aggregates()
         {
             var traceId = ActivityTraceId.CreateRandom();
-            var queries = new ConcurrentQueue<string>();
-            using var listener = new ActivityListener
-            {
-                ShouldListenTo = source => source.Name == NpgsqlSource,
-                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
-                ActivityStopped = activity =>
-                {
-                    if (activity.TraceId == traceId && activity.GetTagItem(QueryTextTag) is string query)
-                    {
-                        queries.Enqueue(query);
-                    }
-                },
-            };
-            ActivitySource.AddActivityListener(listener);
             using var client = OperatorClient();
             client.DefaultRequestHeaders.Add(TraceParentHeader, $"00-{traceId}-{ActivitySpanId.CreateRandom()}-01");
 
             using var response = await client.GetAsync(HourQuery);
 
-            Assert.Contains(queries, query => query.Contains("FROM metering.\"UsageHourly\"", StringComparison.Ordinal));
+            Assert.Contains(
+                metering.Spans.Of(traceId),
+                span => span.Source.Name == NpgsqlSource
+                    && span.GetTagItem(QueryTextTag) is string query
+                    && query.Contains("FROM metering.\"UsageHourly\"", StringComparison.Ordinal));
         }
 
         private HttpClient OperatorClient() => metering.CreateClient(metering.OperatorToken($"operator-{Guid.NewGuid()}"));
