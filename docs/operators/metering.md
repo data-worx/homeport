@@ -159,6 +159,14 @@ The gateway logs the metering address that applies when it starts. The
 export counts against the tenant's rate limit and is not itself metered.
 Metering logs a token it refuses at Warning, without the token.
 
+Metering's readiness check, `/health/ready`, signs in on both connections.
+An admin connection that cannot sign in, such as one with a wrong
+`METERING_ADMIN_PASSWORD` after an upgrade, reports metering unhealthy, and
+metering logs whether the password was refused or the database could not be
+reached. The operator's reads still answer `500` meanwhile. The compose file
+does not probe the endpoint; point your orchestrator's readiness probe at it
+to see the failure before the first read does.
+
 ## The operator's usage read
 
 Metering serves `GET /v1/admin/usage` to the operator, which the gateway

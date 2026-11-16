@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using Homeport.Platform.Metering.Api.Messaging;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Internal.Platform.Metering;
+using Homeport.Shared.ServiceDefaults;
 using Homeport.Testing.Metrics;
 
 namespace Homeport.Platform.Metering.Api.Tests.Integration;
@@ -29,6 +30,27 @@ public sealed class ProgramTests
             await metering.PublishAsync(message);
 
             Assert.All(labels.Seen, seen => Assert.Contains(seen.Label, allowed));
+        }
+
+        [Fact]
+        public async Task Reports_Ready_When_The_Admin_Connection_Signs_In()
+        {
+            using var client = metering.CreateClient();
+
+            using var response = await client.GetAsync(ServiceDefaultsExtensions.ReadinessPath);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Reports_Not_Ready_When_The_Admin_Connection_Cannot_Sign_In()
+        {
+            await using var misconfigured = metering.WithAdminPassword("wrong-password");
+            using var client = misconfigured.CreateClient();
+
+            using var response = await client.GetAsync(ServiceDefaultsExtensions.ReadinessPath);
+
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
         }
 
         [Fact]

@@ -14,10 +14,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using OpenTelemetry.Trace;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 using Wolverine;
@@ -84,12 +86,16 @@ public sealed class RunningMetering : IAsyncLifetime
     private readonly ECDsa gatewayKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
     private WebApplication? jwks;
     private WebApplicationFactory<Program>? metering;
+    private readonly RecordedSpans spans = new();
     private IHost? gateway;
 
     private WebApplicationFactory<Program> Metering =>
         metering ?? throw new InvalidOperationException("Metering has not been started.");
 
     private IHost Gateway => gateway ?? throw new InvalidOperationException("The gateway stand-in has not been started.");
+
+    /// <summary>The spans metering's tracer provider has ended.</summary>
+    internal RecordedSpans Spans => spans;
 
     /// <summary>Metering's services.</summary>
     internal IServiceProvider Services => Metering.Services;
@@ -104,6 +110,18 @@ public sealed class RunningMetering : IAsyncLifetime
         }
 
         return client;
+    }
+
+    /// <summary>
+    /// A second metering whose admin connection signs in with
+    /// <paramref name="adminPassword"/>, on the same database, with its
+    /// broker transport switched off so it takes no message from the first.
+    /// </summary>
+    internal WebApplicationFactory<Program> WithAdminPassword(string adminPassword)
+    {
+        return Metering.WithWebHostBuilder(host => host
+            .UseSetting($"ConnectionStrings:{MeteringPersistenceExtensions.AdminConnectionName}", ConnectionString(AdminRole, adminPassword))
+            .ConfigureTestServices(services => services.DisableAllExternalWolverineTransports()));
     }
 
     /// <summary>
@@ -210,7 +228,8 @@ public sealed class RunningMetering : IAsyncLifetime
                 .UseSetting($"ConnectionStrings:{MeteringPersistenceExtensions.AppConnectionName}", ConnectionString(AppRole, AppPassword))
                 .UseSetting($"ConnectionStrings:{MeteringPersistenceExtensions.AdminConnectionName}", ConnectionString(AdminRole, AdminPassword))
                 .UseSetting($"ConnectionStrings:{MeteringMessagingExtensions.ConnectionName}", rabbitMq.GetConnectionString())
-                .UseSetting($"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}", $"{jwks.Urls.Single()}{GatewayTokens.JwksPath}"));
+                .UseSetting($"{GatewayTokenOptions.SectionName}:{nameof(GatewayTokenOptions.JwksUri)}", $"{jwks.Urls.Single()}{GatewayTokens.JwksPath}")
+                .ConfigureTestServices(services => services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddProcessor(spans))));
 
         // Starts metering, so its queue exists before anything is published.
         _ = metering.Services;
