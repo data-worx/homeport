@@ -19,10 +19,11 @@ internal static class Navigation
         new("Usage", "usage", HomeportIcons.Platform.Meter),
     ];
 
-    /// <summary>The pages of the platform itself, shown under <em>Platform</em>.</summary>
+    /// <summary>The pages of the platform itself, its modules and audit log, shown under <em>Platform</em>.</summary>
     internal static readonly IReadOnlyList<NavigationEntry> Platform =
     [
         new("Modules", "modules", HomeportIcons.Platform.Module),
+        new("Audit log", "audit", HomeportIcons.Lucide.History),
     ];
 }
 

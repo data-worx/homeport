@@ -1,0 +1,247 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/audit"
+@using System.Globalization
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Problems
+@inject IAdminApi AdminApi
+@inject NavigationManager Navigation
+
+<PageTitle>Audit log · Homeport</PageTitle>
+
+<div class="mb-6">
+    <MudText Typo="Typo.h4" HtmlTag="h1">Audit log</MudText>
+    <MudText Class="mud-text-secondary">Who changed tenants, plans and clients, and who read which tenant's usage, newest first</MudText>
+</div>
+
+<div class="hp-filters mb-4">
+    <MudDatePicker Date="_from" DateChanged="FromChangedAsync" Label="From" Variant="Variant.Outlined" Margin="Margin.Dense"
+                   DateFormat="@DayFormat" MaxDate="_to" Clearable="true" data-filter="from" />
+    <MudDatePicker Date="_to" DateChanged="ToChangedAsync" Label="To" Variant="Variant.Outlined" Margin="Margin.Dense"
+                   DateFormat="@DayFormat" MinDate="_from" Clearable="true" data-filter="to" />
+    <MudTextField T="string" Value="_actor" ValueChanged="ActorChangedAsync" Label="Operator subject" Variant="Variant.Outlined" Margin="Margin.Dense"
+                  Clearable="true" data-filter="actor" />
+    <MudTextField T="string" Value="_target" ValueChanged="TargetChangedAsync" Label="Target" Variant="Variant.Outlined" Margin="Margin.Dense"
+                  Clearable="true" data-filter="target" />
+</div>
+
+@if (_trail is { Failed: false })
+{
+    @foreach (var (service, problem) in _trail.Gaps)
+    {
+        <ListDegraded Title="@($"{NameOf(service)} not reachable")"
+                      Text="@($"{problem.Title} Its entries are missing below; the other services' entries are shown.")"
+                      TraceId="@problem.TraceId" />
+    }
+}
+
+<MudPaper Outlined="true">
+    @if (_trail is null || _loading && _trail.Rows.Count == 0)
+    {
+        <ListLoading Label="Loading the audit log" />
+    }
+    else if (_trail.Failed)
+    {
+        <ListError Title="Could not load the audit log" State="_problem" OnRetry="LoadAsync" />
+    }
+    else if (_trail.Rows.Count == 0)
+    {
+        <ListEmpty Illustration="spot-calm-buoy.svg"
+                   Title="No entries"
+                   Text="Every change to a tenant, plan or client and every read of the tenants' usage is recorded here. Choose another period, or clear a filter." />
+    }
+    else
+    {
+        <div class="hp-scroll">
+            <MudSimpleTable Hover="true" Dense="false" Elevation="0" data-audit>
+                <thead>
+                    <tr>
+                        <th>Time (UTC)</th>
+                        <th>Service</th>
+                        <th>Operator</th>
+                        <th>Action</th>
+                        <th>Target</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _trail.Rows)
+                    {
+                        <tr @key="(row.Service, row.Id)" data-entry="@row.Id" data-service="@ServiceOf(row.Service)">
+                            <td class="hp-mono text-nowrap" data-time>@row.OccurredAt.ToString(MomentFormat, CultureInfo.InvariantCulture)</td>
+                            <td class="text-nowrap" data-service-name>@NameOf(row.Service)</td>
+                            <td>
+                                <span data-operator-name>@row.OperatorName</span>
+                                <div class="hp-mono mud-text-secondary hp-id" data-operator-subject>@row.OperatorSubject</div>
+                            </td>
+                            <td>
+                                <span class="hp-mono" data-action>@row.Action</span>
+                                <div class="mud-text-secondary hp-id" data-summary>@row.Summary</div>
+                            </td>
+                            <td class="hp-mono" data-target>@row.Target</td>
+                        </tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+        </div>
+        @if (_trail.HasMore)
+        {
+            <div class="d-flex justify-center pa-4">
+                <MudButton Variant="Variant.Outlined" Disabled="_loading" OnClick="ShowMoreAsync" data-action="more">Load more</MudButton>
+            </div>
+        }
+    }
+</MudPaper>
+
+<MudText Typo="Typo.body2" Class="mud-text-secondary mt-4">
+    Each service keeps its own audit log; this page merges them by time. An entry is written in the same transaction as what it records, so it records only what was done. Reading this page is not recorded.
+</MudText>
+
+@code {
+    /// <summary>The entries the page shows at first, and adds with every <em>Load more</em>.</summary>
+    private const int PageSize = 50;
+
+    private const string DayFormat = "yyyy-MM-dd";
+
+    private const string MomentFormat = "yyyy-MM-dd HH:mm:ss";
+
+    private readonly ProblemState _problem = new();
+    private AuditTrail? _trail;
+    private DateTime? _from;
+    private DateTime? _to;
+    private string? _actor;
+    private string? _target;
+    private bool _loading;
+
+    // After the first render, so the prerendered page shows the loading state
+    // and the audit logs are read once, by the circuit.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadAsync();
+            StateHasChanged();
+        }
+    }
+
+    // A new list for the filters as they are. Only the latest list is shown:
+    // an earlier one that answers later is of filters the page no longer shows.
+    private async Task LoadAsync()
+    {
+        var filter = FilterOf();
+        var trail = new AuditTrail(new Dictionary<AuditService, AuditPageReader>
+        {
+            [AuditService.ControlPlane] = before => ReadControlPlaneAsync(filter, before),
+            [AuditService.Metering] = before => ReadMeteringAsync(filter, before),
+        });
+        _trail = trail;
+        await ShowAsync(trail);
+    }
+
+    private Task ShowMoreAsync() => _trail is { } trail ? ShowAsync(trail) : Task.CompletedTask;
+
+    private async Task ShowAsync(AuditTrail trail)
+    {
+        _loading = true;
+        try
+        {
+            await trail.ShowMoreAsync(PageSize);
+        }
+        finally
+        {
+            _loading = false;
+        }
+
+        if (trail != _trail)
+        {
+            return;
+        }
+
+        if (trail.SignInRequired)
+        {
+            Navigation.SignInAgain();
+            return;
+        }
+
+        _problem.Clear();
+        if (trail.Failed)
+        {
+            _problem.Show(trail.Gaps[0].Problem);
+        }
+    }
+
+    private async Task FromChangedAsync(DateTime? from)
+    {
+        _from = from;
+        await LoadAsync();
+    }
+
+    private async Task ToChangedAsync(DateTime? to)
+    {
+        _to = to;
+        await LoadAsync();
+    }
+
+    private async Task ActorChangedAsync(string? actor)
+    {
+        _actor = actor?.Trim();
+        await LoadAsync();
+    }
+
+    private async Task TargetChangedAsync(string? target)
+    {
+        _target = target?.Trim();
+        await LoadAsync();
+    }
+
+    // The days the operator picked, as the period the audit logs are read
+    // for: from the start of the first day to the start of the day after the last.
+    private AuditFilter FilterOf()
+    {
+        return new AuditFilter(
+            _from is { } from ? new DateTimeOffset(DateTime.SpecifyKind(from.Date, DateTimeKind.Utc)) : null,
+            _to is { } to ? new DateTimeOffset(DateTime.SpecifyKind(to.Date.AddDays(1), DateTimeKind.Utc)) : null,
+            string.IsNullOrEmpty(_actor) ? null : _actor,
+            string.IsNullOrEmpty(_target) ? null : _target);
+    }
+
+    private async Task<AdminResult<AuditRows>> ReadControlPlaneAsync(AuditFilter filter, string? before)
+    {
+        var result = await AdminApi.GetControlPlaneAuditAsync(filter, before, CancellationToken.None);
+        return Map(result, page => new AuditRows(
+            page.Entries.Select(e => new AuditRow(AuditService.ControlPlane, e.Id, e.OccurredAt, e.OperatorSubject, e.OperatorName, e.Action, e.Target, e.Summary)).ToList(),
+            page.Next));
+    }
+
+    private async Task<AdminResult<AuditRows>> ReadMeteringAsync(AuditFilter filter, string? before)
+    {
+        var result = await AdminApi.GetMeteringAuditAsync(filter, before, CancellationToken.None);
+        return Map(result, page => new AuditRows(
+            page.Entries.Select(e => new AuditRow(AuditService.Metering, e.Id, e.OccurredAt, e.OperatorSubject, e.OperatorName, e.Action, e.Target, e.Summary)).ToList(),
+            page.Next));
+    }
+
+    private static AdminResult<AuditRows> Map<TPage>(AdminResult<TPage> result, Func<TPage, AuditRows> rowsOf)
+    {
+        if (result.SignInRequired)
+        {
+            return AdminResult<AuditRows>.SignInAgain();
+        }
+
+        return result.Problem is { } problem
+            ? AdminResult<AuditRows>.Failure(problem)
+            : AdminResult<AuditRows>.Success(rowsOf(result.Value!));
+    }
+
+    private static string NameOf(AuditService service) => service switch
+    {
+        AuditService.ControlPlane => "Control plane",
+        AuditService.Metering => "Metering",
+        _ => throw new ArgumentOutOfRangeException(nameof(service), service, "Every service has a name."),
+    };
+
+    private static string ServiceOf(AuditService service) => service switch
+    {
+        AuditService.ControlPlane => "control-plane",
+        AuditService.Metering => "metering",
+        _ => throw new ArgumentOutOfRangeException(nameof(service), service, "Every service has an id."),
+    };
+}

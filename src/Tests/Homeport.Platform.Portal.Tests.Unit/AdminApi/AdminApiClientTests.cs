@@ -9,6 +9,8 @@ using Homeport.Shared.Client.Platform.ControlPlane.V1;
 using Homeport.Shared.Client.Platform.Metering.V1;
 using Microsoft.Extensions.Logging.Abstractions;
 using Polly.Timeout;
+using ControlPlaneAudit = Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse;
+using MeteringAudit = Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse;
 
 namespace Homeport.Platform.Portal.Tests.Unit.AdminApi;
 
@@ -276,6 +278,54 @@ public sealed class AdminApiClientTests
             Assert.Equal(
                 "http://gateway:8000/platform/v1/admin/usage?from=2026-11-04T00:00:00Z&to=2026-11-05T00:00:00Z&granularity=hour",
                 Uri.UnescapeDataString(request.RequestUri!.AbsoluteUri));
+        }
+    }
+
+    public sealed class GetControlPlaneAuditAsync
+    {
+        private readonly StandInIdentityProvider identityProvider = new();
+        private readonly StandInHandler gateway = new();
+
+        [Fact]
+        public async Task Asks_For_Every_Filter_Set_And_The_Page_After_The_Cursor()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(new ControlPlaneAudit([], Next: null)) };
+            var filter = new AuditFilter(Day, Day.AddDays(1), "operator-1", "tenants/one");
+
+            await ClientOf(identityProvider, gateway).GetControlPlaneAuditAsync(filter, "123.abc", CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal(
+                "http://gateway:8000/platform/v1/admin/control-plane/audit?from=2026-11-04T00:00:00Z&to=2026-11-05T00:00:00Z&actor=operator-1&target=tenants/one&before=123.abc",
+                Uri.UnescapeDataString(request.RequestUri!.AbsoluteUri));
+        }
+
+        [Fact]
+        public async Task Leaves_Out_The_Filters_That_Are_Not_Set()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(new ControlPlaneAudit([], Next: null)) };
+
+            await ClientOf(identityProvider, gateway).GetControlPlaneAuditAsync(new AuditFilter(null, null, null, null), before: null, CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal("http://gateway:8000/platform/v1/admin/control-plane/audit", request.RequestUri!.AbsoluteUri);
+        }
+    }
+
+    public sealed class GetMeteringAuditAsync
+    {
+        private readonly StandInIdentityProvider identityProvider = new();
+        private readonly StandInHandler gateway = new();
+
+        [Fact]
+        public async Task Asks_Meterings_Audit_Log_With_The_Filters()
+        {
+            gateway.Respond = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(new MeteringAudit([], Next: null)) };
+
+            await ClientOf(identityProvider, gateway).GetMeteringAuditAsync(new AuditFilter(null, null, "operator-1", null), before: null, CancellationToken.None);
+
+            var (request, _) = Assert.Single(gateway.Received);
+            Assert.Equal("http://gateway:8000/platform/v1/admin/metering/audit?actor=operator-1", request.RequestUri!.AbsoluteUri);
         }
     }
 

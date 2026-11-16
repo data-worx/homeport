@@ -1,0 +1,27 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@* The degraded state of a list (ListStates): what could not be read, while
+   the data that could be read stays visible below. *@
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Icon="@HomeportIcons.Lucide.CloudOff" Class="mb-4" data-list-state="degraded">
+    <MudText Typo="Typo.subtitle2" data-degraded-title>@Title</MudText>
+    <MudText Typo="Typo.body2">@Text</MudText>
+    @if (!string.IsNullOrEmpty(TraceId))
+    {
+        <MudText Typo="Typo.body2" Class="mud-text-secondary">
+            Trace id <span class="hp-mono" data-trace-id>@TraceId</span>
+        </MudText>
+    }
+</MudAlert>
+
+@code {
+    /// <summary>What could not be read, such as <em>Metering not reachable</em>.</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>One sentence on what the list shows instead.</summary>
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    /// <summary>The trace id of the failed read, for whoever reads the logs.</summary>
+    [Parameter]
+    public string? TraceId { get; set; }
+}

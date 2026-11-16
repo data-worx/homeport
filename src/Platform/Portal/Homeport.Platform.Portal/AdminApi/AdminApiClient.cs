@@ -9,6 +9,10 @@ using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Client.Platform.Registry.V1;
 using Homeport.Shared.Client.Problems;
 using Polly.Timeout;
+using ControlPlaneAudit = Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse;
+using ControlPlaneAuditApi = Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi;
+using MeteringAudit = Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse;
+using MeteringAuditApi = Homeport.Shared.Client.Platform.Metering.V1.AuditApi;
 
 namespace Homeport.Platform.Portal.AdminApi;
 
@@ -129,6 +133,18 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
             mediaType,
             (response, token) => response.Content.ReadAsByteArrayAsync(token),
             cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<AdminResult<ControlPlaneAudit>> GetControlPlaneAuditAsync(AuditFilter filter, string? before, CancellationToken cancellationToken)
+    {
+        return SendAsync<ControlPlaneAudit>(HttpMethod.Get, ControlPlaneAuditApi.Path + filter.QueryString(before), body: null, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<AdminResult<MeteringAudit>> GetMeteringAuditAsync(AuditFilter filter, string? before, CancellationToken cancellationToken)
+    {
+        return SendAsync<MeteringAudit>(HttpMethod.Get, MeteringAuditApi.Path + filter.QueryString(before), body: null, cancellationToken);
     }
 
     /// <summary>
