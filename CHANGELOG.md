@@ -16,7 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `GET /platform/v1/admin/usage`, from metering, which reads it as the new
   database role `metering_admin` and records every read in
   `metering.audit_entries`. An existing installation creates the role by
-  hand before it migrates. See
+  hand before it migrates; metering reports unhealthy while the role
+  cannot sign in. See
   [the admin portal](docs/operators/admin-portal.md#usage) and
   [metering](docs/operators/metering.md#preparing-the-database).
 

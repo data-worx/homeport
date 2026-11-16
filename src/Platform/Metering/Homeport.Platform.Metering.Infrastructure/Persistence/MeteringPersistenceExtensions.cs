@@ -47,7 +47,10 @@ public static class MeteringPersistenceExtensions
 
     /// <summary>
     /// Adds the operator's reads of every tenant's usage on the connection
-    /// string <see cref="AdminConnectionName"/>, with retries. Needs
+    /// string <see cref="AdminConnectionName"/>, with retries and a health
+    /// check that signs in on it. Tracing comes from
+    /// <see cref="AddMeteringPersistence"/>, which listens to every Npgsql
+    /// connection. Needs
     /// <see cref="AddMeteringPersistence"/> first.
     /// </summary>
     /// <remarks>
@@ -66,6 +69,7 @@ public static class MeteringPersistenceExtensions
 
         builder.Services.AddKeyedScoped(AdminConnectionName, (_, _) => new MeteringDbContext(adminOptions, new CurrentTenant()));
         builder.Services.AddScoped<IAdminUsageReader, AdminUsageReader>();
+        builder.Services.AddHealthChecks().AddCheck<AdminConnectionHealthCheck>(AdminConnectionHealthCheck.Name);
 
         return builder;
     }

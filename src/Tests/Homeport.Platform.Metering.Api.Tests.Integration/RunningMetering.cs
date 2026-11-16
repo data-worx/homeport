@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -104,6 +105,18 @@ public sealed class RunningMetering : IAsyncLifetime
         }
 
         return client;
+    }
+
+    /// <summary>
+    /// A second metering whose admin connection signs in with
+    /// <paramref name="adminPassword"/>, on the same database, with its
+    /// broker transport switched off so it takes no message from the first.
+    /// </summary>
+    internal WebApplicationFactory<Program> WithAdminPassword(string adminPassword)
+    {
+        return Metering.WithWebHostBuilder(host => host
+            .UseSetting($"ConnectionStrings:{MeteringPersistenceExtensions.AdminConnectionName}", ConnectionString(AdminRole, adminPassword))
+            .ConfigureTestServices(services => services.DisableAllExternalWolverineTransports()));
     }
 
     /// <summary>

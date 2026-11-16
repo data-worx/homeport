@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -17,6 +19,12 @@ public sealed class AdminUsageControllerTests
     public sealed class Get(RunningMetering metering) : IClassFixture<RunningMetering>
     {
         private const string HourQuery = "/v1/admin/usage?from=2026-11-04T13:00:00Z&to=2026-11-04T14:00:00Z&granularity=hour";
+
+        private const string NpgsqlSource = "Npgsql";
+
+        private const string QueryTextTag = "db.query.text";
+
+        private const string TraceParentHeader = "traceparent";
 
         private static readonly DateTime Hour = new(2026, 11, 4, 13, 0, 0, DateTimeKind.Utc);
 
@@ -139,6 +147,32 @@ public sealed class AdminUsageControllerTests
             Assert.Equal(
                 (HttpStatusCode.BadRequest, true, 0L),
                 (response.StatusCode, problem!.Errors!.ContainsKey(UsageApi.ModuleParameter), await metering.AuditEntriesOfAsync(subject)));
+        }
+
+        [Fact]
+        public async Task Traces_The_Query_On_The_Hourly_Aggregates()
+        {
+            var traceId = ActivityTraceId.CreateRandom();
+            var queries = new ConcurrentQueue<string>();
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = source => source.Name == NpgsqlSource,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+                ActivityStopped = activity =>
+                {
+                    if (activity.TraceId == traceId && activity.GetTagItem(QueryTextTag) is string query)
+                    {
+                        queries.Enqueue(query);
+                    }
+                },
+            };
+            ActivitySource.AddActivityListener(listener);
+            using var client = OperatorClient();
+            client.DefaultRequestHeaders.Add(TraceParentHeader, $"00-{traceId}-{ActivitySpanId.CreateRandom()}-01");
+
+            using var response = await client.GetAsync(HourQuery);
+
+            Assert.Contains(queries, query => query.Contains("FROM metering.\"UsageHourly\"", StringComparison.Ordinal));
         }
 
         private HttpClient OperatorClient() => metering.CreateClient(metering.OperatorToken($"operator-{Guid.NewGuid()}"));

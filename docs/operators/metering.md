@@ -159,6 +159,11 @@ The gateway logs the metering address that applies when it starts. The
 export counts against the tenant's rate limit and is not itself metered.
 Metering logs a token it refuses at Warning, without the token.
 
+Metering's readiness check, `/health/ready`, signs in on both connections. An
+admin connection that cannot sign in, such as one with a wrong
+`METERING_ADMIN_PASSWORD` after an upgrade, reports metering unhealthy at
+start instead of failing the operator's first read with `500`.
+
 ## The operator's usage read
 
 Metering serves `GET /v1/admin/usage` to the operator, which the gateway
