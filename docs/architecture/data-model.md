@@ -13,9 +13,10 @@ stores data owns one schema in it and nothing outside it:
 | Service | Schema | Tables |
 |---|---|---|
 | Control plane | `control_plane` | `Tenants`, `Plans`, `Clients`, `audit_entries`, and EF Core's `__EFMigrationsHistory` |
-| Metering | `metering` | `UsageEvents`, `UsageHourly`, `UsageDaily`, and EF Core's `__EFMigrationsHistory` |
+| Metering | `metering` | `UsageEvents`, `UsageHourly`, `UsageDaily`, `audit_entries`, and EF Core's `__EFMigrationsHistory` |
 
-Each schema comes with two roles, which
+Each schema comes with two roles, and a third where the operator reads its
+tenant data, which
 [`deploy/postgres/init/init-homeport.sh`](../../deploy/postgres/init/init-homeport.sh)
 creates:
 
@@ -24,6 +25,12 @@ creates:
 - **`<schema>_app`** is what the service connects as. It may read and write
   the tables of its schema, and nothing else: it cannot create, alter or drop
   a table, and it sees no other service's schema.
+- **`<schema>_admin`** is what the service connects as for the operator's
+  reads of every tenant's data, so far `metering_admin`. It may read what
+  the migrations grant it and add to the schema's audit table, nothing
+  else, and it reads every tenant's rows through a policy of its own, not
+  through `BYPASSRLS`
+  ([ADR-0020](adr/0020-the-operator-as-a-caller.md)).
 
 A service never migrates its own database at start. Its image has a second
 entry point, `migrate`, that runs once as the owner role, applies the pending
@@ -37,7 +44,8 @@ it, only row-level security and the privileges of an audit table are not
 provider-neutral. The setup is kept in the init script rather than in the
 migrations, because creating a role needs rights no service holds. Taking
 `UPDATE` and `DELETE` on an audit table back from the app role needs only
-the owner's rights, so the migration that creates the table does it.
+the owner's rights, so the migration that creates the table does it; so do
+granting the admin role what it reads and creating its policy.
 
 ## Tenant-owned and platform tables
 
@@ -78,6 +86,12 @@ query filters read the same tenant. Metering works for the tenant of the
 event it records. The policies bind the app role; PostgreSQL exempts a
 table's owner, so `migrate` is not held to them.
 
+A tenant-owned table the operator reads across tenants also has the policy
+`admin_read`, for the admin role and for `SELECT` only: it sees every row
+and writes none. So far `UsageHourly` and `UsageDaily` have it; the raw
+events do not. Every read through it writes an audit entry in the same
+transaction.
+
 Every feature that touches tenant data has a cross-tenant leakage test:
 with tenant A set, no query returns a row of tenant B, through EF Core with
 and without the query filters and through raw SQL as the app role.
@@ -99,7 +113,7 @@ foreign key to the key it refers to, the crow's foot on the many side.
 
 ### `metering`
 
-The same notation; the three tables share no foreign key, and `TenantId`
+The same notation; the four tables share no foreign key, and `TenantId`
 refers to `control_plane.Tenants` only logically.
 
 ![ER diagram of the metering schema](data-model-metering.drawio.svg)

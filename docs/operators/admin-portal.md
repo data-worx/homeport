@@ -7,8 +7,9 @@ a Blazor Server application, so your tokens stay on its server and never
 reach the browser.
 
 You sign in, see who you are signed in as, sign out, manage the tenants,
-plans and clients, and see the registered modules. The pages for usage and
-the audit log follow, each with its own entry in the navigation. Every page calls the
+plans and clients, see the registered modules, and read and download the
+usage of every tenant. The audit log follows, with its own entry in the
+navigation. Every page calls the
 [admin API](admin-api.md) at the gateway's admin port, as you.
 
 ![The portal's shell after signing in: the app bar with the operator's name, the navigation and the start page](admin-portal-shell.png)
@@ -131,6 +132,30 @@ after its last heartbeat; there is nothing to remove by hand. The
 heartbeat ages are those of the moment the list was read: *Refresh* reads
 it again. Reading the modules writes no audit entry, since a registration
 is the platform's data, not a tenant's.
+
+## Usage
+
+*Usage* shows what every tenant used in a period: one row per tenant, one
+column per module and meter, each cell the sum over the period, and a row
+of totals at the bottom. The period runs from the first to the last day
+chosen, both whole UTC days, and starts as the current month up to today.
+Filter by tenant, module or meter to narrow it; the module and meter
+filters offer what the period has. A tenant deleted since appears with its
+id. Meters count different units, so a tenant's row has no total.
+
+![The usage of two tenants in the current month: requests to Echo per tenant and their total, with the period, tenant, module and meter filters and the downloads](admin-portal-usage.png)
+
+*CSV* and *JSON* download the usage of the filters as the admin API writes
+it, one row per hour or per day, as chosen next to the buttons, with the
+tenant's id in every row. The file is named after the period and the
+granularity, such as `homeport-usage-2026-11-01-2026-11-15-day.csv`; its
+columns are those of [a tenant's own export](../api-consumers/reading-usage.md),
+plus `tenant`.
+
+Usage is tenant data. Every read — the page, each change of a filter and
+each download — writes an entry into metering's audit log under your
+subject and name, with the filter it read
+([metering](metering.md#the-operators-usage-read)).
 
 ## Configuration
 

@@ -55,8 +55,9 @@ answered with `403` and the problem type
 ## Endpoints
 
 The request and response types are in `Homeport.Shared.Client`, namespace
-`Homeport.Shared.Client.Platform.ControlPlane.V1` for the control plane and
-`Homeport.Shared.Client.Platform.Registry.V1` for the registry.
+`Homeport.Shared.Client.Platform.ControlPlane.V1` for the control plane,
+`Homeport.Shared.Client.Platform.Registry.V1` for the registry and
+`Homeport.Shared.Client.Platform.Metering.V1` for metering.
 
 | Method and path | Served by | Body | Answer |
 |---|---|---|---|
@@ -75,6 +76,7 @@ The request and response types are in `Homeport.Shared.Client`, namespace
 | `PUT /platform/v1/admin/clients/{clientId}` | control plane | `{ "planId": "…" }` | `200` with the client on its new plan, `404` for a client that is not registered |
 | `DELETE /platform/v1/admin/clients/{clientId}` | control plane | — | `204`, `404` for a client that is not registered |
 | `GET /platform/v1/admin/modules` | registry | — | `200` with every module that has a live instance, ordered by module id: its instances with instance id, address, version, contract version, last heartbeat and when the registration ends, and the routes the gateway serves for it with method, path, scope, meter, quantity and the version of the instance whose declaration applies |
+| `GET /platform/v1/admin/usage` | metering | — | `200` with the usage of every tenant per hour or day, as JSON or, with `Accept: text/csv`, as CSV: period, tenant, module, meter and quantity per row. `?tenant=<id>` reads one tenant's usage only |
 
 A tenant's name is required, at most 200 characters, and unique among
 tenants. Surrounding whitespace is dropped. Names are compared
@@ -111,6 +113,13 @@ again: the gateway keeps the plan it looked up with a client for
 [throttling](throttling.md#plan-limits)). Until then a client keeps the
 limits it had.
 
+The usage read takes the parameters of a tenant's own export, `from`, `to`,
+`granularity`, `module` and `meter`, described in
+[reading usage](../api-consumers/reading-usage.md), plus `tenant`. A
+parameter that breaks a rule is answered with `400` and `validation`, the
+message under its name. Metering reads it as its admin role, the one
+connection that sees every tenant; see [metering](metering.md#the-operators-usage-read).
+
 Modules register themselves
 ([ADR-0004](../architecture/adr/0004-gateway-and-service-discovery.md)); the admin API
 only reads what the [registry](registry.md) holds and neither removes an
@@ -120,12 +129,15 @@ once its registration ends, 30 seconds after its last heartbeat.
 ## Audit
 
 Every change through the admin API writes an entry into the audit table of
-the service that owns the data, in the same transaction as the change: so
-far `control_plane.audit_entries`. An entry records when, the operator's
+the service that owns the data, in the same transaction as the change:
+`control_plane.audit_entries`. Every read of a tenant's data writes one,
+too: reading the usage writes into `metering.audit_entries`, with the
+action `usage.read`, the target `tenants` or `tenants/<id>`, and the filter
+as its sentence. An entry records when, the operator's
 subject and display name as the caller token named them, what was done
 (`tenant.created`, `tenant.renamed`, `plan.created`, `plan.changed`,
 `plan.deleted`, `client.registered`, `client.plan-changed`,
-`client.removed`), what it was done to (`tenants/<id>`, `plans/<id>`,
+`client.removed`, `usage.read`), what it was done to (`tenants/<id>`, `plans/<id>`,
 `clients/<client id>`) and a sentence for the reader with the values before
 and after. Renaming a tenant to the name it already has, saving a plan
 unchanged, or moving a client to the plan it is on changes nothing and
@@ -133,14 +145,16 @@ writes no entry; neither does a change the admin API refuses. Reading the
 modules writes none either: a registration is the platform's data, not a
 tenant's.
 
-The service's app role may only add entries and read them; it can neither
-change nor delete one. Homeport never deletes an entry. The entries hold
+The service's app role, and its admin role where it has one, may only add
+entries and read them; neither can change nor delete one. Homeport never deletes an entry. The entries hold
 personal data — the operator's subject and name — so delete them after a
 period of your own choosing, as the schema's owner role:
 
 ```sql
 -- as control_plane_owner
 DELETE FROM control_plane.audit_entries WHERE "OccurredAt" < now() - interval '1 year';
+-- as metering_owner
+DELETE FROM metering.audit_entries WHERE "OccurredAt" < now() - interval '1 year';
 ```
 
 ## Configuration
@@ -156,6 +170,7 @@ DELETE FROM control_plane.audit_entries WHERE "OccurredAt" < now() - interval '1
 | `AdminApi:RequireHttpsMetadata` | `AdminApi__RequireHttpsMetadata` | `true` | Whether the metadata must be fetched over HTTPS. Turn it off only for a development provider without TLS |
 | `PlatformRoutes:ControlPlaneUrl` | `PlatformRoutes__ControlPlaneUrl` | `http://control-plane` | Where the gateway forwards the tenants, plans and clients. The AppHost and the compose file set the control plane's endpoint |
 | `PlatformRoutes:RegistryUrl` | `PlatformRoutes__RegistryUrl` | `http://registry` | Where the gateway forwards the modules. The AppHost and the compose file set the registry's endpoint |
+| `PlatformRoutes:MeteringUrl` | `PlatformRoutes__MeteringUrl` | `http://metering` | Where the gateway forwards the usage, the tenants' export included. The AppHost and the compose file set metering's endpoint |
 
 With a port, the gateway does not start without an authority and an
 audience. Its start is logged at Information with the admin port, the

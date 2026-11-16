@@ -39,6 +39,32 @@ against a server of your own.
 |---|---|---|---|
 | `metering_owner` | `migrate` | owns `metering`, runs DDL | `METERING_OWNER_PASSWORD` |
 | `metering_app` | metering | reads and writes the tables, no DDL, held to row-level security | `METERING_APP_PASSWORD` |
+| `metering_admin` | metering, for the operator | reads the usage aggregates of every tenant, adds to `audit_entries`; nothing else | `METERING_ADMIN_PASSWORD` |
+
+`metering_admin` reads every tenant's rows through a row-level security
+policy of its own, `admin_read`, never through `BYPASSRLS`
+([ADR-0020](../architecture/adr/0020-the-operator-as-a-caller.md)). The
+script creates the role and lets it use the schema; the migrations grant it
+what it reads and create the policy, so the role has to exist before
+`migrate` runs.
+
+An installation whose database was prepared before this role existed lacks
+it, and `migrate` fails on the first grant to it. Create it once, as a
+superuser, before you migrate:
+
+```bash
+export POSTGRES_USER=postgres POSTGRES_DB=homeport PGHOST=<host> PGPASSWORD=<superuser password>
+export METERING_ADMIN_PASSWORD="$(openssl rand -hex 24)"
+psql --no-psqlrc --set ON_ERROR_STOP=1 \
+  --username "${POSTGRES_USER}" --dbname "${POSTGRES_DB}" \
+  --set admin_password="${METERING_ADMIN_PASSWORD}" <<'SQL'
+CREATE ROLE metering_admin LOGIN PASSWORD :'admin_password';
+GRANT USAGE ON SCHEMA metering TO metering_admin;
+SQL
+```
+
+Keep the password: metering needs it in `ConnectionStrings__metering-admin`,
+and the compose file takes it from `METERING_ADMIN_PASSWORD` in `.env`.
 
 ## Preparing the broker
 
@@ -104,6 +130,7 @@ plane's, it retries a connection while PostgreSQL still starts.
 | Environment variable | Compose `.env` | Meaning |
 |---|---|---|
 | `ConnectionStrings__metering` | built from `METERING_APP_PASSWORD` | The app role's connection |
+| `ConnectionStrings__metering-admin` | built from `METERING_ADMIN_PASSWORD` | The admin role's connection, for the operator's reads only |
 | `ConnectionStrings__rabbitmq` | built from `METERING_RABBITMQ_PASSWORD` | The broker, as the user `metering` |
 
 The gateway publishes with `ConnectionStrings__rabbitmq` built from
@@ -131,6 +158,25 @@ A service token, which names no tenant, is refused with `403`.
 The gateway logs the metering address that applies when it starts. The
 export counts against the tenant's rate limit and is not itself metered.
 Metering logs a token it refuses at Warning, without the token.
+
+## The operator's usage read
+
+Metering serves `GET /v1/admin/usage` to the operator, which the gateway
+forwards from `/platform/v1/admin/usage` on its admin endpoint only. It takes
+the parameters of the export plus `tenant`, a tenant's id, and writes the
+tenant into every row; the [admin portal](admin-portal.md#usage) reads and
+downloads it. Metering serves it only on a caller token with the scope
+`admin` and no tenant
+([ADR-0020](../architecture/adr/0020-the-operator-as-a-caller.md)), and
+reads through `ConnectionStrings__metering-admin`, the one connection that
+sees every tenant.
+
+Every read writes an entry into `metering.audit_entries` in the same
+transaction: when, the operator's subject and display name, the action
+`usage.read`, the target — `tenants` or `tenants/<id>` — and the filter in
+words. A read that is refused, such as one with an invalid period, writes
+none. Metering never deletes an entry; neither the app role nor the admin
+role may change or delete one.
 
 ## Metrics and logs
 

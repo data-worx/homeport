@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The operator reads the usage of every tenant in the admin portal: one row
+  per tenant and one column per module and meter, summed over a period and
+  filterable by tenant, module and meter, with totals, and downloads it per
+  hour or day as CSV or JSON. The admin API serves it at
+  `GET /platform/v1/admin/usage`, from metering, which reads it as the new
+  database role `metering_admin` and records every read in
+  `metering.audit_entries`. An existing installation creates the role by
+  hand before it migrates. See
+  [the admin portal](docs/operators/admin-portal.md#usage) and
+  [metering](docs/operators/metering.md#preparing-the-database).
+
 - The operator sees the registered modules in the admin portal: each
   module with its versions, contract versions, instances, last heartbeat,
   routes and a link to its API docs where they are served, and per module

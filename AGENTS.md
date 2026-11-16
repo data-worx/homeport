@@ -98,9 +98,9 @@ reader it is written for:
   `Directory.Packages.props`.
 - Use `TimeProvider`, never `DateTime.Now` or `DateTime.UtcNow`.
 - Keep data access provider-neutral. Vendor-specific SQL is allowed only for
-  the row-level security setup, for revoking the app role's `UPDATE` and
-  `DELETE` on an audit table, and for the schema and role setup in
-  `deploy/postgres/init/`.
+  the row-level security setup, the admin role's grants and policies
+  included, for revoking the app role's `UPDATE` and `DELETE` on an audit
+  table, and for the schema and role setup in `deploy/postgres/init/`.
 - Code outside C# only where an atomic operation must run inside a data
   store: row-level security and audit table privileges in PostgreSQL,
   counter scripts in Valkey.
