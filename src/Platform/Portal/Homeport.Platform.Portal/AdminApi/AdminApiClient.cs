@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
+using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Client.Platform.Registry.V1;
 using Homeport.Shared.Client.Problems;
 
@@ -72,7 +73,7 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
     /// <remarks>The answer has no body; the deleted plan's id stands in for it.</remarks>
     public Task<AdminResult<Guid>> DeletePlanAsync(Guid planId, CancellationToken cancellationToken)
     {
-        return SendAsync(HttpMethod.Delete, PlanPathOf(planId), body: null, (_, _) => Task.FromResult(planId), cancellationToken);
+        return SendAsync(HttpMethod.Delete, PlanPathOf(planId), body: null, accept: null, (_, _) => Task.FromResult(planId), cancellationToken);
     }
 
     /// <inheritdoc />
@@ -98,13 +99,32 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
     /// <remarks>The answer has no body; the removed client's id stands in for it.</remarks>
     public Task<AdminResult<string>> RemoveClientAsync(string clientId, CancellationToken cancellationToken)
     {
-        return SendAsync(HttpMethod.Delete, ClientPathOf(clientId), body: null, (_, _) => Task.FromResult(clientId), cancellationToken);
+        return SendAsync(HttpMethod.Delete, ClientPathOf(clientId), body: null, accept: null, (_, _) => Task.FromResult(clientId), cancellationToken);
     }
 
     /// <inheritdoc />
     public Task<AdminResult<ModulesResponse>> GetModulesAsync(CancellationToken cancellationToken)
     {
         return SendAsync<ModulesResponse>(HttpMethod.Get, ModulesApi.Path, body: null, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<AdminResult<AdminUsageResponse>> GetUsageAsync(UsageFilter filter, CancellationToken cancellationToken)
+    {
+        return SendAsync<AdminUsageResponse>(HttpMethod.Get, AdminUsageApi.Path + filter.QueryString(), body: null, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    /// <remarks>The body is handed on as the admin API wrote it, so the download is the export itself.</remarks>
+    public Task<AdminResult<byte[]>> ExportUsageAsync(UsageFilter filter, string mediaType, CancellationToken cancellationToken)
+    {
+        return SendAsync(
+            HttpMethod.Get,
+            AdminUsageApi.Path + filter.QueryString(),
+            body: null,
+            mediaType,
+            (response, token) => response.Content.ReadAsByteArrayAsync(token),
+            cancellationToken);
     }
 
     /// <summary>
@@ -129,19 +149,22 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
             method,
             path,
             body,
+            accept: null,
             async (response, token) => await response.Content.ReadFromJsonAsync<TValue>(token)
                 ?? throw new InvalidOperationException($"The admin API answered {method} {path} without a body."),
             cancellationToken);
     }
 
     /// <summary>
-    /// Sends the request with the operator's access token; a missing or refused token asks for a
+    /// Sends the request with the operator's access token, and with <paramref name="accept"/>
+    /// as the media type asked for where it is set; a missing or refused token asks for a
     /// new sign-in, and every error becomes a problem.
     /// </summary>
     private async Task<AdminResult<TValue>> SendAsync<TValue>(
         HttpMethod method,
         string path,
         HttpContent? body,
+        string? accept,
         Func<HttpResponseMessage, CancellationToken, Task<TValue>> readValue,
         CancellationToken cancellationToken)
     {
@@ -153,6 +176,10 @@ internal sealed class AdminApiClient(HttpClient http, OperatorTokens tokens, ILo
 
         using var request = new HttpRequestMessage(method, PlatformPrefix + path) { Content = body };
         request.Headers.Authorization = new AuthenticationHeaderValue(BearerScheme, accessToken);
+        if (accept is not null)
+        {
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
+        }
 
         HttpResponseMessage response;
         try

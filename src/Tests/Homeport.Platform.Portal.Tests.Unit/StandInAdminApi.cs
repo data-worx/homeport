@@ -2,6 +2,7 @@
 
 using Homeport.Platform.Portal.AdminApi;
 using Homeport.Shared.Client.Platform.ControlPlane.V1;
+using Homeport.Shared.Client.Platform.Metering.V1;
 using Homeport.Shared.Client.Platform.Registry.V1;
 using Homeport.Shared.Client.Problems;
 
@@ -98,4 +99,29 @@ internal sealed class StandInAdminApi : IAdminApi
     internal AdminResult<ModulesResponse> Modules { get; set; } = AdminResult<ModulesResponse>.Success(new ModulesResponse([]));
 
     public Task<AdminResult<ModulesResponse>> GetModulesAsync(CancellationToken cancellationToken) => Task.FromResult(Modules);
+
+    /// <summary>The answer to <see cref="GetUsageAsync"/>.</summary>
+    internal AdminResult<AdminUsageResponse> Usage { get; set; } =
+        AdminResult<AdminUsageResponse>.Success(new AdminUsageResponse(DateTime.UnixEpoch, DateTime.UnixEpoch, UsageApi.Day, []));
+
+    /// <summary>The filters <see cref="GetUsageAsync"/> was called with, in order.</summary>
+    internal List<UsageFilter> UsageReads { get; } = [];
+
+    /// <summary>The answer to <see cref="ExportUsageAsync"/>.</summary>
+    internal AdminResult<byte[]> Export { get; set; } = AdminResult<byte[]>.Success("period,tenant,module,meter,quantity\r\n"u8.ToArray());
+
+    /// <summary>The filters and media types <see cref="ExportUsageAsync"/> was called with, in order.</summary>
+    internal List<(UsageFilter Filter, string MediaType)> Exports { get; } = [];
+
+    public Task<AdminResult<AdminUsageResponse>> GetUsageAsync(UsageFilter filter, CancellationToken cancellationToken)
+    {
+        UsageReads.Add(filter);
+        return Task.FromResult(Usage);
+    }
+
+    public Task<AdminResult<byte[]>> ExportUsageAsync(UsageFilter filter, string mediaType, CancellationToken cancellationToken)
+    {
+        Exports.Add((filter, mediaType));
+        return Task.FromResult(Export);
+    }
 }

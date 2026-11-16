@@ -1,0 +1,342 @@
+@* SPDX-License-Identifier: AGPL-3.0-or-later *@
+@page "/usage"
+@using System.Globalization
+@using System.Net.Mime
+@using Homeport.Platform.Portal.AdminApi
+@using Homeport.Shared.Client.Platform.ControlPlane.V1
+@using Homeport.Shared.Client.Platform.Metering.V1
+@implements IAsyncDisposable
+@inject IAdminApi AdminApi
+@inject TimeProvider Clock
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject ILogger<UsagePage> Logger
+
+<PageTitle>Usage · Homeport</PageTitle>
+
+<div class="d-flex align-center justify-space-between flex-wrap gap-4 mb-6">
+    <div>
+        <MudText Typo="Typo.h4" HtmlTag="h1">Usage</MudText>
+        <MudText Class="mud-text-secondary">@Summary</MudText>
+    </div>
+    @if (_table is { Rows.Count: > 0 })
+    {
+        <div class="d-flex align-center flex-wrap gap-2" data-export>
+            <MudToggleGroup T="string" @bind-Value="_exportGranularity" Outlined="true" Size="Size.Small" data-export-granularity>
+                <MudToggleItem Value="UsageApi.Hour">Hour</MudToggleItem>
+                <MudToggleItem Value="UsageApi.Day">Day</MudToggleItem>
+            </MudToggleGroup>
+            <MudButton Variant="Variant.Outlined" StartIcon="@HomeportIcons.Lucide.Download" Disabled="_exporting"
+                       OnClick="() => ExportAsync(UsageApi.CsvMediaType, CsvExtension)" data-action="export-csv">CSV</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@HomeportIcons.Lucide.Download" Disabled="_exporting"
+                       OnClick="() => ExportAsync(MediaTypeNames.Application.Json, JsonExtension)" data-action="export-json">JSON</MudButton>
+        </div>
+    }
+</div>
+
+<ProblemAlert State="_exportProblem" />
+
+<div class="hp-filters mb-4">
+    <MudDatePicker Date="_from" DateChanged="FromChangedAsync" Label="From" Variant="Variant.Outlined" Margin="Margin.Dense"
+                   DateFormat="@DayFormat" MaxDate="_to" data-filter="from" />
+    <MudDatePicker Date="_to" DateChanged="ToChangedAsync" Label="To" Variant="Variant.Outlined" Margin="Margin.Dense"
+                   DateFormat="@DayFormat" MinDate="_from" data-filter="to" />
+    <MudSelect T="Guid" Value="_tenant" ValueChanged="TenantChangedAsync" Label="Tenant" Variant="Variant.Outlined" Margin="Margin.Dense" data-filter="tenant">
+        <MudSelectItem T="Guid" Value="Guid.Empty">All tenants</MudSelectItem>
+        @foreach (var tenant in _tenants)
+        {
+            <MudSelectItem T="Guid" Value="tenant.Id" @key="tenant.Id">@tenant.Name</MudSelectItem>
+        }
+    </MudSelect>
+    <MudSelect T="string" Value="_module" ValueChanged="ModuleChangedAsync" Label="Module" Variant="Variant.Outlined" Margin="Margin.Dense" data-filter="module">
+        <MudSelectItem T="string" Value="AllValues">All modules</MudSelectItem>
+        @foreach (var module in _modules)
+        {
+            <MudSelectItem T="string" Value="module" @key="module">@module</MudSelectItem>
+        }
+    </MudSelect>
+    <MudSelect T="string" Value="_meter" ValueChanged="MeterChangedAsync" Label="Meter" Variant="Variant.Outlined" Margin="Margin.Dense" data-filter="meter">
+        <MudSelectItem T="string" Value="AllValues">All meters</MudSelectItem>
+        @foreach (var meter in _meters)
+        {
+            <MudSelectItem T="string" Value="meter" @key="meter">@meter</MudSelectItem>
+        }
+    </MudSelect>
+</div>
+
+<MudPaper Outlined="true">
+    @if (_problem.Problem is not null)
+    {
+        <ListError Title="Could not load usage" State="_problem" OnRetry="LoadAsync" />
+    }
+    else if (_table is null)
+    {
+        <ListLoading Label="Loading usage" />
+    }
+    else if (_table.Rows.Count == 0)
+    {
+        <ListEmpty Illustration="spot-empty-berth.svg"
+                   Title="No usage in this period"
+                   Text="Metering counts every call a tenant's client makes to a module through the gateway. Choose another period, or clear a filter." />
+    }
+    else
+    {
+        <div class="hp-scroll">
+            <MudSimpleTable Hover="true" Dense="false" Elevation="0" data-usage>
+                <thead>
+                    <tr>
+                        <th>Tenant</th>
+                        @foreach (var column in _table.Columns)
+                        {
+                            <th class="hp-num" data-column="@ColumnOf(column)">
+                                <span class="hp-mono">@column.Module</span>
+                                <div class="mud-text-secondary hp-id">@column.Meter</div>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _table.Rows)
+                    {
+                        <tr @key="row.TenantId" data-tenant="@row.TenantId">
+                            <td>
+                                <span data-tenant-name>@row.TenantName</span>
+                                <div class="hp-mono mud-text-secondary hp-id">@row.TenantId</div>
+                            </td>
+                            @foreach (var quantity in row.Quantities)
+                            {
+                                <td class="hp-num" data-quantity>@Format(quantity)</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="hp-totals" data-totals>
+                        <td>Total</td>
+                        @foreach (var total in _table.Totals)
+                        {
+                            <td class="hp-num" data-quantity>@Format(total)</td>
+                        }
+                    </tr>
+                </tfoot>
+            </MudSimpleTable>
+        </div>
+    }
+</MudPaper>
+
+<MudText Typo="Typo.body2" Class="mud-text-secondary mt-4">
+    Days are UTC days. Usage reaches metering within seconds of the call. Every read of this page and every download is recorded in metering's audit log under your name.
+</MudText>
+
+@code {
+    /// <summary>The value of the module and meter filters that stands for every value.</summary>
+    private const string AllValues = "";
+
+    private const string CsvExtension = "csv";
+
+    private const string JsonExtension = "json";
+
+    private const string DayFormat = "yyyy-MM-dd";
+
+    /// <summary>The module, next to this page, that hands a download to the browser.</summary>
+    private const string DownloadModule = "./Components/Pages/Usage/UsagePage.razor.js";
+
+    private readonly ProblemState _problem = new();
+    private readonly ProblemState _exportProblem = new();
+    private IReadOnlyList<TenantResponse> _tenants = [];
+    private IReadOnlyList<string> _modules = [];
+    private IReadOnlyList<string> _meters = [];
+    private UsageTable? _table;
+    private DateTime? _from;
+    private DateTime? _to;
+    private Guid _tenant = Guid.Empty;
+    private string _module = AllValues;
+    private string _meter = AllValues;
+    private string _exportGranularity = UsageApi.Day;
+    private bool _exporting;
+    private IJSObjectReference? _download;
+
+    private string Summary => _table is null
+        ? "The usage of every tenant, summed over the period"
+        : $"{_table.Rows.Count} {(_table.Rows.Count == 1 ? "tenant" : "tenants")} · {_from:yyyy-MM-dd} to {_to:yyyy-MM-dd}";
+
+    // The current month up to today, as the operator most often reads it.
+    protected override void OnInitialized()
+    {
+        var today = Clock.GetUtcNow().UtcDateTime.Date;
+        _from = new DateTime(today.Year, today.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        _to = today;
+    }
+
+    // After the first render, so the prerendered page shows the loading state
+    // and the usage is read once, by the circuit: every read is audited.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadAsync();
+            StateHasChanged();
+        }
+    }
+
+    // The tenants are read with the usage: the filter offers them, and the
+    // table names them.
+    private async Task LoadAsync()
+    {
+        _problem.Clear();
+        _table = null;
+        var tenants = AdminApi.GetTenantsAsync(CancellationToken.None);
+        var usage = AdminApi.GetUsageAsync(FilterOf(UsageApi.Day), CancellationToken.None);
+        await Task.WhenAll(tenants, usage);
+
+        if (tenants.Result.SignInRequired || usage.Result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+            return;
+        }
+
+        if ((tenants.Result.Problem ?? usage.Result.Problem) is { } problem)
+        {
+            _problem.Show(problem);
+            return;
+        }
+
+        _tenants = tenants.Result.Value!.Tenants;
+        Show(usage.Result.Value!);
+    }
+
+    // A changed filter reads the usage again, without the tenants.
+    private async Task ReloadAsync()
+    {
+        _problem.Clear();
+        _table = null;
+        var result = await AdminApi.GetUsageAsync(FilterOf(UsageApi.Day), CancellationToken.None);
+        if (result.SignInRequired)
+        {
+            Navigation.SignInAgain();
+        }
+        else if (result.Problem is { } problem)
+        {
+            _problem.Show(problem);
+        }
+        else
+        {
+            Show(result.Value!);
+        }
+    }
+
+    // The module and meter filters offer what the period has, and keep the
+    // value chosen even where it has nothing.
+    private void Show(AdminUsageResponse usage)
+    {
+        _table = UsageTable.Of(usage, _tenants);
+        _modules = OptionsOf(usage.Usage.Select(entry => entry.Module), _module);
+        _meters = OptionsOf(usage.Usage.Select(entry => entry.Meter), _meter);
+    }
+
+    private async Task FromChangedAsync(DateTime? from)
+    {
+        _from = from;
+        await ReloadAsync();
+    }
+
+    private async Task ToChangedAsync(DateTime? to)
+    {
+        _to = to;
+        await ReloadAsync();
+    }
+
+    private async Task TenantChangedAsync(Guid tenant)
+    {
+        _tenant = tenant;
+        await ReloadAsync();
+    }
+
+    private async Task ModuleChangedAsync(string module)
+    {
+        _module = module;
+        await ReloadAsync();
+    }
+
+    private async Task MeterChangedAsync(string meter)
+    {
+        _meter = meter;
+        await ReloadAsync();
+    }
+
+    // The export reads the usage again, with the filters of the table and the
+    // granularity next to the buttons, and hands the body to the browser as
+    // the admin API wrote it.
+    private async Task ExportAsync(string mediaType, string extension)
+    {
+        _exportProblem.Clear();
+        _exporting = true;
+        try
+        {
+            var result = await AdminApi.ExportUsageAsync(FilterOf(_exportGranularity), mediaType, CancellationToken.None);
+            if (result.SignInRequired)
+            {
+                Navigation.SignInAgain();
+                return;
+            }
+
+            if (result.Problem is { } problem)
+            {
+                _exportProblem.Show(problem);
+                return;
+            }
+
+            using var content = new MemoryStream(result.Value!);
+            using var stream = new DotNetStreamReference(content);
+            _download ??= await JS.InvokeAsync<IJSObjectReference>("import", DownloadModule);
+            await _download.InvokeVoidAsync("download", FileNameOf(extension), stream);
+        }
+        finally
+        {
+            _exporting = false;
+        }
+    }
+
+    // The days the operator picked, as the period the admin API reads: from
+    // the start of the first day to the start of the day after the last.
+    private UsageFilter FilterOf(string granularity)
+    {
+        var from = _from ?? Clock.GetUtcNow().UtcDateTime.Date;
+        var to = _to ?? from;
+        return new UsageFilter(
+            new DateTimeOffset(DateTime.SpecifyKind(from.Date, DateTimeKind.Utc)),
+            new DateTimeOffset(DateTime.SpecifyKind(to.Date.AddDays(1), DateTimeKind.Utc)),
+            granularity,
+            _tenant == Guid.Empty ? null : _tenant,
+            _module == AllValues ? null : _module,
+            _meter == AllValues ? null : _meter);
+    }
+
+    private string FileNameOf(string extension) =>
+        string.Create(CultureInfo.InvariantCulture, $"homeport-usage-{_from:yyyy-MM-dd}-{_to:yyyy-MM-dd}-{_exportGranularity}.{extension}");
+
+    private static IReadOnlyList<string> OptionsOf(IEnumerable<string> values, string chosen) =>
+        values.Append(chosen).Where(value => value != AllValues).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
+
+    private static string ColumnOf(UsageColumn column) => $"{column.Module} · {column.Meter}";
+
+    private static string Format(long quantity) => quantity.ToString("N0", CultureInfo.InvariantCulture);
+
+    /// <summary>Releases the download module; a circuit that is gone has released it already.</summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (_download is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _download.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            Logger.LogDebug("The circuit was gone before the download module was released");
+        }
+    }
+}
