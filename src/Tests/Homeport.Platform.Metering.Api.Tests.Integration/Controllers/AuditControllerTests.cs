@@ -82,6 +82,22 @@ public sealed class AuditControllerTests
         }
 
         [Fact]
+        public async Task Pages_Through_Entries_Of_The_Same_Moment_Without_Losing_One()
+        {
+            var actor = NewActor();
+            var ids = new HashSet<Guid>();
+            for (var i = 0; i < 3; i++)
+            {
+                ids.Add(await metering.AddAuditEntryAsync(actor, Start, AuditEntry.AllTenantsTarget));
+            }
+
+            var first = await ReadAsync($"?{AuditApi.ActorParameter}={actor}&{AuditApi.LimitParameter}=2");
+            var second = await ReadAsync($"?{AuditApi.ActorParameter}={actor}&{AuditApi.LimitParameter}=2&{AuditApi.BeforeParameter}={first.Next}");
+
+            Assert.Equal(ids, first.Entries.Concat(second.Entries).Select(entry => entry.Id).ToHashSet());
+        }
+
+        [Fact]
         public async Task Returns_No_Next_On_A_Page_That_Holds_The_Last_Entry()
         {
             var actor = NewActor();

@@ -68,8 +68,11 @@ internal sealed class AuditTrail
     internal IReadOnlyList<(AuditService Service, ProblemResponse Problem)> Gaps =>
         sources.Where(source => source.Problem is not null).Select(source => (source.Service, source.Problem!)).ToList();
 
-    /// <summary>Whether every service answered with a problem, so the list has nothing to show.</summary>
-    internal bool Failed => sources.All(source => source.Problem is not null);
+    /// <summary>
+    /// Whether every service answered with a problem before the list showed
+    /// anything. Once it shows entries, it keeps them, and the problems are gaps.
+    /// </summary>
+    internal bool Failed => rows.Count == 0 && sources.All(source => source.Problem is not null);
 
     /// <summary>Whether the operator has to sign in again before the list can be read.</summary>
     internal bool SignInRequired { get; private set; }

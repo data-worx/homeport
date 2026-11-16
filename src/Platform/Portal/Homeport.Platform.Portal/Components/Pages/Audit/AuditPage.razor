@@ -147,7 +147,11 @@
         }
         finally
         {
-            _loading = false;
+            // A list the filters replaced meanwhile leaves the newer one loading.
+            if (trail == _trail)
+            {
+                _loading = false;
+            }
         }
 
         if (trail != _trail)

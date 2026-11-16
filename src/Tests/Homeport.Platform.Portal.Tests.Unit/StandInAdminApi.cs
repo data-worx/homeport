@@ -144,10 +144,13 @@ internal sealed class StandInAdminApi : IAdminApi
     /// <summary>The filters and cursors <see cref="GetMeteringAuditAsync"/> was called with, in order.</summary>
     internal List<(AuditFilter Filter, string? Before)> MeteringAuditReads { get; } = [];
 
+    /// <summary>The answer to <see cref="GetControlPlaneAuditAsync"/> by its filter, where a test sets one; <see cref="ControlPlaneAudit"/> otherwise.</summary>
+    internal Func<AuditFilter, Task<AdminResult<ControlPlaneAudit>>>? ControlPlaneAuditFor { get; set; }
+
     public Task<AdminResult<ControlPlaneAudit>> GetControlPlaneAuditAsync(AuditFilter filter, string? before, CancellationToken cancellationToken)
     {
         ControlPlaneAuditReads.Add((filter, before));
-        return Task.FromResult(ControlPlaneAudit(before));
+        return ControlPlaneAuditFor?.Invoke(filter) ?? Task.FromResult(ControlPlaneAudit(before));
     }
 
     public Task<AdminResult<MeteringAudit>> GetMeteringAuditAsync(AuditFilter filter, string? before, CancellationToken cancellationToken)

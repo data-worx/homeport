@@ -101,6 +101,43 @@ public sealed class AuditPageTests : PortalTestContext
     }
 
     [Fact]
+    public void Keeps_The_Entries_Shown_When_Every_Service_Fails_On_A_Later_Page()
+    {
+        Api.ControlPlaneAudit = before => before is null
+            ? ControlPlanePage(Enumerable.Range(30, 30).Reverse().Select(ControlPlaneAt).ToList(), next: "page-2")
+            : AdminResult<ControlPlaneAudit>.Failure(StandInAdminApi.Unavailable);
+        Api.MeteringAudit = before => before is null
+            ? MeteringPage(Enumerable.Range(0, 30).Reverse().Select(MeteringAt).ToList(), next: "page-2")
+            : AdminResult<MeteringAudit>.Failure(StandInAdminApi.Unavailable);
+
+        var (page, _) = RenderWithProviders<AuditPage>();
+        page.WaitForAssertion(() => Assert.Equal(50, page.FindAll("[data-entry]").Count));
+
+        page.Find("[data-action=more]").Click();
+
+        page.WaitForAssertion(() => Assert.Equal(
+            (60, 0, 2),
+            (page.FindAll("[data-entry]").Count, page.FindAll("[data-list-state=error]").Count, page.FindAll("[data-list-state=degraded]").Count)));
+    }
+
+    [Fact]
+    public void Keeps_Loading_The_Latest_Filters_When_An_Earlier_Read_Answers_First()
+    {
+        var earlier = new TaskCompletionSource<AdminResult<ControlPlaneAudit>>();
+        var latest = new TaskCompletionSource<AdminResult<ControlPlaneAudit>>();
+        Api.ControlPlaneAuditFor = filter => filter.Actor is null ? earlier.Task : latest.Task;
+        var (page, _) = RenderWithProviders<AuditPage>();
+        var actor = page.FindComponents<MudTextField<string>>().Single(field => field.Instance.Label == "Operator subject");
+        page.InvokeAsync(() => actor.Instance.ValueChanged.InvokeAsync("operator-1"));
+
+        page.InvokeAsync(() => earlier.SetResult(ControlPlanePage([ControlPlaneAt(3)], next: null)));
+
+        page.WaitForAssertion(() => Assert.Equal(
+            (0, 0),
+            (page.FindAll("[data-list-state=empty]").Count, page.FindAll("[data-entry]").Count)));
+    }
+
+    [Fact]
     public void Shows_The_Error_State_When_No_Service_Answers()
     {
         Api.ControlPlaneAudit = _ => AdminResult<ControlPlaneAudit>.Failure(StandInAdminApi.Unavailable);
