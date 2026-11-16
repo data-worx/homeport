@@ -509,3 +509,99 @@ static Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.opera
 static Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AdminUsageEntryResponse? right) -> bool
 static Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? right) -> bool
 static Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AdminUsageResponse? right) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse!
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.AuditEntriesResponse(System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse!>! Entries, string? Next) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.Deconstruct(out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse!>! Entries, out string? Next) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.Entries.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse!>!
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.Entries.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.Next.get -> string?
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.Next.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse!
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Action.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Action.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.AuditEntryResponse(System.Guid Id, System.DateTime OccurredAt, string! OperatorSubject, string! OperatorName, string! Action, string! Target, string! Summary) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Deconstruct(out System.Guid Id, out System.DateTime OccurredAt, out string! OperatorSubject, out string! OperatorName, out string! Action, out string! Target, out string! Summary) -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Equals(Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse? other) -> bool
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Id.get -> System.Guid
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Id.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.OccurredAt.get -> System.DateTime
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.OccurredAt.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.OperatorName.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.OperatorName.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.OperatorSubject.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.OperatorSubject.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Summary.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Summary.init -> void
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Target.get -> string!
+Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Target.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditApi
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse!
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.AuditEntriesResponse(System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse!>! Entries, string? Next) -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.Deconstruct(out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse!>! Entries, out string? Next) -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.Entries.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse!>!
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.Entries.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.Equals(Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse? other) -> bool
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.Next.get -> string?
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.Next.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.<Clone>$() -> Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse!
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Action.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Action.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.AuditEntryResponse(System.Guid Id, System.DateTime OccurredAt, string! OperatorSubject, string! OperatorName, string! Action, string! Target, string! Summary) -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Deconstruct(out System.Guid Id, out System.DateTime OccurredAt, out string! OperatorSubject, out string! OperatorName, out string! Action, out string! Target, out string! Summary) -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Equals(Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? other) -> bool
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Id.get -> System.Guid
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Id.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.OccurredAt.get -> System.DateTime
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.OccurredAt.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.OperatorName.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.OperatorName.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.OperatorSubject.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.OperatorSubject.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Summary.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Summary.init -> void
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Target.get -> string!
+Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Target.init -> void
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.ActorParameter = "actor" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.BeforeParameter = "before" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.DefaultLimit = 50 -> int
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.FromParameter = "from" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.LimitParameter = "limit" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.MaxLimit = 200 -> int
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.Path = "/v1/admin/control-plane/audit" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.TargetParameter = "target" -> string!
+const Homeport.Shared.Client.Platform.ControlPlane.V1.AuditApi.ToParameter = "to" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.ActorParameter = "actor" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.BeforeParameter = "before" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.DefaultLimit = 50 -> int
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.FromParameter = "from" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.LimitParameter = "limit" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.MaxLimit = 200 -> int
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.Path = "/v1/admin/metering/audit" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.TargetParameter = "target" -> string!
+const Homeport.Shared.Client.Platform.Metering.V1.AuditApi.ToParameter = "to" -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.ToString() -> string!
+override Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.ToString() -> string!
+static Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntriesResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse? right) -> bool
+static Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.AuditEntryResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? right) -> bool
+static Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? right) -> bool
