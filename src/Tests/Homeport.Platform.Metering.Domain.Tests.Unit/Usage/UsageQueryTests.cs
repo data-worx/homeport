@@ -64,6 +64,32 @@ public sealed class UsageQueryTests
         }
 
         [Fact]
+        public void Takes_A_Module_And_A_Meter_Of_The_Longest_Length()
+        {
+            var name = new string('m', UsageQuery.MaxNameLength);
+
+            var query = UsageQuery.Create(From, To, "hour", moduleId: name, meter: name);
+
+            Assert.Equal((name, name), (query.Value.ModuleId, query.Value.Meter));
+        }
+
+        [Fact]
+        public void Returns_Failure_For_A_Module_Longer_Than_The_Longest_Length()
+        {
+            var query = UsageQuery.Create(From, To, "hour", moduleId: new string('m', UsageQuery.MaxNameLength + 1), meter: null);
+
+            Assert.Equal(UsageQuery.ModuleTooLongCode, query.Error.Code);
+        }
+
+        [Fact]
+        public void Returns_Failure_For_A_Meter_Longer_Than_The_Longest_Length()
+        {
+            var query = UsageQuery.Create(From, To, "hour", moduleId: null, meter: new string('m', UsageQuery.MaxNameLength + 1));
+
+            Assert.Equal(UsageQuery.MeterTooLongCode, query.Error.Code);
+        }
+
+        [Fact]
         public void Returns_No_Module_And_No_Meter_When_They_Are_Empty()
         {
             var query = UsageQuery.Create(From, To, "hour", moduleId: string.Empty, meter: string.Empty);

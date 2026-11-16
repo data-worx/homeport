@@ -127,6 +127,20 @@ public sealed class AdminUsageControllerTests
                 (response.StatusCode, problem!.Type.ToString(), problem.Errors!.ContainsKey(AdminUsageApi.TenantParameter)));
         }
 
+        [Fact]
+        public async Task Returns_400_And_Records_Nothing_For_A_Module_Too_Long_For_The_Audit_Entry()
+        {
+            var subject = $"operator-{Guid.NewGuid()}";
+            using var client = metering.CreateClient(metering.OperatorToken(subject));
+
+            using var response = await client.GetAsync($"{HourQuery}&{UsageApi.ModuleParameter}={new string('m', 900)}");
+
+            var problem = await response.Content.ReadFromJsonAsync<ProblemResponse>();
+            Assert.Equal(
+                (HttpStatusCode.BadRequest, true, 0L),
+                (response.StatusCode, problem!.Errors!.ContainsKey(UsageApi.ModuleParameter), await metering.AuditEntriesOfAsync(subject)));
+        }
+
         private HttpClient OperatorClient() => metering.CreateClient(metering.OperatorToken($"operator-{Guid.NewGuid()}"));
 
         private static async Task<List<string[]>> CsvRowsAsync(HttpResponseMessage response)

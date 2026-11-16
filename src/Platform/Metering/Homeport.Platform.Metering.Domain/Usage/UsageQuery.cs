@@ -17,6 +17,18 @@ public sealed record UsageQuery
     /// <summary>The period ends before it starts, or is empty.</summary>
     public const string EmptyPeriodCode = "usage.period";
 
+    /// <summary>The module id is longer than <see cref="MaxNameLength"/>.</summary>
+    public const string ModuleTooLongCode = "usage.module";
+
+    /// <summary>The meter is longer than <see cref="MaxNameLength"/>.</summary>
+    public const string MeterTooLongCode = "usage.meter";
+
+    /// <summary>
+    /// The longest module id or meter a query takes. Longer names exist nowhere,
+    /// and an operator's read writes them into its audit entry.
+    /// </summary>
+    public const int MaxNameLength = 255;
+
     /// <summary>The name of <see cref="UsageGranularity.Hour"/> in a query.</summary>
     public const string HourName = "hour";
 
@@ -77,6 +89,16 @@ public sealed record UsageQuery
         if (to <= from)
         {
             return Result<UsageQuery>.Failure(new Error(EmptyPeriodCode, "The period ends after it starts."));
+        }
+
+        if (moduleId?.Length > MaxNameLength)
+        {
+            return Result<UsageQuery>.Failure(new Error(ModuleTooLongCode, $"A module id has at most {MaxNameLength} characters."));
+        }
+
+        if (meter?.Length > MaxNameLength)
+        {
+            return Result<UsageQuery>.Failure(new Error(MeterTooLongCode, $"A meter has at most {MaxNameLength} characters."));
         }
 
         return Result<UsageQuery>.Success(new UsageQuery(

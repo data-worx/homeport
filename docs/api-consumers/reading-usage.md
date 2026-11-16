@@ -23,8 +23,8 @@ the gateway to metering is drawn in
 | `from` | yes | The first moment of the period, ISO 8601, such as `2026-11-07T00:00:00Z` |
 | `to` | yes | The first moment after the period; later than `from` |
 | `granularity` | yes | `hour` or `day` |
-| `module` | no | Only this module's usage, by its id, such as `echo` |
-| `meter` | no | Only this meter's usage, such as `requests` |
+| `module` | no | Only this module's usage, by its id, such as `echo`; at most 255 characters |
+| `meter` | no | Only this meter's usage, such as `requests`; at most 255 characters |
 
 Hours and days are UTC. A bucket is in the export when it **starts** in
 [`from`, `to`): `from=2026-11-07T00:00:00Z&to=2026-11-08T00:00:00Z` with
