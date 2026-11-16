@@ -99,7 +99,12 @@ public sealed class RowLevelSecurityTests
         [InlineData(MeteringDbContext.UsageDailyTable, "DELETE FROM {0}")]
         [InlineData(MeteringDbContext.UsageHourlyTable, "INSERT INTO {0} SELECT * FROM {0} LIMIT 0")]
         [InlineData(MeteringDbContext.UsageDailyTable, "INSERT INTO {0} SELECT * FROM {0} LIMIT 0")]
-        public async Task Keeps_The_Admin_Role_From_Writing_The_Aggregates(string table, string statement)
+
+        // The events are not readable to it either, so none of these may read a column.
+        [InlineData(MeteringDbContext.UsageEventsTable, "UPDATE {0} SET \"Quantity\" = 0")]
+        [InlineData(MeteringDbContext.UsageEventsTable, "DELETE FROM {0}")]
+        [InlineData(MeteringDbContext.UsageEventsTable, "INSERT INTO {0} DEFAULT VALUES")]
+        public async Task Keeps_The_Admin_Role_From_Writing_The_Usage_Tables(string table, string statement)
         {
             var sql = string.Format(CultureInfo.InvariantCulture, statement, $"{MeteringDbContext.Schema}.\"{table}\"");
 
