@@ -144,5 +144,18 @@ public sealed class AdminRoutesTests
             var cluster = Assert.Single(clusters, cluster => cluster.ClusterId == route.ClusterId);
             Assert.Equal("http://registry:5100/", Assert.Single(cluster.Destinations!.Values).Address);
         }
+
+        [Fact]
+        public void Forwards_The_Usage_To_Metering_With_A_Caller_Token_For_It()
+        {
+            var options = new PlatformRoutesOptions { MeteringUrl = new Uri("http://metering:5200") };
+
+            var (routes, clusters) = AdminRoutes.Configured(options).Build();
+
+            var route = Assert.Single(routes, route => route.Match.Path == "/platform/v1/admin/usage");
+            Assert.Equal((HttpMethods.Get, "homeport-metering"), (Assert.Single(route.Match.Methods!), route.Metadata![AdminRoutes.AdminAudienceMetadata]));
+            var cluster = Assert.Single(clusters, cluster => cluster.ClusterId == route.ClusterId);
+            Assert.Equal("http://metering:5200/", Assert.Single(cluster.Destinations!.Values).Address);
+        }
     }
 }
