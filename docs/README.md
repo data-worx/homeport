@@ -10,6 +10,7 @@ Arranged by reader. A directory exists once it has its first document.
 | Document | About |
 |---|---|
 | [`operators/running-locally.md`](operators/running-locally.md) | Starting Homeport on one machine, with the AppHost or with Docker Compose |
+| [`operators/upgrading.md`](operators/upgrading.md) | Upgrading an installation to the next release: the backup, the roles and settings a release adds, migrating, and the way back |
 | [`operators/verifying-images.md`](operators/verifying-images.md) | The released images in GHCR, what a release carries, and verifying an image and its SBOM with `cosign.pub`, offline |
 | [`operators/signing-key.md`](operators/signing-key.md) | Generating, configuring and rotating the gateway's signing key |
 | [`operators/registry.md`](operators/registry.md) | The registry, the modules' registration keys and what happens while it is down |

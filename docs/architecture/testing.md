@@ -5,8 +5,8 @@ in the *Tests* section of [`AGENTS.md`](../../AGENTS.md#tests).
 
 A test suite that fails now and then is worse than a smaller one that never
 does: a red run stops meaning anything, and a real failure gets re-run until
-it turns green. Every rule below comes from a test that hung or failed
-intermittently.
+it turns green. Every rule below but the last comes from a test that hung
+or failed intermittently.
 
 ## Clocks
 
@@ -62,3 +62,19 @@ How the gateway strips headers, propagates traces, keeps its routes while
 the registry is down or drops a module whose instance expired is tested in
 the gateway's and registry's own tests, where a stand-in replaces the other
 side and the test controls time. One stack is started for the whole run.
+
+## Upgrades
+
+An operator upgrades an installation that holds data, so a migration that
+drops or changes a column the previous release wrote loses that data where
+a test on an empty database sees nothing wrong. Each service with
+migrations therefore has an upgrade test in its Infrastructure tests,
+`UpgradeTests`: it migrates an empty database to the last migration of the
+previous release, writes rows with SQL as that release knew its tables,
+migrates to the latest migration, and reads the rows back unchanged.
+
+The starting points are constants in `ReleasedMigrations`, one per release
+that changed the schema. A release that changes a schema adds its last
+migration there and moves the test to it, so every release is tested as an
+upgrade from the one before; the steps an operator takes are in
+[upgrading](../operators/upgrading.md).

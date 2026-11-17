@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Upgrading from v0.1.0 is documented step by step: the backup, the new
+  database role `metering_admin`, the portal's settings, the new compose
+  file, migrating, and the way back if a step fails. Every release from now
+  on is tested as an upgrade from the one before: the data the previous
+  release wrote survives the new migrations unchanged. See
+  [upgrading](docs/operators/upgrading.md).
+
 - The operator reads the audit log in the admin portal: who changed which
   tenant, plan or client and who read which tenant's usage, from the
   control plane and metering in one list, newest first, filterable by

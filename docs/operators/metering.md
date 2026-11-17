@@ -50,20 +50,9 @@ what it reads and create the policy, so the role has to exist before
 
 An installation whose database was prepared before this role existed lacks
 it, and `migrate` fails on the first grant to it. Create it once, as a
-superuser, before you migrate:
-
-```bash
-export POSTGRES_USER=postgres POSTGRES_DB=homeport PGHOST=<host> PGPASSWORD=<superuser password>
-export METERING_ADMIN_PASSWORD="$(openssl rand -hex 24)"
-psql --no-psqlrc --set ON_ERROR_STOP=1 \
-  --username "${POSTGRES_USER}" --dbname "${POSTGRES_DB}" \
-  --set admin_password="${METERING_ADMIN_PASSWORD}" <<'SQL'
-CREATE ROLE metering_admin LOGIN PASSWORD :'admin_password';
-GRANT USAGE ON SCHEMA metering TO metering_admin;
-SQL
-```
-
-Keep the password: metering needs it in `ConnectionStrings__metering-admin`,
+superuser, before you migrate, as
+[upgrading from v0.1.0](upgrading.md#3-create-the-role-metering_admin)
+shows. Metering needs its password in `ConnectionStrings__metering-admin`,
 and the compose file takes it from `METERING_ADMIN_PASSWORD` in `.env`.
 
 ## Preparing the broker

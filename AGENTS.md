@@ -394,6 +394,12 @@ A test that passes or fails depending on timing is a broken test. See
   start order, what is exposed, and that the components are wired to each
   other — on one stack shared by the whole run. A behaviour of one component
   is tested in that component's tests.
+- Every schema with migrations has an upgrade test: an empty database
+  migrated to the last migration of the previous release, data written as
+  that release knew it, migrated to the latest, the data unchanged. A
+  release that changes a schema adds its last migration to
+  `ReleasedMigrations` as the next starting point, so every release is
+  tested as an upgrade from the one before.
 
 ## Licensing and dependencies
 
