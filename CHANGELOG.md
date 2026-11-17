@@ -97,6 +97,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- PostgreSQL runs on `postgres:18.7-alpine`, which carries the fixed
+  krb5-libs 1.22.3-r0 and libxslt 1.1.43-r4. The 19 findings in them that
+  were accepted until 2026-11-30 are gone from the image and no longer
+  ignored by the scan.
+
 - The registry refuses a module id that starts with `homeport-`, in a
   manifest and in its configured registration keys, and a registration key
   for the reserved id `platform`. Such an id named the

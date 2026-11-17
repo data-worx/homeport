@@ -10,7 +10,7 @@ namespace Homeport.Testing.Containers;
 /// </summary>
 public static class ContainerImages
 {
-    public const string Postgres = "postgres:18.6-alpine@sha256:123b17998ccaf47e53b502e8c6a1e79afd8f579c6f3eec83c563da026f957395";
+    public const string Postgres = "postgres:18.7-alpine@sha256:b6972e1115a4ff8eba5d7f7d19184926d1e16d7d1136ae1e1a7ebf286da0f015";
 
     public const string RabbitMq = "rabbitmq:4.3-alpine@sha256:68fd0566c1c5a5aef2d7b3ad55af8be503a767c1ff8646d7088c8c7946270cf9";
 
