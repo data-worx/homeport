@@ -66,6 +66,10 @@ public sealed class Program
         builder.Services.AddSingleton<IConfigureOptions<ProblemDetailsOptions>, GatewayProblemDetails>();
         builder.Services.AddOptions<PlatformRoutesOptions>().BindConfiguration(PlatformRoutesOptions.SectionName);
         builder.Services.AddSingleton<PlatformRoutes>();
+        builder.Services.AddOptions<ForwardingOptions>()
+            .BindConfiguration(ForwardingOptions.SectionName)
+            .ValidateOnStart();
+        builder.Services.AddSingleton<IValidateOptions<ForwardingOptions>, ForwardingOptionsValidator>();
 
         // What LoadFromMemory registers, but starting with the platform routes,
         // so they are served before the registry has been read.
@@ -76,6 +80,7 @@ public sealed class Program
         });
         builder.Services.AddSingleton<IProxyConfigProvider>(services => services.GetRequiredService<InMemoryConfigProvider>());
         builder.Services.AddReverseProxy()
+            .AddConfigFilter<ForwardingTimeout>()
             .AddTransforms<HomeportHeaders>()
             .AddTransforms<ModuleTokens>()
             .AddTransforms<UsageReports>()
@@ -151,9 +156,10 @@ public sealed class Program
             var docs = app.Services.GetRequiredService<IOptions<ApiDocsOptions>>().Value;
             var platform = app.Services.GetRequiredService<IOptions<PlatformRoutesOptions>>().Value;
             var admin = app.Services.GetRequiredService<IOptions<AdminApiOptions>>().Value;
+            var forwarding = app.Services.GetRequiredService<IOptions<ForwardingOptions>>().Value;
 
             app.Logger.LogInformation(
-                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, usage from {MeteringUrl}, admin API of the control plane at {ControlPlaneAdminUrl} and of the registry at {RegistryAdminUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}, admin API {AdminApi}",
+                "Gateway started on {Urls}: signing key {KeyId}, additional public key {AdditionalKeyId}, routes from {RegistryUrl}, usage from {MeteringUrl}, admin API of the control plane at {ControlPlaneAdminUrl} and of the registry at {RegistryAdminUrl}, client tokens from {Authority} for {Audience} with the client id in {ClientIdClaim} and the scopes in {ScopeClaim}, clients from {ControlPlaneUrl} kept for {ClientCacheLifetime}, module tokens valid for {ModuleTokenLifetime}, usage events retried after {UsageRetryDelays}, requests forwarded with a timeout of {ForwardingTimeout}, forwarded headers from proxies {TrustedProxies} and networks {TrustedNetworks}, API docs {ApiDocs}, admin API {AdminApi}",
                 app.Urls,
                 signing.KeyId,
                 additionalKeyId,
@@ -169,6 +175,7 @@ public sealed class Program
                 controlPlane.ClientCacheLifetime,
                 moduleTokens.Lifetime,
                 usage.EffectiveRetryDelays,
+                forwarding.Timeout,
                 proxies.Proxies.Count == 0 ? None : string.Join(", ", proxies.Proxies),
                 proxies.Networks.Count == 0 ? None : string.Join(", ", proxies.Networks),
                 docs.Enabled ? "on" : "off",

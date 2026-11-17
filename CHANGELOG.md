@@ -111,6 +111,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   adds the variable. More replicas run from an override file; see
   [running behind a reverse proxy](docs/operators/reverse-proxy.md#scaling-out-the-gateway).
 
+### Fixed
+
+- The gateway gives up on a forwarded request after 30 seconds without
+  activity, set by `Gateway:Forwarding:Timeout`, and answers `504` with the
+  `module-timeout` problem, on module, platform and admin routes alike.
+  Before, it waited up to 100 seconds for a service that had stopped
+  answering, long after the caller had given up. See
+  [running behind a reverse proxy](docs/operators/reverse-proxy.md#timeouts).
+
 ### Security
 
 - PostgreSQL runs on `postgres:18.7-alpine`, which carries the fixed

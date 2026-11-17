@@ -249,6 +249,22 @@ public sealed class ProgramTests
         }
 
         [Fact]
+        public async Task Does_Not_Start_With_A_Forwarding_Timeout_Of_Zero()
+        {
+            await using var unconfigured = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(host => host
+                    .WithUsage().WithTokenBuckets()
+                    .WithSigningKey()
+                    .WithIdentityProvider(GatewaySettings.UnusedAuthority)
+                    .UseSetting("Gateway:Forwarding:Timeout", "00:00:00"));
+
+            // The proxy applies its configuration before the options are
+            // validated on start, so the validation failure arrives wrapped.
+            var exception = Assert.ThrowsAny<Exception>(() => unconfigured.CreateClient());
+            Assert.Contains("Gateway:Forwarding:Timeout must be positive.", exception.ToString(), StringComparison.Ordinal);
+        }
+
+        [Fact]
         public async Task Does_Not_Start_Without_An_Identity_Provider()
         {
             await using var unconfigured = new WebApplicationFactory<Program>()

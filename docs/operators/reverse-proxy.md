@@ -58,6 +58,27 @@ services:
 accept forwarded headers from any caller, has no effect on the gateway: only
 the proxies configured here are trusted.
 
+## Timeouts
+
+The gateway gives up on a forwarded request that stays idle - neither a
+byte sent nor received - for `Gateway:Forwarding:Timeout`, and answers `504`
+with the problem type
+[`module-timeout`](../reference/problems/module-timeout.md). It applies to
+every route: modules, platform endpoints and the admin API.
+
+| Setting | Environment variable | Default |
+|---|---|---|
+| Forwarding timeout, `hh:mm:ss` | `Gateway__Forwarding__Timeout` | `00:00:30` |
+
+The timeout counts idle time, not the whole request: a response that keeps
+streaming, such as a large usage export, is not cut off. The gateway does
+not start with a timeout of zero or less, and logs the timeout in its start
+message.
+
+Give the proxy in front a longer timeout than the gateway's, so the caller
+receives the gateway's `504` with its trace id rather than the proxy's own
+error.
+
 ## The gateway's port
 
 The compose file runs one gateway and publishes its port on the host port
