@@ -113,9 +113,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- When the gateway cannot forward a platform or admin request, such as
+  `GET /platform/v1/usage`, because the platform service behind it cannot
+  be reached, has no instance available or does not answer in time, it
+  answers with the new problem types `platform-service-unreachable` (502),
+  `platform-service-unavailable` (503) and `platform-service-timeout` (504).
+  Before, it answered with the `module-*` types, which named a module
+  where none was involved. Module routes keep their types. See
+  [problem types](docs/reference/problems/README.md).
+
 - The gateway gives up on a forwarded request after 30 seconds without
-  activity, set by `Gateway:Forwarding:Timeout`, and answers `504` with the
-  `module-timeout` problem, on module, platform and admin routes alike.
+  activity, set by `Gateway:Forwarding:Timeout`, and answers `504` with a
+  timeout problem, on module, platform and admin routes alike.
   Before, it waited up to 100 seconds for a service that had stopped
   answering, long after the caller had given up. See
   [running behind a reverse proxy](docs/operators/reverse-proxy.md#timeouts).

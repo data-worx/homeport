@@ -63,8 +63,10 @@ the proxies configured here are trusted.
 The gateway gives up on a forwarded request that stays idle - neither a
 byte sent nor received - for `Gateway:Forwarding:Timeout`, and answers `504`
 with the problem type
-[`module-timeout`](../reference/problems/module-timeout.md). It applies to
-every route: modules, platform endpoints and the admin API.
+[`module-timeout`](../reference/problems/module-timeout.md), or
+[`platform-service-timeout`](../reference/problems/platform-service-timeout.md)
+for a platform endpoint or the admin API. It applies to every route:
+modules, platform endpoints and the admin API.
 
 | Setting | Environment variable | Default |
 |---|---|---|

@@ -77,6 +77,9 @@ period,module,meter,quantity
 | `403` | [`insufficient-scope`](../reference/problems/insufficient-scope.md) | The token lacks `usage.read` |
 | `403` | [`unknown-client`](../reference/problems/unknown-client.md) | The operator has not mapped your client to a tenant |
 | `429` | [`rate-limited`](../reference/problems/rate-limited.md) | Your tenant's rate limit is exceeded |
+| `502` | [`platform-service-unreachable`](../reference/problems/platform-service-unreachable.md) | The gateway could not reach metering |
+| `503` | [`platform-service-unavailable`](../reference/problems/platform-service-unavailable.md) | No instance of metering is available |
+| `504` | [`platform-service-timeout`](../reference/problems/platform-service-timeout.md) | Metering did not answer in time |
 
 ## Try it locally
 
