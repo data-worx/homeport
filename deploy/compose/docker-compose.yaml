@@ -168,7 +168,7 @@ services:
       PlatformRoutes__RegistryUrl: "http://registry:${REGISTRY_PORT}"
       PlatformRoutes__MeteringUrl: "http://metering:${METERING_PORT}"
     ports:
-      - "${GATEWAY_PORT}"
+      - "${GATEWAY_HOST_PORT}:${GATEWAY_PORT}"
     expose:
       - "8000"
     depends_on:
@@ -178,8 +178,6 @@ services:
         condition: "service_started"
     networks:
       - "aspire"
-    deploy:
-      replicas: 2
   control-plane-migrate:
     image: "${CONTROL_PLANE_MIGRATE_IMAGE}"
     command:
