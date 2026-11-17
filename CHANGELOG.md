@@ -102,6 +102,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   admin port. The admin endpoints of the services follow with the admin
   portal. See [the admin API](docs/operators/admin-api.md).
 
+### Changed
+
+- The compose file runs one gateway on a fixed host port,
+  `GATEWAY_HOST_PORT` in `.env` (`5100` from `create-env.sh`), instead of
+  two replicas on ports Docker picked on every start, so a reverse proxy
+  or load balancer has a stable address to point at. An existing `.env`
+  adds the variable. More replicas run from an override file; see
+  [running behind a reverse proxy](docs/operators/reverse-proxy.md#scaling-out-the-gateway).
+
 ### Security
 
 - PostgreSQL runs on `postgres:18.7-alpine`, which carries the fixed

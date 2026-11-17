@@ -28,6 +28,8 @@ trap 'rm -f "$tmp"' EXIT
 {
   printf 'ECHO_IMAGE=homeport-module-echo:latest\nECHO_PORT=8080\n'
   printf 'GATEWAY_IMAGE=homeport-gateway:latest\nGATEWAY_PORT=8080\n'
+  # The gateway's port on the host, where a reverse proxy points.
+  printf 'GATEWAY_HOST_PORT=5100\n'
   printf 'REGISTRY_IMAGE=homeport-registry:latest\nREGISTRY_PORT=8080\n'
   printf 'CONTROL_PLANE_IMAGE=homeport-control-plane:latest\nCONTROL_PLANE_PORT=8080\n'
   printf 'CONTROL_PLANE_MIGRATE_IMAGE=homeport-control-plane:latest\n'

@@ -81,13 +81,13 @@ done
 ```
 
 Call Echo through the gateway
-([calling a module](docs/api-consumers/calling-a-module.md)). Docker picks
-the gateway's port; until Echo has registered and the gateway routes to it
-([the registry](docs/operators/registry.md)), the call is refused, so this
-retries:
+([calling a module](docs/api-consumers/calling-a-module.md)), on the host
+port `GATEWAY_HOST_PORT` in `.env`; until Echo has registered and the
+gateway routes to it ([the registry](docs/operators/registry.md)), the call
+is refused, so this retries:
 
 ```bash
-gateway="http://localhost:$(docker compose port gateway 8080 | sed 's/.*://')"
+gateway="http://localhost:$(sed -n 's/^GATEWAY_HOST_PORT=//p' .env)"
 until curl -sf -w '\n' -X POST -H "Authorization: Bearer ${token}" \
   -H 'Content-Type: application/json' \
   -d '{"hello":"Homeport"}' "${gateway}/modules/echo/v1/echo"; do

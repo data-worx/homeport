@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Aspire.Hosting.Docker.Resources.ServiceNodes.Swarm;
 using Homeport.Shared.ServiceDefaults;
 using Microsoft.Extensions.Hosting;
 
@@ -57,7 +56,9 @@ public static class Program
     private const string ApiDocsDisplayText = "API docs";
 
     // Two, so every run shows that a tenant's rate limit holds across
-    // replicas: they share its bucket in Valkey (ADR-0007).
+    // replicas: they share its bucket in Valkey (ADR-0007). The compose file
+    // runs one, on a fixed host port, so an operator's proxy has an address
+    // to point at; scaling out there is the operator's override.
     private const int GatewayReplicas = 2;
 
     /// <summary>Declares every resource and runs or publishes them.</summary>
@@ -192,6 +193,10 @@ public static class Program
         var additionalPublicKey = builder.AddParameter("gateway-additional-public-key", string.Empty);
         var additionalKeyId = builder.AddParameter("gateway-additional-key-id", string.Empty);
 
+        // The gateway's port on the host in the compose file. A local run
+        // does not use it; the default only spares the dashboard a prompt.
+        var gatewayHostPort = builder.AddParameter("gateway-host-port", new LocalDefault("5100"));
+
         // The one service with an external endpoint: modules are reachable only
         // through it, on the routes it reads from the registry, for clients with
         // a token from Keycloak that the control plane knows. It applies
@@ -229,8 +234,12 @@ public static class Program
             // and publishes no port for it (ADR-0020).
             .WithHttpEndpoint(name: GatewayAdminEndpoint)
 
-            // The compose publisher does not take the replicas from the model.
-            .PublishAsDockerComposeService((_, service) => service.Deploy = new Deploy { Replicas = GatewayReplicas });
+            // One gateway in the compose file, its external endpoint published
+            // on the host port `.env` sets rather than one Docker picks on
+            // every start. Single, so a second published port fails the
+            // publish instead of sharing the host port.
+            .PublishAsDockerComposeService((resource, service) =>
+                service.Ports = [$"{gatewayHostPort.AsEnvironmentPlaceholder(resource)}:{service.Ports.Single()}"]);
 
         // The gateway tells the admin endpoint apart by the port a request
         // arrives on, and accepts operator tokens from the same realm.
