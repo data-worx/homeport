@@ -67,6 +67,8 @@ asynchronous workers.
 
 ## M2 — v0.2 Admin portal
 
+Done: released as v0.2.0.
+
 The operator manages tenants, plans and clients in a web portal and reads
 modules, usage and audit across tenants, without touching the database or
 the seed data.

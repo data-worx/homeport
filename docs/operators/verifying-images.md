@@ -78,7 +78,7 @@ sed -n -E 's|^[[:space:]]+image:[[:space:]]*"(ghcr.io/data-worx/[^"]+)"$|\1|p' d
     done
 ```
 
-The expected output is one `verified` line per Homeport image, five in all.
+The expected output is one `verified` line per Homeport image, six in all.
 
 ## The SBOM
 
