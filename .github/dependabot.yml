@@ -21,6 +21,9 @@ updates:
       aspire:
         patterns:
           - "Aspire*"
+      aspnetcore:
+        patterns:
+          - "Microsoft.AspNetCore*"
       opentelemetry:
         patterns:
           - "OpenTelemetry*"
