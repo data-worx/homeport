@@ -3,9 +3,9 @@
 `https://homeport.data-worx.de/problems/module-timeout` — status `504`.
 
 The gateway answered: the module did not answer in time, and the gateway
-stopped waiting. The module may still have done the work. Until the
-platform services have problem types of their own, the gateway answers a
-platform or admin request the same way.
+stopped waiting. The module may still have done the work. A platform or
+admin request is answered with
+[`platform-service-timeout`](platform-service-timeout.md) instead.
 
 In time means without a pause longer than the operator's forwarding
 timeout, 30 seconds unless configured otherwise; see

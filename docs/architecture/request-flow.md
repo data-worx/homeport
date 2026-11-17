@@ -165,7 +165,7 @@ tenant's data.
 | 7 | The token lacks `usage.read` | `403` [`insufficient-scope`](../reference/problems/insufficient-scope.md) |
 | 9 | The tenant's bucket is empty | `429` [`rate-limited`](../reference/problems/rate-limited.md) with `Retry-After` |
 | 9 | Valkey cannot be reached | The request passes unthrottled |
-| 10 | Metering cannot be reached, is not available or does not answer in time | `502` [`module-unreachable`](../reference/problems/module-unreachable.md), `503` [`module-unavailable`](../reference/problems/module-unavailable.md) or `504` [`module-timeout`](../reference/problems/module-timeout.md), as for a module |
+| 10 | Metering cannot be reached, is not available or does not answer in time | `502` [`platform-service-unreachable`](../reference/problems/platform-service-unreachable.md), `503` [`platform-service-unavailable`](../reference/problems/platform-service-unavailable.md) or `504` [`platform-service-timeout`](../reference/problems/platform-service-timeout.md) |
 | 11 | The caller token is invalid, names no tenant or lacks the scope | `401` or `403` from metering; cannot happen to a request through the gateway |
 | 11 | A parameter is missing or invalid | `400` [`validation`](../reference/problems/validation.md), with `errors` naming the parameter |
 | 12 | The read fails | `500` [`internal`](../reference/problems/internal.md) |
@@ -231,5 +231,5 @@ client, and neither throttles nor meters the request.
 | 7 | No token | `401` [`unauthorized`](../reference/problems/unauthorized.md) |
 | 8 | The token is expired, signed by another issuer or meant for another audience, such as a client token | `401` [`unauthorized`](../reference/problems/unauthorized.md) |
 | 9 | The token lacks the admin claim or a subject | `403` [`admin-claim-missing`](../reference/problems/admin-claim-missing.md) |
-| 10 | The service cannot be reached, is not available or does not answer in time | `502` [`module-unreachable`](../reference/problems/module-unreachable.md), `503` [`module-unavailable`](../reference/problems/module-unavailable.md) or `504` [`module-timeout`](../reference/problems/module-timeout.md), as for a module |
+| 10 | The service cannot be reached, is not available or does not answer in time | `502` [`platform-service-unreachable`](../reference/problems/platform-service-unreachable.md), `503` [`platform-service-unavailable`](../reference/problems/platform-service-unavailable.md) or `504` [`platform-service-timeout`](../reference/problems/platform-service-timeout.md) |
 | 11 | The caller token is invalid or lacks the scope `admin` | `401` or `403` from the service; cannot happen to a request through the gateway |

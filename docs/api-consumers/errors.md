@@ -37,7 +37,7 @@ The `type` tells you who produced the error.
 - **The gateway** answers with Homeport's own types under
   `https://homeport.data-worx.de/problems/`, listed in
   [problem types](../reference/problems/README.md). They say the request
-  never reached a module, or the module could not answer:
+  never reached a module or a platform service, or it could not answer:
 
   | Status | Type | Means |
   |---|---|---|
@@ -49,6 +49,9 @@ The `type` tells you who produced the error.
   | `503` | [`module-unavailable`](../reference/problems/module-unavailable.md) | No instance of the module is available |
   | `503` | [`control-plane-unavailable`](../reference/problems/control-plane-unavailable.md) | The gateway could not look the client up |
   | `504` | [`module-timeout`](../reference/problems/module-timeout.md) | The module did not answer in time |
+  | `502` | [`platform-service-unreachable`](../reference/problems/platform-service-unreachable.md) | The gateway could not reach the platform service behind a `/platform` endpoint |
+  | `503` | [`platform-service-unavailable`](../reference/problems/platform-service-unavailable.md) | No instance of the platform service is available |
+  | `504` | [`platform-service-timeout`](../reference/problems/platform-service-timeout.md) | The platform service did not answer in time |
 
 - **A module** answers with its own types, under a prefix of its own and
   documented by the module, or with Homeport's
