@@ -18,12 +18,14 @@ using Homeport.Testing.Metrics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.Metrics.Testing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Yarp.ReverseProxy.Configuration;
 
 namespace Homeport.Platform.Gateway.Api.Tests.Integration;
 
@@ -37,6 +39,8 @@ public sealed class ProgramTests
         private const string ClosedEndpoint = "http://127.0.0.1:1";
 
         private const string ProblemTypePrefix = "https://homeport.data-worx.de/problems/";
+
+        private const string UsagePath = "/platform/v1/usage";
 
         private const string ProgramCategory = "Homeport.Platform.Gateway.Api";
 
@@ -216,6 +220,54 @@ public sealed class ProgramTests
             var problem = await ReadProblem(response);
             Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
             Assert.Equal(ProblemTypePrefix + "module-unreachable", problem["type"]?.GetValue<string>());
+            Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Answers_An_Unreachable_Platform_Service_As_Platform_Service_Unreachable_Problem()
+        {
+            await using var registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(ClosedEndpoint, ForwardingGateway.RequestPath));
+            await using var unreachable = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(host => host
+                    .WithUsage().WithTokenBuckets()
+                    .WithSigningKey()
+                    .WithRegistry(registry)
+                    .WithClients(gateway.IdentityProvider, gateway.ControlPlane)
+                    .UseSetting("PlatformRoutes:MeteringUrl", ClosedEndpoint)
+                    .ConfigureLogging(logging => logging.AddFakeLogging()));
+            await ForwardingGateway.WaitForRoutesAsync(unreachable);
+
+            using var response = await unreachable.CreateClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.KnownClientId))
+                .SendAsync(Traced(UsagePath));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
+            Assert.Equal(ProblemTypePrefix + "platform-service-unreachable", problem["type"]?.GetValue<string>());
+            Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
+        }
+
+        [Fact]
+        public async Task Answers_A_Platform_Service_Without_An_Instance_As_Platform_Service_Unavailable_Problem()
+        {
+            await using var registry = await StandInRegistry.StartAsync(StandInRegistry.EchoTable(ClosedEndpoint, ForwardingGateway.RequestPath));
+            await using var unavailable = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(host => host
+                    .WithUsage().WithTokenBuckets()
+                    .WithSigningKey()
+                    .WithRegistry(registry)
+                    .WithClients(gateway.IdentityProvider, gateway.ControlPlane)
+                    .ConfigureTestServices(services => services.AddSingleton<IProxyConfigFilter, NoDestinations>())
+                    .ConfigureLogging(logging => logging.AddFakeLogging()));
+            await ForwardingGateway.WaitForRoutesAsync(unavailable);
+
+            using var response = await unavailable.CreateClient()
+                .WithToken(gateway.IdentityProvider.Issue(StandInControlPlane.KnownClientId))
+                .SendAsync(Traced(UsagePath));
+
+            var problem = await ReadProblem(response);
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+            Assert.Equal(ProblemTypePrefix + "platform-service-unavailable", problem["type"]?.GetValue<string>());
             Assert.Equal(TraceId, problem["traceId"]?.GetValue<string>());
         }
 
@@ -447,6 +499,16 @@ public sealed class ProgramTests
 
             return await response.Content.ReadFromJsonAsync<ForwardedRequest>()
                 ?? throw new InvalidOperationException("The stand-in module answered without a body.");
+        }
+
+        // Leaves every cluster without a destination, so the proxy has no instance to forward to.
+        private sealed class NoDestinations : IProxyConfigFilter
+        {
+            public ValueTask<ClusterConfig> ConfigureClusterAsync(ClusterConfig cluster, CancellationToken cancel) =>
+                ValueTask.FromResult(cluster with { Destinations = new Dictionary<string, DestinationConfig>(StringComparer.Ordinal) });
+
+            public ValueTask<RouteConfig> ConfigureRouteAsync(RouteConfig route, ClusterConfig? cluster, CancellationToken cancel) =>
+                ValueTask.FromResult(route);
         }
     }
 }

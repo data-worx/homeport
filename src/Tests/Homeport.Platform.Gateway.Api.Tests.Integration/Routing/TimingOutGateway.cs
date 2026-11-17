@@ -13,7 +13,8 @@ namespace Homeport.Platform.Gateway.Api.Tests.Integration.Routing;
 /// <summary>
 /// The gateway in memory with a short forwarding timeout, in front of a
 /// stand-in that never answers: on a module route of Echo at
-/// <see cref="ModulePath"/>, and on an admin route at <see cref="AdminPath"/>.
+/// <see cref="ModulePath"/>, on the platform route of metering at
+/// <see cref="PlatformPath"/>, and on an admin route at <see cref="AdminPath"/>.
 /// The stand-in waits until the gateway gives up on the request, so whatever
 /// the timing, the gateway's answer is its timeout.
 /// </summary>
@@ -27,6 +28,9 @@ public sealed class TimingOutGateway : IAsyncLifetime
 
     /// <summary>The module route at the gateway.</summary>
     internal const string ModulePath = "/modules/echo" + ServicePath;
+
+    /// <summary>The platform route of metering at the gateway.</summary>
+    internal const string PlatformPath = "/platform/v1/usage";
 
     /// <summary>The admin route at the gateway.</summary>
     internal const string AdminPath = "/platform" + AdminServicePath;
@@ -89,6 +93,7 @@ public sealed class TimingOutGateway : IAsyncLifetime
                     AdminPort,
                     identityProvider,
                     new AdminEndpoint(HttpMethods.Get, AdminServicePath, new AdminService("silent", "homeport-silent", new Uri(address))))
+                .UseSetting("PlatformRoutes:MeteringUrl", address)
                 .UseSetting("Gateway:Forwarding:Timeout", Timeout)
                 .ConfigureLogging(logging => logging.AddFakeLogging()));
         await ForwardingGateway.WaitForRoutesAsync(gateway);

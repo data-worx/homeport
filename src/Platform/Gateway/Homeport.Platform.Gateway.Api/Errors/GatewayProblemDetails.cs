@@ -62,19 +62,7 @@ internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logge
     {
         if (context.Features.Get<IForwarderErrorFeature>() is { } failure)
         {
-            // Logged here, where the failure is answered.
-            logger.LogWarning(
-                "Forwarding to module {ModuleId} failed with {ForwarderError}; answered {StatusCode}",
-                context.Features.Get<IReverseProxyFeature>()?.Cluster.Config.ClusterId,
-                failure.Error,
-                status);
-
-            return status switch
-            {
-                StatusCodes.Status503ServiceUnavailable => GatewayProblems.ModuleUnavailable,
-                StatusCodes.Status504GatewayTimeout => GatewayProblems.ModuleTimeout,
-                _ => GatewayProblems.ModuleUnreachable,
-            };
+            return ForwardingFailed(context.Features.Get<IReverseProxyFeature>(), failure.Error, status);
         }
 
         if (context.Features.Get<IExceptionHandlerFeature>()?.Error is ControlPlaneUnavailableException unavailable)
@@ -119,5 +107,47 @@ internal sealed class GatewayProblemDetails(ILogger<GatewayProblemDetails> logge
         }
 
         return status == StatusCodes.Status500InternalServerError ? GatewayProblems.Internal : null;
+    }
+
+    /// <summary>
+    /// The problem for a request the proxy could not forward: a platform
+    /// service's type on a platform or admin route, which names the audience of
+    /// the service, a module's type on every other route.
+    /// </summary>
+    private GatewayProblem ForwardingFailed(IReverseProxyFeature? proxy, ForwarderError error, int? status)
+    {
+        var metadata = proxy?.Route.Config.Metadata;
+        string? service = null;
+        if (metadata?.TryGetValue(PlatformRoutes.AudienceMetadata, out service) == true
+            || metadata?.TryGetValue(AdminRoutes.AdminAudienceMetadata, out service) == true)
+        {
+            // Logged here, where the failure is answered.
+            logger.LogWarning(
+                "Forwarding to platform service {Service} failed with {ForwarderError}; answered {StatusCode}",
+                service,
+                error,
+                status);
+
+            return status switch
+            {
+                StatusCodes.Status503ServiceUnavailable => GatewayProblems.PlatformServiceUnavailable,
+                StatusCodes.Status504GatewayTimeout => GatewayProblems.PlatformServiceTimeout,
+                _ => GatewayProblems.PlatformServiceUnreachable,
+            };
+        }
+
+        // Logged here, where the failure is answered.
+        logger.LogWarning(
+            "Forwarding to module {ModuleId} failed with {ForwarderError}; answered {StatusCode}",
+            proxy?.Cluster.Config.ClusterId,
+            error,
+            status);
+
+        return status switch
+        {
+            StatusCodes.Status503ServiceUnavailable => GatewayProblems.ModuleUnavailable,
+            StatusCodes.Status504GatewayTimeout => GatewayProblems.ModuleTimeout,
+            _ => GatewayProblems.ModuleUnreachable,
+        };
     }
 }

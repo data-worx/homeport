@@ -75,6 +75,24 @@ internal static class GatewayProblems
         "module-timeout",
         "The module did not answer in time.",
         StatusCodes.Status504GatewayTimeout);
+
+    /// <summary>The gateway could not reach the platform service behind a platform or admin route, or it broke off its answer.</summary>
+    internal static readonly GatewayProblem PlatformServiceUnreachable = new(
+        "platform-service-unreachable",
+        "The platform service could not be reached.",
+        StatusCodes.Status502BadGateway);
+
+    /// <summary>No instance of the platform service behind a platform or admin route is available.</summary>
+    internal static readonly GatewayProblem PlatformServiceUnavailable = new(
+        "platform-service-unavailable",
+        "The platform service is not available.",
+        StatusCodes.Status503ServiceUnavailable);
+
+    /// <summary>The platform service behind a platform or admin route did not answer in time.</summary>
+    internal static readonly GatewayProblem PlatformServiceTimeout = new(
+        "platform-service-timeout",
+        "The platform service did not answer in time.",
+        StatusCodes.Status504GatewayTimeout);
 }
 
 /// <summary>A problem type of the gateway.</summary>

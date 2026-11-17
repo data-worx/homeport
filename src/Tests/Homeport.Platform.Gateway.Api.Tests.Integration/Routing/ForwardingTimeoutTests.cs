@@ -13,28 +13,38 @@ public sealed class ForwardingTimeoutTests
     {
         private const string ModuleTimeoutType = "https://homeport.data-worx.de/problems/module-timeout";
 
+        private const string PlatformServiceTimeoutType = "https://homeport.data-worx.de/problems/platform-service-timeout";
+
         [Fact]
         public async Task Answers_A_Module_That_Does_Not_Answer_In_Time_As_Module_Timeout_Problem()
         {
             using var response = await gateway.CreateClient().GetAsync(TimingOutGateway.ModulePath);
 
-            await AssertTimeoutProblemAsync(response);
+            await AssertTimeoutProblemAsync(response, ModuleTimeoutType);
         }
 
         [Fact]
-        public async Task Answers_An_Admin_Service_That_Does_Not_Answer_In_Time_As_Module_Timeout_Problem()
+        public async Task Answers_A_Platform_Service_That_Does_Not_Answer_In_Time_As_Platform_Service_Timeout_Problem()
+        {
+            using var response = await gateway.CreateClient().GetAsync(TimingOutGateway.PlatformPath);
+
+            await AssertTimeoutProblemAsync(response, PlatformServiceTimeoutType);
+        }
+
+        [Fact]
+        public async Task Answers_An_Admin_Service_That_Does_Not_Answer_In_Time_As_Platform_Service_Timeout_Problem()
         {
             using var response = await gateway.CreateAdminClient().GetAsync(TimingOutGateway.AdminPath);
 
-            await AssertTimeoutProblemAsync(response);
+            await AssertTimeoutProblemAsync(response, PlatformServiceTimeoutType);
         }
 
-        private static async Task AssertTimeoutProblemAsync(HttpResponseMessage response)
+        private static async Task AssertTimeoutProblemAsync(HttpResponseMessage response, string type)
         {
             Assert.Equal(HttpStatusCode.GatewayTimeout, response.StatusCode);
             Assert.Equal(MediaTypeNames.Application.ProblemJson, response.Content.Headers.ContentType?.MediaType);
             var problem = await response.Content.ReadFromJsonAsync<JsonObject>();
-            Assert.Equal(ModuleTimeoutType, problem?["type"]?.GetValue<string>());
+            Assert.Equal(type, problem?["type"]?.GetValue<string>());
         }
     }
 }
