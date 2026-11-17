@@ -94,6 +94,7 @@ v0.2.0 reads these variables from `.env`, besides `METERING_ADMIN_PASSWORD`:
 
 | Variable | Meaning |
 |---|---|
+| `GATEWAY_HOST_PORT` | The gateway's port on the host, such as `5100`. v0.1.0 ran two gateway replicas on ports Docker picked; v0.2.0 runs one on this port ([reverse proxy](reverse-proxy.md#the-gateways-port)) |
 | `PORTAL_PORT` | The portal's plain HTTP port inside its container, such as `8080` |
 | `PORTAL_ADDRESS` | The portal's address in your browser, behind the reverse proxy that terminates TLS ([admin portal](admin-portal.md#tls-and-the-reverse-proxy)) |
 | `PORTAL_CLIENT_SECRET` | The secret of the portal's client at your identity provider ([admin portal](admin-portal.md#the-client-at-your-identity-provider)) |
@@ -111,6 +112,7 @@ for name in PORTAL_CLIENT_SECRET OPERATOR_PASSWORD REGISTERED_CLIENT_SECRET ADMI
   printf '%s=%s\n' "${name}" "$(openssl rand -hex 24)" >> .env
 done
 printf 'PORTAL_PORT=8080\nPORTAL_ADDRESS=https://portal.example.com\n' >> .env
+printf 'GATEWAY_HOST_PORT=5100\n' >> .env
 ```
 
 The gateway answers the admin API on a second port, `8000`, which the

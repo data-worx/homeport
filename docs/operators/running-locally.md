@@ -216,7 +216,7 @@ and the file with `docker compose down -v && rm .env`.
 Check it: every line but the two `GATEWAY_ADDITIONAL_` ones has a value.
 
 ```bash
-grep -c '=.' .env      # prints 42
+grep -c '=.' .env      # prints 46
 ```
 
 Start, then check:
@@ -230,7 +230,6 @@ docker compose ps --format '{{.Service}} {{.State}}'
 control-plane running
 echo running
 gateway running
-gateway running
 keycloak running
 metering running
 portal running
@@ -240,11 +239,13 @@ registry running
 valkey running
 ```
 
-The gateway runs as two replicas, each publishing a port to the host, chosen
-by Docker on every start; `docker compose port` names the first one's.
+The compose file runs one gateway, on the host port `GATEWAY_HOST_PORT` in
+`.env`, `5100` as `create-env.sh` writes it; it stays the same across
+restarts, so a reverse proxy can point at it. To run more replicas, see
+[scaling out the gateway](reverse-proxy.md#scaling-out-the-gateway).
 Keycloak publishes `8080`, so a client on the host gets its token there, and
-its management port, chosen by Docker. Get a token for `local-client`, ask
-for the gateway's port, then call Echo through it. Until Echo has registered
+its management port, chosen by Docker. Get a token for `local-client`, then
+call Echo through the gateway. Until Echo has registered
 and the gateway has read its routes, a few seconds after the start, the call
 is answered with `404`:
 
@@ -257,10 +258,9 @@ token="$(curl -s \
   -d scope=echo.invoke \
   http://localhost:8080/realms/homeport/protocol/openid-connect/token \
   | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')"
-docker compose port gateway 8080      # prints 0.0.0.0:<port>
 curl -s -X POST -H "Authorization: Bearer ${token}" \
   -H 'Content-Type: application/json' \
-  -d '{"hello":"Homeport"}' http://localhost:<port>/modules/echo/v1/echo
+  -d '{"hello":"Homeport"}' http://localhost:5100/modules/echo/v1/echo
 ```
 
 ```json

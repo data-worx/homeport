@@ -38,8 +38,9 @@ replicas whose clocks drift still agree. A key expires once its bucket would
 be full again, so an idle tenant leaves nothing behind.
 
 The gateway reads Valkey's address from `ConnectionStrings__valkey`. The
-AppHost runs two gateway replicas, and so does the compose file, with
-`deploy.replicas`.
+AppHost runs two gateway replicas; the compose file runs one, and more as
+[scaling out the gateway](reverse-proxy.md#scaling-out-the-gateway)
+describes.
 
 ## While Valkey is down
 
