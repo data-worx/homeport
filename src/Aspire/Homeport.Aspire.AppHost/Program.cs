@@ -106,7 +106,7 @@ public static class Program
         var gatewayRabbitMqPassword = builder.AddParameter("gateway-rabbitmq-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var meteringRabbitMqPassword = builder.AddParameter("metering-rabbitmq-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
         var rabbitMq = builder.AddRabbitMQ("rabbitmq")
-            .WithImageTag("4.3-alpine@sha256:68fd0566c1c5a5aef2d7b3ad55af8be503a767c1ff8646d7088c8c7946270cf9")
+            .WithImageTag("4.4-alpine@sha256:7b77c3d3a996c7fcca1ca8bf53ce1557ff43c13b8ca2c132df6031781b209ef2")
             .WithEnvironment("GATEWAY_RABBITMQ_PASSWORD", gatewayRabbitMqPassword)
             .WithEnvironment("METERING_RABBITMQ_PASSWORD", meteringRabbitMqPassword)
             .WithBindMount(RabbitMqInitFiles, RabbitMqInitDirectory, isReadOnly: true)

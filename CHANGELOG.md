@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The compose file runs RabbitMQ 4.4 instead of 4.3.
+
 ## [0.2.0] - 2026-11-18
 
 ### Added
