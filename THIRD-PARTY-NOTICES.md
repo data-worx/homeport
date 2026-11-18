@@ -102,10 +102,10 @@ asset change; the `notices` gate fails while it is stale.
 | System.IdentityModel.Tokens.Jwt | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.IO.Hashing | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Linq.Dynamic.Core | 1.7.4 | Apache-2.0 | Copyright © ZZZ Projects |
-| WolverineFx | 6.64.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
-| WolverineFx.Newtonsoft | 6.64.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
-| WolverineFx.RabbitMQ | 6.64.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
-| WolverineFx.RuntimeCompilation | 6.64.0 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx | 6.64.2 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.Newtonsoft | 6.64.2 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.RabbitMQ | 6.64.2 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
+| WolverineFx.RuntimeCompilation | 6.64.2 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
 | Yarp.ReverseProxy | 2.3.0 | MIT | © Microsoft Corporation. All rights reserved. |
 
 A copyright reading "— not declared by the package" is declared neither in that package's own
