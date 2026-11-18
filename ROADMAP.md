@@ -67,6 +67,8 @@ asynchronous workers.
 
 ## M2 — v0.2 Admin portal
 
+Done: released as v0.2.0.
+
 The operator manages tenants, plans and clients in a web portal and reads
 modules, usage and audit across tenants, without touching the database or
 the seed data.
@@ -113,7 +115,7 @@ TLS between components
 - Active invalidation of the gateway's cached client lookups
 - First real module, chosen by the community poll in
   [discussion #2](https://github.com/data-worx/homeport/discussions/2);
-  decided when M2 is released
+  decided now that M2 is released
 - Helm chart
 - Quotas
 - Period-close webhook

@@ -21,13 +21,14 @@ More in [docs/architecture/vision.md](docs/architecture/vision.md).
 
 ## Status
 
-Pre-alpha. v0.1.0, the walking skeleton, is released: a call goes through the
-gateway to a module and is metered. Images and the compose file are on the
-[releases page](https://github.com/data-worx/homeport/releases). The
-milestones ahead are described in [ROADMAP.md](ROADMAP.md): next is M2, the
-admin portal. The first real module is chosen in
-[discussion #2](https://github.com/data-worx/homeport/discussions/2) and
-decided when M2 is released.
+Pre-alpha. v0.2.0 is released: a call goes through the gateway to a module
+and is metered, and the operator manages tenants, plans and clients in the
+admin portal and reads modules, usage and the audit log there. Images and
+the compose file are on the
+[releases page](https://github.com/data-worx/homeport/releases). What comes
+next is described in [ROADMAP.md](ROADMAP.md). The first real module is
+chosen in [discussion #2](https://github.com/data-worx/homeport/discussions/2),
+now that M2 is released.
 
 ## Quickstart
 
@@ -38,8 +39,8 @@ On Windows, also switch Smart App Control off, as
 [running locally](docs/operators/running-locally.md#smart-app-control)
 explains.
 
-Build the images of the gateway, the registry, the control plane, metering
-and the Echo module from this checkout
+Build the images of the gateway, the registry, the control plane, metering,
+the admin portal and the Echo module from this checkout
 ([running locally](docs/operators/running-locally.md#with-docker-compose)):
 
 ```bash
@@ -50,6 +51,7 @@ for project in \
   Platform/Registry/Homeport.Platform.Registry.Api \
   Platform/ControlPlane/Homeport.Platform.ControlPlane.Api \
   Platform/Metering/Homeport.Platform.Metering.Api \
+  Platform/Portal/Homeport.Platform.Portal \
   Modules/Echo/Homeport.Modules.Echo.Api; do
   dotnet publish "src/${project}" -t:PublishContainer
 done

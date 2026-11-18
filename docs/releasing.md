@@ -99,7 +99,7 @@ version=0.1.0-rc.1
 gh release delete "v${version}" --yes --cleanup-tag
 
 for package in homeport-gateway homeport-registry homeport-control-plane \
-               homeport-metering homeport-module-echo; do
+               homeport-metering homeport-portal homeport-module-echo; do
   versions="/orgs/data-worx/packages/container/${package}/versions"
   digest="$(gh api --paginate "${versions}" \
     --jq ".[] | select(.metadata.container.tags | index(\"${version}\")) | .name")"
