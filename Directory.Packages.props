@@ -32,7 +32,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageVersion Include="bunit" Version="2.15.2" />
     <!-- The version the design kit's theme is built against (design/dist/HomeportTheme.cs). -->
-    <PackageVersion Include="MudBlazor" Version="9.11.0" />
+    <PackageVersion Include="MudBlazor" Version="9.14.0" />
     <PackageVersion Include="Npgsql" Version="10.0.3" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.21.0" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.21.0" />
