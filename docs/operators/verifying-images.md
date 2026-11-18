@@ -14,6 +14,7 @@ the Homeport release workflow built, unchanged since.
 | `ghcr.io/data-worx/homeport-registry` | The registry |
 | `ghcr.io/data-worx/homeport-control-plane` | The control plane; its `migrate` step runs the same image |
 | `ghcr.io/data-worx/homeport-metering` | Metering; its `migrate` step runs the same image |
+| `ghcr.io/data-worx/homeport-portal` | The admin portal |
 | `ghcr.io/data-worx/homeport-module-echo` | The Echo reference module |
 
 Each is tagged with the version it is released as, `0.1.0` for v0.1.0. A

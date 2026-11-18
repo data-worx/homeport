@@ -115,7 +115,7 @@ TLS between components
 - Active invalidation of the gateway's cached client lookups
 - First real module, chosen by the community poll in
   [discussion #2](https://github.com/data-worx/homeport/discussions/2);
-  decided when M2 is released
+  decided now that M2 is released
 - Helm chart
 - Quotas
 - Period-close webhook
