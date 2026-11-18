@@ -54,3 +54,9 @@ CVE-2026-102554 exp:2026-12-31
 # (ADR-0006). Red Hat lists no fixed package yet, and the digest of
 # 2026-11-13 carries the same version. Removed with the first fixed image.
 CVE-2026-76844 exp:2026-12-31
+
+# keycloak: java-21-openjdk-headless 1:21.0.13.0.9-1.2.el9 in keycloak:26.8,
+# development and tests only (ADR-0006). No fixed version exists yet, and
+# the pinned digest is the current one of 26.8 (26.8.2-2). Short expiry, so
+# the scan fails again if no fixed image has appeared by then.
+CVE-2026-114938 exp:2026-12-02
