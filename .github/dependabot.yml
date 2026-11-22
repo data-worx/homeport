@@ -27,6 +27,11 @@ updates:
       opentelemetry:
         patterns:
           - "OpenTelemetry*"
+      # The modules share the package Testcontainers: one module on a newer
+      # version lifts it, and the others fail at run time.
+      testcontainers:
+        patterns:
+          - "Testcontainers*"
       wolverine:
         patterns:
           - "WolverineFx*"
