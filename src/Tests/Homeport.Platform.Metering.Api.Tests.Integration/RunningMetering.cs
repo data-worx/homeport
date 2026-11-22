@@ -3,6 +3,7 @@
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text.Json;
+using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using Homeport.Platform.Metering.Api.Messaging;
 using Homeport.Platform.Metering.Infrastructure.Persistence;
@@ -78,7 +79,7 @@ public sealed class RunningMetering : IAsyncLifetime
         // The script prepares every service's schema; this fixture uses only metering's.
         .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", AppPassword)
-        .WithResourceMapping(new FileInfo(Path.Combine(AppContext.BaseDirectory, InitScript)), InitDirectory, fileMode: Executable)
+        .WithResourceMapping(FilePath.Of(Path.Combine(AppContext.BaseDirectory, InitScript)), DirectoryPath.Of(InitDirectory), fileMode: Executable)
         .Build();
 
     private readonly RabbitMqContainer rabbitMq = new RabbitMqBuilder(ContainerImages.RabbitMq).Build();

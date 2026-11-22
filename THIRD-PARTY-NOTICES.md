@@ -67,7 +67,7 @@ asset change; the `notices` gate fails while it is stale.
 | Microsoft.IdentityModel.Protocols.OpenIdConnect | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.IdentityModel.Tokens | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
 | Microsoft.OpenApi | 2.13.0 | MIT | © Microsoft Corporation. All rights reserved. |
-| MudBlazor | 9.11.0 | MIT | Copyright 2026 MudBlazor |
+| MudBlazor | 9.14.0 | MIT | Copyright 2026 MudBlazor |
 | NewId | 4.0.1 | Apache-2.0 | Copyright 2007-2019 Chris Patterson |
 | Newtonsoft.Json | 13.0.3 | MIT | Copyright © James Newton-King 2008 |
 | Npgsql | 10.0.3 | PostgreSQL | Copyright 2025 © The Npgsql Development Team |

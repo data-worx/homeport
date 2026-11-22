@@ -140,7 +140,7 @@ public static class Program
         var portalAddress = builder.AddParameter("portal-address", new LocalDefault($"{Uri.UriSchemeHttps}://localhost:{PortalPort}"));
         var keycloakHostAddress = $"{Uri.UriSchemeHttp}://localhost:{KeycloakPort}";
         var keycloak = builder.AddKeycloak("keycloak", port: KeycloakPort)
-            .WithImageTag("26.8@sha256:c68e286cacd87b942ac1939a0a1481461109d6acd3a57dc496969a319a76bbf0")
+            .WithImageTag("26.8@sha256:7e66a96e4739239070aeaf72e4c5decf0f7f682cfc725b9f7ea2b336eaba38b3")
             .WithRealmImport(Realms)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_ID", seedClientId)
             .WithEnvironment("HOMEPORT_LOCAL_CLIENT_SECRET", builder.AddParameter("local-client-secret", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true))

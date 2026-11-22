@@ -39,6 +39,12 @@ CVE-2026-78667 exp:2026-12-31
 CVE-2026-78669 exp:2026-12-31
 CVE-2026-97031 exp:2026-12-31
 
+# postgres: libxml2 2.13.9-r2 in postgres:18.7-alpine. Alpine fixes it in
+# 2.13.9-r3, but the current digest of 18.7-alpine still carries r2, so no
+# rebuilt image exists yet. Short expiry, so the scan fails again if none has
+# appeared by then; removed with the first rebuilt digest.
+CVE-2026-86144 exp:2026-11-29
+
 # keycloak, development and tests only - an operator brings their own identity
 # provider (ADR-0006). No fixed package in Red Hat's base image yet for
 # java-21-openjdk-headless and sqlite-libs; guava is fixed in 33.7.2, which
@@ -49,14 +55,3 @@ CVE-2026-119374 exp:2026-12-31
 CVE-2026-119379 exp:2026-12-31
 CVE-2026-119586 exp:2026-12-31
 CVE-2026-102554 exp:2026-12-31
-
-# keycloak: zlib 1.2.11-40.el9 in keycloak:26.8, development and tests only
-# (ADR-0006). Red Hat lists no fixed package yet, and the digest of
-# 2026-11-13 carries the same version. Removed with the first fixed image.
-CVE-2026-76844 exp:2026-12-31
-
-# keycloak: java-21-openjdk-headless 1:21.0.13.0.9-1.2.el9 in keycloak:26.8,
-# development and tests only (ADR-0006). No fixed version exists yet, and
-# the pinned digest is the current one of 26.8 (26.8.2-2). Short expiry, so
-# the scan fails again if no fixed image has appeared by then.
-CVE-2026-114938 exp:2026-12-02

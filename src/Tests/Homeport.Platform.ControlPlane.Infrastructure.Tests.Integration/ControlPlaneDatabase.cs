@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using Homeport.Platform.ControlPlane.Infrastructure.Persistence;
 using Homeport.Testing.Containers;
@@ -50,7 +51,7 @@ public sealed class ControlPlaneDatabase : IAsyncLifetime
         .WithEnvironment("METERING_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("METERING_APP_PASSWORD", AppPassword)
         .WithEnvironment("METERING_ADMIN_PASSWORD", AdminPassword)
-        .WithResourceMapping(new FileInfo(Path.Combine(AppContext.BaseDirectory, InitScript)), InitDirectory, fileMode: Executable)
+        .WithResourceMapping(FilePath.Of(Path.Combine(AppContext.BaseDirectory, InitScript)), DirectoryPath.Of(InitDirectory), fileMode: Executable)
         .Build();
 
     private IHost? app;
