@@ -30,8 +30,10 @@ Homeport is a **self-hosted platform for business modules**.
 - **Not a hosted SaaS.** data-worx does not operate customer instances.
 - **Not a collection of thin one-function APIs** ("validate IBAN"). Every
   module solves a hard problem in depth.
-- **Not an invoicing system.** Homeport meters and exports usage; the
-  operator's own ERP or accounting creates invoices.
+- **Not an invoicing system.** The platform meters and exports usage and
+  never creates an invoice for it; the operator's own ERP or accounting bills
+  the tenants. A module may still process a business's own invoices as its
+  domain, such as validating and reading incoming e-invoices.
 
 ## Why
 
