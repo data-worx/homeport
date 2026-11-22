@@ -14,8 +14,9 @@ billing files.
 
 - **Not a hosted SaaS.** Business data never leaves the operator's
   infrastructure. Nothing phones home.
-- **Not an invoicing system.** Homeport meters and exports usage for showback
-  and chargeback; it never creates invoices.
+- **Not an invoicing system.** The platform meters and exports usage for
+  showback and chargeback; it never bills anybody for it. A module may process
+  your own business invoices as its domain.
 
 More in [docs/architecture/vision.md](docs/architecture/vision.md).
 

@@ -107,15 +107,35 @@ invalidation of the gateway's cached client lookups, dashboards, localisation,
 TLS between components
 ([discussion #4](https://github.com/data-worx/homeport/discussions/4)).
 
+## M3 — v0.3 E-invoicing: receive
+
+The first business module: an operator validates and reads incoming
+electronic invoices through the gateway.
+
+Done when:
+
+1. The module `e-invoicing` runs through the AppHost and the compose file.
+2. `POST v1/validate` and `POST v1/read` take an XML document or a hybrid
+   PDF and detect its format themselves.
+3. XRechnung (UBL and CII, with Extension), ZUGFeRD / Factur-X in the
+   profiles BASIC, EN 16931 and XRECHNUNG, and plain EN 16931 are validated
+   and read.
+4. The module is stateless and validates with its own validator, which agrees
+   with the KoSIT validator on the KoSIT test suite.
+5. Every processed document counts one `documents`.
+6. The standards the module implements are watched by a scheduled workflow.
+
+Out of scope: PDF/A conformance checks, full support of the ZUGFeRD profile
+EXTENDED, Peppol BIS Billing 3.0, creating e-invoices, clearance countries
+(FatturaPA, KSeF, CFDI) as a module of their own, asynchronous and batch
+processing, a Peppol access point.
+
 ## Later — not yet phased
 
 - API keys
 - Tenant self-service
 - Suspending or deleting a tenant
 - Active invalidation of the gateway's cached client lookups
-- First real module, chosen by the community poll in
-  [discussion #2](https://github.com/data-worx/homeport/discussions/2);
-  decided now that M2 is released
 - Helm chart
 - Quotas
 - Period-close webhook
@@ -129,3 +149,10 @@ TLS between components
 - Typed .NET client in `Homeport.Shared.Client`: calls the platform and
   catalog module APIs and obtains tokens with client credentials
   ([ADR-0018](docs/architecture/adr/0018-where-wire-types-live.md))
+- PDF/A conformance checks of hybrid e-invoices
+- Full support of the ZUGFeRD profile EXTENDED
+- Peppol BIS Billing 3.0
+- Creating e-invoices
+- Clearance countries (FatturaPA, KSeF, CFDI) as a module of their own
+- Asynchronous and batch processing of e-invoices
+- A Peppol access point

@@ -33,8 +33,9 @@ Two facts a newcomer gets wrong:
 - **Not a hosted SaaS.** Business data never leaves the operator's
   infrastructure. Nothing may phone home, and nothing may depend on a service
   operated by data-worx.
-- **Not an invoicing system.** Homeport meters and exports usage for showback
-  and chargeback. It never creates invoices.
+- **Not an invoicing system.** The platform meters and exports usage for
+  showback and chargeback and never creates an invoice for it. A module may
+  process the operator's own business invoices as its domain.
 
 Background: [docs/architecture/vision.md](docs/architecture/vision.md).
 
