@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json;
+using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using Homeport.Platform.ControlPlane.Domain;
 using Homeport.Platform.ControlPlane.Infrastructure.Persistence;
@@ -71,7 +72,7 @@ public sealed class RunningControlPlane : IAsyncLifetime
         .WithEnvironment("METERING_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("METERING_APP_PASSWORD", AppPassword)
         .WithEnvironment("METERING_ADMIN_PASSWORD", AdminPassword)
-        .WithResourceMapping(new FileInfo(Path.Combine(AppContext.BaseDirectory, InitScript)), InitDirectory, fileMode: Executable)
+        .WithResourceMapping(FilePath.Of(Path.Combine(AppContext.BaseDirectory, InitScript)), DirectoryPath.Of(InitDirectory), fileMode: Executable)
         .Build();
 
     private readonly ECDsa gatewayKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
