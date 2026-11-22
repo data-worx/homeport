@@ -98,7 +98,7 @@ public static class Program
         var meteringAdminPassword = builder.AddParameter("metering-admin-password", new GenerateParameterDefault { MinLength = PasswordLength, Special = false }, secret: true, persist: true);
 
         var postgres = builder.AddPostgres("postgres")
-            .WithImageTag("18.7-alpine@sha256:b6972e1115a4ff8eba5d7f7d19184926d1e16d7d1136ae1e1a7ebf286da0f015")
+            .WithImageTag("18.7-alpine@sha256:0115267ab5a509022df9319c77be365cef335adb71556c75f60f5360ee247e71")
             .WithEnvironment("POSTGRES_INITDB_ARGS", InitDbArgs)
             .WithEnvironment("POSTGRES_DB", Database)
             .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", controlPlaneOwnerPassword)
@@ -123,7 +123,7 @@ public static class Program
         var rabbitMqEndpoint = rabbitMq.Resource.PrimaryEndpoint;
 
         var valkey = builder.AddValkey("valkey")
-            .WithImageTag("9.1-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b");
+            .WithImageTag("9.2-alpine@sha256:c8e2d17498838af5d91e12eb7c11220b3434a7b7131a333e3af52ad5e0b80882");
 
         // Development and tests only. An operator brings their own identity
         // provider (ADR-0006), so the compose file runs Keycloak in development
