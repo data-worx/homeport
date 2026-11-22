@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using Homeport.Platform.Metering.Domain.Usage;
 using Homeport.Platform.Metering.Infrastructure.Persistence;
@@ -57,7 +58,7 @@ public sealed class MeteringDatabase : IAsyncLifetime
         // The script prepares every service's schema; this fixture uses only metering's.
         .WithEnvironment("CONTROL_PLANE_OWNER_PASSWORD", OwnerPassword)
         .WithEnvironment("CONTROL_PLANE_APP_PASSWORD", AppPassword)
-        .WithResourceMapping(new FileInfo(Path.Combine(AppContext.BaseDirectory, InitScript)), InitDirectory, fileMode: Executable)
+        .WithResourceMapping(FilePath.Of(Path.Combine(AppContext.BaseDirectory, InitScript)), DirectoryPath.Of(InitDirectory), fileMode: Executable)
         .Build();
 
     private IHost? app;
