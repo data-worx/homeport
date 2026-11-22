@@ -21,7 +21,7 @@ asset change; the `notices` gate fails while it is stale.
 | Package | Version | Licence | Copyright |
 |---|---|---|---|
 | Aspire.Npgsql.EntityFrameworkCore.PostgreSQL | 13.6.5 | MIT | © Microsoft Corporation. All rights reserved. |
-| Aspire.StackExchange.Redis | 13.6.5 | MIT | © Microsoft Corporation. All rights reserved. |
+| Aspire.StackExchange.Redis | 17.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | AspNetCore.HealthChecks.Redis | 9.0.0 | Apache-2.0 | — not declared by the package |
 | Cronos | 0.11.0 | MIT | Copyright © 2016–2025 Hangfire OÜ. |
 | FastExpressionCompiler | 5.4.1 | MIT | Copyright © 2016-2026 Maksim Volkau |
@@ -100,7 +100,7 @@ asset change; the `notices` gate fails while it is stale.
 | System.Composition.TypedParts | 9.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Diagnostics.DiagnosticSource | 11.0.0 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.IdentityModel.Tokens.Jwt | 8.19.2 | MIT | © Microsoft Corporation. All rights reserved. |
-| System.IO.Hashing | 10.0.14 | MIT | © Microsoft Corporation. All rights reserved. |
+| System.IO.Hashing | 10.0.15 | MIT | © Microsoft Corporation. All rights reserved. |
 | System.Linq.Dynamic.Core | 1.7.4 | Apache-2.0 | Copyright © ZZZ Projects |
 | WolverineFx | 6.64.2 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |
 | WolverineFx.Newtonsoft | 6.64.2 | MIT | Copyright (c) Jeremy D. Miller and Contributors. |

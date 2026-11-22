@@ -27,6 +27,14 @@ public static class Program
     private const string RabbitMqInitFiles = "../../../deploy/rabbitmq/init";
     private const string Realms = "../../../deploy/keycloak/realms";
 
+    // Relative to the AppHost project: the hosts it runs as resources.
+    private const string RegistryProject = "../../Platform/Registry/Homeport.Platform.Registry.Api/Homeport.Platform.Registry.Api.csproj";
+    private const string EchoProject = "../../Modules/Echo/Homeport.Modules.Echo.Api/Homeport.Modules.Echo.Api.csproj";
+    private const string GatewayProject = "../../Platform/Gateway/Homeport.Platform.Gateway.Api/Homeport.Platform.Gateway.Api.csproj";
+    private const string ControlPlaneProject = "../../Platform/ControlPlane/Homeport.Platform.ControlPlane.Api/Homeport.Platform.ControlPlane.Api.csproj";
+    private const string MeteringProject = "../../Platform/Metering/Homeport.Platform.Metering.Api/Homeport.Platform.Metering.Api.csproj";
+    private const string PortalProject = "../../Platform/Portal/Homeport.Platform.Portal/Homeport.Platform.Portal.csproj";
+
     // The realm in deploy/keycloak/realms/ and the audience its clients' tokens carry.
     private const string Realm = "homeport";
     private const string Audience = "homeport";
@@ -167,7 +175,7 @@ public static class Program
         var echoRegistrationKey = builder.AddParameter("echo-registration-key", new GeneratedRegistrationKey(), secret: true, persist: true);
 
         // Modules register here and the gateway reads their routes from it.
-        var registry = builder.AddProject<Projects.Homeport_Platform_Registry_Api>("registry")
+        var registry = builder.AddDotnetProject("registry", RegistryProject)
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-registry")
             .WithEnvironment("Registry__RegistrationKeys__echo__0", echoRegistrationKey)
             .WithReference(valkey)
@@ -177,7 +185,7 @@ public static class Program
         // Modules. The resource is named after the module id; service.name
         // follows the observability rule instead. Each instance registers at
         // the registry with the address the gateway reaches it at.
-        var echo = builder.AddProject<Projects.Homeport_Modules_Echo_Api>("echo")
+        var echo = builder.AddDotnetProject("echo", EchoProject)
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-module-echo")
             .WithEnvironment("Homeport__Registry__Url", $"{Uri.UriSchemeHttp}://registry")
             .WithEnvironment("Homeport__Registry__Key", echoRegistrationKey)
@@ -187,11 +195,12 @@ public static class Program
 
         // The gateway's signing key. A local run generates one and keeps it in
         // the user secrets; the compose file takes it from the environment. The
-        // additional public key is empty until a rotation needs it.
+        // additional public key is empty until a rotation needs it, so it is
+        // optional: Aspire rejects an empty value for a required parameter.
         var signingKey = builder.AddParameter("gateway-signing-key", new GeneratedSigningKey(), secret: true, persist: true);
         var signingKeyId = builder.AddParameter("gateway-signing-key-id", "local");
-        var additionalPublicKey = builder.AddParameter("gateway-additional-public-key", string.Empty);
-        var additionalKeyId = builder.AddParameter("gateway-additional-key-id", string.Empty);
+        var additionalPublicKey = builder.AddParameter("gateway-additional-public-key", string.Empty).AsOptional();
+        var additionalKeyId = builder.AddParameter("gateway-additional-key-id", string.Empty).AsOptional();
 
         // The gateway's port on the host in the compose file. A local run
         // does not use it; the default only spares the dashboard a prompt.
@@ -202,7 +211,7 @@ public static class Program
         // a token from Keycloak that the control plane knows. It applies
         // forwarded headers only from the proxies an operator configures, so
         // it does not take Aspire's publish default of trusting every caller.
-        var gateway = builder.AddProject<Projects.Homeport_Platform_Gateway_Api>("gateway")
+        var gateway = builder.AddDotnetProject("gateway", GatewayProject)
             .DisableForwardedHeaders()
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-gateway")
             .WithEnvironment("Signing__Key", signingKey)
@@ -258,7 +267,7 @@ public static class Program
         // and seeds one tenant, plan and client, whose values configuration
         // overrides; the service starts after it completed and runs as the app
         // role.
-        var controlPlaneMigrate = builder.AddProject<Projects.Homeport_Platform_ControlPlane_Api>("control-plane-migrate", launchProfileName: null)
+        var controlPlaneMigrate = builder.AddDotnetProject("control-plane-migrate", ControlPlaneProject, WithoutLaunchProfile)
             .WithArgs("migrate")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-control-plane-migrate")
             .WithEnvironment("ConnectionStrings__control-plane-owner", ConnectionString(postgresEndpoint, "control_plane_owner", controlPlaneOwnerPassword))
@@ -271,7 +280,7 @@ public static class Program
             .WithEnvironment("Seed__ClientId", seedClientId)
             .WaitFor(postgres);
 
-        var controlPlane = builder.AddProject<Projects.Homeport_Platform_ControlPlane_Api>("control-plane")
+        var controlPlane = builder.AddDotnetProject("control-plane", ControlPlaneProject)
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-control-plane")
             .WithEnvironment("ConnectionStrings__control-plane", ConnectionString(postgresEndpoint, "control_plane_app", controlPlaneAppPassword))
             .WithReference(gateway)
@@ -295,13 +304,13 @@ public static class Program
         // It serves the usage export the gateway forwards, with caller tokens
         // it validates against the gateway's JWKS (ADR-0019), and reads the
         // usage of every tenant for the operator as the admin role (ADR-0020).
-        var meteringMigrate = builder.AddProject<Projects.Homeport_Platform_Metering_Api>("metering-migrate", launchProfileName: null)
+        var meteringMigrate = builder.AddDotnetProject("metering-migrate", MeteringProject, WithoutLaunchProfile)
             .WithArgs("migrate")
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-metering-migrate")
             .WithEnvironment("ConnectionStrings__metering-owner", ConnectionString(postgresEndpoint, "metering_owner", meteringOwnerPassword))
             .WaitFor(postgres);
 
-        var metering = builder.AddProject<Projects.Homeport_Platform_Metering_Api>("metering")
+        var metering = builder.AddDotnetProject("metering", MeteringProject)
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-metering")
             .WithEnvironment("ConnectionStrings__metering", ConnectionString(postgresEndpoint, "metering_app", meteringAppPassword))
             .WithEnvironment("ConnectionStrings__metering-admin", ConnectionString(postgresEndpoint, "metering_admin", meteringAdminPassword))
@@ -323,7 +332,7 @@ public static class Program
         // developer certificate. The compose file publishes plain HTTP: TLS
         // ends at the operator's reverse proxy, whose forwarded headers the
         // portal applies only once the operator trusts it.
-        var portal = builder.AddProject<Projects.Homeport_Platform_Portal>("portal", launchProfileName: null)
+        var portal = builder.AddDotnetProject("portal", PortalProject, WithoutLaunchProfile)
             .DisableForwardedHeaders()
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-portal")
             .WithEnvironment("SignIn__Authority", ReferenceExpression.Create($"{keycloak.GetEndpoint(Uri.UriSchemeHttp)}/realms/{Realm}"))
@@ -375,5 +384,14 @@ public static class Program
     {
         return ReferenceExpression.Create(
             $"amqp://{user}:{password}@{rabbitMq.Property(EndpointProperty.Host)}:{rabbitMq.Property(EndpointProperty.Port)}");
+    }
+
+    /// <summary>
+    /// Runs a project without its launch profile, for a one-shot command
+    /// and for a resource whose endpoints the AppHost declares itself.
+    /// </summary>
+    private static void WithoutLaunchProfile(ProjectResourceOptions options)
+    {
+        options.ExcludeLaunchProfile = true;
     }
 }

@@ -34,11 +34,10 @@ In Visual Studio or Rider, make `Homeport.Aspire.AppHost` the startup project an
 start it; the IDE opens the dashboard itself. Both use the launch profile
 `https`; the profile `http` runs without TLS.
 
-The output ends with the dashboard address and a login link:
+The output names the dashboard with a login link:
 
 ```text
-Login to the dashboard at https://localhost:17000/login?t=<token>
-Distributed application started. Press Ctrl+C to shut down.
+  Dashboard:  https://localhost:17000/login?t=<token>
 ```
 
 Open the login link. The dashboard lists `postgres`, `rabbitmq`, `valkey`,

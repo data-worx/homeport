@@ -94,10 +94,13 @@ gate_notices() {
 # Regenerates the compose file from the AppHost into a temporary directory and
 # compares it with the committed one, the way the notices gate does. The
 # generated .env holds the variable names only; it is committed as .env.example.
+# It publishes with the Aspire CLI, a local tool in dotnet-tools.json, which
+# finds the AppHost through aspire.config.json; its telemetry stays off.
 # To update the committed files after a change to the AppHost:
 #   out="$(mktemp -d)"
-#   dotnet run --project src/Aspire/Homeport.Aspire.AppHost -- --operation publish \
-#     --step publish --output-path "$(cygpath -w "${out}" 2>/dev/null || echo "${out}")"
+#   dotnet tool restore
+#   ASPIRE_CLI_TELEMETRY_OPTOUT=true dotnet aspire publish --non-interactive --nologo \
+#     --output-path "$(cygpath -w "${out}" 2>/dev/null || echo "${out}")"
 #   cp "${out}/docker-compose.yaml" deploy/compose/
 #   cp "${out}/.env" deploy/compose/.env.example
 gate_compose() {
@@ -105,8 +108,9 @@ gate_compose() {
   generated="$(mktemp -d)"
   native="$(cygpath -w "${generated}" 2>/dev/null || echo "${generated}")"
   # The AppHost writes .env with the platform's line endings; compare without them.
-  dotnet run --project src/Aspire/Homeport.Aspire.AppHost -- --operation publish \
-      --step publish --output-path "${native}" > /dev/null \
+  dotnet tool restore > /dev/null \
+    && ASPIRE_CLI_TELEMETRY_OPTOUT=true dotnet aspire publish --non-interactive --nologo \
+      --output-path "${native}" > /dev/null \
     && diff -u --strip-trailing-cr deploy/compose/docker-compose.yaml "${generated}/docker-compose.yaml" \
     && diff -u --strip-trailing-cr deploy/compose/.env.example "${generated}/.env" \
     || rc=1

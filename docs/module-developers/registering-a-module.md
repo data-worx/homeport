@@ -23,7 +23,7 @@ In the AppHost, give the module a key parameter and its own endpoint as
 address. Echo is the reference, in `src/Aspire/Homeport.Aspire.AppHost/Program.cs`:
 
 ```csharp
-var contracts = builder.AddProject<Projects.Homeport_Modules_Contracts_Api>("contracts")
+var contracts = builder.AddDotnetProject("contracts", "../../Modules/Contracts/Homeport.Modules.Contracts.Api/Homeport.Modules.Contracts.Api.csproj")
     .WithEnvironment("Homeport__Registry__Url", "http://registry")
     .WithEnvironment("Homeport__Registry__Key", contractsRegistrationKey)
     .WithReference(registry);
