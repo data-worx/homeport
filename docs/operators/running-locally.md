@@ -6,7 +6,7 @@ file, which is how it is deployed without .NET.
 
 Today both start the infrastructure — PostgreSQL, RabbitMQ, Valkey and
 Keycloak — the gateway, the registry, the control plane, metering, the
-admin portal and the Echo module.
+admin portal, the Echo module and the e-invoicing module.
 Homeport's other services follow
 with the next milestones.
 
@@ -41,14 +41,14 @@ The output names the dashboard with a login link:
 ```
 
 Open the login link. The dashboard lists `postgres`, `rabbitmq`, `valkey`,
-`keycloak`, `registry`, `echo`, `gateway`, `control-plane-migrate`,
+`keycloak`, `registry`, `echo`, `e-invoicing`, `gateway`, `control-plane-migrate`,
 `control-plane`, `metering-migrate`, `metering` and `portal`; each reaches the state
 *Healthy* within a minute, longer on the first run while the images are
 pulled. `control-plane-migrate` instead reaches *Finished* once it has
 migrated and seeded the control plane's database, and `control-plane` starts
 only then; see [the control plane](control-plane.md). `metering-migrate` and
-`metering` do the same for metering; see [metering](metering.md). Echo
-registers at the registry once it has started, and the gateway routes to it
+`metering` do the same for metering; see [metering](metering.md). Each
+module registers at the registry once it has started, and the gateway routes to it
 a few seconds later; see [the registry](registry.md). The gateway runs as two
 replicas, which share every tenant's rate limit; see
 [throttling](throttling.md).
@@ -67,7 +67,7 @@ the gateway with a token, as
 The AppHost generates the passwords of all four, the passwords of the
 database roles of the control plane and metering, the passwords of the
 broker users of the gateway and metering, the gateway's signing key and
-Echo's registration key on its first start and keeps them in the .NET user secrets of the AppHost
+a registration key per module on its first start and keeps them in the .NET user secrets of the AppHost
 project, on your machine only.
 List them from the repository root:
 
@@ -86,6 +86,7 @@ Parameters:registered-client-secret = …
 Parameters:admin-api-test-secret = …
 Parameters:gateway-signing-key = -----BEGIN PRIVATE KEY-----…
 Parameters:echo-registration-key = …
+Parameters:e-invoicing-registration-key = …
 Parameters:control-plane-owner-password = …
 Parameters:control-plane-app-password = …
 Parameters:metering-owner-password = …
@@ -99,7 +100,8 @@ Parameters:operator-password = …
 The dashboard shows the same values under the parameter resources, masked
 until revealed. `gateway-signing-key` is the key the gateway signs its tokens
 with, under the key id `local`; see [the gateway's signing key](signing-key.md).
-`echo-registration-key` is the key Echo registers with; see
+`echo-registration-key` and `e-invoicing-registration-key` are the keys
+Echo and the e-invoicing module register with; see
 [the registry](registry.md). The two `control-plane-` and the two
 `metering-` `-owner-` and `-app-` passwords belong to the database roles the
 services migrate and run as; the two `-rabbitmq-` passwords to the broker
@@ -168,7 +170,8 @@ lines below are not needed. Verify the images first, as
 [verifying an image](verifying-images.md) describes.
 
 To run the source of this checkout, build the images of the gateway, the
-registry, the control plane, metering, the portal and the Echo module locally first,
+registry, the control plane, metering, the portal, the Echo module and the
+e-invoicing module locally first,
 from the repository root:
 
 ```bash
@@ -178,6 +181,7 @@ dotnet publish src/Platform/ControlPlane/Homeport.Platform.ControlPlane.Api -t:P
 dotnet publish src/Platform/Metering/Homeport.Platform.Metering.Api -t:PublishContainer
 dotnet publish src/Platform/Portal/Homeport.Platform.Portal -t:PublishContainer
 dotnet publish src/Modules/Echo/Homeport.Modules.Echo.Api -t:PublishContainer
+dotnet publish src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Api -t:PublishContainer
 ```
 
 The last line of each names its image:
@@ -189,6 +193,7 @@ The last line of each names its image:
 … "homeport-metering:latest" …
 … "homeport-portal:latest" …
 … "homeport-module-echo:latest" …
+… "homeport-module-e-invoicing:latest" …
 ```
 
 The compose file reads its settings from `deploy/compose/.env`, which is never
@@ -203,7 +208,7 @@ cd deploy/compose
 It writes the images and ports, a random password for every `_PASSWORD`
 variable listed in `.env.example`, a signing key for the gateway, as
 [the gateway's signing key](signing-key.md) describes, a registration key
-for Echo, as [the registry](registry.md) describes, the directories of the
+per module, as [the registry](registry.md) describes, the directories of the
 database and broker init scripts and the Keycloak realm, a random secret for
 every `_SECRET` variable, the portal's address, and the seed of
 [the control plane](control-plane.md). `control-plane-migrate` runs from the
@@ -215,7 +220,7 @@ and the file with `docker compose down -v && rm .env`.
 Check it: every line but the two `GATEWAY_ADDITIONAL_` ones has a value.
 
 ```bash
-grep -c '=.' .env      # prints 46
+grep -c '=.' .env      # prints 49
 ```
 
 Start, then check:
@@ -227,6 +232,7 @@ docker compose ps --format '{{.Service}} {{.State}}'
 
 ```text
 control-plane running
+e-invoicing running
 echo running
 gateway running
 keycloak running
@@ -277,7 +283,7 @@ everything with:
 docker compose down
 ```
 
-After pulling changes to a service or Echo, rebuild its image
+After pulling changes to a service or a module, rebuild its image
 before starting. When `.env.example` gains a variable after an update, add it to
 `.env` as `create-env.sh` would before starting.
 

@@ -20,6 +20,15 @@
       }
     },
     {
+      "name": "e-invoicing.validate",
+      "description": "Validate documents with the e-invoicing module",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
       "name": "usage.read",
       "description": "Read the usage of the client's tenant",
       "protocol": "openid-connect",
@@ -54,7 +63,7 @@
       "directAccessGrantsEnabled": false,
       "fullScopeAllowed": false,
       "defaultClientScopes": ["usage.read"],
-      "optionalClientScopes": ["echo.invoke"],
+      "optionalClientScopes": ["echo.invoke", "e-invoicing.validate"],
       "protocolMappers": [
         {
           "name": "homeport-audience",

@@ -96,6 +96,7 @@ services:
       HTTP_PORTS: "${REGISTRY_PORT}"
       OTEL_SERVICE_NAME: "homeport-registry"
       Registry__RegistrationKeys__echo__0: "${ECHO_REGISTRATION_KEY}"
+      Registry__RegistrationKeys__e-invoicing__0: "${E_INVOICING_REGISTRATION_KEY}"
       ConnectionStrings__valkey: "valkey:6379,password=${VALKEY_PASSWORD}"
       VALKEY_HOST: "valkey"
       VALKEY_PORT: "6379"
@@ -133,6 +134,28 @@ services:
       services__gateway__admin__0: "http://gateway:8000"
     expose:
       - "${ECHO_PORT}"
+    networks:
+      - "aspire"
+  e-invoicing:
+    image: "${E_INVOICING_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${E_INVOICING_PORT}"
+      OTEL_SERVICE_NAME: "homeport-module-e-invoicing"
+      Homeport__Registry__Url: "http://registry"
+      Homeport__Registry__Key: "${E_INVOICING_REGISTRATION_KEY}"
+      REGISTRY_HTTP: "http://registry:${REGISTRY_PORT}"
+      services__registry__http__0: "http://registry:${REGISTRY_PORT}"
+      REGISTRY_HTTPS: "https://registry:${REGISTRY_PORT}"
+      Homeport__Registry__InstanceAddress: "http://e-invoicing:${E_INVOICING_PORT}"
+      GATEWAY_HTTP: "http://gateway:${GATEWAY_PORT}"
+      services__gateway__http__0: "http://gateway:${GATEWAY_PORT}"
+      GATEWAY_HTTPS: "https://gateway:${GATEWAY_PORT}"
+      GATEWAY_ADMIN: "http://gateway:8000"
+      services__gateway__admin__0: "http://gateway:8000"
+    expose:
+      - "${E_INVOICING_PORT}"
     networks:
       - "aspire"
   gateway:

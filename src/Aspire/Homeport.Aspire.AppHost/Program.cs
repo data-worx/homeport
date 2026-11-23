@@ -30,6 +30,7 @@ public static class Program
     // Relative to the AppHost project: the hosts it runs as resources.
     private const string RegistryProject = "../../Platform/Registry/Homeport.Platform.Registry.Api/Homeport.Platform.Registry.Api.csproj";
     private const string EchoProject = "../../Modules/Echo/Homeport.Modules.Echo.Api/Homeport.Modules.Echo.Api.csproj";
+    private const string EInvoicingProject = "../../Modules/EInvoicing/Homeport.Modules.EInvoicing.Api/Homeport.Modules.EInvoicing.Api.csproj";
     private const string GatewayProject = "../../Platform/Gateway/Homeport.Platform.Gateway.Api/Homeport.Platform.Gateway.Api.csproj";
     private const string ControlPlaneProject = "../../Platform/ControlPlane/Homeport.Platform.ControlPlane.Api/Homeport.Platform.ControlPlane.Api.csproj";
     private const string MeteringProject = "../../Platform/Metering/Homeport.Platform.Metering.Api/Homeport.Platform.Metering.Api.csproj";
@@ -173,11 +174,13 @@ public static class Program
         // one and keeps it in the user secrets; the compose file takes it from
         // the environment.
         var echoRegistrationKey = builder.AddParameter("echo-registration-key", new GeneratedRegistrationKey(), secret: true, persist: true);
+        var eInvoicingRegistrationKey = builder.AddParameter("e-invoicing-registration-key", new GeneratedRegistrationKey(), secret: true, persist: true);
 
         // Modules register here and the gateway reads their routes from it.
         var registry = builder.AddDotnetProject("registry", RegistryProject)
             .WithEnvironment("OTEL_SERVICE_NAME", "homeport-registry")
             .WithEnvironment("Registry__RegistrationKeys__echo__0", echoRegistrationKey)
+            .WithEnvironment("Registry__RegistrationKeys__e-invoicing__0", eInvoicingRegistrationKey)
             .WithReference(valkey)
             .WaitFor(valkey)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
@@ -192,6 +195,14 @@ public static class Program
             .WithReference(registry)
             .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
         echo.WithEnvironment("Homeport__Registry__InstanceAddress", echo.GetEndpoint(Uri.UriSchemeHttp));
+
+        var eInvoicing = builder.AddDotnetProject("e-invoicing", EInvoicingProject)
+            .WithEnvironment("OTEL_SERVICE_NAME", "homeport-module-e-invoicing")
+            .WithEnvironment("Homeport__Registry__Url", $"{Uri.UriSchemeHttp}://registry")
+            .WithEnvironment("Homeport__Registry__Key", eInvoicingRegistrationKey)
+            .WithReference(registry)
+            .WithHttpHealthCheck(ServiceDefaultsExtensions.ReadinessPath);
+        eInvoicing.WithEnvironment("Homeport__Registry__InstanceAddress", eInvoicing.GetEndpoint(Uri.UriSchemeHttp));
 
         // The gateway's signing key. A local run generates one and keeps it in
         // the user secrets; the compose file takes it from the environment. The
@@ -259,9 +270,10 @@ public static class Program
             .WithEnvironment("AdminApi__RequireHttpsMetadata", bool.FalseString);
 
         // The registry validates the gateway's service tokens against its JWKS,
-        // and Echo its module tokens.
+        // and the modules their module tokens.
         registry.WithReference(gateway);
         echo.WithReference(gateway);
+        eInvoicing.WithReference(gateway);
 
         // The control plane: `migrate` applies its migrations as the owner role
         // and seeds one tenant, plan and client, whose values configuration

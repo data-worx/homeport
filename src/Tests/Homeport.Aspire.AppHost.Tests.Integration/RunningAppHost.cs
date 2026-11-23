@@ -3,6 +3,7 @@
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
@@ -49,6 +50,15 @@ public sealed class RunningAppHost : IAsyncLifetime
 
     /// <summary>The scope Echo's routes require, which the seeded client gets only on request.</summary>
     internal const string EchoInvokeScope = "echo.invoke";
+
+    /// <summary>The path the e-invoicing module validates a document at through the gateway.</summary>
+    internal const string EInvoicingValidatePath = "/modules/e-invoicing/v1/validate";
+
+    /// <summary>The scope the e-invoicing module's validate route requires, which the seeded client gets only on request.</summary>
+    internal const string EInvoicingValidateScope = "e-invoicing.validate";
+
+    /// <summary>A UBL invoice, as small as the e-invoicing module accepts it.</summary>
+    internal const string UblInvoice = """<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"/>""";
 
     private const string TokenPath = "/realms/homeport/protocol/openid-connect/token";
 
@@ -228,9 +238,39 @@ public sealed class RunningAppHost : IAsyncLifetime
         await App.ResourceNotifications.WaitForResourceHealthyAsync("control-plane", timeout.Token);
 
         gateway.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await TokenAsync(client, EchoInvokeScope));
-        await StatusOnceAsync(gateway, status => status != HttpStatusCode.NotFound, RouteTimeout);
+        await StatusOnceAsync(token => gateway.GetAsync(EchoRequestPath, token), status => status != HttpStatusCode.NotFound, RouteTimeout);
 
         return gateway;
+    }
+
+    /// <summary>
+    /// A client of the gateway with a token of <see cref="SeededClient"/>
+    /// granting <see cref="EInvoicingValidateScope"/>, once the e-invoicing
+    /// module, the gateway, Keycloak and the control plane are healthy and the
+    /// gateway routes to the module. Like <see cref="GatewayRoutingEchoAsync()"/>,
+    /// it sends a request that exceeds the seeded plan's limit again.
+    /// </summary>
+    internal async Task<HttpClient> GatewayRoutingEInvoicingAsync()
+    {
+        using var timeout = new CancellationTokenSource(StartTimeout);
+        await App.ResourceNotifications.WaitForResourceHealthyAsync("e-invoicing", timeout.Token);
+        await App.ResourceNotifications.WaitForResourceHealthyAsync("gateway", timeout.Token);
+        await App.ResourceNotifications.WaitForResourceHealthyAsync("keycloak", timeout.Token);
+        await App.ResourceNotifications.WaitForResourceHealthyAsync("control-plane", timeout.Token);
+
+        var gateway = new HttpClient(new RetryAfterHandler()) { BaseAddress = App.GetEndpoint("gateway", GatewayEndpoint) };
+        gateway.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await TokenAsync(SeededClient, EInvoicingValidateScope));
+        await StatusOnceAsync(token => ValidateAsync(gateway, token), status => status != HttpStatusCode.NotFound, RouteTimeout);
+
+        return gateway;
+    }
+
+    /// <summary>Posts <see cref="UblInvoice"/> to the e-invoicing module's validate route through <paramref name="gateway"/>.</summary>
+    internal static async Task<HttpResponseMessage> ValidateAsync(HttpClient gateway, CancellationToken cancellationToken)
+    {
+        using var content = new StringContent(UblInvoice, Encoding.UTF8, "application/xml");
+
+        return await gateway.PostAsync(EInvoicingValidatePath, content, cancellationToken);
     }
 
     /// <summary>
@@ -279,32 +319,33 @@ public sealed class RunningAppHost : IAsyncLifetime
     }
 
     /// <summary>
-    /// Requests <see cref="EchoRequestPath"/> until the gateway answers with a
+    /// Sends the request of <paramref name="send"/> until the gateway answers with a
     /// status <paramref name="expected"/> accepts, and returns that status, or
     /// the last one once <paramref name="within"/> has passed.
     /// </summary>
     private static async Task<HttpStatusCode> StatusOnceAsync(
-        HttpClient gateway,
+        Func<CancellationToken, Task<HttpResponseMessage>> send,
         Func<HttpStatusCode, bool> expected,
         TimeSpan within)
     {
         var deadline = TimeProvider.System.GetUtcNow() + within;
-        var status = await StatusAsync(gateway);
+        var status = await StatusAsync(send);
         while (!(status is { } answered && expected(answered)) && TimeProvider.System.GetUtcNow() < deadline)
         {
             await Task.Delay(RoutePoll);
-            status = await StatusAsync(gateway);
+            status = await StatusAsync(send);
         }
 
         return status ?? HttpStatusCode.RequestTimeout;
     }
 
-    private static async Task<HttpStatusCode?> StatusAsync(HttpClient gateway)
+    private static async Task<HttpStatusCode?> StatusAsync(Func<CancellationToken, Task<HttpResponseMessage>> send)
     {
         using var timeout = new CancellationTokenSource(RequestTimeout);
         try
         {
-            return (await gateway.GetAsync(EchoRequestPath, timeout.Token)).StatusCode;
+            using var response = await send(timeout.Token);
+            return response.StatusCode;
         }
         catch (OperationCanceledException) when (timeout.IsCancellationRequested)
         {

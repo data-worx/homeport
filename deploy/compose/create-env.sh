@@ -4,7 +4,7 @@
 # Writes deploy/compose/.env for a local run of the compose file: the images
 # built from this checkout, a random password or secret for every variable
 # .env.example lists, a fresh signing key for the gateway, a registration key
-# for Echo, the directories of the init scripts and the Keycloak realm, the
+# per module, the directories of the init scripts and the Keycloak realm, the
 # portal's address, and the seed of the control plane.
 #
 # Refuses to overwrite an existing .env: the databases and the broker keep
@@ -27,6 +27,7 @@ trap 'rm -f "$tmp"' EXIT
 
 {
   printf 'ECHO_IMAGE=homeport-module-echo:latest\nECHO_PORT=8080\n'
+  printf 'E_INVOICING_IMAGE=homeport-module-e-invoicing:latest\nE_INVOICING_PORT=8080\n'
   printf 'GATEWAY_IMAGE=homeport-gateway:latest\nGATEWAY_PORT=8080\n'
   # The gateway's port on the host, where a reverse proxy points.
   printf 'GATEWAY_HOST_PORT=5100\n'
@@ -49,6 +50,7 @@ trap 'rm -f "$tmp"' EXIT
   printf 'GATEWAY_SIGNING_KEY_ID=local\n'
   printf 'GATEWAY_ADDITIONAL_PUBLIC_KEY=\nGATEWAY_ADDITIONAL_KEY_ID=\n'
   printf 'ECHO_REGISTRATION_KEY=%s\n' "$(openssl rand -hex 32)"
+  printf 'E_INVOICING_REGISTRATION_KEY=%s\n' "$(openssl rand -hex 32)"
   printf 'SEED_TENANT_ID=3f6c1b9e-2d4a-4e8f-9b7c-5a1d0e2f4c61\nSEED_TENANT_NAME=Local tenant\n'
   printf 'SEED_PLAN_ID=8a2e4c6d-1f3b-4a5c-9d7e-0b1c2d3e4f50\nSEED_PLAN_NAME=Local plan\n'
   printf 'SEED_PLAN_REQUESTS_PER_SECOND=10\nSEED_PLAN_BURST=20\nSEED_CLIENT_ID=local-client\n'

@@ -51,7 +51,8 @@ and scope claims, the cache lifetime and the module token lifetime.
 ## Scopes
 
 Every route of a module requires one scope, named in the module's manifest
-under `scopes`; Echo's is `echo.invoke`. Create each scope of every module
+under `scopes`; Echo's is `echo.invoke`, the e-invoicing module's
+`e-invoicing.validate`. Create each scope of every module
 you run at your provider, and grant a client the scopes of the routes it may
 call. Homeport does not create them for you.
 
@@ -155,12 +156,13 @@ lists what it needs from any provider):
 The AppHost imports the realm in
 [`deploy/keycloak/realms/`](../../deploy/keycloak/realms/homeport-realm.json):
 
-- the realm `homeport`, with the client scopes `echo.invoke` and
-  `usage.read`;
+- the realm `homeport`, with the client scopes `echo.invoke`,
+  `e-invoicing.validate` and `usage.read`;
 - the client the control plane seeds (`local-client` by default, the
   parameter `seed-client-id`), confidential, with only the client-credentials
-  grant, the audience `homeport`, `usage.read` by default and `echo.invoke`
-  only when the token request asks for it with `scope=echo.invoke`;
+  grant, the audience `homeport`, `usage.read` by default, and `echo.invoke`
+  and `e-invoicing.validate` only when the token request asks for them, as
+  with `scope=echo.invoke`;
 - the client `unmapped-client`, which the control plane does not know, for
   the tests that expect `403`;
 - the client `registered-client`, which the control plane does not seed,

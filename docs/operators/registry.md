@@ -37,7 +37,8 @@ Configure it on both sides, the same value:
 | Registry | `Registry__RegistrationKeys__<moduleId>__0` | `<MODULEID>_REGISTRATION_KEY` |
 | Module | `Homeport__Registry__Key` | the same variable |
 
-`<moduleId>` is the module's id, such as `echo`. The id `platform` and every
+`<moduleId>` is the module's id, such as `echo` or `e-invoicing`; in the
+compose `.env` a `-` becomes `_`, as in `E_INVOICING_REGISTRATION_KEY`. The id `platform` and every
 id that starts with `homeport-` are reserved for the platform and its
 services, and the registry does not start with a key for one. Each key belongs to exactly one module: a leaked
 key lets its holder register as that module, never as another. Homeport

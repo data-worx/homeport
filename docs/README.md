@@ -45,6 +45,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`api-consumers/errors.md`](api-consumers/errors.md) | The error format, and what the gateway does to a module's errors |
 | [`api-consumers/rate-limits.md`](api-consumers/rate-limits.md) | The rate limit of your tenant's plan, the RateLimit headers, and `429` with `Retry-After` |
 | [`api-consumers/reading-usage.md`](api-consumers/reading-usage.md) | Reading your tenant's usage per hour or day from `/platform/v1/usage`, as JSON or CSV |
+| [`api-consumers/validating-an-invoice.md`](api-consumers/validating-an-invoice.md) | Validating a received invoice with the e-invoicing module: the request, the report, rejected documents and what it counts |
 | [`api-consumers/api-docs.md`](api-consumers/api-docs.md) | The consolidated API docs at `/platform/docs`, and trying a request with a token from `curl` |
 
 ## Architecture — why Homeport is built the way it is
@@ -66,6 +67,8 @@ Arranged by reader. A directory exists once it has its first document.
 |---|---|
 | [`reference/module-contract/`](reference/module-contract/README.md) | The language-neutral contract every module implements |
 | [`reference/problems/`](reference/problems/README.md) | Homeport's problem types, one page each |
+| [`reference/modules/e-invoicing/problems/unreadable-document.md`](reference/modules/e-invoicing/problems/unreadable-document.md) | The e-invoicing module's problem for a body that is not the XML or PDF its content type declares |
+| [`reference/modules/e-invoicing/problems/unknown-syntax.md`](reference/modules/e-invoicing/problems/unknown-syntax.md) | The e-invoicing module's problem for XML in no invoice syntax it knows |
 
 ## Maintainers — releasing Homeport
 
