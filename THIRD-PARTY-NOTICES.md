@@ -88,7 +88,7 @@ asset change; the `notices` gate fails while it is stale.
 | Polly.Extensions | 8.4.2 | BSD-3-Clause | Copyright (c) 2024, App vNext |
 | Polly.RateLimiting | 8.4.2 | BSD-3-Clause | Copyright (c) 2024, App vNext |
 | RabbitMQ.Client | 7.2.2 | Apache-2.0 (chosen from Apache-2.0 OR MPL-2.0) | Copyright (c) 2007-2026 Broadcom. All Rights Reserved. The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries. |
-| Scalar.AspNetCore | 2.19.0 | MIT | Copyright (c) 2023-present Scalar |
+| Scalar.AspNetCore | 3.2.0 | MIT | Copyright (c) 2023-present Scalar |
 | Spectre.Console | 0.55.0 | MIT | Patrik Svensson, Phil Scott, Nils Andresen, Cédric Luthi |
 | Spectre.Console.Ansi | 0.55.0 | MIT | Patrik Svensson, Phil Scott, Nils Andresen, Cédric Luthi |
 | StackExchange.Redis | 2.13.17 | MIT | 2014 - 2026 Stack Exchange, Inc. |
