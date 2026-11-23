@@ -1,0 +1,71 @@
+{
+  "ruleSets": [
+    {
+      "customizationId": "urn:cen.eu:en16931:2017",
+      "ruleSet": "en16931",
+      "version": "2017",
+      "profile": "EN 16931",
+      "standard": "EN 16931 validation artefacts"
+    },
+    {
+      "customizationId": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
+      "ruleSet": "xrechnung",
+      "version": "3.0",
+      "validFrom": "2023-08-01",
+      "profile": "XRECHNUNG",
+      "standard": "XRechnung"
+    },
+    {
+      "customizationId": "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3",
+      "ruleSet": "xrechnung",
+      "version": "2.3",
+      "validFrom": "2023-08-01",
+      "validUntil": "2024-01-31",
+      "profile": "XRECHNUNG",
+      "standard": "XRechnung"
+    },
+    {
+      "customizationId": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0#conformant#urn:xeinkauf.de:kosit:extension:xrechnung_3.0",
+      "ruleSet": "xrechnung-extension",
+      "version": "3.0",
+      "validFrom": "2023-08-01",
+      "profile": "XRECHNUNG",
+      "standard": "XRechnung"
+    },
+    {
+      "customizationId": "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3#conformant#urn:xoev-de:kosit:extension:xrechnung_2.3",
+      "ruleSet": "xrechnung-extension",
+      "version": "2.3",
+      "validFrom": "2023-08-01",
+      "validUntil": "2024-01-31",
+      "profile": "XRECHNUNG",
+      "standard": "XRechnung"
+    },
+    {
+      "customizationId": "urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic",
+      "ruleSet": "factur-x-basic",
+      "version": "1.0",
+      "profile": "BASIC",
+      "standard": "ZUGFeRD / Factur-X"
+    },
+    {
+      "customizationId": "urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended",
+      "ruleSet": "factur-x-extended",
+      "version": "1.0",
+      "profile": "EXTENDED",
+      "standard": "ZUGFeRD / Factur-X"
+    }
+  ],
+  "notAnEInvoice": [
+    {
+      "customizationId": "urn:factur-x.eu:1p0:minimum",
+      "profile": "MINIMUM",
+      "standard": "ZUGFeRD / Factur-X"
+    },
+    {
+      "customizationId": "urn:factur-x.eu:1p0:basicwl",
+      "profile": "BASIC WL",
+      "standard": "ZUGFeRD / Factur-X"
+    }
+  ]
+}

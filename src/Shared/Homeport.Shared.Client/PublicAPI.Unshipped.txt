@@ -609,11 +609,9 @@ Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse
 Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse!
 Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Container.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer
 Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Container.init -> void
-Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Deconstruct(out Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer Container, out Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax? Syntax) -> void
 Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse? other) -> bool
 Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Syntax.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax?
 Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Syntax.init -> void
-Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.ValidationReportResponse(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer Container, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax? Syntax) -> void
 override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Equals(object? obj) -> bool
 override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.GetHashCode() -> int
 override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.ToString() -> string!
@@ -626,3 +624,41 @@ Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax
 Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax.Cii = 2 -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax
 Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax.UblCreditNote = 1 -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax
 Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax.UblInvoice = 0 -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax
+Homeport.Shared.Client.Modules.EInvoicing.V1.FindingSeverity
+Homeport.Shared.Client.Modules.EInvoicing.V1.FindingSeverity.Warning = 0 -> Homeport.Shared.Client.Modules.EInvoicing.V1.FindingSeverity
+Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet
+Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet.En16931 = 0 -> Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet
+Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet.FacturXBasic = 3 -> Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet
+Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet.FacturXExtended = 4 -> Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet
+Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet.XRechnung = 1 -> Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet
+Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet.XRechnungExtension = 2 -> Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Deconstruct(out Homeport.Shared.Client.Modules.EInvoicing.V1.FindingSeverity Severity, out string! Rule, out string! Message) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Message.get -> string!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Message.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Rule.get -> string!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Rule.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Severity.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.FindingSeverity
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Severity.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.ValidationFinding(Homeport.Shared.Client.Modules.EInvoicing.V1.FindingSeverity Severity, string! Rule, string! Message) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.CustomizationId.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.CustomizationId.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Deconstruct(out Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer Container, out Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax? Syntax, out string? CustomizationId, out Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet? RuleSet, out string? RuleSetVersion, out Homeport.Shared.Client.Modules.EInvoicing.V1.Verdict? Verdict, out System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding!>! Findings) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Findings.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Findings.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.RuleSet.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.RuleSet.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.RuleSetVersion.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.RuleSetVersion.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.ValidationReportResponse(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer Container, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax? Syntax, string? CustomizationId, Homeport.Shared.Client.Modules.EInvoicing.V1.RuleSet? RuleSet, string? RuleSetVersion, Homeport.Shared.Client.Modules.EInvoicing.V1.Verdict? Verdict, System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding!>! Findings) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Verdict.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Verdict?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Verdict.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Verdict
+Homeport.Shared.Client.Modules.EInvoicing.V1.Verdict.NotAnEInvoice = 0 -> Homeport.Shared.Client.Modules.EInvoicing.V1.Verdict
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.ToString() -> string!
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationFinding? right) -> bool

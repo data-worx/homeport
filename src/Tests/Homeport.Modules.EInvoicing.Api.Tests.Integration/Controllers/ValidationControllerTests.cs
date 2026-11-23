@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Homeport.Shared.Client.ModuleContract;
+using Homeport.Testing.EInvoicing;
 
 namespace Homeport.Modules.EInvoicing.Api.Tests.Integration.Controllers;
 
@@ -14,9 +16,14 @@ public sealed class ValidationControllerTests
         private const string ValidatePath = "/v1/validate";
         private const string ProblemPrefix = "https://homeport.data-worx.de/modules/e-invoicing/problems/";
 
-        private const string UblInvoice = """<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"><ID>1</ID></Invoice>""";
-        private const string UblCreditNote = """<?xml version="1.0" encoding="UTF-8"?><CreditNote xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2"><ID>1</ID></CreditNote>""";
-        private const string CiiInvoice = """<?xml version="1.0" encoding="UTF-8"?><rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"/>""";
+        private const string XRechnung = "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0";
+        private const string UblHeader = $"""<cbc:CustomizationID>{XRechnung}</cbc:CustomizationID><cbc:ID>1</cbc:ID><cbc:IssueDate>2026-11-23</cbc:IssueDate>""";
+        private const string UblInvoice = $"""<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">{UblHeader}</Invoice>""";
+        private const string UblCreditNote = $"""<?xml version="1.0" encoding="UTF-8"?><CreditNote xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">{UblHeader}</CreditNote>""";
+        private const string CiiInvoice = $"""<?xml version="1.0" encoding="UTF-8"?><rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"><rsm:ExchangedDocumentContext><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>{XRechnung}</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext><rsm:ExchangedDocument><ram:IssueDateTime><udt:DateTimeString format="102">20161123</udt:DateTimeString></ram:IssueDateTime></rsm:ExchangedDocument></rsm:CrossIndustryInvoice>""";
+        private const string Minimum = """<rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"><rsm:ExchangedDocumentContext><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:factur-x.eu:1p0:minimum</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext></rsm:CrossIndustryInvoice>""";
+        private const string UnknownRuleSet = """<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"><cbc:CustomizationID>urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID></Invoice>""";
+        private const string Report = $"\"customizationId\":\"{XRechnung}\",\"ruleSet\":\"xrechnung\",\"ruleSetVersion\":\"3.0\",\"verdict\":null";
         private const string WithDoctype = """<?xml version="1.0"?><!DOCTYPE Invoice [<!ENTITY x "x">]><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">&x;</Invoice>""";
         private const string UnknownRoot = """<Order xmlns="urn:example:order"/>""";
         private const string NotXml = "Invoice 1, 100 EUR";
@@ -24,13 +31,48 @@ public sealed class ValidationControllerTests
         [Theory]
         [InlineData(UblInvoice, "ubl-invoice")]
         [InlineData(UblCreditNote, "ubl-credit-note")]
-        [InlineData(CiiInvoice, "cii")]
-        public async Task Reports_The_Detected_Syntax_Of_An_Xml_Invoice(string document, string syntax)
+        public async Task Reports_The_Syntax_And_Rule_Set_Of_An_Xml_Invoice(string document, string syntax)
         {
             var response = await PostAsync(document, "application/xml");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal($$"""{"container":"xml","syntax":"{{syntax}}"}""", await response.Content.ReadAsStringAsync());
+            Assert.Equal($$"""{"container":"xml","syntax":"{{syntax}}",{{Report}},"findings":[]}""", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Reports_A_Warning_For_An_Issue_Date_Outside_The_Window()
+        {
+            var response = await PostAsync(CiiInvoice, "application/xml");
+
+            Assert.Equal(
+                $$"""{"container":"xml","syntax":"cii",{{Report}},"findings":[{"severity":"warning","rule":"EINV-RULE-SET-WINDOW","message":"The invoice was issued on 2016-11-23, outside the window of version 3.0 (valid from 2023-08-01)."}]}""",
+                await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Reports_The_Invoice_A_Pdf_Carries()
+        {
+            var response = await PostAsync(HybridPdf.Carrying("xrechnung.xml", UblInvoice, "XRECHNUNG"), "application/pdf");
+
+            Assert.Equal($$"""{"container":"pdf","syntax":"ubl-invoice",{{Report}},"findings":[]}""", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Reports_Not_An_E_Invoice_For_A_Minimum_Profile()
+        {
+            var response = await PostAsync(Minimum, "application/xml");
+
+            Assert.Equal(
+                """{"container":"xml","syntax":"cii","customizationId":"urn:factur-x.eu:1p0:minimum","ruleSet":null,"ruleSetVersion":null,"verdict":"not-an-e-invoice","findings":[]}""",
+                await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Reports_One_Document_For_A_Document_That_Is_No_E_Invoice()
+        {
+            var response = await PostAsync(Minimum, "application/xml");
+
+            Assert.Equal(["documents=1"], response.Headers.GetValues(ModuleHeaders.Usage));
         }
 
         [Fact]
@@ -39,14 +81,6 @@ public sealed class ValidationControllerTests
             var response = await PostAsync(UblInvoice, "text/xml");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task Reports_A_Pdf_Without_Syntax()
-        {
-            var response = await PostAsync("%PDF-1.7\n", "application/pdf");
-
-            Assert.Equal("""{"container":"pdf","syntax":null}""", await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
@@ -62,14 +96,28 @@ public sealed class ValidationControllerTests
         [InlineData(NotXml, "application/xml", "unreadable-document")]
         [InlineData(UblInvoice, "application/pdf", "unreadable-document")]
         [InlineData(UnknownRoot, "application/xml", "unknown-syntax")]
+        [InlineData(UnknownRuleSet, "application/xml", "unknown-rule-set")]
         public async Task Answers_A_Rejected_Document_With_Its_Problem(string document, string contentType, string problem)
         {
             var response = await PostAsync(document, contentType);
 
-            Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
-            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
-            Assert.Equal(ProblemPrefix + problem, root.GetProperty("type").GetString());
+            await AssertProblem(response, problem);
+        }
+
+        [Fact]
+        public async Task Answers_A_Pdf_Without_An_Embedded_Invoice_With_Its_Problem()
+        {
+            var response = await PostAsync(HybridPdf.Carrying("invoice.xml", UblInvoice), "application/pdf");
+
+            await AssertProblem(response, "pdf-without-invoice");
+        }
+
+        [Fact]
+        public async Task Reports_No_Document_For_A_Pdf_Without_An_Embedded_Invoice()
+        {
+            var response = await PostAsync(HybridPdf.Carrying("invoice.xml", UblInvoice), "application/pdf");
+
+            Assert.Equal(["documents=0"], response.Headers.GetValues(ModuleHeaders.Usage));
         }
 
         [Theory]
@@ -102,9 +150,25 @@ public sealed class ValidationControllerTests
             Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         }
 
+        private static async Task AssertProblem(HttpResponseMessage response, string problem)
+        {
+            Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+            var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Equal(ProblemPrefix + problem, root.GetProperty("type").GetString());
+        }
+
         private async Task<HttpResponseMessage> PostAsync(string document, string contentType)
         {
             using var content = new StringContent(document, Encoding.UTF8, contentType);
+
+            return await module.CreateClient().PostAsync(ValidatePath, content);
+        }
+
+        private async Task<HttpResponseMessage> PostAsync(byte[] document, string contentType)
+        {
+            using var content = new ByteArrayContent(document);
+            content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
             return await module.CreateClient().PostAsync(ValidatePath, content);
         }

@@ -6,6 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Data, not code: versioned with the module, not overridable by the operator. -->
+  <ItemGroup>
+    <EmbeddedResource Include="RuleSets\rule-sets.json" LogicalName="Homeport.Modules.EInvoicing.Domain.RuleSets.rule-sets.json" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Homeport.Shared.Contracts\Homeport.Shared.Contracts.csproj" />
   </ItemGroup>

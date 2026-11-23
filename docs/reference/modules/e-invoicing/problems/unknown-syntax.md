@@ -16,6 +16,12 @@ from the namespace and the local name of the root element together:
 Both are compared exactly, case included: an `Invoice` without the UBL
 namespace is no UBL invoice.
 
+A ZUGFeRD 1.0 invoice, root element `CrossIndustryDocument` in the namespace
+`urn:ferd:CrossIndustryDocument:invoice:1p0`, does not get this problem: it
+is answered with `200` and the verdict `not-an-e-invoice`, as
+[validating an invoice](../../../../api-consumers/validating-an-invoice.md#rule-sets)
+describes.
+
 ```json
 {
   "type": "https://homeport.data-worx.de/modules/e-invoicing/problems/unknown-syntax",

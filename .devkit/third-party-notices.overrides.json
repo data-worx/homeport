@@ -28,6 +28,10 @@
       "notice": "Copyright (c) 2024 The \"Critter Stack\" and JasperFx Tools",
       "source": "https://github.com/JasperFx/jasperfx/blob/43131f8a33f8af44964606d277fb1f159a3649b0/LICENSE"
     },
+    "PdfPig": {
+      "notice": "This product is derived from software developed at The Apache Software Foundation (http://www.apache.org/). Based on source code originally developed in the PDFBox and FontBox projects. Copyright (c) 2002-2007, www.pdfbox.org. Includes the Adobe Glyph List Copyright 1997, 1998, 2002, 2007, 2010 Adobe Systems Incorporated. Includes the Zapf Dingbats Glyph List Copyright 2002, 2010 Adobe Systems Incorporated.",
+      "source": "https://github.com/UglyToad/PdfPig/blob/49ddb62c146d326f90785ed1ca6ca99852768036/NOTICES.txt"
+    },
     "Scalar.AspNetCore": {
       "notice": "Copyright (c) 2023-present Scalar",
       "source": "https://github.com/scalar/scalar/blob/1fa4255b2ad83c956fe5dc8838aa7b3c4e4fd3b9/LICENSE"

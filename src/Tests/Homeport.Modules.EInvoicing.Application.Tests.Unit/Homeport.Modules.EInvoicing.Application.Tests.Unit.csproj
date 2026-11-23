@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\EInvoicing\Homeport.Modules.EInvoicing.Application\Homeport.Modules.EInvoicing.Application.csproj" />
+    <ProjectReference Include="..\Homeport.Testing\Homeport.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
