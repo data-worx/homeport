@@ -605,3 +605,24 @@ static Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.operator
 static Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AuditEntriesResponse? right) -> bool
 static Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.operator !=(Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? right) -> bool
 static Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse.operator ==(Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? left, Homeport.Shared.Client.Platform.Metering.V1.AuditEntryResponse? right) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Container.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Container.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Deconstruct(out Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer Container, out Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax? Syntax) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Syntax.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Syntax.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.ValidationReportResponse(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer Container, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax? Syntax) -> void
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.ToString() -> string!
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse? right) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer.Pdf = 1 -> Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer.Xml = 0 -> Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentContainer
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax.Cii = 2 -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax.UblCreditNote = 1 -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax.UblInvoice = 0 -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceSyntax

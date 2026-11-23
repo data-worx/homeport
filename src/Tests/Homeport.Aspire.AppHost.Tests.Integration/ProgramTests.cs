@@ -40,6 +40,7 @@ public sealed class ProgramTests
         [InlineData("keycloak")]
         [InlineData("registry")]
         [InlineData("echo")]
+        [InlineData("e-invoicing")]
         [InlineData("gateway")]
         [InlineData("control-plane")]
         [InlineData("metering")]
@@ -190,6 +191,16 @@ public sealed class ProgramTests
             var response = await gateway.PostAsync("/modules/echo/v1/echo", content);
 
             Assert.Equal("""{"hello":"Homeport ⚓"}""", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Validates_A_Document_The_E_Invoicing_Module_Received_Through_The_Gateway()
+        {
+            var gateway = await appHost.GatewayRoutingEInvoicingAsync();
+
+            using var response = await RunningAppHost.ValidateAsync(gateway, CancellationToken.None);
+
+            Assert.Equal("""{"container":"xml","syntax":"ubl-invoice"}""", await response.Content.ReadAsStringAsync());
         }
 
         [Fact]

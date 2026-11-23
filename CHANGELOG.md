@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   request it rejects no longer counts the route's quantity. The usage event
   is still recorded, with quantity `0`. Echo counts an empty batch as no
   item. See [reporting usage](docs/module-developers/reporting-usage.md).
+- The e-invoicing module, the first business module, runs in the AppHost and
+  the compose file as the image `homeport-module-e-invoicing`.
+  `POST /modules/e-invoicing/v1/validate` takes a received invoice as XML or
+  PDF and reports its container and syntax — UBL invoice, UBL credit note or
+  CII. It refuses a document type declaration. Every processed document
+  counts one in the meter `documents`, a rejected one nothing. See
+  [validating an invoice](docs/api-consumers/validating-an-invoice.md).
 
 ### Changed
 

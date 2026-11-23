@@ -5,7 +5,12 @@ media type `application/problem+json`. The `type` names the kind of error as
 an absolute URI. Homeport's own types live under
 `https://homeport.data-worx.de/problems/<name>`; each has a page here. A
 module's own types live under a prefix of its own and are documented by the
-module.
+module. Those of a catalog module live under
+`https://homeport.data-worx.de/modules/<moduleId>/problems/<name>`, with a
+page in `docs/reference/modules/<moduleId>/problems/`, such as the
+e-invoicing module's
+[`unreadable-document`](../modules/e-invoicing/problems/unreadable-document.md)
+and [`unknown-syntax`](../modules/e-invoicing/problems/unknown-syntax.md).
 
 A type URI is an identifier. Homeport never fetches it, and a client compares
 it as a string. Once published, a type is part of the public API.

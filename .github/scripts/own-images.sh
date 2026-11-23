@@ -22,6 +22,7 @@ compose="deploy/compose/docker-compose.yaml"
 declare -A projects=(
   [CONTROL_PLANE]="src/Platform/ControlPlane/Homeport.Platform.ControlPlane.Api"
   [ECHO]="src/Modules/Echo/Homeport.Modules.Echo.Api"
+  [E_INVOICING]="src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Api"
   [GATEWAY]="src/Platform/Gateway/Homeport.Platform.Gateway.Api"
   [METERING]="src/Platform/Metering/Homeport.Platform.Metering.Api"
   [PORTAL]="src/Platform/Portal/Homeport.Platform.Portal"

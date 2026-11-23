@@ -41,7 +41,7 @@ On Windows, also switch Smart App Control off, as
 explains.
 
 Build the images of the gateway, the registry, the control plane, metering,
-the admin portal and the Echo module from this checkout
+the admin portal, the Echo module and the e-invoicing module from this checkout
 ([running locally](docs/operators/running-locally.md#with-docker-compose)):
 
 ```bash
@@ -53,7 +53,8 @@ for project in \
   Platform/ControlPlane/Homeport.Platform.ControlPlane.Api \
   Platform/Metering/Homeport.Platform.Metering.Api \
   Platform/Portal/Homeport.Platform.Portal \
-  Modules/Echo/Homeport.Modules.Echo.Api; do
+  Modules/Echo/Homeport.Modules.Echo.Api \
+  Modules/EInvoicing/Homeport.Modules.EInvoicing.Api; do
   dotnet publish "src/${project}" -t:PublishContainer
 done
 ```
