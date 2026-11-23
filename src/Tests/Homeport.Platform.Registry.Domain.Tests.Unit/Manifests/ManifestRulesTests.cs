@@ -30,12 +30,22 @@ public sealed class ManifestRulesTests
             Assert.Empty(errors);
         }
 
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void Returns_Nothing_For_The_Previous_And_The_Current_Contract_Version(int contractVersion)
+        {
+            var errors = ManifestRules.Validate(ModuleId, Valid with { ContractVersion = contractVersion });
+
+            Assert.Empty(errors);
+        }
+
         [Fact]
         public void Reports_An_Unsupported_Contract_Version_Naming_The_Supported_Ones()
         {
             var errors = ManifestRules.Validate(ModuleId, Valid with { ContractVersion = 99 });
 
-            Assert.Equal(["Contract version 99 is not supported; supported versions: 1."], errors["contractVersion"]);
+            Assert.Equal(["Contract version 99 is not supported; supported versions: 1, 2."], errors["contractVersion"]);
         }
 
         [Theory]

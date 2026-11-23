@@ -8,8 +8,9 @@ namespace Homeport.Platform.Gateway.Domain.Usage;
 /// <summary>
 /// The rules for a quantity a module reports for a request as
 /// <c>&lt;meter&gt;=&lt;quantity&gt;</c>, instead of the default of the
-/// route it was matched on. A report that breaks one is rejected, and the
-/// route's default applies.
+/// route it was matched on. A quantity of <c>0</c> means the request counts
+/// nothing, such as one the module rejected. A report that breaks a rule is
+/// rejected, and the route's default applies.
 /// </summary>
 public static class ReportedUsage
 {
@@ -19,7 +20,7 @@ public static class ReportedUsage
     /// <summary>The report names a meter other than the one the route declares.</summary>
     public const string UndeclaredMeterCode = "usage.undeclared-meter";
 
-    /// <summary>The reported quantity is not a positive integer.</summary>
+    /// <summary>The reported quantity is not a non-negative integer.</summary>
     public const string InvalidQuantityCode = "usage.invalid-quantity";
 
     private const char Separator = '=';
@@ -48,9 +49,9 @@ public static class ReportedUsage
             return Result<int>.Failure(new Error(UndeclaredMeterCode, $"The route counts in the meter '{routeMeter}', not in '{meter}'."));
         }
 
-        if (!int.TryParse(report.AsSpan(separator + 1), NumberStyles.None, CultureInfo.InvariantCulture, out var quantity) || quantity == 0)
+        if (!int.TryParse(report.AsSpan(separator + 1), NumberStyles.None, CultureInfo.InvariantCulture, out var quantity))
         {
-            return Result<int>.Failure(new Error(InvalidQuantityCode, "A reported quantity is a positive integer."));
+            return Result<int>.Failure(new Error(InvalidQuantityCode, "A reported quantity is a non-negative integer."));
         }
 
         return Result<int>.Success(quantity);

@@ -50,7 +50,7 @@ public sealed class EchoController(BatchEchoing batches) : ControllerBase
     /// <summary>Returns a batch of items unchanged.</summary>
     /// <remarks>
     /// The request counts one in the meter <c>items</c> per item, which Echo
-    /// reports to the gateway.
+    /// reports to the gateway. A batch Echo rejects counts nothing.
     /// </remarks>
     /// <param name="request">The items to return.</param>
     /// <response code="200">The items, in the order they were sent.</response>
@@ -63,6 +63,8 @@ public sealed class EchoController(BatchEchoing batches) : ControllerBase
         var batch = batches.Echo<JsonElement>(request.Items);
         if (!batch.IsSuccess)
         {
+            Response.ReportUsage(EchoManifest.ItemsMeter, 0);
+
             return EchoProblems.For(batch.Error).ToResult(batch.Error.Message);
         }
 

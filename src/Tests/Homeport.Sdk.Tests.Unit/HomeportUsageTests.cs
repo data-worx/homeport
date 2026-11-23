@@ -30,14 +30,22 @@ public sealed class HomeportUsageTests
             Assert.Equal("items=3", response.Headers[ModuleHeaders.Usage]);
         }
 
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public void Throws_When_The_Quantity_Is_Not_Positive(int quantity)
+        [Fact]
+        public void Reports_Zero_When_The_Request_Counts_Nothing()
         {
             var response = new DefaultHttpContext().Response;
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => response.ReportUsage("items", quantity));
+            response.ReportUsage("items", 0);
+
+            Assert.Equal("items=0", response.Headers[ModuleHeaders.Usage]);
+        }
+
+        [Fact]
+        public void Throws_When_The_Quantity_Is_Negative()
+        {
+            var response = new DefaultHttpContext().Response;
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => response.ReportUsage("items", -1));
         }
 
         [Theory]

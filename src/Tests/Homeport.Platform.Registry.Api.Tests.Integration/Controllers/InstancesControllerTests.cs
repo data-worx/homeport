@@ -37,6 +37,18 @@ public sealed class InstancesControllerTests
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task Registers_An_Instance_Of_The_Previous_And_The_Current_Contract_Version(int contractVersion)
+        {
+            var registration = Registration with { Manifest = Manifest with { ContractVersion = contractVersion } };
+
+            var response = await registry.CreateModuleClient().PutAsJsonAsync(InstancePath($"register-contract-{contractVersion}"), registration);
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
         [Fact]
         public async Task Does_Not_Read_The_Registration_Key_As_A_Gateway_Token()
         {
@@ -82,7 +94,7 @@ public sealed class InstancesControllerTests
             Assert.Equal(MediaTypeNames.Application.ProblemJson, response.Content.Headers.ContentType?.MediaType);
             var problem = await response.Content.ReadFromJsonAsync<ProblemResponse>();
             Assert.Equal(new Uri(ProblemConventions.TypePrefix + "invalid-manifest"), problem?.Type);
-            Assert.Equal(["Contract version 99 is not supported; supported versions: 1."], problem?.Errors?["contractVersion"] ?? []);
+            Assert.Equal(["Contract version 99 is not supported; supported versions: 1, 2."], problem?.Errors?["contractVersion"] ?? []);
         }
 
         [Fact]

@@ -53,9 +53,20 @@ public sealed class UsageEventsTests
         }
 
         [Fact]
-        public async Task Publishes_The_Route_Default_When_The_Report_Is_Rejected()
+        public async Task Publishes_Zero_When_The_Module_Reported_That_The_Request_Counts_Nothing()
         {
-            var usage = Assert.Single(await PublishedAsync(gateway.CreateClient(), NewTraceId(), Reporting("documents=5")));
+            var usage = Assert.Single(await PublishedAsync(gateway.CreateClient(), NewTraceId(), Reporting("requests=0")));
+
+            Assert.Equal(("requests", 0), (usage.Meter, usage.Quantity));
+        }
+
+        [Theory]
+        [InlineData("documents=5")]
+        [InlineData("requests=-1")]
+        [InlineData("requests=+0")]
+        public async Task Publishes_The_Route_Default_When_The_Report_Is_Rejected(string report)
+        {
+            var usage = Assert.Single(await PublishedAsync(gateway.CreateClient(), NewTraceId(), Reporting(report)));
 
             Assert.Equal(("requests", 1), (usage.Meter, usage.Quantity));
         }
@@ -66,7 +77,7 @@ public sealed class UsageEventsTests
             using var rejected = new MetricCollector<long>(
                 gateway.Host.Services.GetRequiredService<IMeterFactory>(), UsageMetrics.MeterName, UsageMetrics.RejectedInstrument);
 
-            await PublishedAsync(gateway.CreateClient(), NewTraceId(), Reporting("requests=0"));
+            await PublishedAsync(gateway.CreateClient(), NewTraceId(), Reporting("requests=-1"));
 
             Assert.Equal(ReportedUsage.InvalidQuantityCode, Assert.Single(rejected.GetMeasurementSnapshot()).Tags[UsageMetrics.ReasonTag]);
         }

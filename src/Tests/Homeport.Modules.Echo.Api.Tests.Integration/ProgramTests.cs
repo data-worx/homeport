@@ -14,12 +14,12 @@ public sealed class ProgramTests
     public sealed class Main(EchoBehindGateway echo) : IClassFixture<EchoBehindGateway>
     {
         [Fact]
-        public async Task Serves_A_Manifest_With_Contract_Version_0()
+        public async Task Serves_A_Manifest_With_Contract_Version_2()
         {
             var response = await echo.CreateClient().GetStringAsync("/.well-known/homeport/manifest");
 
             var root = JsonDocument.Parse(response).RootElement;
-            Assert.Equal(1, root.GetProperty("contractVersion").GetInt32());
+            Assert.Equal(2, root.GetProperty("contractVersion").GetInt32());
         }
 
         [Fact]
@@ -97,6 +97,16 @@ public sealed class ProgramTests
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             var root = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
             Assert.Equal("https://homeport.data-worx.de/modules/echo/problems/empty-batch", root.GetProperty("type").GetString());
+        }
+
+        [Fact]
+        public async Task Reports_That_An_Empty_Batch_Counts_No_Item()
+        {
+            using var content = new StringContent("""{"items":[]}""", Encoding.UTF8, "application/json");
+
+            var response = await echo.CreateClient().PostAsync("/v1/echo/batch", content);
+
+            Assert.Equal(["items=0"], response.Headers.GetValues(ModuleHeaders.Usage));
         }
 
         [Fact]

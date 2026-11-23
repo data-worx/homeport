@@ -6,9 +6,9 @@ namespace Homeport.Platform.Registry.Domain.Manifests;
 public static class ContractVersions
 {
     /// <summary>
-    /// The current version and, once there is one, the previous. Version 1 is
-    /// the first released with v0.1; the drafts before it were never released,
-    /// so there is no previous version yet.
+    /// The previous version and the current. Version 1 was released with
+    /// v0.1; version 2 lets a module report a quantity of <c>0</c>, which a
+    /// module of version 1 never does, so the registry accepts both.
     /// </summary>
-    public static IReadOnlyList<int> Supported { get; } = [1];
+    public static IReadOnlyList<int> Supported { get; } = [1, 2];
 }
