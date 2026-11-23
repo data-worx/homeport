@@ -221,6 +221,16 @@ The contract is normative in
 Any change to it bumps `contractVersion` and updates the SDK, the documentation
 and the Echo module **in the same pull request**.
 
+### Standards
+
+- A module that implements an external standard — a schema, rule set, code
+  list or tax guidance — declares it in `src/Modules/<Module>/standards.json`.
+  See [watching standards](docs/module-developers/watching-standards.md).
+- A change of the version a module implements updates its `standards.json`
+  in the same pull request, and so does the review of a manual source.
+- The *Standards watch* workflow only opens issues. It never changes a
+  module.
+
 ## Multi-tenancy
 
 Security-critical. No exception without an ADR.

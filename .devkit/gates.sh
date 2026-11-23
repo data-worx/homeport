@@ -119,9 +119,12 @@ gate_compose() {
   return "${rc}"
 }
 
-# The tests of the release scripts in .github/scripts/, against throwaway
-# fixtures. The scripts run only on a tag, so they are tested before then.
-gate_scripts() { bash .github/scripts/test-release-scripts.sh; }
+# The tests of the scripts in .github/scripts/, against throwaway fixtures:
+# the release scripts run only on a tag and standards-watch.sh only on its
+# schedule, so they are tested before then.
+gate_scripts() {
+  bash .github/scripts/test-release-scripts.sh && bash .github/scripts/test-standards-watch.sh
+}
 
 # Rebuilds the design kit and fails when that changes a file under design/:
 # its generated files are committed and must match their sources. It compares
@@ -157,7 +160,7 @@ gate_expectation() {
     format)  echo "no formatting changes needed" ;;
     notices) echo "THIRD-PARTY-NOTICES.md matches what the shipped projects publish" ;;
     compose) echo "deploy/compose/ matches what the AppHost publishes" ;;
-    scripts) echo "every release script test passes" ;;
+    scripts) echo "every test of the scripts in .github/scripts/ passes" ;;
     design)  echo "design/ matches what design/tools/build-kit.mjs generates" ;;
   esac
 }

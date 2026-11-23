@@ -35,6 +35,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`module-developers/answering-errors.md`](module-developers/answering-errors.md) | Answering errors as Problem Details with `Homeport.Sdk` |
 | [`module-developers/reporting-usage.md`](module-developers/reporting-usage.md) | Reporting how much a request counts with `Homeport.Sdk`, and what the gateway does with the report |
 | [`module-developers/documenting-endpoints.md`](module-developers/documenting-endpoints.md) | Documenting a module's endpoints in its OpenAPI document, and checking it in a test |
+| [`module-developers/watching-standards.md`](module-developers/watching-standards.md) | Declaring the external standards a module implements in `standards.json`, and the issues the *Standards watch* workflow opens for them |
 
 ## API consumers — obtaining a token, calling modules, reading usage
 

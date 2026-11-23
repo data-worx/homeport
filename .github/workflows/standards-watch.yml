@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Opens an issue when a standard a module implements has moved on: a new
+# GitHub release of a watched repository, or a manual source whose review
+# interval has passed. It reads every src/Modules/<Module>/standards.json and
+# never changes a file. See docs/module-developers/watching-standards.md.
+name: Standards watch
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Every issue goes to the maintainer the devkit configuration names.
+      - run: |
+          . .devkit/config.sh
+          STANDARDS_WATCH_ASSIGNEE="${DEVKIT_ASSIGNEE}" bash .github/scripts/standards-watch.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
