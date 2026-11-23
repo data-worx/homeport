@@ -27,7 +27,7 @@ public sealed record ModuleManifest(
     public const string OpenApiPath = "/openapi/v1.json";
 
     /// <summary>The version of the module contract these types describe.</summary>
-    public const int CurrentContractVersion = 1;
+    public const int CurrentContractVersion = 2;
 
     /// <summary>
     /// The version of the module contract the module implements;

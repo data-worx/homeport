@@ -31,8 +31,26 @@ return new BatchResponse(batch.Value.Items);
 ```
 
 A response reports one meter; a second call replaces the first. A meter that
-is empty or contains `=`, `,` or white space, and a quantity that is not
-positive, throw an `ArgumentException`: a module that reports them has a bug.
+is empty or contains `=`, `,` or white space, and a negative quantity, throw
+an `ArgumentException`: a module that reports them has a bug.
+
+## Counting nothing
+
+A request the module rejects need not count. Reporting `0` before the error
+response counts it as nothing, as Echo does for an empty batch:
+
+```csharp
+if (!batch.IsSuccess)
+{
+    Response.ReportUsage("items", 0);
+
+    return EchoProblems.For(batch.Error).ToResult(batch.Error.Message);
+}
+```
+
+Without a report, the request counts the route's quantity, whatever the
+status. Reporting `0` needs contract version 2, which `Homeport.Sdk`
+declares.
 
 How much a request counts is a business rule. It belongs in the module's
 Domain, as Echo's `BatchRules`, and the host only reports what the use case
@@ -47,7 +65,11 @@ rejects a report when
 - it is not one `<meter>=<quantity>` pair,
 - the meter is not the one the route declares — compared exactly,
   case included,
-- the quantity is not a positive integer, such as `0`, `-5`, `+5` or `2.5`.
+- the quantity is not a non-negative integer, such as `-5`, `+5`, `+0` or
+  `2.5`.
+
+A report of `0` is accepted: the gateway records the request's usage event
+with quantity `0`.
 
 A rejected report counts the request with the route's quantity. The gateway
 logs it at Warning and counts it in `homeport.gateway.usage.rejected`, so

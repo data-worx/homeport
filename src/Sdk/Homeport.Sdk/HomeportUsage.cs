@@ -16,20 +16,21 @@ public static class HomeportUsage
     /// Counts the request as <paramref name="quantity"/> in <paramref name="meter"/>
     /// instead of the quantity its route declares, through the
     /// <see cref="ModuleHeaders.Usage"/> header. A response reports one meter,
-    /// so a second call replaces the first. The gateway removes the header
+    /// so a second call replaces the first. A quantity of <c>0</c> counts the
+    /// request as nothing, such as one the module rejects. The gateway removes the header
     /// before the caller sees it, and falls back to the route's quantity when
     /// <paramref name="meter"/> is not the route's own.
     /// </summary>
     /// <param name="response">The response to the request being counted, before it has started.</param>
     /// <param name="meter">The meter the route declares.</param>
-    /// <param name="quantity">How much the request counts; positive.</param>
+    /// <param name="quantity">How much the request counts; zero or more.</param>
     /// <exception cref="ArgumentException"><paramref name="meter"/> is empty or contains a character the header cannot carry.</exception>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="quantity"/> is not positive.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="quantity"/> is negative.</exception>
     public static void ReportUsage(this HttpResponse response, string meter, int quantity)
     {
         ArgumentNullException.ThrowIfNull(response);
         ArgumentException.ThrowIfNullOrWhiteSpace(meter);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        ArgumentOutOfRangeException.ThrowIfNegative(quantity);
         if (meter.AsSpan().ContainsAny(ReservedCharacters))
         {
             throw new ArgumentException("A meter contains no '=', no ',' and no white space.", nameof(meter));

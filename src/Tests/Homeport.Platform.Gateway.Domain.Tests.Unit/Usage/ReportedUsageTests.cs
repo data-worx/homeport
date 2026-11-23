@@ -16,6 +16,16 @@ public sealed class ReportedUsageTests
             Assert.Equal(5, quantity.Value);
         }
 
+        [Theory]
+        [InlineData("items=0")]
+        [InlineData("items=00")]
+        public void Returns_Zero_When_The_Module_Reports_That_The_Request_Counts_Nothing(string report)
+        {
+            var quantity = ReportedUsage.QuantityOf(report, "items");
+
+            Assert.Equal(0, quantity.Value);
+        }
+
         [Fact]
         public void Rejects_A_Meter_The_Route_Does_Not_Declare()
         {
@@ -33,15 +43,16 @@ public sealed class ReportedUsageTests
         }
 
         [Theory]
-        [InlineData("items=0")]
         [InlineData("items=-5")]
+        [InlineData("items=-0")]
+        [InlineData("items=+0")]
         [InlineData("items=+5")]
         [InlineData("items=five")]
         [InlineData("items=2.5")]
         [InlineData("items= 5")]
         [InlineData("items=")]
         [InlineData("items=2147483648")]
-        public void Rejects_A_Quantity_That_Is_Not_A_Positive_Integer(string report)
+        public void Rejects_A_Quantity_That_Is_Not_A_Non_Negative_Integer(string report)
         {
             var quantity = ReportedUsage.QuantityOf(report, "items");
 

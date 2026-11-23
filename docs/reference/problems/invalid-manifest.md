@@ -13,7 +13,7 @@ every failure, keyed by the field path in the manifest, in the notation of
   "title": "The manifest breaks the module contract.",
   "status": 422,
   "errors": {
-    "contractVersion": ["Contract version 99 is not supported; supported versions: 1."],
+    "contractVersion": ["Contract version 99 is not supported; supported versions: 1, 2."],
     "routes[0].path": ["Path '/echo' must start with /v{major}/."]
   },
   "traceId": "4bf92f3577b34da6a3ce929d0e0e4736"
@@ -21,7 +21,7 @@ every failure, keyed by the field path in the manifest, in the notation of
 ```
 
 - An unsupported `contractVersion` names the versions the registry supports:
-  the current one and, once there is one, the previous.
+  the previous one and the current.
 - `id` is reported when it is not lower-case letters, digits and `-`, when it
   is the reserved `platform`, or when it differs from the module id the
   registration is made for.

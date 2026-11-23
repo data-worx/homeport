@@ -1,9 +1,13 @@
 # Module contract
 
-**Status: normative, `contractVersion` 1**, the version released with v0.1.
-Every change bumps it and updates the SDK, this documentation and the Echo
-module in the same pull request. The drafts before it carried version 0 and
-were never released.
+**Status: normative, `contractVersion` 2.** Every change bumps it and
+updates the SDK, this documentation and the Echo module in the same pull
+request.
+
+| Version | Change |
+|---|---|
+| 1 | Released with v0.1. The drafts before it carried version 0 and were never released |
+| 2 | A module may report a quantity of `0`, so a request counts nothing ([Metering](#metering)) |
 
 The contract is language-neutral HTTP. A module may be written in any language;
 the .NET SDK (`Homeport.Sdk`) is a convenience, not a requirement.
@@ -141,7 +145,10 @@ running instance, so instances of one module never replace each other.
 - A module may report a different quantity with the response header
   `X-Homeport-Usage: <meter>=<quantity>`, at most one per response. The
   meter is the one the matched route declares, compared exactly; the
-  quantity is a positive integer in decimal digits, without sign.
+  quantity is a non-negative integer in decimal digits, without sign.
+- A reported `0` counts the request as nothing, such as a request the module
+  rejects. The gateway still records its usage event, with quantity `0`, so
+  its status and duration stay visible.
 - The gateway removes `X-Homeport-Usage` before the response reaches the
   caller. A report that breaks a rule above is ignored, and the route's
   quantity applies.

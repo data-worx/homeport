@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A module can report that a request counts nothing, with
+  `X-Homeport-Usage: <meter>=0` or `ReportUsage(meter, 0)` in the SDK, so a
+  request it rejects no longer counts the route's quantity. The usage event
+  is still recorded, with quantity `0`. Echo counts an empty batch as no
+  item. See [reporting usage](docs/module-developers/reporting-usage.md).
+
 ### Changed
+
+- The module contract is at version 2. The registry accepts modules of
+  version 1 and 2, so a module built on an older SDK keeps registering.
 
 - The compose file runs RabbitMQ 4.4 instead of 4.3.
 - The compose file runs Valkey 9.2 instead of 9.1.
