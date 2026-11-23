@@ -8,7 +8,9 @@ The e-invoicing module could not read the request body as the document its
 
 - for `application/xml` or `text/xml`, the body is not well-formed XML, is
   empty, or carries a document type declaration (`<!DOCTYPE …>`);
-- for `application/pdf`, the body does not start with the PDF header `%PDF-`.
+- for `application/pdf`, the body does not start with the PDF header
+  `%PDF-` or cannot be read as a PDF, or the invoice it carries is not
+  well-formed XML or carries a document type declaration.
 
 ```json
 {

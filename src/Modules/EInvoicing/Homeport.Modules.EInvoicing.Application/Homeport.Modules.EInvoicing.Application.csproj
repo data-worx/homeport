@@ -6,6 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Reads the invoice a ZUGFeRD / Factur-X PDF carries. In-process only,
+       so it is referenced where it is used (core.architecture). -->
+  <ItemGroup>
+    <PackageReference Include="PdfPig" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Homeport.Modules.EInvoicing.Domain\Homeport.Modules.EInvoicing.Domain.csproj" />
   </ItemGroup>

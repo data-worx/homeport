@@ -9,6 +9,7 @@ means the source states no date. The page is generated from
 
 | Standard | Version | Valid from | Valid until | Source |
 |---|---|---|---|---|
+| XRechnung | `3.0` | 2023-08-01 | — | <https://xeinkauf.de/xrechnung/versionen-und-bundles/> |
 | XRechnung Schematron | `v2.6.0` | 2026-08-31 | — | [itplr-kosit/xrechnung-schematron](https://github.com/itplr-kosit/xrechnung-schematron/releases/tag/v2.6.0) |
 | XRechnung validator configuration | `v2026-08-31` | 2026-08-31 | — | [itplr-kosit/validator-configuration-xrechnung](https://github.com/itplr-kosit/validator-configuration-xrechnung/releases/tag/v2026-08-31) |
 | XRechnung test suite | `v2026-08-31` | 2026-08-31 | — | [itplr-kosit/xrechnung-testsuite](https://github.com/itplr-kosit/xrechnung-testsuite/releases/tag/v2026-08-31) |

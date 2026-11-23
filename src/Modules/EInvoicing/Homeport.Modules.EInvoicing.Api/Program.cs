@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Modules.EInvoicing.Application.Documents;
+using Homeport.Modules.EInvoicing.Domain.RuleSets;
 using Homeport.Sdk;
 
 namespace Homeport.Modules.EInvoicing.Api;
@@ -26,6 +27,7 @@ public sealed class Program
         // the OpenAPI document.
         builder.Services.AddOpenApi();
         builder.Services.AddControllers();
+        builder.Services.AddSingleton(RuleSetCatalog.LoadEmbedded());
         builder.Services.AddSingleton<DocumentInspection>();
 
         var app = builder.Build();

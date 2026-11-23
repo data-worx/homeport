@@ -70,6 +70,8 @@ Arranged by reader. A directory exists once it has its first document.
 | [`reference/problems/`](reference/problems/README.md) | Homeport's problem types, one page each |
 | [`reference/modules/e-invoicing/problems/unreadable-document.md`](reference/modules/e-invoicing/problems/unreadable-document.md) | The e-invoicing module's problem for a body that is not the XML or PDF its content type declares |
 | [`reference/modules/e-invoicing/problems/unknown-syntax.md`](reference/modules/e-invoicing/problems/unknown-syntax.md) | The e-invoicing module's problem for XML in no invoice syntax it knows |
+| [`reference/modules/e-invoicing/problems/pdf-without-invoice.md`](reference/modules/e-invoicing/problems/pdf-without-invoice.md) | The e-invoicing module's problem for a PDF that carries no embedded invoice |
+| [`reference/modules/e-invoicing/problems/unknown-rule-set.md`](reference/modules/e-invoicing/problems/unknown-rule-set.md) | The e-invoicing module's problem for an invoice whose specification identifier names no rule set it knows |
 | [`reference/modules/e-invoicing/standards.md`](reference/modules/e-invoicing/standards.md) | The external standards the e-invoicing module implements, their versions and from when until when each is valid; generated from its `standards.json` |
 
 ## Maintainers — releasing Homeport

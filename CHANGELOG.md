@@ -17,9 +17,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The e-invoicing module, the first business module, runs in the AppHost and
   the compose file as the image `homeport-module-e-invoicing`.
   `POST /modules/e-invoicing/v1/validate` takes a received invoice as XML or
-  PDF and reports its container and syntax — UBL invoice, UBL credit note or
-  CII. It refuses a document type declaration. Every processed document
-  counts one in the meter `documents`, a rejected one nothing. See
+  as a ZUGFeRD / Factur-X PDF and reports its container, its syntax — UBL
+  invoice, UBL credit note or CII — and the rule set and version its
+  specification identifier claims: EN 16931, XRechnung 3.0 and 2.3 with and
+  without extension, Factur-X BASIC and EXTENDED. ZUGFeRD MINIMUM, BASIC WL
+  and 1.0 get the verdict `not-an-e-invoice`. An issue date outside the
+  claimed version's window and a PDF whose XMP profile disagrees with its
+  invoice are reported as warnings. It refuses a document type declaration,
+  a PDF without an embedded invoice and an invoice of an unknown rule set.
+  Every processed document counts one in the meter `documents`, a rejected
+  one nothing. See
   [validating an invoice](docs/api-consumers/validating-an-invoice.md).
 
 ### Changed

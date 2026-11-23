@@ -28,7 +28,7 @@ public sealed class ErDiagram
     /// <summary>Reads <c>docs/architecture/&lt;fileName&gt;</c>, an uncompressed <c>.drawio.svg</c>.</summary>
     public static ErDiagram Read(string fileName)
     {
-        var path = Path.Combine(FindRoot(), DiagramDirectory, fileName);
+        var path = Path.Combine(RepositoryRoot.Find(), DiagramDirectory, fileName);
         var content = XDocument.Load(path).Root?.Attribute("content")?.Value
             ?? throw new InvalidOperationException($"{path} carries no draw.io content attribute.");
         var cells = XDocument.Parse(content).Descendants("mxCell").ToList();
@@ -74,23 +74,5 @@ public sealed class ErDiagram
     {
         var note = label.IndexOf(" (", StringComparison.Ordinal);
         return note < 0 ? label : label[..note];
-    }
-
-    private static string FindRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null)
-        {
-            var git = Path.Combine(directory.FullName, ".git");
-            if (Directory.Exists(git) || File.Exists(git))
-            {
-                return directory.FullName;
-            }
-
-            directory = directory.Parent;
-        }
-
-        throw new InvalidOperationException(
-            $"No .git found above {AppContext.BaseDirectory}; the test needs the repository checkout.");
     }
 }

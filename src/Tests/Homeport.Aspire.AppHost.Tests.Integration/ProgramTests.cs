@@ -200,7 +200,9 @@ public sealed class ProgramTests
 
             using var response = await RunningAppHost.ValidateAsync(gateway, CancellationToken.None);
 
-            Assert.Equal("""{"container":"xml","syntax":"ubl-invoice"}""", await response.Content.ReadAsStringAsync());
+            Assert.Equal(
+                """{"container":"xml","syntax":"ubl-invoice","customizationId":"urn:cen.eu:en16931:2017","ruleSet":"en16931","ruleSetVersion":"2017","verdict":null,"findings":[]}""",
+                await response.Content.ReadAsStringAsync());
         }
 
         [Fact]

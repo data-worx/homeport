@@ -83,6 +83,7 @@ asset change; the `notices` gate fails while it is stale.
 | OpenTelemetry.Instrumentation.AspNetCore | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
 | OpenTelemetry.Instrumentation.Http | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
 | OpenTelemetry.Instrumentation.Runtime | 1.21.0 | Apache-2.0 | Copyright The OpenTelemetry Authors |
+| PdfPig | 0.1.16 | Apache-2.0 | This product is derived from software developed at The Apache Software Foundation (http://www.apache.org/). Based on source code originally developed in the PDFBox and FontBox projects. Copyright (c) 2002-2007, www.pdfbox.org. Includes the Adobe Glyph List Copyright 1997, 1998, 2002, 2007, 2010 Adobe Systems Incorporated. Includes the Zapf Dingbats Glyph List Copyright 2002, 2010 Adobe Systems Incorporated. |
 | Pipelines.Sockets.Unofficial | 2.2.16 | MIT | Marc Gravell 2018 |
 | Polly.Core | 8.4.2 | BSD-3-Clause | Copyright (c) 2024, App vNext |
 | Polly.Core | 8.6.5 | BSD-3-Clause | Copyright (c) 2015-2025, App vNext |

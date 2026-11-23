@@ -58,7 +58,7 @@ public sealed class RunningAppHost : IAsyncLifetime
     internal const string EInvoicingValidateScope = "e-invoicing.validate";
 
     /// <summary>A UBL invoice, as small as the e-invoicing module accepts it.</summary>
-    internal const string UblInvoice = """<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"/>""";
+    internal const string UblInvoice = """<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"><cbc:CustomizationID>urn:cen.eu:en16931:2017</cbc:CustomizationID></Invoice>""";
 
     private const string TokenPath = "/realms/homeport/protocol/openid-connect/token";
 

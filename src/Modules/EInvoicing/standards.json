@@ -2,6 +2,16 @@
   "moduleId": "e-invoicing",
   "standards": [
     {
+      "name": "XRechnung",
+      "version": "3.0",
+      "validFrom": "2023-08-01",
+      "urls": [
+        "https://xeinkauf.de/xrechnung/versionen-und-bundles/"
+      ],
+      "reviewEveryMonths": 3,
+      "lastReviewed": "2026-11-23"
+    },
+    {
       "name": "XRechnung Schematron",
       "github": "itplr-kosit/xrechnung-schematron",
       "version": "v2.6.0",
