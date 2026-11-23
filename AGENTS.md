@@ -228,6 +228,15 @@ and the Echo module **in the same pull request**.
   See [watching standards](docs/module-developers/watching-standards.md).
 - A change of the version a module implements updates its `standards.json`
   in the same pull request, and so does the review of a manual source.
+  `validFrom` and `validUntil` are taken from the source, never estimated.
+- `docs/reference/modules/<moduleId>/standards.md` is generated from
+  `standards.json` by `.github/scripts/render-standards.sh`, never edited
+  by hand. The `standards` gate fails when it differs.
+- An update of an implemented standard has a changelog entry under
+  `Changed`.
+- A pull request that changes a module with a `standards.json` carries a
+  **Standards** line: each standard whose version changed, old → new, or
+  `n. a.` with the reason.
 - The *Standards watch* workflow only opens issues. It never changes a
   module.
 

@@ -117,5 +117,40 @@ watch 2026-11-22; rc=$?
 check "a repository without a release fails" '[ "${rc}" -eq 1 ]'
 check "a repository without a release is named" 'grep -q -F "no latest release of acme/rules" "${work}/output"'
 
+root="${work}/repo-validity"
+mkdir -p "${root}/src/Modules/Sample"
+cat > "${root}/src/Modules/Sample/standards.json" <<'EOF'
+{
+  "standards": [
+    { "name": "Rules", "github": "acme/rules", "version": "v1.0.0",
+      "validFrom": "2026-01-01", "validUntil": "2027-01-31" }
+  ]
+}
+EOF
+echo "v1.0.0" > "${FAKE_GH}/releases/acme__rules"
+
+reset
+watch 2026-10-30; rc=$?
+check "a validUntil 3 months or more away passes" '[ "${rc}" -eq 0 ]'
+check "a validUntil 3 months or more away opens nothing" '[ "$(created)" -eq 0 ]'
+
+reset
+watch 2026-11-23; rc=$?
+check "a validUntil less than 3 months away opens one issue" '[ "$(created)" -eq 1 ]'
+check "the issue names the standard and the end of its validity" \
+  'grep -q -x -F "chore: update Rules, valid until 2027-01-31" "${FAKE_GH}/created"'
+watch 2026-11-23; rc=$?
+check "a second run opens no second validity issue" '[ "$(created)" -eq 1 ]'
+
+reset
+watch 2027-02-15; rc=$?
+check "a validUntil in the past opens one issue" '[ "$(created)" -eq 1 ]'
+
+sed -i 's/"2027-01-31"/"31.01.2027"/' "${root}/src/Modules/Sample/standards.json"
+reset
+watch 2026-11-23; rc=$?
+check "a validUntil that is not YYYY-MM-DD fails" '[ "${rc}" -eq 1 ]'
+check "a validUntil that is not YYYY-MM-DD is named" 'grep -q -F "invalid validUntil \"31.01.2027\"" "${work}/output"'
+
 [ "${failed}" -eq 0 ] && echo "All standards-watch tests passed"
 exit "${failed}"

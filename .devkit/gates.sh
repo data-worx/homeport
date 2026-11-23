@@ -2,7 +2,7 @@
 # The gates that must be green before a commit. Project-owned: devkit-sync
 # never overwrites this file, so adjust the commands to fit the repository.
 #
-# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|scripts|design|all]
+# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|standards|scripts|design|all]
 #         (no argument means all)
 set -uo pipefail
 
@@ -119,11 +119,28 @@ gate_compose() {
   return "${rc}"
 }
 
+# Regenerates the standards page of every module from its standards.json into
+# a temporary directory and compares it with the committed one, the way the
+# compose gate does; a difference names the page. To update the committed
+# pages after a change to a standards.json:
+#   bash .github/scripts/render-standards.sh
+gate_standards() {
+  local generated page rc=0
+  generated="$(mktemp -d)"
+  bash .github/scripts/render-standards.sh . "${generated}" > "${generated}/pages" || rc=1
+  while IFS= read -r page; do
+    [ -n "${page}" ] || continue
+    diff -u "${page}" "${generated}/${page}" || rc=1
+  done < "${generated}/pages"
+  rm -rf "${generated}"
+  return "${rc}"
+}
+
 # The tests of the scripts in .github/scripts/, against throwaway fixtures:
 # the release scripts run only on a tag and standards-watch.sh only on its
 # schedule, so they are tested before then.
 gate_scripts() {
-  bash .github/scripts/test-release-scripts.sh && bash .github/scripts/test-standards-watch.sh
+  bash .github/scripts/test-release-scripts.sh \n    && bash .github/scripts/test-standards-watch.sh \n    && bash .github/scripts/test-render-standards.sh
 }
 
 # Rebuilds the design kit and fails when that changes a file under design/:
@@ -160,6 +177,7 @@ gate_expectation() {
     format)  echo "no formatting changes needed" ;;
     notices) echo "THIRD-PARTY-NOTICES.md matches what the shipped projects publish" ;;
     compose) echo "deploy/compose/ matches what the AppHost publishes" ;;
+    standards) echo "docs/reference/modules/ matches what render-standards.sh generates" ;;
     scripts) echo "every test of the scripts in .github/scripts/ passes" ;;
     design)  echo "design/ matches what design/tools/build-kit.mjs generates" ;;
   esac
@@ -167,7 +185,7 @@ gate_expectation() {
 
 # --- runner, do not edit below unless you know why ---------------------------
 
-GATES="build test format notices compose scripts design"
+GATES="build test format notices compose standards scripts design"
 
 # A gate returns 77 when it does not apply to this repository; its last line of
 # output says why. A passing gate prints PASS, a skipped one SKIP and the
