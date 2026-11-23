@@ -8,7 +8,9 @@
 # - a standard with a "github" repository whose latest release is not the
 #   declared "version" gets "chore: update <name> to <tag>";
 # - a standard with "urls" whose "lastReviewed" lies "reviewEveryMonths" or
-#   more in the past gets "chore: review <name>", the URLs as a checklist.
+#   more in the past gets "chore: review <name>", the URLs as a checklist;
+# - a standard whose "validUntil" lies less than 3 months ahead, or in the
+#   past, gets "chore: update <name>, valid until <date>".
 #
 # An issue is opened only when no open issue carries the same title, so a
 # second run opens none. The script never changes a file; it only opens
@@ -18,7 +20,8 @@
 #
 # Environment:
 #   STANDARDS_WATCH_ASSIGNEE  login every issue is assigned to (optional)
-#   STANDARDS_WATCH_TODAY     the date to judge review intervals by, YYYY-MM-DD
+#   STANDARDS_WATCH_TODAY     the date to judge review intervals and validity
+#                             by, YYYY-MM-DD
 #                             (default: today, UTC)
 set -uo pipefail
 
@@ -26,6 +29,8 @@ root="${1:-$(git rev-parse --show-toplevel)}"
 today="${STANDARDS_WATCH_TODAY:-$(date -u +%F)}"
 assignee="${STANDARDS_WATCH_ASSIGNEE:-}"
 label="chore"
+# How far ahead the end of a version's validity opens an update issue.
+validity_warning="3 months"
 failed=0
 
 work="$(mktemp -d)"
@@ -149,6 +154,47 @@ EOF
   open_issue "chore: review ${name}" "${body}"
 }
 
+# check_validity <module> <file> <name> <version> <validUntil>
+check_validity() {
+  local module="$1" file="$2" name="$3" version="$4" until="$5" horizon body
+  if ! [[ "${until}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
+    || ! date -u -d "${until}" +%F > /dev/null 2>&1; then
+    echo "::error::${file}: ${name} has an invalid validUntil \"${until}\""
+    failed=1
+    return
+  fi
+  horizon="$(date -u -d "${today} +${validity_warning}" +%F)"
+  if ! [[ "${until}" < "${horizon}" ]]; then
+    echo "  valid: ${name} ${version} until ${until}"
+    return
+  fi
+  body="${work}/body.md"
+  cat > "${body}" <<EOF
+## Description
+
+${module} implements ${name} at \`${version}\`, as \`${file}\` declares.
+Its source states that this version is valid until ${until}, which is less
+than ${validity_warning} after ${today} or already past.
+
+Opened by the *Standards watch* workflow.
+
+## Non-goals
+
+No change beyond moving to the version that follows.
+
+## Acceptance criteria / Definition of Done
+
+- [ ] ${module} implements the version valid after ${until}, or a comment
+      here says why it does not
+- [ ] \`${file}\` declares that version with its \`validFrom\` and \`validUntil\`
+
+## Type
+
+\`chore\`
+EOF
+  open_issue "chore: update ${name}, valid until ${until}" "${body}"
+}
+
 shopt -s nullglob
 files=("${root}"/src/Modules/*/standards.json)
 if [ "${#files[@]}" -eq 0 ]; then
@@ -170,6 +216,7 @@ for path in "${files[@]}"; do
     version="$(field "${standard}" '.version')"
     repo="$(field "${standard}" '.github')"
     urls="$(field "${standard}" '(.urls // []) | length')"
+    until="$(field "${standard}" '.validUntil')"
     if [ -z "${name}" ] || [ -z "${version}" ]; then
       echo "::error::${file}: a standard without name or version"
       failed=1
@@ -180,6 +227,9 @@ for path in "${files[@]}"; do
     else
       echo "::error::${file}: ${name} needs either github or urls"
       failed=1
+    fi
+    if [ -n "${name}" ] && [ -n "${until}" ]; then
+      check_validity "${module}" "${file}" "${name}" "${version}" "${until}"
     fi
   done <<< "${standards}"
 done

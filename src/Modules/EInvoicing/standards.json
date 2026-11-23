@@ -1,19 +1,23 @@
 {
+  "moduleId": "e-invoicing",
   "standards": [
     {
       "name": "XRechnung Schematron",
       "github": "itplr-kosit/xrechnung-schematron",
-      "version": "v2.6.0"
+      "version": "v2.6.0",
+      "validFrom": "2026-08-31"
     },
     {
       "name": "XRechnung validator configuration",
       "github": "itplr-kosit/validator-configuration-xrechnung",
-      "version": "v2026-08-31"
+      "version": "v2026-08-31",
+      "validFrom": "2026-08-31"
     },
     {
       "name": "XRechnung test suite",
       "github": "itplr-kosit/xrechnung-testsuite",
-      "version": "v2026-08-31"
+      "version": "v2026-08-31",
+      "validFrom": "2026-08-31"
     },
     {
       "name": "EN 16931 validation artefacts",
@@ -32,6 +36,7 @@
     {
       "name": "EN 16931 code lists",
       "version": "18.0",
+      "validFrom": "2026-11-15",
       "urls": [
         "https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931"
       ],
