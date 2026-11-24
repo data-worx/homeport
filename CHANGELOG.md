@@ -28,6 +28,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Every processed document counts one in the meter `documents`, a rejected
   one nothing. See
   [validating an invoice](docs/api-consumers/validating-an-invoice.md).
+- `POST /modules/e-invoicing/v1/read`, with the scope `e-invoicing.read`,
+  reads a received invoice into the semantic model of EN 16931 and returns
+  it with the report `validate` gives. The model is the same for UBL and CII
+  and has a field for every business term; amounts, quantities and prices
+  come back as the document writes them, dates as `yyyy-MM-dd`, attachments
+  as metadata without their content. An invalid invoice is still read as far
+  as it goes. The extension of XRechnung Extension and ZUGFeRD EXTENDED is
+  left out, with a warning. The local Keycloak realm offers the new scope;
+  an operator creates it at their identity provider. See
+  [reading an invoice](docs/api-consumers/reading-an-invoice.md).
 
 ### Changed
 

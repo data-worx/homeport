@@ -29,6 +29,15 @@
       }
     },
     {
+      "name": "e-invoicing.read",
+      "description": "Read documents into the EN 16931 model with the e-invoicing module",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
       "name": "usage.read",
       "description": "Read the usage of the client's tenant",
       "protocol": "openid-connect",
@@ -63,7 +72,7 @@
       "directAccessGrantsEnabled": false,
       "fullScopeAllowed": false,
       "defaultClientScopes": ["usage.read"],
-      "optionalClientScopes": ["echo.invoke", "e-invoicing.validate"],
+      "optionalClientScopes": ["echo.invoke", "e-invoicing.validate", "e-invoicing.read"],
       "protocolMappers": [
         {
           "name": "homeport-audience",

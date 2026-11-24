@@ -47,6 +47,7 @@ Arranged by reader. A directory exists once it has its first document.
 | [`api-consumers/rate-limits.md`](api-consumers/rate-limits.md) | The rate limit of your tenant's plan, the RateLimit headers, and `429` with `Retry-After` |
 | [`api-consumers/reading-usage.md`](api-consumers/reading-usage.md) | Reading your tenant's usage per hour or day from `/platform/v1/usage`, as JSON or CSV |
 | [`api-consumers/validating-an-invoice.md`](api-consumers/validating-an-invoice.md) | Validating a received invoice with the e-invoicing module: the request, the report, rejected documents and what it counts |
+| [`api-consumers/reading-an-invoice.md`](api-consumers/reading-an-invoice.md) | Reading a received invoice into the EN 16931 model with the e-invoicing module: the request, the response, how each syntax maps, and every field with its business term |
 | [`api-consumers/api-docs.md`](api-consumers/api-docs.md) | The consolidated API docs at `/platform/docs`, and trying a request with a token from `curl` |
 
 ## Architecture — why Homeport is built the way it is

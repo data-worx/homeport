@@ -20,6 +20,9 @@ public static class RuleSetRules
     /// <summary>The rule of the warning for a PDF whose XMP metadata declares another profile than its invoice claims.</summary>
     public const string ProfileRule = "EINV-XMP-PROFILE";
 
+    /// <summary>The rule of the warning for an invoice read under a rule set that extends EN 16931, whose extension is not read.</summary>
+    public const string ExtensionIgnoredRule = "EINV-EXTENSION-IGNORED";
+
     /// <summary>The specification identifier of EN 16931; every further specification of it starts with it.</summary>
     public const string En16931Identifier = "urn:cen.eu:en16931:2017";
 
@@ -92,6 +95,25 @@ public static class RuleSetRules
                 FindingSeverity.Warning,
                 ProfileRule,
                 $"The XMP metadata of the PDF declares the profile '{declaredProfile}', but the invoice claims '{match.CustomizationId}', which is the profile '{expected}'.")
+            : null;
+    }
+
+    /// <summary>The warning that the extension of an invoice was not read, if it claims a rule set that extends EN 16931.</summary>
+    /// <remarks>
+    /// XRechnung Extension and ZUGFeRD / Factur-X EXTENDED add elements to the
+    /// syntax that the semantic model of EN 16931 has no term for. The model
+    /// holds the core of such an invoice; the extension is left out.
+    /// </remarks>
+    /// <param name="match">What the invoice claims.</param>
+    public static Finding? CheckExtension(RuleSetMatch match)
+    {
+        ArgumentNullException.ThrowIfNull(match);
+
+        return match.RuleSet?.RuleSet is RuleSet.XRechnungExtension or RuleSet.FacturXExtended
+            ? new Finding(
+                FindingSeverity.Warning,
+                ExtensionIgnoredRule,
+                $"The invoice claims '{match.CustomizationId}', which extends EN 16931; the module read its EN 16931 core and ignored the extension.")
             : null;
     }
 

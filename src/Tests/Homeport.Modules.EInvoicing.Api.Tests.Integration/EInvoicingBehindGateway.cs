@@ -16,6 +16,8 @@ public sealed class EInvoicingBehindGateway : IAsyncLifetime
 
     internal const string ValidateScope = "e-invoicing.validate";
 
+    internal const string ReadScope = "e-invoicing.read";
+
     private StandInGateway? gateway;
     private WebApplicationFactory<Program>? module;
 
