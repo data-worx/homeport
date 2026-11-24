@@ -127,6 +127,7 @@ ships beside it as well.
 | ETSI XAdES schemas 1.3.2 and 1.4.1, as UBL 2.1 ships them | 1.3.2 / 1.4.1 | BSD-3-Clause | Copyright 2024 ETSI |
 | Instrument Sans | Fontsource 5.3 | OFL-1.1 | Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans) |
 | JetBrains Mono | Fontsource 5.3 | OFL-1.1 | Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono) |
+| KoSIT XRechnung test suite, as test fixtures (not shipped) | v2026-08-31 | Apache-2.0 | No copyright notice stated by the publisher, KoSIT |
 | Lucide icons | 1.59.0 | ISC | Copyright (c) 2026 Lucide Icons and Contributors |
 | Lucide icons derived from Feather | 1.59.0 | MIT | Copyright (c) 2013-present Cole Bemis |
 | OASIS UBL 2.1 XML schemas | 2.1 OS | LicenseRef-OASIS | Copyright (c) OASIS Open 2013. All Rights Reserved. |

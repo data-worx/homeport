@@ -17,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Aspire.StackExchange.Redis" />
+    <PackageReference Include="Testcontainers" />
     <PackageReference Include="Testcontainers.Redis" />
     <PackageReference Include="xunit" />
   </ItemGroup>
@@ -27,6 +28,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="EInvoicing\Invoices\*.xml" LogicalName="Homeport.Testing.EInvoicing.Invoices.%(Filename)%(Extension)" />
+    <!-- The instances of the KoSIT XRechnung test suite, named by their path
+         below TestSuite/ with forward slashes, as upstream names them. -->
+    <EmbeddedResource Include="EInvoicing\TestSuite\**\*.xml" LogicalName="Homeport.Testing.EInvoicing.TestSuite.$([System.String]::Copy('%(RecursiveDir)').Replace('\', '/'))%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

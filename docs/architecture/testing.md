@@ -5,7 +5,7 @@ in the *Tests* section of [`AGENTS.md`](../../AGENTS.md#tests).
 
 A test suite that fails now and then is worse than a smaller one that never
 does: a red run stops meaning anything, and a real failure gets re-run until
-it turns green. Every rule below but the last comes from a test that hung
+it turns green. Every rule below but the last two comes from a test that hung
 or failed intermittently.
 
 ## Clocks
@@ -78,3 +78,32 @@ that changed the schema. A release that changes a schema adds its last
 migration there and moves the test to it, so every release is tested as an
 upgrade from the one before; the steps an operator takes are in
 [upgrading](../operators/upgrading.md).
+
+## The KoSIT oracle
+
+The e-invoicing module validates with rules of its own, and its verdict is
+only worth something where it agrees with the reference: the KoSIT validator
+with the XRechnung configuration. Two tests hold it to that.
+
+The instances of the KoSIT XRechnung test suite are fixtures in
+`src/Tests/Homeport.Testing/EInvoicing/TestSuite/`, unchanged, in the
+version `src/Modules/EInvoicing/standards.json` names. Upstream publishes
+every one as a valid XRechnung, so the Application tests expect the verdict
+`valid` for each, without Docker.
+
+The comparison test in the module's API tests sends every instance to the
+module and to the KoSIT validator, and compares the sets of rule IDs both
+fire. The validator runs in a container, `KositValidatorContainer` in
+`Homeport.Testing`, built from
+`src/Tests/Homeport.Testing/Containers/KositValidator/Dockerfile`; the
+image downloads the validator and its configuration from fixed releases and
+checks their checksums. The configuration bundles the EN 16931 schematron
+under EUPL-1.2, so none of it is in the repository. Rule IDs of the module's
+own, `EINV-*`, have no counterpart at KoSIT and are left out.
+
+Rules the module does not implement yet are listed in
+`NotYetImplementedRules`, and the comparison leaves them out. The list holds
+only rules KoSIT actually fires on an instance, and it only shrinks: the
+test fails while the module fires a listed rule, or while KoSIT no longer
+fires one on any instance. A rule ticket deletes the lines of the rules it
+implements.

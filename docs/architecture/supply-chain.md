@@ -144,6 +144,22 @@ A package offered under a choice of licences, such as RabbitMQ.Client under
 `Apache-2.0 OR MPL-2.0`, is shipped under one of them; the choice is recorded
 in `.devkit/third-party-notices.overrides.json`.
 
+## Test tools
+
+Some tests need a tool that is never part of an image. The KoSIT validator
+(Apache-2.0), with Saxon-HE (MPL-2.0) inside its standalone jar, and its
+XRechnung configuration, which bundles the EN 16931 schematron under
+EUPL-1.2, are the reference the e-invoicing module is compared with
+([the KoSIT oracle](testing.md#the-kosit-oracle)). The tests build an image
+for them from
+[`src/Tests/Homeport.Testing/Containers/KositValidator/Dockerfile`](../../src/Tests/Homeport.Testing/Containers/KositValidator/Dockerfile):
+a Temurin JRE pinned by digest, the validator and the configuration
+downloaded from fixed releases and checked against their checksums. The
+image is never pushed, is not in the compose files and so not in the scan,
+and nothing of it is shipped or listed in `THIRD-PARTY-NOTICES.md`. Its
+pins are updated by hand, together with the configuration version in
+`src/Modules/EInvoicing/standards.json`.
+
 ## Updates
 
 Dependabot proposes updates for NuGet packages, GitHub Actions and the image
