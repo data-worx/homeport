@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-License-Identifier: AGPL-3.0-or-later
+
+  An invoice that carries every business term of EN 16931 once, written for
+  the tests of the module; maximal-invoice.cii.xml is the same invoice in CII.
+  It carries the VAT point date (BT-7) and its code (BT-8) together, so it is
+  read, never valid (BR-CO-03).
+-->
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+         xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+         xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>
+  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
+  <cbc:ID>INV-2026-0001</cbc:ID>
+  <cbc:IssueDate>2026-11-02</cbc:IssueDate>
+  <cbc:DueDate>2026-12-02</cbc:DueDate>
+  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+  <cbc:Note>#AAI#Goods remain our property until paid in full.</cbc:Note>
+  <cbc:Note>Thank you for your order.</cbc:Note>
+  <cbc:TaxPointDate>2026-11-01</cbc:TaxPointDate>
+  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
+  <cbc:TaxCurrencyCode>USD</cbc:TaxCurrencyCode>
+  <cbc:AccountingCost>4711-cost-centre</cbc:AccountingCost>
+  <cbc:BuyerReference>04011000-12345-34</cbc:BuyerReference>
+  <cac:InvoicePeriod>
+    <cbc:StartDate>2026-10-01</cbc:StartDate>
+    <cbc:EndDate>2026-10-31</cbc:EndDate>
+    <cbc:DescriptionCode>3</cbc:DescriptionCode>
+  </cac:InvoicePeriod>
+  <cac:OrderReference>
+    <cbc:ID>PO-778</cbc:ID>
+    <cbc:SalesOrderID>SO-991</cbc:SalesOrderID>
+  </cac:OrderReference>
+  <cac:BillingReference>
+    <cac:InvoiceDocumentReference>
+      <cbc:ID>INV-2026-0000</cbc:ID>
+      <cbc:IssueDate>2026-10-02</cbc:IssueDate>
+    </cac:InvoiceDocumentReference>
+  </cac:BillingReference>
+  <cac:DespatchDocumentReference>
+    <cbc:ID>DESADV-12</cbc:ID>
+  </cac:DespatchDocumentReference>
+  <cac:ReceiptDocumentReference>
+    <cbc:ID>RECADV-34</cbc:ID>
+  </cac:ReceiptDocumentReference>
+  <cac:OriginatorDocumentReference>
+    <cbc:ID>LOT-5</cbc:ID>
+  </cac:OriginatorDocumentReference>
+  <cac:ContractDocumentReference>
+    <cbc:ID>CONTRACT-2026-7</cbc:ID>
+  </cac:ContractDocumentReference>
+  <cac:AdditionalDocumentReference>
+    <cbc:ID schemeID="AAA">METER-4711</cbc:ID>
+    <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+  </cac:AdditionalDocumentReference>
+  <cac:AdditionalDocumentReference>
+    <cbc:ID>TIMESHEET-10</cbc:ID>
+    <cbc:DocumentDescription>Timesheet of October</cbc:DocumentDescription>
+    <cac:Attachment>
+      <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="timesheet.pdf">JVBERi0xLjQK</cbc:EmbeddedDocumentBinaryObject>
+      <cac:ExternalReference>
+        <cbc:URI>https://example.com/timesheets/10</cbc:URI>
+      </cac:ExternalReference>
+    </cac:Attachment>
+  </cac:AdditionalDocumentReference>
+  <cac:ProjectReference>
+    <cbc:ID>PROJECT-42</cbc:ID>
+  </cac:ProjectReference>
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cbc:EndpointID schemeID="EM">invoices@seller.example</cbc:EndpointID>
+      <cac:PartyIdentification>
+        <cbc:ID>SELLER-1</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="0088">4000001000005</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="SEPA">DE98ZZZ09999999999</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>Seller Trading</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:StreetName>Seller Street 1</cbc:StreetName>
+        <cbc:AdditionalStreetName>Building A</cbc:AdditionalStreetName>
+        <cbc:CityName>Seller City</cbc:CityName>
+        <cbc:PostalZone>10115</cbc:PostalZone>
+        <cbc:CountrySubentity>Berlin</cbc:CountrySubentity>
+        <cac:AddressLine>
+          <cbc:Line>Third floor</cbc:Line>
+        </cac:AddressLine>
+        <cac:Country>
+          <cbc:IdentificationCode>DE</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>DE123456789</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>30/123/45678</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>FC</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>Seller GmbH</cbc:RegistrationName>
+        <cbc:CompanyID schemeID="0002">HRB 12345</cbc:CompanyID>
+        <cbc:CompanyLegalForm>Managing director: A. Seller</cbc:CompanyLegalForm>
+      </cac:PartyLegalEntity>
+      <cac:Contact>
+        <cbc:Name>Accounts receivable</cbc:Name>
+        <cbc:Telephone>+49 30 1234567</cbc:Telephone>
+        <cbc:ElectronicMail>receivables@seller.example</cbc:ElectronicMail>
+      </cac:Contact>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cbc:EndpointID schemeID="EM">invoices@buyer.example</cbc:EndpointID>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="0088">4000001000012</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>Buyer Trading</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:StreetName>Buyer Street 2</cbc:StreetName>
+        <cbc:AdditionalStreetName>Building B</cbc:AdditionalStreetName>
+        <cbc:CityName>Buyer City</cbc:CityName>
+        <cbc:PostalZone>20095</cbc:PostalZone>
+        <cbc:CountrySubentity>Hamburg</cbc:CountrySubentity>
+        <cac:AddressLine>
+          <cbc:Line>Goods receipt</cbc:Line>
+        </cac:AddressLine>
+        <cac:Country>
+          <cbc:IdentificationCode>DE</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>DE987654321</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>Buyer AG</cbc:RegistrationName>
+        <cbc:CompanyID schemeID="0002">HRB 67890</cbc:CompanyID>
+      </cac:PartyLegalEntity>
+      <cac:Contact>
+        <cbc:Name>Purchasing</cbc:Name>
+        <cbc:Telephone>+49 40 7654321</cbc:Telephone>
+        <cbc:ElectronicMail>purchasing@buyer.example</cbc:ElectronicMail>
+      </cac:Contact>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:PayeeParty>
+    <cac:PartyIdentification>
+      <cbc:ID schemeID="0088">4000001000029</cbc:ID>
+    </cac:PartyIdentification>
+    <cac:PartyName>
+      <cbc:Name>Payee Factoring GmbH</cbc:Name>
+    </cac:PartyName>
+    <cac:PartyLegalEntity>
+      <cbc:CompanyID schemeID="0002">HRB 13579</cbc:CompanyID>
+    </cac:PartyLegalEntity>
+  </cac:PayeeParty>
+  <cac:TaxRepresentativeParty>
+    <cac:PartyName>
+      <cbc:Name>Tax Representative Ltd</cbc:Name>
+    </cac:PartyName>
+    <cac:PostalAddress>
+      <cbc:StreetName>Representative Road 3</cbc:StreetName>
+      <cbc:AdditionalStreetName>Suite 4</cbc:AdditionalStreetName>
+      <cbc:CityName>Munich</cbc:CityName>
+      <cbc:PostalZone>80331</cbc:PostalZone>
+      <cbc:CountrySubentity>Bavaria</cbc:CountrySubentity>
+      <cac:AddressLine>
+        <cbc:Line>Reception</cbc:Line>
+      </cac:AddressLine>
+      <cac:Country>
+        <cbc:IdentificationCode>DE</cbc:IdentificationCode>
+      </cac:Country>
+    </cac:PostalAddress>
+    <cac:PartyTaxScheme>
+      <cbc:CompanyID>DE111222333</cbc:CompanyID>
+      <cac:TaxScheme>
+        <cbc:ID>VAT</cbc:ID>
+      </cac:TaxScheme>
+    </cac:PartyTaxScheme>
+  </cac:TaxRepresentativeParty>
+  <cac:Delivery>
+    <cbc:ActualDeliveryDate>2026-10-15</cbc:ActualDeliveryDate>
+    <cac:DeliveryLocation>
+      <cbc:ID schemeID="0088">4000001000036</cbc:ID>
+      <cac:Address>
+        <cbc:StreetName>Warehouse Way 5</cbc:StreetName>
+        <cbc:AdditionalStreetName>Gate 6</cbc:AdditionalStreetName>
+        <cbc:CityName>Bremen</cbc:CityName>
+        <cbc:PostalZone>28195</cbc:PostalZone>
+        <cbc:CountrySubentity>Bremen</cbc:CountrySubentity>
+        <cac:AddressLine>
+          <cbc:Line>Ramp 7</cbc:Line>
+        </cac:AddressLine>
+        <cac:Country>
+          <cbc:IdentificationCode>DE</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:Address>
+    </cac:DeliveryLocation>
+    <cac:DeliveryParty>
+      <cac:PartyName>
+        <cbc:Name>Buyer Warehouse</cbc:Name>
+      </cac:PartyName>
+    </cac:DeliveryParty>
+  </cac:Delivery>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode name="SEPA credit transfer">58</cbc:PaymentMeansCode>
+    <cbc:PaymentID>INV-2026-0001 PROJECT-42</cbc:PaymentID>
+    <cac:CardAccount>
+      <cbc:PrimaryAccountNumberID>4111</cbc:PrimaryAccountNumberID>
+      <cbc:NetworkID>VISA</cbc:NetworkID>
+      <cbc:HolderName>A. Buyer</cbc:HolderName>
+    </cac:CardAccount>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>DE02120300000000202051</cbc:ID>
+      <cbc:Name>Seller GmbH</cbc:Name>
+      <cac:FinancialInstitutionBranch>
+        <cbc:ID>BYLADEM1001</cbc:ID>
+      </cac:FinancialInstitutionBranch>
+    </cac:PayeeFinancialAccount>
+    <cac:PaymentMandate>
+      <cbc:ID>MANDATE-88</cbc:ID>
+      <cac:PayerFinancialAccount>
+        <cbc:ID>DE75512108001245126199</cbc:ID>
+      </cac:PayerFinancialAccount>
+    </cac:PaymentMandate>
+  </cac:PaymentMeans>
+  <cac:PaymentTerms>
+    <cbc:Note>Payable within 30 days.</cbc:Note>
+  </cac:PaymentTerms>
+  <cac:AllowanceCharge>
+    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+    <cbc:AllowanceChargeReasonCode>95</cbc:AllowanceChargeReasonCode>
+    <cbc:AllowanceChargeReason>Discount</cbc:AllowanceChargeReason>
+    <cbc:MultiplierFactorNumeric>10</cbc:MultiplierFactorNumeric>
+    <cbc:Amount currencyID="EUR">10.00</cbc:Amount>
+    <cbc:BaseAmount currencyID="EUR">100.00</cbc:BaseAmount>
+    <cac:TaxCategory>
+      <cbc:ID>S</cbc:ID>
+      <cbc:Percent>19</cbc:Percent>
+      <cac:TaxScheme>
+        <cbc:ID>VAT</cbc:ID>
+      </cac:TaxScheme>
+    </cac:TaxCategory>
+  </cac:AllowanceCharge>
+  <cac:AllowanceCharge>
+    <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+    <cbc:AllowanceChargeReasonCode>FC</cbc:AllowanceChargeReasonCode>
+    <cbc:AllowanceChargeReason>Freight</cbc:AllowanceChargeReason>
+    <cbc:MultiplierFactorNumeric>5</cbc:MultiplierFactorNumeric>
+    <cbc:Amount currencyID="EUR">5.00</cbc:Amount>
+    <cbc:BaseAmount currencyID="EUR">100.00</cbc:BaseAmount>
+    <cac:TaxCategory>
+      <cbc:ID>S</cbc:ID>
+      <cbc:Percent>19</cbc:Percent>
+      <cac:TaxScheme>
+        <cbc:ID>VAT</cbc:ID>
+      </cac:TaxScheme>
+    </cac:TaxCategory>
+  </cac:AllowanceCharge>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="EUR">190.00</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="EUR">1000.00</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="EUR">190.00</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>19</cbc:Percent>
+        <cbc:TaxExemptionReasonCode>VATEX-EU-79-C</cbc:TaxExemptionReasonCode>
+        <cbc:TaxExemptionReason>Not exempt; written for the test</cbc:TaxExemptionReason>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="USD">205.20</cbc:TaxAmount>
+  </cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="EUR">1005.00</cbc:LineExtensionAmount>
+    <cbc:TaxExclusiveAmount currencyID="EUR">1000.00</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="EUR">1190.0</cbc:TaxInclusiveAmount>
+    <cbc:AllowanceTotalAmount currencyID="EUR">10.00</cbc:AllowanceTotalAmount>
+    <cbc:ChargeTotalAmount currencyID="EUR">5.00</cbc:ChargeTotalAmount>
+    <cbc:PrepaidAmount currencyID="EUR">100.00</cbc:PrepaidAmount>
+    <cbc:PayableRoundingAmount currencyID="EUR">0.01</cbc:PayableRoundingAmount>
+    <cbc:PayableAmount currencyID="EUR">1090.01</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:Note>Delivered in two parts.</cbc:Note>
+    <cbc:InvoicedQuantity unitCode="H87">10</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">1005.00</cbc:LineExtensionAmount>
+    <cbc:AccountingCost>4712-line-cost-centre</cbc:AccountingCost>
+    <cac:InvoicePeriod>
+      <cbc:StartDate>2026-10-01</cbc:StartDate>
+      <cbc:EndDate>2026-10-15</cbc:EndDate>
+    </cac:InvoicePeriod>
+    <cac:OrderLineReference>
+      <cbc:LineID>PO-778-1</cbc:LineID>
+    </cac:OrderLineReference>
+    <cac:DocumentReference>
+      <cbc:ID schemeID="AAA">METER-4711-1</cbc:ID>
+      <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+    </cac:DocumentReference>
+    <cac:AllowanceCharge>
+      <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+      <cbc:AllowanceChargeReasonCode>95</cbc:AllowanceChargeReasonCode>
+      <cbc:AllowanceChargeReason>Line discount</cbc:AllowanceChargeReason>
+      <cbc:MultiplierFactorNumeric>1</cbc:MultiplierFactorNumeric>
+      <cbc:Amount currencyID="EUR">10.00</cbc:Amount>
+      <cbc:BaseAmount currencyID="EUR">1000.00</cbc:BaseAmount>
+    </cac:AllowanceCharge>
+    <cac:AllowanceCharge>
+      <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+      <cbc:AllowanceChargeReasonCode>ABL</cbc:AllowanceChargeReasonCode>
+      <cbc:AllowanceChargeReason>Packaging</cbc:AllowanceChargeReason>
+      <cbc:MultiplierFactorNumeric>1.5</cbc:MultiplierFactorNumeric>
+      <cbc:Amount currencyID="EUR">15.00</cbc:Amount>
+      <cbc:BaseAmount currencyID="EUR">1000.00</cbc:BaseAmount>
+    </cac:AllowanceCharge>
+    <cac:Item>
+      <cbc:Description>A widget, blue</cbc:Description>
+      <cbc:Name>Widget</cbc:Name>
+      <cac:BuyersItemIdentification>
+        <cbc:ID>BUYER-ITEM-9</cbc:ID>
+      </cac:BuyersItemIdentification>
+      <cac:SellersItemIdentification>
+        <cbc:ID>SELLER-ITEM-8</cbc:ID>
+      </cac:SellersItemIdentification>
+      <cac:StandardItemIdentification>
+        <cbc:ID schemeID="0160">4012345678901</cbc:ID>
+      </cac:StandardItemIdentification>
+      <cac:OriginCountry>
+        <cbc:IdentificationCode>FR</cbc:IdentificationCode>
+      </cac:OriginCountry>
+      <cac:CommodityClassification>
+        <cbc:ItemClassificationCode listID="STI" listVersionID="2.1">43211503</cbc:ItemClassificationCode>
+      </cac:CommodityClassification>
+      <cac:ClassifiedTaxCategory>
+        <cbc:ID>S</cbc:ID>
+        <cbc:Percent>19</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:ClassifiedTaxCategory>
+      <cac:AdditionalItemProperty>
+        <cbc:Name>Colour</cbc:Name>
+        <cbc:Value>Blue</cbc:Value>
+      </cac:AdditionalItemProperty>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="EUR">100.00</cbc:PriceAmount>
+      <cbc:BaseQuantity unitCode="H87">1</cbc:BaseQuantity>
+      <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+        <cbc:Amount currencyID="EUR">2.00</cbc:Amount>
+        <cbc:BaseAmount currencyID="EUR">102.00</cbc:BaseAmount>
+      </cac:AllowanceCharge>
+    </cac:Price>
+  </cac:InvoiceLine>
+</Invoice>

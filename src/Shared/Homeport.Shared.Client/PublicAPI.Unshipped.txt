@@ -70,6 +70,559 @@ Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.Equals(Homeport.S
 Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.Headers.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
 Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.Headers.init -> void
 Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.ReceivedRequestResponse(System.Collections.Generic.IReadOnlyDictionary<string!, string!>! Headers) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument!
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.AdditionalSupportingDocument() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.AttachedDocument.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject?
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.AttachedDocument.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.Description.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.Description.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.ExternalLocation.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.ExternalLocation.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.Reference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.Reference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject!
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.BinaryObject(string? MimeCode, string? Filename) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.Deconstruct(out string? MimeCode, out string? Filename) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.Filename.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.Filename.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.MimeCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.MimeCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Buyer() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Contact.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Contact.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.ElectronicAddress.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.ElectronicAddress.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Identifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Identifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.LegalRegistrationIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.LegalRegistrationIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Name.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Name.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.PostalAddress.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.PostalAddress.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.TradingName.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.TradingName.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.VatIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.VatIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact!
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.BuyerContact() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.ContactPoint.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.ContactPoint.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.EmailAddress.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.EmailAddress.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.TelephoneNumber.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.TelephoneNumber.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress!
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.AddressLine1.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.AddressLine1.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.AddressLine2.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.AddressLine2.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.AddressLine3.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.AddressLine3.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.BuyerPostalAddress() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.City.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.City.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.CountryCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.CountryCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.CountrySubdivision.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.CountrySubdivision.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.PostCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.PostCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer!
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.CreditTransfer() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.PaymentAccountIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.PaymentAccountIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.PaymentAccountName.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.PaymentAccountName.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.PaymentServiceProviderIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.PaymentServiceProviderIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress!
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.AddressLine1.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.AddressLine1.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.AddressLine2.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.AddressLine2.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.AddressLine3.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.AddressLine3.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.City.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.City.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.CountryCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.CountryCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.CountrySubdivision.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.CountrySubdivision.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.DeliverToAddress() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.PostCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.PostCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation!
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.ActualDeliveryDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.ActualDeliveryDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.DeliverToAddress.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.DeliverToAddress.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.DeliverToLocationIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.DeliverToLocationIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.DeliverToPartyName.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.DeliverToPartyName.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.DeliveryInformation() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit!
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.BankAssignedCreditorIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.BankAssignedCreditorIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.DebitedAccountIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.DebitedAccountIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.DirectDebit() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.MandateReferenceIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.MandateReferenceIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance!
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.Amount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.Amount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.BaseAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.BaseAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.DocumentLevelAllowance() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.Percentage.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.Percentage.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.Reason.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.Reason.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.ReasonCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.ReasonCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.VatCategoryCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.VatCategoryCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.VatRate.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.VatRate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge!
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.Amount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.Amount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.BaseAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.BaseAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.DocumentLevelCharge() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.Percentage.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.Percentage.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.Reason.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.Reason.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.ReasonCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.ReasonCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.VatCategoryCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.VatCategoryCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.VatRate.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.VatRate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals!
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.AmountDueForPayment.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.AmountDueForPayment.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.DocumentTotals() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.PaidAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.PaidAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.RoundingAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.RoundingAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.SumOfAllowances.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.SumOfAllowances.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.SumOfCharges.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.SumOfCharges.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.SumOfLineNetAmounts.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.SumOfLineNetAmounts.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.TotalVatAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.TotalVatAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.TotalVatAmountInAccountingCurrency.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.TotalVatAmountInAccountingCurrency.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.TotalWithoutVat.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.TotalWithoutVat.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.TotalWithVat.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.TotalWithVat.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.Deconstruct(out string! Value, out string? SchemeId, out string? SchemeVersionId) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.Identifier(string! Value, string? SchemeId, string? SchemeVersionId) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.SchemeId.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.SchemeId.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.SchemeVersionId.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.SchemeVersionId.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.Value.get -> string!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.Value.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.AdditionalSupportingDocuments.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.AdditionalSupportingDocuments.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Buyer.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Buyer.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.BuyerAccountingReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.BuyerAccountingReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.BuyerReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.BuyerReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ContractReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ContractReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.CurrencyCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.CurrencyCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DeliveryInformation.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DeliveryInformation.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DespatchAdviceReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DespatchAdviceReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DocumentLevelAllowances.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DocumentLevelAllowances.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DocumentLevelCharges.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DocumentLevelCharges.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DocumentTotals.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.DocumentTotals.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Invoice() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.InvoicedObjectIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.InvoicedObjectIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.InvoicingPeriod.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.InvoicingPeriod.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.IssueDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.IssueDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Lines.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Lines.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Notes.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Notes.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Number.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Number.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Payee.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Payee?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Payee.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PaymentDueDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PaymentDueDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PaymentInstructions.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PaymentInstructions.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PaymentTerms.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PaymentTerms.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PrecedingInvoiceReferences.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PrecedingInvoiceReferences.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ProcessControl.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ProcessControl.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ProjectReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ProjectReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PurchaseOrderReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.PurchaseOrderReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ReceivingAdviceReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ReceivingAdviceReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.SalesOrderReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.SalesOrderReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Seller.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Seller?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Seller.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.SellerTaxRepresentative.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.SellerTaxRepresentative.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.TenderOrLotReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.TenderOrLotReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.TypeCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.TypeCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.VatAccountingCurrencyCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.VatAccountingCurrencyCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.VatBreakdowns.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.VatBreakdowns.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.VatPointDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.VatPointDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.VatPointDateCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.VatPointDateCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Allowances.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Allowances.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.BuyerAccountingReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.BuyerAccountingReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Charges.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Charges.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Identifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Identifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.InvoicedQuantity.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.InvoicedQuantity.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.InvoicedQuantityUnitCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.InvoicedQuantityUnitCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.InvoiceLine() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Item.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Item.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.NetAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.NetAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Note.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Note.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.ObjectIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.ObjectIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Period.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Period.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.PriceDetails.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.PriceDetails.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.PurchaseOrderLineReference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.PurchaseOrderLineReference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.VatInformation.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.VatInformation.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.Amount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.Amount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.BaseAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.BaseAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.InvoiceLineAllowance() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.Percentage.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.Percentage.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.Reason.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.Reason.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.ReasonCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.ReasonCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.Amount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.Amount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.BaseAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.BaseAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.InvoiceLineCharge() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.Percentage.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.Percentage.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.Reason.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.Reason.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.ReasonCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.ReasonCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.EndDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.EndDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.InvoiceLinePeriod() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.StartDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.StartDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.InvoiceNote() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.Note.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.Note.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.SubjectCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.SubjectCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.Deconstruct(out Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse! Report, out Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice? Invoice) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.Invoice.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.Invoice.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.InvoiceReadResponse(Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse! Report, Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice? Invoice) -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.Report.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.ValidationReportResponse!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.Report.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod!
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.EndDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.EndDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.InvoicingPeriod() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.StartDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.StartDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.ItemAttribute() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.Name.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.Name.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.Value.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.Value.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.Attributes.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.Attributes.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.BuyersIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.BuyersIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.ClassificationIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.ClassificationIdentifiers.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.CountryOfOrigin.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.CountryOfOrigin.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.Description.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.Description.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.ItemInformation() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.Name.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.Name.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.SellersIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.SellersIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.StandardIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.StandardIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation
+Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation!
+Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.LineVatInformation() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.VatCategoryCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.VatCategoryCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.VatRate.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.VatRate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.Payee!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.Payee? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.Identifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.Identifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.LegalRegistrationIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.LegalRegistrationIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.Name.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.Name.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.Payee() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation!
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.HolderName.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.HolderName.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.PaymentCardInformation() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.PrimaryAccountNumber.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.PrimaryAccountNumber.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions!
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.CreditTransfers.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.CreditTransfers.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.DirectDebit.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.DirectDebit.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.PaymentCard.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.PaymentCard.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.PaymentInstructions() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.PaymentMeansText.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.PaymentMeansText.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.PaymentMeansTypeCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.PaymentMeansTypeCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.RemittanceInformation.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.RemittanceInformation.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference
+Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference!
+Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.IssueDate.get -> System.DateOnly?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.IssueDate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.PrecedingInvoiceReference() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.Reference.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.Reference.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails!
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.BaseQuantity.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.BaseQuantity.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.BaseQuantityUnitCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.BaseQuantityUnitCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.GrossPrice.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.GrossPrice.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.NetPrice.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.NetPrice.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.PriceDetails() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.PriceDiscount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.PriceDiscount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl
+Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl!
+Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.BusinessProcessType.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.BusinessProcessType.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.ProcessControl() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.SpecificationIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.SpecificationIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.Seller!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.AdditionalLegalInformation.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.AdditionalLegalInformation.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Contact.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Contact.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.ElectronicAddress.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.ElectronicAddress.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.Seller? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Identifiers.get -> System.Collections.Generic.IReadOnlyList<Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier!>!
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Identifiers.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.LegalRegistrationIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.LegalRegistrationIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Name.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Name.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.PostalAddress.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.PostalAddress.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Seller() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.TaxRegistrationIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.TaxRegistrationIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.TradingName.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.TradingName.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.VatIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.VatIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact!
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.ContactPoint.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.ContactPoint.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.EmailAddress.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.EmailAddress.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.SellerContact() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.TelephoneNumber.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.TelephoneNumber.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress!
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.AddressLine1.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.AddressLine1.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.AddressLine2.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.AddressLine2.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.AddressLine3.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.AddressLine3.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.City.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.City.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.CountryCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.CountryCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.CountrySubdivision.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.CountrySubdivision.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.PostCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.PostCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.SellerPostalAddress() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty!
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.Name.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.Name.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.PostalAddress.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.PostalAddress.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.SellerTaxRepresentativeParty() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.VatIdentifier.get -> Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.VatIdentifier.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress!
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.AddressLine1.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.AddressLine1.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.AddressLine2.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.AddressLine2.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.AddressLine3.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.AddressLine3.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.City.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.City.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.CountryCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.CountryCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.CountrySubdivision.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.CountrySubdivision.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.PostCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.PostCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.SellerTaxRepresentativePostalAddress() -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.<Clone>$() -> Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown!
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.CategoryCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.CategoryCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.Equals(Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown? other) -> bool
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.ExemptionReason.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.ExemptionReason.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.ExemptionReasonCode.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.ExemptionReasonCode.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.Rate.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.Rate.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.TaxableAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.TaxableAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.TaxAmount.get -> string?
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.TaxAmount.init -> void
+Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.VatBreakdown() -> void
 Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest
 Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest.<Clone>$() -> Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest!
 Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest.ChangeClientPlanRequest(System.Guid PlanId) -> void
@@ -198,6 +751,114 @@ override Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.ToString(
 override Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.Equals(object? obj) -> bool
 override Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.GetHashCode() -> int
 override Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.ToString() -> string!
+override Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.Equals(object? obj) -> bool
+override Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.GetHashCode() -> int
+override Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.ToString() -> string!
 override Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest.Equals(object? obj) -> bool
 override Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest.GetHashCode() -> int
 override Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest.ToString() -> string!
@@ -233,6 +894,78 @@ static Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.operator !=
 static Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest.operator ==(Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest? left, Homeport.Shared.Client.ModuleContract.RegisterInstanceRequest? right) -> bool
 static Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.operator !=(Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? left, Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? right) -> bool
 static Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse.operator ==(Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? left, Homeport.Shared.Client.Modules.Echo.V1.ReceivedRequestResponse? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument? left, Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument? left, Homeport.Shared.Client.Modules.EInvoicing.V1.AdditionalSupportingDocument? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject? left, Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject? left, Homeport.Shared.Client.Modules.EInvoicing.V1.BinaryObject? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Buyer? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact? left, Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact? left, Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerContact? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress? left, Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress? left, Homeport.Shared.Client.Modules.EInvoicing.V1.BuyerPostalAddress? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer? left, Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer? left, Homeport.Shared.Client.Modules.EInvoicing.V1.CreditTransfer? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DeliverToAddress? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DeliveryInformation? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DirectDebit? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelAllowance? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentLevelCharge? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals? left, Homeport.Shared.Client.Modules.EInvoicing.V1.DocumentTotals? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Identifier? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Invoice? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLine? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineAllowance? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLineCharge? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceLinePeriod? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceNote? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoiceReadResponse? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod? left, Homeport.Shared.Client.Modules.EInvoicing.V1.InvoicingPeriod? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ItemAttribute? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ItemInformation? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation? left, Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation? left, Homeport.Shared.Client.Modules.EInvoicing.V1.LineVatInformation? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.Payee? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Payee? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Payee.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.Payee? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Payee? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation? left, Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation? left, Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentCardInformation? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions? left, Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions? left, Homeport.Shared.Client.Modules.EInvoicing.V1.PaymentInstructions? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference? left, Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference? left, Homeport.Shared.Client.Modules.EInvoicing.V1.PrecedingInvoiceReference? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails? left, Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails? left, Homeport.Shared.Client.Modules.EInvoicing.V1.PriceDetails? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl? left, Homeport.Shared.Client.Modules.EInvoicing.V1.ProcessControl? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.Seller? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Seller? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.Seller.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.Seller? left, Homeport.Shared.Client.Modules.EInvoicing.V1.Seller? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact? left, Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact? left, Homeport.Shared.Client.Modules.EInvoicing.V1.SellerContact? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress? left, Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress? left, Homeport.Shared.Client.Modules.EInvoicing.V1.SellerPostalAddress? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty? left, Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty? left, Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativeParty? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress? left, Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress? left, Homeport.Shared.Client.Modules.EInvoicing.V1.SellerTaxRepresentativePostalAddress? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.operator !=(Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown? left, Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown? right) -> bool
+static Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown.operator ==(Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown? left, Homeport.Shared.Client.Modules.EInvoicing.V1.VatBreakdown? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest.operator ==(Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest? left, Homeport.Shared.Client.Platform.ControlPlane.V1.ChangeClientPlanRequest? right) -> bool
 static Homeport.Shared.Client.Platform.ControlPlane.V1.ClientResponse.operator !=(Homeport.Shared.Client.Platform.ControlPlane.V1.ClientResponse? left, Homeport.Shared.Client.Platform.ControlPlane.V1.ClientResponse? right) -> bool

@@ -328,4 +328,75 @@ public sealed class DocumentInspectionTests
             return await inspection.InspectAsync(stream, container, CancellationToken.None);
         }
     }
+
+    public sealed class ReadAsync
+    {
+        private const string XRechnung30 = "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0";
+
+        private const string Zugferd1 = """<rsm:CrossIndustryDocument xmlns:rsm="urn:ferd:CrossIndustryDocument:invoice:1p0"/>""";
+
+        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded());
+
+        [Theory]
+        [InlineData(SampleInvoices.MaximalUbl)]
+        [InlineData(SampleInvoices.MaximalCii)]
+        public async Task Reads_The_Invoice_An_Xml_Document_Holds(string sample)
+        {
+            var read = await Read(Encoding.UTF8.GetBytes(SampleInvoices.Text(sample)), DocumentContainer.Xml);
+
+            Assert.Equal("INV-2026-0001", read.Value.Invoice?.Number?.Value);
+        }
+
+        [Fact]
+        public async Task Reads_The_Invoice_A_Pdf_Carries()
+        {
+            var read = await Read(HybridPdf.Carrying("factur-x.xml", SampleInvoices.Text(SampleInvoices.MaximalCii)), DocumentContainer.Pdf);
+
+            Assert.Equal((DocumentContainer.Pdf, "INV-2026-0001"), (read.Value.Report.Container, read.Value.Invoice?.Number?.Value));
+        }
+
+        [Fact]
+        public async Task Reports_What_Inspecting_The_Document_Reports()
+        {
+            var read = await Read(Encoding.UTF8.GetBytes(SampleInvoices.Text(SampleInvoices.MaximalUbl)), DocumentContainer.Xml);
+
+            Assert.Equal((InvoiceSyntax.UblInvoice, RuleSet.XRechnung), (read.Value.Report.Syntax, read.Value.Report.Match?.RuleSet?.RuleSet));
+        }
+
+        [Fact]
+        public async Task Reads_No_Invoice_From_A_Zugferd_1_Document()
+        {
+            var read = await Read(Encoding.UTF8.GetBytes(Zugferd1), DocumentContainer.Xml);
+
+            Assert.Equal((Verdict.NotAnEInvoice, null), (read.Value.Report.Verdict, read.Value.Invoice));
+        }
+
+        [Fact]
+        public async Task Warns_That_The_Extension_Of_An_Extended_Invoice_Was_Ignored()
+        {
+            var extension = SampleInvoices.Text(SampleInvoices.MaximalUbl).Replace(
+                $"<cbc:CustomizationID>{XRechnung30}</cbc:CustomizationID>",
+                $"<cbc:CustomizationID>{XRechnung30}#conformant#urn:xeinkauf.de:kosit:extension:xrechnung_3.0</cbc:CustomizationID>",
+                StringComparison.Ordinal);
+
+            var read = await Read(Encoding.UTF8.GetBytes(extension), DocumentContainer.Xml);
+
+            Assert.Equal([RuleSetRules.ExtensionIgnoredRule], read.Value.Report.Findings.Select(finding => finding.Rule));
+        }
+
+        [Fact]
+        public async Task Returns_The_Error_Of_A_Document_It_Cannot_Inspect()
+        {
+            var read = await Read(Encoding.UTF8.GetBytes("<Order/>"), DocumentContainer.Xml);
+
+            Assert.Equal(DocumentRules.UnknownSyntaxCode, read.Error.Code);
+        }
+
+        private async Task<Result<ReadDocument>> Read(byte[] document, DocumentContainer container)
+        {
+            using var stream = new MemoryStream(document);
+
+            return await inspection.ReadAsync(stream, container, CancellationToken.None);
+        }
+    }
 }

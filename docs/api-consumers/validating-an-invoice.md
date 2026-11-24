@@ -6,6 +6,10 @@ document claims, including the invoice a ZUGFeRD or Factur-X PDF carries.
 The checks of EN 16931 and XRechnung follow in the next releases of M3, as
 the [roadmap](../../ROADMAP.md) lists.
 
+To get the content of the invoice as well, in the semantic model of
+EN 16931, send it to `read` instead: see
+[reading an invoice](reading-an-invoice.md).
+
 ## The request
 
 ```text

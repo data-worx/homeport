@@ -13,14 +13,14 @@ public sealed class ProgramTests
     public sealed class Main(EInvoicingBehindGateway module) : IClassFixture<EInvoicingBehindGateway>
     {
         [Fact]
-        public async Task Declares_The_Validate_Route_With_Its_Scope_And_The_Documents_Meter()
+        public async Task Declares_The_Validate_And_Read_Routes_With_Their_Scopes_And_The_Documents_Meter()
         {
             var response = await module.CreateClient().GetStringAsync("/.well-known/homeport/manifest");
 
             var root = JsonDocument.Parse(response).RootElement;
             Assert.Equal("e-invoicing", root.GetProperty("id").GetString());
             Assert.Equal(
-                """[{"method":"POST","path":"/v1/validate","scope":"e-invoicing.validate","meter":"documents","quantity":1}]""",
+                """[{"method":"POST","path":"/v1/validate","scope":"e-invoicing.validate","meter":"documents","quantity":1},{"method":"POST","path":"/v1/read","scope":"e-invoicing.read","meter":"documents","quantity":1}]""",
                 root.GetProperty("routes").GetRawText());
         }
 

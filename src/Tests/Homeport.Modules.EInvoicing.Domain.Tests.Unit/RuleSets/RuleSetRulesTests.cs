@@ -136,4 +136,28 @@ public sealed class RuleSetRulesTests
             Assert.Null(RuleSetRules.CheckProfile(match, "XRECHNUNG"));
         }
     }
+
+    public sealed class CheckExtension
+    {
+        [Theory]
+        [InlineData(XRechnung30 + "#conformant#urn:xeinkauf.de:kosit:extension:xrechnung_3.0")]
+        [InlineData("urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended")]
+        public void Warns_That_The_Extension_Of_A_Rule_Set_That_Extends_En_16931_Was_Ignored(string customizationId)
+        {
+            var match = RuleSetRules.Identify(Catalog, customizationId, issueDate: null).Value;
+
+            Assert.Equal(RuleSetRules.ExtensionIgnoredRule, RuleSetRules.CheckExtension(match)?.Rule);
+        }
+
+        [Theory]
+        [InlineData(XRechnung30)]
+        [InlineData(RuleSetRules.En16931Identifier)]
+        [InlineData(Minimum)]
+        public void Returns_Nothing_For_A_Rule_Set_Without_An_Extension(string customizationId)
+        {
+            var match = RuleSetRules.Identify(Catalog, customizationId, issueDate: null).Value;
+
+            Assert.Null(RuleSetRules.CheckExtension(match));
+        }
+    }
 }
