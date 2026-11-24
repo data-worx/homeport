@@ -1,10 +1,12 @@
 # Validating an invoice
 
 The e-invoicing module, module id `e-invoicing`, validates the electronic
-invoices you receive. Today it tells which container, syntax and rule set a
-document claims, including the invoice a ZUGFeRD or Factur-X PDF carries.
-The checks of EN 16931 and XRechnung follow in the next releases of M3, as
-the [roadmap](../../ROADMAP.md) lists.
+invoices you receive. It tells which container, syntax and rule set a
+document claims, including the invoice a ZUGFeRD or Factur-X PDF carries,
+and validates the invoice against the XML schema of its syntax: UBL 2.1 or
+CII D16B. The business rules of EN 16931 and XRechnung follow in the next
+releases of M3, as the [roadmap](../../ROADMAP.md) lists; until then,
+`valid` means valid against the schema.
 
 To get the content of the invoice as well, in the semantic model of
 EN 16931, send it to `read` instead: see
@@ -35,7 +37,7 @@ A document the module processed is answered with `200` and a report:
   "customizationId": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
   "ruleSet": "xrechnung",
   "ruleSetVersion": "3.0",
-  "verdict": null,
+  "verdict": "valid",
   "findings": []
 }
 ```
@@ -47,8 +49,8 @@ A document the module processed is answered with `200` and a report:
 | `customizationId` | The specification identifier (BT-24) the invoice carries, trimmed; `null` for a ZUGFeRD 1.0 invoice |
 | `ruleSet` | The rule set the invoice is checked against, see [rule sets](#rule-sets); `null` for a document that is no e-invoice |
 | `ruleSetVersion` | The version of `ruleSet` its identifier names; `null` with it |
-| `verdict` | `not-an-e-invoice` for a document that is an invoice, but no e-invoice under EN 16931; otherwise `null` until the validation rules run |
-| `findings` | What the module found, each with `severity` (`warning`), `rule` and an English `message`; see [findings](#findings) |
+| `verdict` | `valid` for an e-invoice without a fatal finding, `invalid` for one with at least one; `not-an-e-invoice` for a document that is an invoice, but no e-invoice under EN 16931, which is not validated |
+| `findings` | What the module found, in the order it found it; empty when it found nothing. See [findings](#findings) |
 
 For a PDF the module reads the embedded invoice; the report is about that
 invoice. In .NET, the report is `ValidationReportResponse` of
@@ -93,14 +95,46 @@ answered with
 
 ## Findings
 
-The module's own rules start with `EINV-`. A warning does not stop the
-document from being processed.
+A finding looks like this:
 
-| `rule` | When |
+```json
+{
+  "severity": "fatal",
+  "rule": "EINV-SCHEMA",
+  "message": "The element 'cac:AccountingSupplierParty' stands where the mandatory element 'cbc:IssueDate' is expected.",
+  "location": "/Invoice/cac:AccountingSupplierParty[1]",
+  "path": null,
+  "businessTerm": null
+}
+```
+
+| Member | Values |
 |---|---|
-| `EINV-RULE-SET-WINDOW` | The issue date lies outside the window of the claimed version |
-| `EINV-RULE-SET-UNKNOWN` | The specification identifier is an unknown specification of EN 16931; the invoice is checked against EN 16931 alone |
-| `EINV-XMP-PROFILE` | The profile the PDF's XMP metadata declares (`ConformanceLevel`) differs from the one the invoice's identifier names; spaces are ignored, so `EN16931` matches `EN 16931` |
+| `severity` | `fatal`: the invoice breaks a rule and is `invalid`. `warning`: worth knowing, the invoice is processed as it is. `information`: a note on the check itself |
+| `rule` | The identifier of the rule that found it |
+| `message` | An English description of the module's own; it may change between releases, so match on `rule`, not on the message |
+| `location` | Where in the document it was found, as an XPath with the prefixes the document uses and the position of each element among its namesakes, such as `/Invoice/cac:InvoiceLine[2]/cbc:InvoicedQuantity[1]`; an attribute ends in `/@name`. `null` when the finding concerns the document as a whole |
+| `path` | Where in the invoice that [`read`](reading-an-invoice.md) returns the finding lies, as a JSON path; `null` when the rule does not know. No rule sets it yet |
+| `businessTerm` | The business term of EN 16931 it concerns, such as `BT-1`; `null` when the rule does not know. No rule sets it yet |
+
+For a PDF, `location` is in the invoice the PDF carries. In .NET, a finding
+is `ValidationFinding`.
+
+The module's own rules start with `EINV-`.
+
+| `rule` | Severity | When |
+|---|---|---|
+| `EINV-SCHEMA` | `fatal` | The invoice does not fit the XML schema of its syntax: an element missing or not allowed where it stands, an attribute missing or not declared, a value that does not fit its type. One finding per place; after an element out of place, the rest of its parent is not checked further |
+| `EINV-SCHEMA-LIMIT` | `information` | The invoice breaks its schema in more than 100 places; only the first 100 are reported |
+| `EINV-RULE-SET-WINDOW` | `warning` | The issue date lies outside the window of the claimed version |
+| `EINV-RULE-SET-UNKNOWN` | `warning` | The specification identifier is an unknown specification of EN 16931; the invoice is checked against EN 16931 alone |
+| `EINV-XMP-PROFILE` | `warning` | The profile the PDF's XMP metadata declares (`ConformanceLevel`) differs from the one the invoice's identifier names; spaces are ignored, so `EN16931` matches `EN 16931` |
+
+The schemas are those of UBL 2.1 and CII D16B, as the KoSIT validator
+configuration for XRechnung ships them, embedded in the module unchanged.
+A `xsi:schemaLocation` in the document is ignored. A UBL extension
+(`ext:UBLExtensions`) is checked only as far as the UBL schemas declare its
+content.
 
 ## Rejected documents
 
@@ -119,7 +153,7 @@ All are Problem Details, as [errors](errors.md) describes.
 ## What it counts
 
 Every document answered with `200` counts one in the meter `documents`,
-a document that is no e-invoice included; a request answered with `4xx` or
+an invalid one and a document that is no e-invoice included; a request answered with `4xx` or
 `5xx` counts nothing. Read the count as [reading usage](reading-usage.md)
 describes.
 
@@ -139,8 +173,11 @@ curl -s -X POST -H "Authorization: Bearer ${token}" \
 ```
 
 ```json
-{"container":"xml","syntax":"ubl-invoice","customizationId":"urn:cen.eu:en16931:2017","ruleSet":"en16931","ruleSetVersion":"2017","verdict":null,"findings":[]}
+{"container":"xml","syntax":"ubl-invoice","customizationId":"urn:cen.eu:en16931:2017","ruleSet":"en16931","ruleSetVersion":"2017","verdict":"invalid","findings":[{"severity":"fatal","rule":"EINV-SCHEMA","message":"The element 'Invoice' lacks the mandatory element 'cbc:ID'.","location":"/Invoice","path":null,"businessTerm":null}]}
 ```
+
+The document carries little more than its specification identifier, so the
+schema finds the invoice number missing first.
 
 A ZUGFeRD PDF goes the same way, with `-H 'Content-Type: application/pdf'`
 and `--data-binary @invoice.pdf` instead of `-d`.

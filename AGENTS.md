@@ -428,6 +428,12 @@ A test that passes or fails depending on timing is a broken test. See
 - Only dependencies under AGPL-compatible permissive licences: MIT,
   Apache-2.0, BSD, ISC, PostgreSQL, and SIL OFL for fonts. Check the licence
   **before** adding the package and record it in `THIRD-PARTY-NOTICES.md`.
+- The one exception: a normative artefact of a standard a module
+  implements, such as its XML schemas, may be embedded under its
+  publisher's notice even where that notice is none of these licences, as
+  long as it is embedded unchanged. Each is an asset in
+  `.devkit/third-party-notices.overrides.json`, its notice a licence text
+  in `.devkit/licenses/`, and it is listed in `THIRD-PARTY-NOTICES.md`.
 - No commercial or source-available packages. This excludes MassTransit v9+
   and the commercial versions of MediatR, AutoMapper and FluentAssertions.
 - Contributions require the signed CLA — see [CONTRIBUTING.md](CONTRIBUTING.md).

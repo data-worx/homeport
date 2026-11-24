@@ -7,13 +7,18 @@ using Homeport.Modules.EInvoicing.Domain.Findings;
 using Homeport.Modules.EInvoicing.Domain.Model;
 using Homeport.Modules.EInvoicing.Domain.Reading;
 using Homeport.Modules.EInvoicing.Domain.RuleSets;
+using Homeport.Modules.EInvoicing.Domain.Schemas;
 using Homeport.Shared.Contracts;
 
 namespace Homeport.Modules.EInvoicing.Application.Documents;
 
-/// <summary>Reads a document far enough to tell its container, its syntax and the rule set it claims.</summary>
+/// <summary>
+/// Reads a document far enough to tell its container, its syntax and the rule
+/// set it claims, and validates the e-invoice it holds.
+/// </summary>
 /// <param name="catalog">The rule sets the module knows.</param>
-public sealed class DocumentInspection(RuleSetCatalog catalog)
+/// <param name="schemas">The XML schemas of the syntaxes.</param>
+public sealed class DocumentInspection(RuleSetCatalog catalog, SchemaCatalog schemas)
 {
     // A DTD is refused rather than ignored: no invoice syntax uses one, and
     // processing it opens the door to entity expansion and external entities.
@@ -34,6 +39,10 @@ public sealed class DocumentInspection(RuleSetCatalog catalog)
     /// An XML document is read to its end, so one that is not well-formed is
     /// refused even when its root element names a known syntax. A PDF is read
     /// for the invoice it carries, which is then inspected like an XML document.
+    /// An e-invoice is validated against the XML schema of its syntax and gets
+    /// the verdict <see cref="Verdict.Invalid"/> with a fatal finding,
+    /// <see cref="Verdict.Valid"/> without; a document that is no e-invoice
+    /// is not validated.
     /// </remarks>
     /// <param name="document">The document as it was sent.</param>
     /// <param name="container">What the caller declares the document to be.</param>
@@ -167,13 +176,17 @@ public sealed class DocumentInspection(RuleSetCatalog catalog)
             return Result<LoadedDocument>.Failure(match.Error);
         }
 
+        if (match.Value.IsNotAnEInvoice)
+        {
+            return Result<LoadedDocument>.Success(new LoadedDocument(
+                new InspectedDocument(container, syntax.Value, match.Value, Verdict.NotAnEInvoice, match.Value.Findings),
+                root));
+        }
+
+        IReadOnlyList<Finding> findings = [.. match.Value.Findings, .. SchemaRules.Validate(root, schemas)];
+
         return Result<LoadedDocument>.Success(new LoadedDocument(
-            new InspectedDocument(
-                container,
-                syntax.Value,
-                match.Value,
-                match.Value.IsNotAnEInvoice ? Verdict.NotAnEInvoice : null,
-                match.Value.Findings),
+            new InspectedDocument(container, syntax.Value, match.Value, VerdictRules.VerdictOf(findings), findings),
             root));
     }
 
@@ -187,13 +200,13 @@ public sealed class DocumentInspection(RuleSetCatalog catalog)
 /// <param name="Container">What the document arrived as.</param>
 /// <param name="Syntax">The syntax of the invoice; none for a ZUGFeRD 1.0 invoice, which is written in none EN 16931 binds to.</param>
 /// <param name="Match">The rule set the invoice claims; none for a ZUGFeRD 1.0 invoice.</param>
-/// <param name="Verdict">What the module concludes; none until the rules have run.</param>
+/// <param name="Verdict">What the module concludes.</param>
 /// <param name="Findings">What the inspection found.</param>
 public sealed record InspectedDocument(
     DocumentContainer Container,
     InvoiceSyntax? Syntax,
     RuleSetMatch? Match,
-    Verdict? Verdict,
+    Verdict Verdict,
     IReadOnlyList<Finding> Findings);
 
 /// <summary>A document as far as <see cref="DocumentInspection"/> has read it, with the invoice it holds.</summary>

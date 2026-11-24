@@ -31,6 +31,14 @@ public sealed class ReadingControllerTests
         }
 
         [Fact]
+        public async Task Reports_The_Verdict_Of_The_Invoice_It_Read()
+        {
+            var response = await PostAsync(SampleInvoices.Text(SampleInvoices.MaximalCii), "application/xml");
+
+            Assert.Equal("valid", (await RootOf(response)).GetProperty("report").GetProperty("verdict").GetString());
+        }
+
+        [Fact]
         public async Task Returns_An_Amount_As_The_Document_Writes_It()
         {
             var response = await PostAsync(SampleInvoices.Text(SampleInvoices.MaximalCii), "application/xml");

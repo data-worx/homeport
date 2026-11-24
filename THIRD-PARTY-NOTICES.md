@@ -124,10 +124,15 @@ ships beside it as well.
 
 | Asset | Version | Licence | Copyright |
 |---|---|---|---|
+| ETSI XAdES schemas 1.3.2 and 1.4.1, as UBL 2.1 ships them | 1.3.2 / 1.4.1 | BSD-3-Clause | Copyright 2024 ETSI |
 | Instrument Sans | Fontsource 5.3 | OFL-1.1 | Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans) |
 | JetBrains Mono | Fontsource 5.3 | OFL-1.1 | Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono) |
 | Lucide icons | 1.59.0 | ISC | Copyright (c) 2026 Lucide Icons and Contributors |
 | Lucide icons derived from Feather | 1.59.0 | MIT | Copyright (c) 2013-present Cole Bemis |
+| OASIS UBL 2.1 XML schemas | 2.1 OS | LicenseRef-OASIS | Copyright (c) OASIS Open 2013. All Rights Reserved. |
+| UN/CEFACT Core Component Type schema module, in UBL 2.1 | 1.1 | LicenseRef-UNCEFACT | Copyright (C) UN/CEFACT (2006). All Rights Reserved. |
+| UN/CEFACT Cross Industry Invoice XML schemas | D16B | LicenseRef-UNCEFACT | Copyright (C) UN/CEFACT (2016). All Rights Reserved. |
+| W3C XML Signature schema, as UBL 2.1 ships it | 2002-02-12 | W3C-19980720 | Copyright 2001 The Internet Society and W3C (Massachusetts Institute of Technology, Institut National de Recherche en Informatique et en Automatique, Keio University). All Rights Reserved. |
 
 ## Licence texts
 
@@ -399,6 +404,118 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
+### LicenseRef-OASIS
+
+Applies to every entry marked `LicenseRef-OASIS` in the tables above. Each of them
+keeps its own copyright notice, as given in those tables.
+
+```text
+OASIS Notices, as the OASIS Standard UBL 2.1 states them
+(http://docs.oasis-open.org/ubl/os-UBL-2.1/UBL-2.1.html)
+
+Copyright (c) <the notice given for the asset in the table above>
+
+All capitalized terms in the following text have the meanings assigned to
+them in the OASIS Intellectual Property Rights Policy (the “OASIS IPR
+Policy”). The full Policy may be found at the OASIS website.
+
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in
+its implementation may be prepared, copied, published, and distributed, in
+whole or in part, without restriction of any kind, provided that the above
+copyright notice and this section are included on all such copies and
+derivative works. However, this document itself may not be modified in any
+way, including by removing the copyright notice or references to OASIS,
+except as needed for the purpose of developing any document or deliverable
+produced by an OASIS Technical Committee (in which case the rules applicable
+to copyrights, as set forth in the OASIS IPR Policy, must be followed) or as
+required to translate it into languages other than English.
+
+The limited permissions granted above are perpetual and will not be revoked
+by OASIS or its successors or assigns.
+
+This document and the information contained herein is provided on an “AS IS”
+basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+INFRINGE ANY OWNERSHIP RIGHTS AND ANY IMPLIED WARRANTIES OF MERCHANTABILITY
+OR FITNESS FOR A PARTICULAR PURPOSE.
+
+OASIS requests that any OASIS Party or any other party that believes it has
+patent claims that would necessarily be infringed by implementations of this
+OASIS Committee Specification or OASIS Standard notify OASIS TC
+Administrator and provide an indication of its willingness to grant patent
+licenses to such patent claims in a manner consistent with the IPR Mode of
+the OASIS Technical Committee that produced this specification.
+
+OASIS invites any party to contact the OASIS TC Administrator if it is aware
+of a claim of ownership of any patent claims that would necessarily be
+infringed by implementations of this specification by a patent holder that
+is not willing to provide a license to such patent claims in a manner
+consistent with the IPR Mode of the OASIS Technical Committee that produced
+this specification. OASIS may include such claims on its website, but
+disclaims any obligation to do so.
+
+OASIS takes no position regarding the validity or scope of any intellectual
+property or other rights that might be claimed to pertain to the
+implementation or use of the technology described in this document or the
+extent to which any license under such rights might or might not be
+available; neither does it represent that it has made any effort to identify
+any such rights. Information on OASIS’ procedures with respect to rights in
+any document or deliverable produced by an OASIS Technical Committee can be
+found on the OASIS website. Copies of claims of rights made available for
+publication and any assurances of licenses to be made available, or the
+result of an attempt made to obtain a general license or permission for the
+use of such proprietary rights by implementers or users of this OASIS
+Committee Specification or OASIS Standard, can be obtained from the OASIS TC
+Administrator. OASIS makes no representation that any information or list of
+intellectual property rights will at any time be complete, or that any
+claims in such list are, in fact, Essential Claims.
+
+The name “OASIS” is a trademark of OASIS, the owner and developer of this
+specification, and should be used only to refer to the organization and its
+official outputs. OASIS welcomes reference to, and implementation and use
+of, specifications, while reserving the right to enforce its marks against
+misleading uses. Please see http://www.oasis-open.org/policies-
+guidelines/trademark.php for guidance.
+
+CPFR is a registered trademark of the Voluntary Interindustry Commerce
+Solutions (VICS) association. The term “CPFR” is not to be used in any
+format without written permission from VICS. For more information on VICS
+and CPFR, visit www.vics.org.
+```
+
+### LicenseRef-UNCEFACT
+
+Applies to every entry marked `LicenseRef-UNCEFACT` in the tables above. Each of them
+keeps its own copyright notice, as given in those tables.
+
+```text
+UN/CEFACT notice, as the schemas of CII D16B state it
+
+Copyright (C) <the notice given for the asset in the table above>
+
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in
+its implementation may be prepared, copied, published and distributed, in
+whole or in part, without restriction of any kind, provided that the above
+copyright notice and this paragraph are included on all such copies and
+derivative works. However, this document itself may not be modified in any
+way, such as by removing the copyright notice or references to UN/CEFACT,
+except as needed for the purpose of developing UN/CEFACT specifications, in
+which case the procedures for copyrights defined in the UN/CEFACT
+Intellectual Property Rights document must be followed, or as required to
+translate it into languages other than English.
+
+The limited permissions granted above are perpetual and will not be revoked
+by UN/CEFACT or its successors or assigns.
+
+This document and the information contained herein is provided on an "AS IS"
+basis and UN/CEFACT DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL
+NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR
+FITNESS FOR A PARTICULAR PURPOSE.
+```
+
 ### MIT
 
 Applies to every entry marked `MIT` in the tables above. Each of them
@@ -554,4 +671,57 @@ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 AND THE COPYRIGHT HOLDER HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
 UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+```
+
+### W3C-19980720
+
+Applies to every entry marked `W3C-19980720` in the tables above. Each of them
+keeps its own copyright notice, as given in those tables.
+
+```text
+W3C Software Notice and License (1998-07-20)
+(http://www.w3.org/Consortium/Legal/copyright-software-19980720)
+
+Copyright (c) <the notice given for the asset in the table above>
+
+This W3C work (including software, documents, or other related items) is
+being provided by the copyright holders under the following license. By
+obtaining, using and/or copying this work, you (the licensee) agree that you
+have read, understood, and will comply with the following terms and
+conditions:
+
+Permission to use, copy, modify, and distribute this software and its
+documentation, with or without modification, for any purpose and without fee
+or royalty is hereby granted, provided that you include the following on ALL
+copies of the software and documentation or portions thereof, including
+modifications, that you make:
+
+1. The full text of this NOTICE in a location viewable to users of the
+   redistributed or derivative work.
+2. Any pre-existing intellectual property disclaimers, notices, or terms and
+   conditions. If none exist, a short notice of the following form
+   (hypertext is preferred, text is permitted) should be used within the
+   body of any redistributed or derivative code: "Copyright ©
+   [$date-of-software] World Wide Web Consortium, (Massachusetts Institute
+   of Technology, Institut National de Recherche en Informatique et en
+   Automatique, Keio University). All Rights Reserved.
+   http://www.w3.org/Consortium/Legal/"
+3. Notice of any changes or modifications to the W3C files, including the
+   date changes were made. (We recommend you provide URIs to the location
+   from which the code is derived.)
+
+THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND COPYRIGHT HOLDERS
+MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO, WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR
+PURPOSE OR THAT THE USE OF THE SOFTWARE OR DOCUMENTATION WILL NOT INFRINGE
+ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE SOFTWARE OR
+DOCUMENTATION.
+
+The name and trademarks of copyright holders may NOT be used in advertising
+or publicity pertaining to the software without specific, written prior
+permission. Title to copyright in this software and any associated
+documentation will at all times remain with copyright holders.
 ```

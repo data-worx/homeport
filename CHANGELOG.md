@@ -38,6 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   left out, with a warning. The local Keycloak realm offers the new scope;
   an operator creates it at their identity provider. See
   [reading an invoice](docs/api-consumers/reading-an-invoice.md).
+- The e-invoicing module validates an invoice against the XML schema of its
+  syntax, UBL 2.1 or CII D16B, as the first stage of validation. The report
+  of `validate` and `read` now gives the verdict `valid` or `invalid` for
+  every e-invoice, and each schema violation as a `fatal` finding with the
+  rule `EINV-SCHEMA`, a message that names what is missing or out of place,
+  and its location in the document as an XPath. A finding also carries
+  `path` and `businessTerm`, set once the business rules arrive. See
+  [validating an invoice](docs/api-consumers/validating-an-invoice.md#findings).
 
 ### Changed
 

@@ -17,13 +17,18 @@ public sealed class ValidationControllerTests
         private const string ProblemPrefix = "https://homeport.data-worx.de/modules/e-invoicing/problems/";
 
         private const string XRechnung = "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0";
+        // The smallest documents the XML schemas admit, as MinimalInvoices
+        // writes them; spelled out here, since a theory takes constants.
+        private const string Namespaces = "xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\"";
         private const string UblHeader = $"""<cbc:CustomizationID>{XRechnung}</cbc:CustomizationID><cbc:ID>1</cbc:ID><cbc:IssueDate>2026-11-23</cbc:IssueDate>""";
-        private const string UblInvoice = $"""<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">{UblHeader}</Invoice>""";
-        private const string UblCreditNote = $"""<?xml version="1.0" encoding="UTF-8"?><CreditNote xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">{UblHeader}</CreditNote>""";
-        private const string CiiInvoice = $"""<?xml version="1.0" encoding="UTF-8"?><rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"><rsm:ExchangedDocumentContext><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>{XRechnung}</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext><rsm:ExchangedDocument><ram:IssueDateTime><udt:DateTimeString format="102">20161123</udt:DateTimeString></ram:IssueDateTime></rsm:ExchangedDocument></rsm:CrossIndustryInvoice>""";
+        private const string UblParties = """<cac:AccountingSupplierParty/><cac:AccountingCustomerParty/><cac:LegalMonetaryTotal><cbc:PayableAmount currencyID="EUR">0</cbc:PayableAmount></cac:LegalMonetaryTotal>""";
+        private const string UblInvoice = $"""<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" {Namespaces}>{UblHeader}{UblParties}<cac:InvoiceLine><cbc:ID>1</cbc:ID><cbc:LineExtensionAmount currencyID="EUR">0</cbc:LineExtensionAmount><cac:Item/></cac:InvoiceLine></Invoice>""";
+        private const string UblCreditNote = $"""<?xml version="1.0" encoding="UTF-8"?><CreditNote xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2" {Namespaces}>{UblHeader}{UblParties}<cac:CreditNoteLine><cbc:ID>1</cbc:ID><cbc:LineExtensionAmount currencyID="EUR">0</cbc:LineExtensionAmount><cac:Item/></cac:CreditNoteLine></CreditNote>""";
+        private const string WithoutIssueDate = $"""<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" {Namespaces}><cbc:CustomizationID>{XRechnung}</cbc:CustomizationID><cbc:ID>1</cbc:ID>{UblParties}<cac:InvoiceLine><cbc:ID>1</cbc:ID><cbc:LineExtensionAmount currencyID="EUR">0</cbc:LineExtensionAmount><cac:Item/></cac:InvoiceLine></Invoice>""";
+        private const string CiiInvoice = $"""<?xml version="1.0" encoding="UTF-8"?><rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"><rsm:ExchangedDocumentContext><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>{XRechnung}</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext><rsm:ExchangedDocument><ram:ID>1</ram:ID><ram:IssueDateTime><udt:DateTimeString format="102">20161123</udt:DateTimeString></ram:IssueDateTime></rsm:ExchangedDocument><rsm:SupplyChainTradeTransaction><ram:ApplicableHeaderTradeAgreement/><ram:ApplicableHeaderTradeDelivery/><ram:ApplicableHeaderTradeSettlement/></rsm:SupplyChainTradeTransaction></rsm:CrossIndustryInvoice>""";
         private const string Minimum = """<rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"><rsm:ExchangedDocumentContext><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:factur-x.eu:1p0:minimum</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext></rsm:CrossIndustryInvoice>""";
         private const string UnknownRuleSet = """<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"><cbc:CustomizationID>urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID></Invoice>""";
-        private const string Report = $"\"customizationId\":\"{XRechnung}\",\"ruleSet\":\"xrechnung\",\"ruleSetVersion\":\"3.0\",\"verdict\":null";
+        private const string Report = $"\"customizationId\":\"{XRechnung}\",\"ruleSet\":\"xrechnung\",\"ruleSetVersion\":\"3.0\",\"verdict\":\"valid\"";
         private const string WithDoctype = """<?xml version="1.0"?><!DOCTYPE Invoice [<!ENTITY x "x">]><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">&x;</Invoice>""";
         private const string UnknownRoot = """<Order xmlns="urn:example:order"/>""";
         private const string NotXml = "Invoice 1, 100 EUR";
@@ -45,8 +50,27 @@ public sealed class ValidationControllerTests
             var response = await PostAsync(CiiInvoice, "application/xml");
 
             Assert.Equal(
-                $$"""{"container":"xml","syntax":"cii",{{Report}},"findings":[{"severity":"warning","rule":"EINV-RULE-SET-WINDOW","message":"The invoice was issued on 2016-11-23, outside the window of version 3.0 (valid from 2023-08-01)."}]}""",
+                $$"""{"container":"xml","syntax":"cii",{{Report}},"findings":[{"severity":"warning","rule":"EINV-RULE-SET-WINDOW","message":"The invoice was issued on 2016-11-23, outside the window of version 3.0 (valid from 2023-08-01).","location":null,"path":null,"businessTerm":null}]}""",
                 await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Reports_Invalid_With_A_Fatal_Finding_Naming_The_Missing_Element()
+        {
+            var response = await PostAsync(WithoutIssueDate, "application/xml");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(
+                $$"""{"container":"xml","syntax":"ubl-invoice","customizationId":"{{XRechnung}}","ruleSet":"xrechnung","ruleSetVersion":"3.0","verdict":"invalid","findings":[{"severity":"fatal","rule":"EINV-SCHEMA","message":"The element 'cac:AccountingSupplierParty' stands where the mandatory element 'cbc:IssueDate' is expected.","location":"/Invoice/cac:AccountingSupplierParty[1]","path":null,"businessTerm":null}]}""",
+                await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Reports_One_Document_For_An_Invalid_E_Invoice()
+        {
+            var response = await PostAsync(WithoutIssueDate, "application/xml");
+
+            Assert.Equal(["documents=1"], response.Headers.GetValues(ModuleHeaders.Usage));
         }
 
         [Fact]

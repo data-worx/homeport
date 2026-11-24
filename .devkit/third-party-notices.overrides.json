@@ -90,6 +90,66 @@
       "files": [
         "design/dist/HomeportIcons.cs"
       ]
+    },
+    {
+      "name": "OASIS UBL 2.1 XML schemas",
+      "version": "2.1 OS",
+      "license": "LicenseRef-OASIS",
+      "copyright": "Copyright (c) OASIS Open 2013. All Rights Reserved.",
+      "files": [
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/maindoc/UBL-Invoice-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/maindoc/UBL-CreditNote-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-CommonAggregateComponents-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-CommonBasicComponents-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-CommonExtensionComponents-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-CommonSignatureComponents-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-CoreComponentParameters-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-ExtensionContentDataType-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-QualifiedDataTypes-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-SignatureAggregateComponents-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-SignatureBasicComponents-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-UnqualifiedDataTypes-2.1.xsd"
+      ]
+    },
+    {
+      "name": "UN/CEFACT Core Component Type schema module, in UBL 2.1",
+      "version": "1.1",
+      "license": "LicenseRef-UNCEFACT",
+      "copyright": "Copyright (C) UN/CEFACT (2006). All Rights Reserved.",
+      "files": [
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/CCTS_CCT_SchemaModule-2.1.xsd"
+      ]
+    },
+    {
+      "name": "W3C XML Signature schema, as UBL 2.1 ships it",
+      "version": "2002-02-12",
+      "license": "W3C-19980720",
+      "copyright": "Copyright 2001 The Internet Society and W3C (Massachusetts Institute of Technology, Institut National de Recherche en Informatique et en Automatique, Keio University). All Rights Reserved.",
+      "files": [
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-xmldsig-core-schema-2.1.xsd"
+      ]
+    },
+    {
+      "name": "ETSI XAdES schemas 1.3.2 and 1.4.1, as UBL 2.1 ships them",
+      "version": "1.3.2 / 1.4.1",
+      "license": "BSD-3-Clause",
+      "copyright": "Copyright 2024 ETSI",
+      "files": [
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-XAdESv132-2.1.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/ubl-2.1/common/UBL-XAdESv141-2.1.xsd"
+      ]
+    },
+    {
+      "name": "UN/CEFACT Cross Industry Invoice XML schemas",
+      "version": "D16B",
+      "license": "LicenseRef-UNCEFACT",
+      "copyright": "Copyright (C) UN/CEFACT (2016). All Rights Reserved.",
+      "files": [
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/cii-d16b/CrossIndustryInvoice_100pD16B.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/cii-d16b/CrossIndustryInvoice_QualifiedDataType_100pD16B.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/cii-d16b/CrossIndustryInvoice_ReusableAggregateBusinessInformationEntity_100pD16B.xsd",
+        "src/Modules/EInvoicing/Homeport.Modules.EInvoicing.Domain/Schemas/cii-d16b/CrossIndustryInvoice_UnqualifiedDataType_100pD16B.xsd"
+      ]
     }
   ],
   "license": {

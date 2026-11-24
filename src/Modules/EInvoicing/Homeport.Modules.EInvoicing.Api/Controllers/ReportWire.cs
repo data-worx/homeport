@@ -33,7 +33,7 @@ internal static class ReportWire
         report.Match?.CustomizationId,
         report.Match?.RuleSet is { } version ? Wire(version.RuleSet) : null,
         report.Match?.RuleSet?.Version,
-        report.Verdict is { } verdict ? Wire(verdict) : null,
+        Wire(report.Verdict),
         [.. report.Findings.Select(Wire)]);
 
     /// <summary>The wire value of a container.</summary>
@@ -68,6 +68,8 @@ internal static class ReportWire
     /// <summary>The wire value of a verdict.</summary>
     private static WireVerdict Wire(Domain.Documents.Verdict verdict) => verdict switch
     {
+        Domain.Documents.Verdict.Valid => WireVerdict.Valid,
+        Domain.Documents.Verdict.Invalid => WireVerdict.Invalid,
         Domain.Documents.Verdict.NotAnEInvoice => WireVerdict.NotAnEInvoice,
         _ => throw new ArgumentOutOfRangeException(nameof(verdict), verdict, "Every verdict has a wire value."),
     };
@@ -76,9 +78,14 @@ internal static class ReportWire
     private static ValidationFinding Wire(Domain.Findings.Finding finding) => new(
         finding.Severity switch
         {
+            Domain.Findings.FindingSeverity.Fatal => WireSeverity.Fatal,
             Domain.Findings.FindingSeverity.Warning => WireSeverity.Warning,
+            Domain.Findings.FindingSeverity.Information => WireSeverity.Information,
             _ => throw new ArgumentOutOfRangeException(nameof(finding), finding.Severity, "Every severity has a wire value."),
         },
         finding.Rule,
-        finding.Message);
+        finding.Message,
+        finding.Location,
+        finding.Path,
+        finding.BusinessTerm);
 }
