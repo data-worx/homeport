@@ -2,6 +2,7 @@
 
 using Homeport.Modules.EInvoicing.Application.Documents;
 using Homeport.Modules.EInvoicing.Domain.RuleSets;
+using Homeport.Modules.EInvoicing.Domain.Schemas;
 using Homeport.Sdk;
 
 namespace Homeport.Modules.EInvoicing.Api;
@@ -28,6 +29,7 @@ public sealed class Program
         builder.Services.AddOpenApi();
         builder.Services.AddControllers();
         builder.Services.AddSingleton(RuleSetCatalog.LoadEmbedded());
+        builder.Services.AddSingleton(SchemaCatalog.LoadEmbedded());
         builder.Services.AddSingleton<DocumentInspection>();
 
         var app = builder.Build();

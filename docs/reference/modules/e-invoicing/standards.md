@@ -14,6 +14,8 @@ means the source states no date. The page is generated from
 | XRechnung validator configuration | `v2026-08-31` | 2026-08-31 | — | [itplr-kosit/validator-configuration-xrechnung](https://github.com/itplr-kosit/validator-configuration-xrechnung/releases/tag/v2026-08-31) |
 | XRechnung test suite | `v2026-08-31` | 2026-08-31 | — | [itplr-kosit/xrechnung-testsuite](https://github.com/itplr-kosit/xrechnung-testsuite/releases/tag/v2026-08-31) |
 | EN 16931 validation artefacts | `validation-1.3.17` | — | — | [ConnectingEurope/eInvoicing-EN16931](https://github.com/ConnectingEurope/eInvoicing-EN16931/releases/tag/validation-1.3.17) |
+| UBL 2.1 XML schemas | `2.1` | — | — | <https://docs.oasis-open.org/ubl/os-UBL-2.1/> |
+| UN/CEFACT CII XML schemas | `D16B` | — | — | <https://unece.org/trade/uncefact/xml-schemas> |
 | ZUGFeRD / Factur-X | `2.5.2` | — | — | <https://www.ferd-net.de/standards/zugferd> |
 | EN 16931 code lists | `18.0` | 2026-11-15 | — | <https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931> |
 | BMF guidance on e-invoices under § 14 UStG | `2026-10-15` | — | — | <https://www.bundesfinanzministerium.de/Content/DE/FAQ/e-rechnung.html> |

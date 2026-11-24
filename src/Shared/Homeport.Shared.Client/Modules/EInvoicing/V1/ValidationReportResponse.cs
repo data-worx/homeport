@@ -21,8 +21,8 @@ namespace Homeport.Shared.Client.Modules.EInvoicing.V1;
 /// names it, such as <c>3.0</c>; <see langword="null"/> with it.
 /// </param>
 /// <param name="Verdict">
-/// What the module concludes; <see langword="null"/> until the validation
-/// rules run.
+/// What the module concludes: <see cref="V1.Verdict.NotAnEInvoice"/> for a
+/// document that is no e-invoice, otherwise whether the e-invoice is valid.
 /// </param>
 /// <param name="Findings">What the module found; empty when it found nothing.</param>
 public sealed record ValidationReportResponse(
@@ -31,5 +31,5 @@ public sealed record ValidationReportResponse(
     string? CustomizationId,
     RuleSet? RuleSet,
     string? RuleSetVersion,
-    Verdict? Verdict,
+    Verdict Verdict,
     IReadOnlyList<ValidationFinding> Findings);

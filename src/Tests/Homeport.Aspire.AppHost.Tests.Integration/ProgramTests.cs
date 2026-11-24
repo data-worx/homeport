@@ -201,7 +201,7 @@ public sealed class ProgramTests
             using var response = await RunningAppHost.ValidateAsync(gateway, CancellationToken.None);
 
             Assert.Equal(
-                """{"container":"xml","syntax":"ubl-invoice","customizationId":"urn:cen.eu:en16931:2017","ruleSet":"en16931","ruleSetVersion":"2017","verdict":null,"findings":[]}""",
+                """{"container":"xml","syntax":"ubl-invoice","customizationId":"urn:cen.eu:en16931:2017","ruleSet":"en16931","ruleSetVersion":"2017","verdict":"invalid","findings":[{"severity":"fatal","rule":"EINV-SCHEMA","message":"The element 'Invoice' lacks the mandatory element 'cbc:ID'.","location":"/Invoice","path":null,"businessTerm":null}]}""",
                 await response.Content.ReadAsStringAsync());
         }
 

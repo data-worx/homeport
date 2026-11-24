@@ -3,7 +3,9 @@
 using System.Text;
 using Homeport.Modules.EInvoicing.Application.Documents;
 using Homeport.Modules.EInvoicing.Domain.Documents;
+using Homeport.Modules.EInvoicing.Domain.Findings;
 using Homeport.Modules.EInvoicing.Domain.RuleSets;
+using Homeport.Modules.EInvoicing.Domain.Schemas;
 using Homeport.Shared.Contracts;
 using Homeport.Testing.EInvoicing;
 
@@ -26,7 +28,7 @@ public sealed class DocumentInspectionTests
 
         private const string Zugferd1 = """<rsm:CrossIndustryDocument xmlns:rsm="urn:ferd:CrossIndustryDocument:invoice:1p0" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:12"><rsm:SpecifiedExchangedDocumentContext><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:ferd:CrossIndustryDocument:invoice:1p0:comfort</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:SpecifiedExchangedDocumentContext></rsm:CrossIndustryDocument>""";
 
-        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded());
+        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded(), SchemaCatalog.LoadEmbedded());
 
         [Theory]
         [InlineData(En16931, RuleSet.En16931, "2017")]
@@ -165,7 +167,7 @@ public sealed class DocumentInspectionTests
             var inspected = await Inspect(Zugferd1, DocumentContainer.Xml);
 
             Assert.Equal(
-                (DocumentContainer.Xml, (InvoiceSyntax?)null, (RuleSetMatch?)null, (Verdict?)Verdict.NotAnEInvoice),
+                (DocumentContainer.Xml, (InvoiceSyntax?)null, (RuleSetMatch?)null, Verdict.NotAnEInvoice),
                 (inspected.Value.Container, inspected.Value.Syntax, inspected.Value.Match, inspected.Value.Verdict));
         }
 
@@ -180,11 +182,43 @@ public sealed class DocumentInspectionTests
         }
 
         [Fact]
-        public async Task Returns_No_Verdict_For_An_E_Invoice_Before_The_Rules_Run()
+        public async Task Returns_Valid_For_An_E_Invoice_That_Fits_Its_Schema()
         {
             var inspected = await Inspect(Ubl(XRechnung30, Today), DocumentContainer.Xml);
 
-            Assert.Null(inspected.Value.Verdict);
+            Assert.Equal(Verdict.Valid, inspected.Value.Verdict);
+        }
+
+        [Fact]
+        public async Task Returns_Invalid_With_A_Fatal_Finding_For_An_E_Invoice_That_Breaks_Its_Schema()
+        {
+            var broken = Cii(XRechnung30, "20261123").Replace("<ram:ApplicableHeaderTradeSettlement/>", string.Empty, StringComparison.Ordinal);
+
+            var inspected = await Inspect(broken, DocumentContainer.Xml);
+
+            Assert.Equal(
+                (Verdict.Invalid, FindingSeverity.Fatal, SchemaRules.SchemaRule),
+                (inspected.Value.Verdict, inspected.Value.Findings.Single().Severity, inspected.Value.Findings.Single().Rule));
+        }
+
+        [Fact]
+        public async Task Validates_The_Invoice_A_Pdf_Carries()
+        {
+            var broken = Cii(XRechnung30, "20261123").Replace("<ram:ApplicableHeaderTradeSettlement/>", string.Empty, StringComparison.Ordinal);
+
+            var inspected = await Inspect(HybridPdf.Carrying("factur-x.xml", broken), DocumentContainer.Pdf);
+
+            Assert.Equal(Verdict.Invalid, inspected.Value.Verdict);
+        }
+
+        [Fact]
+        public async Task Does_Not_Validate_A_Document_That_Is_No_E_Invoice()
+        {
+            var broken = Cii(Minimum, "20261123").Replace("<ram:ApplicableHeaderTradeSettlement/>", string.Empty, StringComparison.Ordinal);
+
+            var inspected = await Inspect(broken, DocumentContainer.Xml);
+
+            Assert.Equal((Verdict.NotAnEInvoice, 0), (inspected.Value.Verdict, inspected.Value.Findings.Count));
         }
 
         [Fact]
@@ -312,11 +346,9 @@ public sealed class DocumentInspectionTests
             Assert.Equal(DocumentRules.UnreadableCode, inspected.Error.Code);
         }
 
-        private static string Ubl(string customizationId, string issueDate) =>
-            $"""<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"><cbc:CustomizationID>{customizationId}</cbc:CustomizationID><cbc:ID>1</cbc:ID><cbc:IssueDate>{issueDate}</cbc:IssueDate></Invoice>""";
+        private static string Ubl(string customizationId, string issueDate) => MinimalInvoices.Ubl(customizationId, issueDate);
 
-        private static string Cii(string customizationId, string issueDate) =>
-            $"""<?xml version="1.0" encoding="UTF-8"?><rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"><rsm:ExchangedDocumentContext><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>{customizationId}</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:ExchangedDocumentContext><rsm:ExchangedDocument><ram:ID>1</ram:ID><ram:IssueDateTime><udt:DateTimeString format="102">{issueDate}</udt:DateTimeString></ram:IssueDateTime></rsm:ExchangedDocument></rsm:CrossIndustryInvoice>""";
+        private static string Cii(string customizationId, string issueDate) => MinimalInvoices.Cii(customizationId, issueDate);
 
         private Task<Result<InspectedDocument>> Inspect(string document, DocumentContainer container) =>
             Inspect(Encoding.UTF8.GetBytes(document), container);
@@ -335,7 +367,7 @@ public sealed class DocumentInspectionTests
 
         private const string Zugferd1 = """<rsm:CrossIndustryDocument xmlns:rsm="urn:ferd:CrossIndustryDocument:invoice:1p0"/>""";
 
-        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded());
+        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded(), SchemaCatalog.LoadEmbedded());
 
         [Theory]
         [InlineData(SampleInvoices.MaximalUbl)]
@@ -361,6 +393,14 @@ public sealed class DocumentInspectionTests
             var read = await Read(Encoding.UTF8.GetBytes(SampleInvoices.Text(SampleInvoices.MaximalUbl)), DocumentContainer.Xml);
 
             Assert.Equal((InvoiceSyntax.UblInvoice, RuleSet.XRechnung), (read.Value.Report.Syntax, read.Value.Report.Match?.RuleSet?.RuleSet));
+        }
+
+        [Fact]
+        public async Task Validates_The_Invoice_It_Reads()
+        {
+            var read = await Read(Encoding.UTF8.GetBytes(SampleInvoices.Text(SampleInvoices.MaximalCii)), DocumentContainer.Xml);
+
+            Assert.Equal(Verdict.Valid, read.Value.Report.Verdict);
         }
 
         [Fact]
