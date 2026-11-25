@@ -46,6 +46,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and its location in the document as an XPath. A finding also carries
   `path` and `businessTerm`, set once the business rules arrive. See
   [validating an invoice](docs/api-consumers/validating-an-invoice.md#findings).
+- The e-invoicing module checks an invoice that fits its XML schema against
+  the 58 core rules of EN 16931, BR-01 to BR-65, as the second stage of
+  validation, under every rule set it knows. A broken rule is a finding with
+  the official rule identifier, a message of the module's own, the business
+  term it concerns and its `path` in the invoice `read` returns; it reports
+  what the KoSIT validator reports for UBL and CII alike. The rules are
+  listed on the module's
+  [rules page](docs/reference/modules/e-invoicing/rules.md).
 
 ### Changed
 

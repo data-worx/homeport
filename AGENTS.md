@@ -79,6 +79,9 @@ reader it is written for:
   `<document>-<subject>.png`, taken from the running AppHost in the light
   theme, without the mouse pointer. It is an image of the product, not a
   diagram, so `core.diagrams` does not apply to it.
+- `docs/reference/modules/<moduleId>/rules.md` is generated from the
+  module's `Rules/rules.json` by `.github/scripts/render-rules.sh`, never
+  edited by hand. The `rules` gate fails when it differs.
 - A change to the path of a call to a module, of a platform request, of an
   admin request or of a module's registration updates its sequence diagram,
   `docs/architecture/request-flow-<flow>.drawio.svg` or the one in

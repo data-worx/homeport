@@ -3,10 +3,11 @@
 The e-invoicing module, module id `e-invoicing`, validates the electronic
 invoices you receive. It tells which container, syntax and rule set a
 document claims, including the invoice a ZUGFeRD or Factur-X PDF carries,
-and validates the invoice against the XML schema of its syntax: UBL 2.1 or
-CII D16B. The business rules of EN 16931 and XRechnung follow in the next
-releases of M3, as the [roadmap](../../ROADMAP.md) lists; until then,
-`valid` means valid against the schema.
+and validates the invoice in two stages: against the XML schema of its
+syntax, UBL 2.1 or CII D16B, and, when it fits the schema, against the core
+rules of EN 16931. The further rules of EN 16931 and those of XRechnung
+follow in the next releases of M3, as the [roadmap](../../ROADMAP.md) lists;
+until then, `valid` means valid against the schema and the core rules.
 
 To get the content of the invoice as well, in the semantic model of
 EN 16931, send it to `read` instead: see
@@ -113,9 +114,9 @@ A finding looks like this:
 | `severity` | `fatal`: the invoice breaks a rule and is `invalid`. `warning`: worth knowing, the invoice is processed as it is. `information`: a note on the check itself |
 | `rule` | The identifier of the rule that found it |
 | `message` | An English description of the module's own; it may change between releases, so match on `rule`, not on the message |
-| `location` | Where in the document it was found, as an XPath with the prefixes the document uses and the position of each element among its namesakes, such as `/Invoice/cac:InvoiceLine[2]/cbc:InvoicedQuantity[1]`; an attribute ends in `/@name`. `null` when the finding concerns the document as a whole |
-| `path` | Where in the invoice that [`read`](reading-an-invoice.md) returns the finding lies, as a JSON path; `null` when the rule does not know. No rule sets it yet |
-| `businessTerm` | The business term of EN 16931 it concerns, such as `BT-1`; `null` when the rule does not know. No rule sets it yet |
+| `location` | Where in the document it was found, as an XPath with the prefixes the document uses and the position of each element among its namesakes, such as `/Invoice/cac:InvoiceLine[2]/cbc:InvoicedQuantity[1]`; an attribute ends in `/@name`. `null` when the finding concerns the document as a whole, and for a business rule, which sets `path` instead |
+| `path` | Where in the invoice that [`read`](reading-an-invoice.md) returns the finding lies, as a JSON path, such as `$.lines[0].item.name`; `null` when the rule does not know. Set by the business rules |
+| `businessTerm` | The business term or group of EN 16931 it concerns, such as `BT-1`; `null` when the rule does not know. Set by the business rules |
 
 For a PDF, `location` is in the invoice the PDF carries. In .NET, a finding
 is `ValidationFinding`.
@@ -135,6 +136,36 @@ configuration for XRechnung ships them, embedded in the module unchanged.
 A `xsi:schemaLocation` in the document is ignored. A UBL extension
 (`ext:UBLExtensions`) is checked only as far as the UBL schemas declare its
 content.
+
+### Business rules
+
+An invoice that fits its schema is checked against the business rules of
+its rule set; one that does not is not, as the KoSIT validator does it,
+since the rules build on what the schema guarantees. A broken rule is a
+finding with the official rule identifier, such as `BR-25`:
+
+```json
+{
+  "severity": "fatal",
+  "rule": "BR-25",
+  "message": "The invoice line carries no item name (BT-153).",
+  "location": null,
+  "path": "$.lines[0].item.name",
+  "businessTerm": "BT-153"
+}
+```
+
+A rule that applies to each line, allowance or VAT breakdown gets one
+finding per place it is broken, its `path` with the position, such as
+`$.lines[1].item.name`. Where an element of the document has no place of
+its own in the invoice `read` returns, such as the second payment means of
+a UBL invoice, `path` names the nearest one that does.
+
+The rules are those of the EN 16931 validation artefacts, for UBL and CII
+as they test each syntax: where the two test a rule differently, the
+module follows each, and BR-51 is a `warning` in UBL and `fatal` in CII.
+Every rule, its business term, its severity and its message are listed on
+the module's [rules page](../reference/modules/e-invoicing/rules.md).
 
 ## Rejected documents
 

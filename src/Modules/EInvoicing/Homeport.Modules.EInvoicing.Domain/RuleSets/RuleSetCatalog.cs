@@ -90,6 +90,11 @@ public sealed class RuleSetCatalog
     public bool TryGetNotAnEInvoice(string customizationId, [NotNullWhen(true)] out NotAnEInvoiceSpecification? specification) =>
         notAnEInvoice.TryGetValue(customizationId, out specification);
 
+    /// <summary>The rule set a name in the embedded data stands for, such as <c>xrechnung-extension</c>, if it names one.</summary>
+    /// <param name="name">The name, compared exactly.</param>
+    /// <param name="ruleSet">The rule set, when the name names one.</param>
+    internal static bool TryParseRuleSet(string name, out RuleSet ruleSet) => RuleSetNames.TryGetValue(name, out ruleSet);
+
     /// <summary>The rule set a name in <c>rule-sets.json</c> stands for.</summary>
     private static RuleSet RuleSetNamed(string name) => RuleSetNames.TryGetValue(name, out var ruleSet)
         ? ruleSet

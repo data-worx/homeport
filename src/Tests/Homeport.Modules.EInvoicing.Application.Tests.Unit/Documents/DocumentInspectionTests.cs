@@ -4,6 +4,7 @@ using System.Text;
 using Homeport.Modules.EInvoicing.Application.Documents;
 using Homeport.Modules.EInvoicing.Domain.Documents;
 using Homeport.Modules.EInvoicing.Domain.Findings;
+using Homeport.Modules.EInvoicing.Domain.Rules;
 using Homeport.Modules.EInvoicing.Domain.RuleSets;
 using Homeport.Modules.EInvoicing.Domain.Schemas;
 using Homeport.Shared.Contracts;
@@ -28,7 +29,7 @@ public sealed class DocumentInspectionTests
 
         private const string Zugferd1 = """<rsm:CrossIndustryDocument xmlns:rsm="urn:ferd:CrossIndustryDocument:invoice:1p0" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:12"><rsm:SpecifiedExchangedDocumentContext><ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:ferd:CrossIndustryDocument:invoice:1p0:comfort</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter></rsm:SpecifiedExchangedDocumentContext></rsm:CrossIndustryDocument>""";
 
-        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded(), SchemaCatalog.LoadEmbedded());
+        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded(), SchemaCatalog.LoadEmbedded(), RuleCatalog.LoadEmbedded());
 
         [Theory]
         [InlineData(En16931, RuleSet.En16931, "2017")]
@@ -192,7 +193,7 @@ public sealed class DocumentInspectionTests
         [Fact]
         public async Task Returns_Invalid_With_A_Fatal_Finding_For_An_E_Invoice_That_Breaks_Its_Schema()
         {
-            var broken = Cii(XRechnung30, "20261123").Replace("<ram:ApplicableHeaderTradeSettlement/>", string.Empty, StringComparison.Ordinal);
+            var broken = Cii(XRechnung30, "20261123").Replace("<ram:ApplicableHeaderTradeDelivery/>", string.Empty, StringComparison.Ordinal);
 
             var inspected = await Inspect(broken, DocumentContainer.Xml);
 
@@ -204,7 +205,7 @@ public sealed class DocumentInspectionTests
         [Fact]
         public async Task Validates_The_Invoice_A_Pdf_Carries()
         {
-            var broken = Cii(XRechnung30, "20261123").Replace("<ram:ApplicableHeaderTradeSettlement/>", string.Empty, StringComparison.Ordinal);
+            var broken = Cii(XRechnung30, "20261123").Replace("<ram:ApplicableHeaderTradeDelivery/>", string.Empty, StringComparison.Ordinal);
 
             var inspected = await Inspect(HybridPdf.Carrying("factur-x.xml", broken), DocumentContainer.Pdf);
 
@@ -214,7 +215,7 @@ public sealed class DocumentInspectionTests
         [Fact]
         public async Task Does_Not_Validate_A_Document_That_Is_No_E_Invoice()
         {
-            var broken = Cii(Minimum, "20261123").Replace("<ram:ApplicableHeaderTradeSettlement/>", string.Empty, StringComparison.Ordinal);
+            var broken = Cii(Minimum, "20261123").Replace("<ram:ApplicableHeaderTradeDelivery/>", string.Empty, StringComparison.Ordinal);
 
             var inspected = await Inspect(broken, DocumentContainer.Xml);
 
@@ -380,7 +381,7 @@ public sealed class DocumentInspectionTests
 
         private const string Zugferd1 = """<rsm:CrossIndustryDocument xmlns:rsm="urn:ferd:CrossIndustryDocument:invoice:1p0"/>""";
 
-        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded(), SchemaCatalog.LoadEmbedded());
+        private readonly DocumentInspection inspection = new(RuleSetCatalog.LoadEmbedded(), SchemaCatalog.LoadEmbedded(), RuleCatalog.LoadEmbedded());
 
         [Theory]
         [InlineData(SampleInvoices.MaximalUbl)]

@@ -2,7 +2,7 @@
 # The gates that must be green before a commit. Project-owned: devkit-sync
 # never overwrites this file, so adjust the commands to fit the repository.
 #
-# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|standards|scripts|design|all]
+# Usage:  bash .devkit/gates.sh [build|test|format|notices|compose|standards|rules|scripts|design|all]
 #         (no argument means all)
 set -uo pipefail
 
@@ -136,11 +136,31 @@ gate_standards() {
   return "${rc}"
 }
 
+# Regenerates the rules page of every module from its rules.json into a
+# temporary directory and compares it with the committed one, the way the
+# standards gate does. To update the committed pages after a change to a
+# rules.json:
+#   bash .github/scripts/render-rules.sh
+gate_rules() {
+  local generated page rc=0
+  generated="$(mktemp -d)"
+  bash .github/scripts/render-rules.sh . "${generated}" > "${generated}/pages" || rc=1
+  while IFS= read -r page; do
+    [ -n "${page}" ] || continue
+    diff -u "${page}" "${generated}/${page}" || rc=1
+  done < "${generated}/pages"
+  rm -rf "${generated}"
+  return "${rc}"
+}
+
 # The tests of the scripts in .github/scripts/, against throwaway fixtures:
 # the release scripts run only on a tag and standards-watch.sh only on its
 # schedule, so they are tested before then.
 gate_scripts() {
-  bash .github/scripts/test-release-scripts.sh \n    && bash .github/scripts/test-standards-watch.sh \n    && bash .github/scripts/test-render-standards.sh
+  bash .github/scripts/test-release-scripts.sh \
+    && bash .github/scripts/test-standards-watch.sh \
+    && bash .github/scripts/test-render-standards.sh \
+    && bash .github/scripts/test-render-rules.sh
 }
 
 # Rebuilds the design kit and fails when that changes a file under design/:
@@ -151,9 +171,7 @@ gate_scripts() {
 design_state() {
   local paths
   paths="$(git ls-files -co --exclude-standard -- design/)"
-  paste -d ' ' <(printf '%s
-' "${paths}" | git hash-object --stdin-paths) <(printf '%s
-' "${paths}")
+  paste -d ' ' <(printf '%s\n' "${paths}" | git hash-object --stdin-paths) <(printf '%s\n' "${paths}")
 }
 gate_design() {
   local before after
@@ -163,9 +181,7 @@ gate_design() {
   after="$(design_state)"
   [ "${before}" = "${after}" ] && return 0
   echo "node design/tools/build-kit.mjs changed these files:"
-  diff <(printf '%s
-' "${before}") <(printf '%s
-' "${after}") | sed -n 's/^[<>] [0-9a-f]* /  /p' | sort -u
+  diff <(printf '%s\n' "${before}") <(printf '%s\n' "${after}") | sed -n 's/^[<>] [0-9a-f]* /  /p' | sort -u
   return 1
 }
 
@@ -178,6 +194,7 @@ gate_expectation() {
     notices) echo "THIRD-PARTY-NOTICES.md matches what the shipped projects publish" ;;
     compose) echo "deploy/compose/ matches what the AppHost publishes" ;;
     standards) echo "docs/reference/modules/ matches what render-standards.sh generates" ;;
+    rules)   echo "docs/reference/modules/ matches what render-rules.sh generates" ;;
     scripts) echo "every test of the scripts in .github/scripts/ passes" ;;
     design)  echo "design/ matches what design/tools/build-kit.mjs generates" ;;
   esac
@@ -185,7 +202,7 @@ gate_expectation() {
 
 # --- runner, do not edit below unless you know why ---------------------------
 
-GATES="build test format notices compose standards scripts design"
+GATES="build test format notices compose standards rules scripts design"
 
 # A gate returns 77 when it does not apply to this repository; its last line of
 # output says why. A passing gate prints PASS, a skipped one SKIP and the
