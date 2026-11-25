@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Homeport.Modules.EInvoicing.Application.Documents;
+using Homeport.Modules.EInvoicing.Domain.Rules;
 using Homeport.Modules.EInvoicing.Domain.RuleSets;
 using Homeport.Modules.EInvoicing.Domain.Schemas;
 using Homeport.Sdk;
@@ -30,6 +31,7 @@ public sealed class Program
         builder.Services.AddControllers();
         builder.Services.AddSingleton(RuleSetCatalog.LoadEmbedded());
         builder.Services.AddSingleton(SchemaCatalog.LoadEmbedded());
+        builder.Services.AddSingleton(RuleCatalog.LoadEmbedded());
         builder.Services.AddSingleton<DocumentInspection>();
 
         var app = builder.Build();

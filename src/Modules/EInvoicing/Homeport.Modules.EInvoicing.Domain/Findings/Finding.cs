@@ -8,7 +8,8 @@ namespace Homeport.Modules.EInvoicing.Domain.Findings;
 /// <param name="Message">An English description of what was found.</param>
 /// <param name="Location">
 /// Where in the document it was found, as an XPath with the prefixes the
-/// document uses; none when it concerns the document as a whole.
+/// document uses; none when it concerns the document as a whole, or for a
+/// business rule, which names the place in the semantic model instead.
 /// </param>
 /// <param name="Path">Where in the semantic model it was found, as a JSON path; none when the rule does not know.</param>
 /// <param name="BusinessTerm">The business term of EN 16931 it concerns, such as <c>BT-1</c>; none when the rule does not know.</param>

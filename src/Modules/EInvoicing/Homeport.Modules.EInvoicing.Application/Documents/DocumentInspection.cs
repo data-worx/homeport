@@ -6,6 +6,7 @@ using Homeport.Modules.EInvoicing.Domain.Documents;
 using Homeport.Modules.EInvoicing.Domain.Findings;
 using Homeport.Modules.EInvoicing.Domain.Model;
 using Homeport.Modules.EInvoicing.Domain.Reading;
+using Homeport.Modules.EInvoicing.Domain.Rules;
 using Homeport.Modules.EInvoicing.Domain.RuleSets;
 using Homeport.Modules.EInvoicing.Domain.Schemas;
 using Homeport.Shared.Contracts;
@@ -18,7 +19,8 @@ namespace Homeport.Modules.EInvoicing.Application.Documents;
 /// </summary>
 /// <param name="catalog">The rule sets the module knows.</param>
 /// <param name="schemas">The XML schemas of the syntaxes.</param>
-public sealed class DocumentInspection(RuleSetCatalog catalog, SchemaCatalog schemas)
+/// <param name="rules">The business rules.</param>
+public sealed class DocumentInspection(RuleSetCatalog catalog, SchemaCatalog schemas, RuleCatalog rules)
 {
     // A DTD is refused rather than ignored: no invoice syntax uses one, and
     // processing it opens the door to entity expansion and external entities.
@@ -39,8 +41,9 @@ public sealed class DocumentInspection(RuleSetCatalog catalog, SchemaCatalog sch
     /// An XML document is read to its end, so one that is not well-formed is
     /// refused even when its root element names a known syntax. A PDF is read
     /// for the invoice it carries, which is then inspected like an XML document.
-    /// An e-invoice is validated against the XML schema of its syntax and gets
-    /// the verdict <see cref="Verdict.Invalid"/> with a fatal finding,
+    /// An e-invoice is validated against the XML schema of its syntax and,
+    /// when it fits the schema, against the business rules of the rule set
+    /// it claims; it gets the verdict <see cref="Verdict.Invalid"/> with a fatal finding,
     /// <see cref="Verdict.Valid"/> without; a document that is no e-invoice
     /// is not validated.
     /// </remarks>
@@ -85,7 +88,7 @@ public sealed class DocumentInspection(RuleSetCatalog catalog, SchemaCatalog sch
             return Result<ReadDocument>.Success(new ReadDocument(inspected, Invoice: null));
         }
 
-        var invoice = InvoiceReader.Read(loaded.Value.Root, syntax);
+        var invoice = loaded.Value.Invoice ?? InvoiceReader.Read(loaded.Value.Root, syntax);
         if (inspected.Match is { } match && RuleSetRules.CheckExtension(match) is { } ignored)
         {
             inspected = inspected with { Findings = [.. inspected.Findings, ignored] };
@@ -183,17 +186,31 @@ public sealed class DocumentInspection(RuleSetCatalog catalog, SchemaCatalog sch
                 root));
         }
 
-        IReadOnlyList<Finding> findings = [.. match.Value.Findings, .. SchemaRules.Validate(root, schemas)];
+        var schemaFindings = SchemaRules.Validate(root, schemas);
+        Invoice? invoice = null;
+        IReadOnlyList<Finding> ruleFindings = [];
+
+        // The business rules assume what the schema guarantees, so they are
+        // checked only on an invoice that fits it, as the KoSIT validator does.
+        if (VerdictRules.VerdictOf(schemaFindings) == Verdict.Valid && match.Value.RuleSet is { } version)
+        {
+            invoice = InvoiceReader.Read(root, syntax.Value);
+            ruleFindings = InvoiceRules.Validate(new RuleInput(invoice, root, syntax.Value), version.RuleSet, rules);
+        }
+
+        IReadOnlyList<Finding> findings = [.. match.Value.Findings, .. schemaFindings, .. ruleFindings];
 
         return Result<LoadedDocument>.Success(new LoadedDocument(
             new InspectedDocument(container, syntax.Value, match.Value, VerdictRules.VerdictOf(findings), findings),
-            root));
+            root,
+            invoice));
     }
 
     /// <summary>A document as far as it was inspected, with the root element of its invoice.</summary>
     /// <param name="Document">What the inspection found.</param>
     /// <param name="Root">The root element of the invoice.</param>
-    private sealed record LoadedDocument(InspectedDocument Document, XElement Root);
+    /// <param name="Invoice">The invoice in the semantic model, when the business rules read it; none when they did not.</param>
+    private sealed record LoadedDocument(InspectedDocument Document, XElement Root, Invoice? Invoice = null);
 }
 
 /// <summary>A document as far as <see cref="DocumentInspection"/> has read it.</summary>
