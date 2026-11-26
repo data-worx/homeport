@@ -13,9 +13,6 @@ internal static class NotYetImplementedRules
 {
     internal static readonly IReadOnlySet<string> All = new HashSet<string>(StringComparer.Ordinal)
     {
-        // #277 — BR-CO
-        "BR-CO-16",
-
         // #278 — BR-CL
         "BR-CL-10",
         "BR-CL-13",

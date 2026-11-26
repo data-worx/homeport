@@ -11,6 +11,7 @@
     <EmbeddedResource Include="RuleSets\rule-sets.json" LogicalName="Homeport.Modules.EInvoicing.Domain.RuleSets.rule-sets.json" />
     <EmbeddedResource Include="Model\business-terms.json" LogicalName="Homeport.Modules.EInvoicing.Domain.Model.business-terms.json" />
     <EmbeddedResource Include="Rules\rules.json" LogicalName="Homeport.Modules.EInvoicing.Domain.Rules.rules.json" />
+    <EmbeddedResource Include="Rules\vat-identifier-prefixes.json" LogicalName="Homeport.Modules.EInvoicing.Domain.Rules.vat-identifier-prefixes.json" />
     <!-- The XML schemas of UBL 2.1 and CII D16B, unchanged as KoSIT ships them;
          named by their path below Schemas/, with / on every platform, so their
          relative imports resolve among the embedded files. -->

@@ -32,6 +32,12 @@ public sealed class InvoiceRulesTests
                     Catalog)).Severity);
 
         [Fact]
+        public void Weighs_A_Finding_As_The_Rule_Set_Of_The_Invoice_Asks() =>
+            Assert.Equal(
+                FindingSeverity.Information,
+                Assert.Single(InvoiceRules.Validate(RuleDocuments.Ubl().Set("LegalMonetaryTotal/PayableAmount", "0.50").Input(), RuleSet.XRechnungExtension, Catalog)).Severity);
+
+        [Fact]
         public void Checks_Only_The_Rules_Of_The_Rule_Set()
         {
             var catalog = new RuleCatalog([Catalog.Rules.Single(rule => rule.Id == "BR-02") with { RuleSets = new HashSet<RuleSet> { RuleSet.XRechnung } }]);

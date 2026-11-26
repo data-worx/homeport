@@ -412,7 +412,7 @@ public sealed class DocumentInspectionTests
         [Fact]
         public async Task Validates_The_Invoice_It_Reads()
         {
-            var read = await Read(Encoding.UTF8.GetBytes(SampleInvoices.Text(SampleInvoices.MaximalCii)), DocumentContainer.Xml);
+            var read = await Read(Encoding.UTF8.GetBytes(MinimalInvoices.Cii(XRechnung30, "20261125")), DocumentContainer.Xml);
 
             Assert.Equal(Verdict.Valid, read.Value.Report.Verdict);
         }
@@ -428,10 +428,7 @@ public sealed class DocumentInspectionTests
         [Fact]
         public async Task Warns_That_The_Extension_Of_An_Extended_Invoice_Was_Ignored()
         {
-            var extension = SampleInvoices.Text(SampleInvoices.MaximalUbl).Replace(
-                $"<cbc:CustomizationID>{XRechnung30}</cbc:CustomizationID>",
-                $"<cbc:CustomizationID>{XRechnung30}#conformant#urn:xeinkauf.de:kosit:extension:xrechnung_3.0</cbc:CustomizationID>",
-                StringComparison.Ordinal);
+            var extension = MinimalInvoices.Ubl($"{XRechnung30}#conformant#urn:xeinkauf.de:kosit:extension:xrechnung_3.0", "2026-11-25");
 
             var read = await Read(Encoding.UTF8.GetBytes(extension), DocumentContainer.Xml);
 

@@ -33,7 +33,7 @@ public sealed class ReadingControllerTests
         [Fact]
         public async Task Reports_The_Verdict_Of_The_Invoice_It_Read()
         {
-            var response = await PostAsync(SampleInvoices.Text(SampleInvoices.MaximalCii), "application/xml");
+            var response = await PostAsync(MinimalInvoices.Cii("urn:cen.eu:en16931:2017", "20261125"), "application/xml");
 
             Assert.Equal("valid", (await RootOf(response)).GetProperty("report").GetProperty("verdict").GetString());
         }

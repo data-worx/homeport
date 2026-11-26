@@ -54,6 +54,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   what the KoSIT validator reports for UBL and CII alike. The rules are
   listed on the module's
   [rules page](docs/reference/modules/e-invoicing/rules.md).
+- The e-invoicing module also checks the 23 calculation rules (BR-CO) and
+  the 21 decimal rules (BR-DEC) of EN 16931: the document totals, the VAT
+  breakdown and the VAT amounts must add up as the standard computes them,
+  a seller must be identified, a VAT identifier must start with a country
+  prefix, and an amount may carry at most two decimals. Four BR-CO rules no
+  machine can check are listed and never reported. See the
+  [rules page](docs/reference/modules/e-invoicing/rules.md).
 
 ### Changed
 

@@ -27,8 +27,15 @@ public sealed record RuleDefinition(
     string Message,
     IReadOnlySet<RuleSet> RuleSets)
 {
-    /// <summary>How much a finding of the rule weighs in an invoice written in <paramref name="syntax"/>.</summary>
+    /// <summary>How much the rule weighs under a rule set whose validator configuration weighs it otherwise; none where none does.</summary>
+    public IReadOnlyList<SeverityOverride> Overrides { get; init; } = [];
+
+    /// <summary>How much a finding of the rule weighs in an invoice written in <paramref name="syntax"/> and checked under <paramref name="ruleSet"/>.</summary>
+    /// <remarks>An override of the rule set wins over the severity of the syntax, which wins over the rule's own.</remarks>
     /// <param name="syntax">The syntax of the invoice.</param>
-    public FindingSeverity SeverityIn(InvoiceSyntax syntax) =>
-        (syntax == InvoiceSyntax.Cii ? SeverityInCii : SeverityInUbl) ?? Severity;
+    /// <param name="ruleSet">The rule set the invoice is checked under.</param>
+    public FindingSeverity SeverityIn(InvoiceSyntax syntax, RuleSet ruleSet) =>
+        Overrides.FirstOrDefault(entry => entry.AppliesTo(syntax, ruleSet))?.Severity
+        ?? (syntax == InvoiceSyntax.Cii ? SeverityInCii : SeverityInUbl)
+        ?? Severity;
 }

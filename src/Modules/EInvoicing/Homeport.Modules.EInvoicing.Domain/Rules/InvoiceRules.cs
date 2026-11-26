@@ -9,14 +9,15 @@ namespace Homeport.Modules.EInvoicing.Domain.Rules;
 public static class InvoiceRules
 {
     /// <summary>Every rule the module implements, by its identifier: it returns the JSON path of every place it is broken.</summary>
-    public static IReadOnlyDictionary<string, Func<RuleInput, IEnumerable<string>>> Implementations { get; } = CoreRules.All;
+    public static IReadOnlyDictionary<string, Func<RuleInput, IEnumerable<string>>> Implementations { get; } =
+        CoreRules.All.Concat(CalculationRules.All).Concat(DecimalRules.All).ToDictionary(StringComparer.Ordinal);
 
     /// <summary>The findings of <paramref name="input"/> against every rule of <paramref name="catalog"/> its rule set is checked against.</summary>
     /// <remarks>
     /// Only an invoice that fits its XML schema is checked, as the KoSIT
     /// validator does: the rules assume the structure and the data types the
     /// schema guarantees. A finding carries the rule's message, its severity
-    /// in the syntax of the invoice and the JSON path of the place in the
+    /// in the syntax and rule set of the invoice and the JSON path of the place in the
     /// semantic model; the location in the document is left out.
     /// </remarks>
     /// <param name="input">The invoice and the document it was read from.</param>
@@ -35,7 +36,7 @@ public static class InvoiceRules
                 ?? throw new InvalidOperationException($"The rule catalog lists the rule '{rule.Id}', which the module does not implement.");
 
             findings.AddRange(check(input).Select(path => new Finding(
-                rule.SeverityIn(input.Syntax),
+                rule.SeverityIn(input.Syntax, ruleSet),
                 rule.Id,
                 rule.Message,
                 Location: null,

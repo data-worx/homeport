@@ -109,28 +109,15 @@ public static partial class CoreRules
 
     /// <summary>BR-29: the invoicing period ends on or after its start (BT-73, BT-74).</summary>
     /// <remarks>
-    /// Checked in the document. UBL matches every <c>cac:InvoicePeriod</c>,
-    /// a line's included, and compares the dates as xs:date; CII matches the
-    /// period of the header and compares the values in format 102 as text,
-    /// so a date in another format breaks the rule.
+    /// Checked in the document, on the periods <see cref="RuleContexts"/>
+    /// names. UBL compares the dates as xs:date; CII compares the values in
+    /// format 102 as text, so a date in another format breaks the rule.
     /// </remarks>
     /// <param name="input">The invoice.</param>
-    public static IEnumerable<string> Br29(RuleInput input)
-    {
-        ArgumentNullException.ThrowIfNull(input);
-
-        if (input.IsCii)
-        {
-            var period = input.Root.Element(Rsm + "SupplyChainTradeTransaction")?.Element(Ram + "ApplicableHeaderTradeSettlement")
-                ?.Elements(Ram + "BillingSpecifiedPeriod") ?? [];
-
-            return period.Where(IsCiiPeriodBroken).Select(_ => "$.invoicingPeriod");
-        }
-
-        return input.Root.Descendants(Cac + "InvoicePeriod")
-            .Where(IsUblPeriodBroken)
-            .Select(period => input.LinePathOf(period) is var line && line == RulePaths.Invoice ? "$.invoicingPeriod" : $"{line}.period");
-    }
+    public static IEnumerable<string> Br29(RuleInput input) =>
+        RuleContexts.InvoicingPeriods(input)
+            .Where(context => input.IsCii ? IsCiiPeriodBroken(context.Element) : IsUblPeriodBroken(context.Element))
+            .Select(context => context.Path);
 
     /// <summary>BR-53: a VAT accounting currency code (BT-6) comes with the total VAT amount in that currency (BT-111).</summary>
     /// <remarks>
