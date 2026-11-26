@@ -33,7 +33,8 @@ cat > "${catalog}" <<'EOF'
       "ruleSets": ["one", "two"],
       "rules": [
         { "id": "R-01", "businessTerm": "BT-1", "severity": "fatal", "message": "The first rule." },
-        { "id": "R-02", "severity": "fatal", "severityInUbl": "warning", "message": "The second rule." }
+        { "id": "R-02", "severity": "fatal", "severityInUbl": "warning", "message": "The second rule." },
+        { "id": "R-03", "severity": "fatal", "message": "The third rule.", "overrides": [{ "ruleSet": "two", "syntax": "cii", "severity": "information", "reason": "Two says so." }] }
       ]
     }
   ]
@@ -55,6 +56,10 @@ check "a rule is a row with its business term" \
   'grep -q -x -F "| R-01 | BT-1 | fatal | The first rule. |" "${page}"'
 check "a rule without a business term shows a dash and its severity in a syntax" \
   'grep -q -x -F "| R-02 | — | fatal, in UBL warning | The second rule. |" "${page}"'
+check "a rule weighed otherwise under a rule set shows it in its severity" \
+  'grep -q -x -F "| R-03 | — | fatal, under \`two\` in \`cii\` information | The third rule. |" "${page}"'
+check "the reason of an override follows the table" \
+  'grep -q -x -F -e "- R-03 under \`two\` in \`cii\`: Two says so." "${page}"'
 check "the page has no carriage return" '! grep -q $'"'"'\r'"'"' "${page}"'
 
 sed -i 's/"moduleId": "sample",//' "${catalog}"

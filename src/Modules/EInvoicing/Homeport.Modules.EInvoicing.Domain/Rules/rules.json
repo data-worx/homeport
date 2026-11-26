@@ -65,6 +65,69 @@
         { "id": "BR-64", "businessTerm": "BT-157", "severity": "fatal", "message": "The item standard identifier (BT-157) names no scheme." },
         { "id": "BR-65", "businessTerm": "BT-158", "severity": "fatal", "message": "The item classification identifier (BT-158) names no scheme." }
       ]
+    },
+    {
+      "name": "EN 16931 calculation rules",
+      "standard": "EN 16931 validation artefacts",
+      "ruleSets": ["en16931", "xrechnung", "xrechnung-extension", "factur-x-basic", "factur-x-extended"],
+      "rules": [
+        { "id": "BR-CO-03", "businessTerm": "BT-7", "severity": "fatal", "message": "The invoice carries both a VAT point date (BT-7) and a VAT point date code (BT-8); it may carry only one of them." },
+        { "id": "BR-CO-04", "businessTerm": "BT-151", "severity": "fatal", "message": "The invoice line carries no VAT category code of the invoiced item (BT-151)." },
+        { "id": "BR-CO-05", "businessTerm": "BT-98", "severity": "fatal", "message": "The reason code (BT-98) and the reason (BT-97) of a document level allowance must describe the same allowance. The module cannot check this and never reports it." },
+        { "id": "BR-CO-06", "businessTerm": "BT-105", "severity": "fatal", "message": "The reason code (BT-105) and the reason (BT-104) of a document level charge must describe the same charge. The module cannot check this and never reports it." },
+        { "id": "BR-CO-07", "businessTerm": "BT-140", "severity": "fatal", "message": "The reason code (BT-140) and the reason (BT-139) of an invoice line allowance must describe the same allowance. The module cannot check this and never reports it." },
+        { "id": "BR-CO-08", "businessTerm": "BT-145", "severity": "fatal", "message": "The reason code (BT-145) and the reason (BT-144) of an invoice line charge must describe the same charge. The module cannot check this and never reports it." },
+        { "id": "BR-CO-09", "businessTerm": "BT-31", "severity": "fatal", "message": "The VAT identifier (BT-31, BT-48 or BT-63) does not start with a known country prefix." },
+        { "id": "BR-CO-10", "businessTerm": "BT-106", "severity": "fatal", "message": "The sum of invoice line net amounts (BT-106) is not the sum of the invoice line net amounts (BT-131)." },
+        { "id": "BR-CO-11", "businessTerm": "BT-107", "severity": "fatal", "message": "The sum of allowances on document level (BT-107) is not the sum of the document level allowance amounts (BT-92), or is given without any allowance." },
+        { "id": "BR-CO-12", "businessTerm": "BT-108", "severity": "fatal", "message": "The sum of charges on document level (BT-108) is not the sum of the document level charge amounts (BT-99), or is given without any charge." },
+        { "id": "BR-CO-13", "businessTerm": "BT-109", "severity": "fatal", "message": "The invoice total amount without VAT (BT-109) is not the sum of invoice line net amounts (BT-106) minus the sum of allowances (BT-107) plus the sum of charges (BT-108)." },
+        { "id": "BR-CO-14", "businessTerm": "BT-110", "severity": "fatal", "message": "The invoice total VAT amount (BT-110) is not the sum of the VAT category tax amounts (BT-117)." },
+        { "id": "BR-CO-15", "businessTerm": "BT-112", "severity": "fatal", "message": "The invoice total amount with VAT (BT-112) is not the invoice total amount without VAT (BT-109) plus the invoice total VAT amount (BT-110)." },
+        {
+          "id": "BR-CO-16", "businessTerm": "BT-115", "severity": "fatal", "message": "The amount due for payment (BT-115) is not the invoice total amount with VAT (BT-112) minus the paid amount (BT-113) plus the rounding amount (BT-114).",
+          "overrides": [
+            { "ruleSet": "xrechnung-extension", "syntax": "ubl-invoice", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as a third party payment (BR-DEX-09) changes the amount due." }
+          ]
+        },
+        { "id": "BR-CO-17", "businessTerm": "BT-117", "severity": "fatal", "message": "The VAT category tax amount (BT-117) differs from the VAT category taxable amount (BT-116) times the VAT category rate (BT-119) by one unit or more." },
+        { "id": "BR-CO-18", "businessTerm": "BG-23", "severity": "fatal", "message": "The invoice carries no VAT breakdown (BG-23)." },
+        { "id": "BR-CO-19", "businessTerm": "BG-14", "severity": "fatal", "message": "The invoicing period (BG-14) carries neither a start date (BT-73) nor an end date (BT-74)." },
+        { "id": "BR-CO-20", "businessTerm": "BG-26", "severity": "fatal", "message": "The invoice line period (BG-26) carries neither a start date (BT-134) nor an end date (BT-135)." },
+        { "id": "BR-CO-21", "businessTerm": "BT-97", "severity": "fatal", "message": "The document level allowance carries neither a reason (BT-97) nor a reason code (BT-98)." },
+        { "id": "BR-CO-22", "businessTerm": "BT-104", "severity": "fatal", "message": "The document level charge carries neither a reason (BT-104) nor a reason code (BT-105)." },
+        { "id": "BR-CO-23", "businessTerm": "BT-139", "severity": "fatal", "message": "The invoice line allowance carries neither a reason (BT-139) nor a reason code (BT-140)." },
+        { "id": "BR-CO-24", "businessTerm": "BT-144", "severity": "fatal", "message": "The invoice line charge carries neither a reason (BT-144) nor a reason code (BT-145)." },
+        { "id": "BR-CO-26", "businessTerm": "BG-4", "severity": "fatal", "message": "The seller (BG-4) carries neither a seller identifier (BT-29), a legal registration identifier (BT-30) nor a VAT identifier (BT-31)." }
+      ]
+    },
+    {
+      "name": "EN 16931 decimal rules",
+      "standard": "EN 16931 validation artefacts",
+      "ruleSets": ["en16931", "xrechnung", "xrechnung-extension", "factur-x-basic", "factur-x-extended"],
+      "rules": [
+        { "id": "BR-DEC-01", "businessTerm": "BT-92", "severity": "fatal", "message": "The document level allowance amount (BT-92) carries more than two decimals." },
+        { "id": "BR-DEC-02", "businessTerm": "BT-93", "severity": "fatal", "message": "The document level allowance base amount (BT-93) carries more than two decimals." },
+        { "id": "BR-DEC-05", "businessTerm": "BT-99", "severity": "fatal", "message": "The document level charge amount (BT-99) carries more than two decimals." },
+        { "id": "BR-DEC-06", "businessTerm": "BT-100", "severity": "fatal", "message": "The document level charge base amount (BT-100) carries more than two decimals." },
+        { "id": "BR-DEC-09", "businessTerm": "BT-106", "severity": "fatal", "message": "The sum of invoice line net amounts (BT-106) carries more than two decimals." },
+        { "id": "BR-DEC-10", "businessTerm": "BT-107", "severity": "fatal", "message": "The sum of allowances on document level (BT-107) carries more than two decimals." },
+        { "id": "BR-DEC-11", "businessTerm": "BT-108", "severity": "fatal", "message": "The sum of charges on document level (BT-108) carries more than two decimals." },
+        { "id": "BR-DEC-12", "businessTerm": "BT-109", "severity": "fatal", "message": "The invoice total amount without VAT (BT-109) carries more than two decimals." },
+        { "id": "BR-DEC-13", "businessTerm": "BT-110", "severity": "fatal", "message": "The invoice total VAT amount (BT-110) carries more than two decimals." },
+        { "id": "BR-DEC-14", "businessTerm": "BT-112", "severity": "fatal", "message": "The invoice total amount with VAT (BT-112) carries more than two decimals." },
+        { "id": "BR-DEC-15", "businessTerm": "BT-111", "severity": "fatal", "message": "The invoice total VAT amount in accounting currency (BT-111) carries more than two decimals." },
+        { "id": "BR-DEC-16", "businessTerm": "BT-113", "severity": "fatal", "message": "The paid amount (BT-113) carries more than two decimals." },
+        { "id": "BR-DEC-17", "businessTerm": "BT-114", "severity": "fatal", "message": "The rounding amount (BT-114) carries more than two decimals." },
+        { "id": "BR-DEC-18", "businessTerm": "BT-115", "severity": "fatal", "message": "The amount due for payment (BT-115) carries more than two decimals." },
+        { "id": "BR-DEC-19", "businessTerm": "BT-116", "severity": "fatal", "message": "The VAT category taxable amount (BT-116) carries more than two decimals." },
+        { "id": "BR-DEC-20", "businessTerm": "BT-117", "severity": "fatal", "message": "The VAT category tax amount (BT-117) carries more than two decimals." },
+        { "id": "BR-DEC-23", "businessTerm": "BT-131", "severity": "fatal", "message": "The invoice line net amount (BT-131) carries more than two decimals." },
+        { "id": "BR-DEC-24", "businessTerm": "BT-136", "severity": "fatal", "message": "The invoice line allowance amount (BT-136) carries more than two decimals." },
+        { "id": "BR-DEC-25", "businessTerm": "BT-137", "severity": "fatal", "message": "The invoice line allowance base amount (BT-137) carries more than two decimals." },
+        { "id": "BR-DEC-27", "businessTerm": "BT-141", "severity": "fatal", "message": "The invoice line charge amount (BT-141) carries more than two decimals." },
+        { "id": "BR-DEC-28", "businessTerm": "BT-142", "severity": "fatal", "message": "The invoice line charge base amount (BT-142) carries more than two decimals." }
+      ]
     }
   ]
 }

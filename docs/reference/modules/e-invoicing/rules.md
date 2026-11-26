@@ -74,3 +74,65 @@ Taken from EN 16931 validation artefacts and checked under the rule sets `en1693
 | BR-63 | BT-49 | fatal | The electronic address of the buyer (BT-49) names no scheme. |
 | BR-64 | BT-157 | fatal | The item standard identifier (BT-157) names no scheme. |
 | BR-65 | BT-158 | fatal | The item classification identifier (BT-158) names no scheme. |
+
+## EN 16931 calculation rules
+
+Taken from EN 16931 validation artefacts and checked under the rule sets `en16931`, `xrechnung`, `xrechnung-extension`, `factur-x-basic`, `factur-x-extended`.
+
+| Rule | Business term | Severity | Message |
+|---|---|---|---|
+| BR-CO-03 | BT-7 | fatal | The invoice carries both a VAT point date (BT-7) and a VAT point date code (BT-8); it may carry only one of them. |
+| BR-CO-04 | BT-151 | fatal | The invoice line carries no VAT category code of the invoiced item (BT-151). |
+| BR-CO-05 | BT-98 | fatal | The reason code (BT-98) and the reason (BT-97) of a document level allowance must describe the same allowance. The module cannot check this and never reports it. |
+| BR-CO-06 | BT-105 | fatal | The reason code (BT-105) and the reason (BT-104) of a document level charge must describe the same charge. The module cannot check this and never reports it. |
+| BR-CO-07 | BT-140 | fatal | The reason code (BT-140) and the reason (BT-139) of an invoice line allowance must describe the same allowance. The module cannot check this and never reports it. |
+| BR-CO-08 | BT-145 | fatal | The reason code (BT-145) and the reason (BT-144) of an invoice line charge must describe the same charge. The module cannot check this and never reports it. |
+| BR-CO-09 | BT-31 | fatal | The VAT identifier (BT-31, BT-48 or BT-63) does not start with a known country prefix. |
+| BR-CO-10 | BT-106 | fatal | The sum of invoice line net amounts (BT-106) is not the sum of the invoice line net amounts (BT-131). |
+| BR-CO-11 | BT-107 | fatal | The sum of allowances on document level (BT-107) is not the sum of the document level allowance amounts (BT-92), or is given without any allowance. |
+| BR-CO-12 | BT-108 | fatal | The sum of charges on document level (BT-108) is not the sum of the document level charge amounts (BT-99), or is given without any charge. |
+| BR-CO-13 | BT-109 | fatal | The invoice total amount without VAT (BT-109) is not the sum of invoice line net amounts (BT-106) minus the sum of allowances (BT-107) plus the sum of charges (BT-108). |
+| BR-CO-14 | BT-110 | fatal | The invoice total VAT amount (BT-110) is not the sum of the VAT category tax amounts (BT-117). |
+| BR-CO-15 | BT-112 | fatal | The invoice total amount with VAT (BT-112) is not the invoice total amount without VAT (BT-109) plus the invoice total VAT amount (BT-110). |
+| BR-CO-16 | BT-115 | fatal, under `xrechnung-extension` in `ubl-invoice` information | The amount due for payment (BT-115) is not the invoice total amount with VAT (BT-112) minus the paid amount (BT-113) plus the rounding amount (BT-114). |
+| BR-CO-17 | BT-117 | fatal | The VAT category tax amount (BT-117) differs from the VAT category taxable amount (BT-116) times the VAT category rate (BT-119) by one unit or more. |
+| BR-CO-18 | BG-23 | fatal | The invoice carries no VAT breakdown (BG-23). |
+| BR-CO-19 | BG-14 | fatal | The invoicing period (BG-14) carries neither a start date (BT-73) nor an end date (BT-74). |
+| BR-CO-20 | BG-26 | fatal | The invoice line period (BG-26) carries neither a start date (BT-134) nor an end date (BT-135). |
+| BR-CO-21 | BT-97 | fatal | The document level allowance carries neither a reason (BT-97) nor a reason code (BT-98). |
+| BR-CO-22 | BT-104 | fatal | The document level charge carries neither a reason (BT-104) nor a reason code (BT-105). |
+| BR-CO-23 | BT-139 | fatal | The invoice line allowance carries neither a reason (BT-139) nor a reason code (BT-140). |
+| BR-CO-24 | BT-144 | fatal | The invoice line charge carries neither a reason (BT-144) nor a reason code (BT-145). |
+| BR-CO-26 | BG-4 | fatal | The seller (BG-4) carries neither a seller identifier (BT-29), a legal registration identifier (BT-30) nor a VAT identifier (BT-31). |
+
+A rule set weighs a rule otherwise where its validator configuration does:
+
+- BR-CO-16 under `xrechnung-extension` in `ubl-invoice`: The XRechnung validator configuration weighs it so, as a third party payment (BR-DEX-09) changes the amount due.
+
+## EN 16931 decimal rules
+
+Taken from EN 16931 validation artefacts and checked under the rule sets `en16931`, `xrechnung`, `xrechnung-extension`, `factur-x-basic`, `factur-x-extended`.
+
+| Rule | Business term | Severity | Message |
+|---|---|---|---|
+| BR-DEC-01 | BT-92 | fatal | The document level allowance amount (BT-92) carries more than two decimals. |
+| BR-DEC-02 | BT-93 | fatal | The document level allowance base amount (BT-93) carries more than two decimals. |
+| BR-DEC-05 | BT-99 | fatal | The document level charge amount (BT-99) carries more than two decimals. |
+| BR-DEC-06 | BT-100 | fatal | The document level charge base amount (BT-100) carries more than two decimals. |
+| BR-DEC-09 | BT-106 | fatal | The sum of invoice line net amounts (BT-106) carries more than two decimals. |
+| BR-DEC-10 | BT-107 | fatal | The sum of allowances on document level (BT-107) carries more than two decimals. |
+| BR-DEC-11 | BT-108 | fatal | The sum of charges on document level (BT-108) carries more than two decimals. |
+| BR-DEC-12 | BT-109 | fatal | The invoice total amount without VAT (BT-109) carries more than two decimals. |
+| BR-DEC-13 | BT-110 | fatal | The invoice total VAT amount (BT-110) carries more than two decimals. |
+| BR-DEC-14 | BT-112 | fatal | The invoice total amount with VAT (BT-112) carries more than two decimals. |
+| BR-DEC-15 | BT-111 | fatal | The invoice total VAT amount in accounting currency (BT-111) carries more than two decimals. |
+| BR-DEC-16 | BT-113 | fatal | The paid amount (BT-113) carries more than two decimals. |
+| BR-DEC-17 | BT-114 | fatal | The rounding amount (BT-114) carries more than two decimals. |
+| BR-DEC-18 | BT-115 | fatal | The amount due for payment (BT-115) carries more than two decimals. |
+| BR-DEC-19 | BT-116 | fatal | The VAT category taxable amount (BT-116) carries more than two decimals. |
+| BR-DEC-20 | BT-117 | fatal | The VAT category tax amount (BT-117) carries more than two decimals. |
+| BR-DEC-23 | BT-131 | fatal | The invoice line net amount (BT-131) carries more than two decimals. |
+| BR-DEC-24 | BT-136 | fatal | The invoice line allowance amount (BT-136) carries more than two decimals. |
+| BR-DEC-25 | BT-137 | fatal | The invoice line allowance base amount (BT-137) carries more than two decimals. |
+| BR-DEC-27 | BT-141 | fatal | The invoice line charge amount (BT-141) carries more than two decimals. |
+| BR-DEC-28 | BT-142 | fatal | The invoice line charge base amount (BT-142) carries more than two decimals. |

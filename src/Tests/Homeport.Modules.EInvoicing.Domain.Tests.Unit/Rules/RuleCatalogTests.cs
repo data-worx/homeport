@@ -23,11 +23,35 @@ public sealed class RuleCatalogTests
             "BR-55", "BR-56", "BR-57", "BR-61", "BR-62", "BR-63", "BR-64", "BR-65",
         ];
 
+        // The rule IDs `BR-CO-` of the same artefacts.
+        private static readonly string[] CalculationRuleIds =
+        [
+            "BR-CO-03", "BR-CO-04", "BR-CO-05", "BR-CO-06", "BR-CO-07", "BR-CO-08", "BR-CO-09", "BR-CO-10",
+            "BR-CO-11", "BR-CO-12", "BR-CO-13", "BR-CO-14", "BR-CO-15", "BR-CO-16", "BR-CO-17", "BR-CO-18",
+            "BR-CO-19", "BR-CO-20", "BR-CO-21", "BR-CO-22", "BR-CO-23", "BR-CO-24", "BR-CO-26",
+        ];
+
+        // The rule IDs `BR-DEC-` of the same artefacts.
+        private static readonly string[] DecimalRuleIds =
+        [
+            "BR-DEC-01", "BR-DEC-02", "BR-DEC-05", "BR-DEC-06", "BR-DEC-09", "BR-DEC-10", "BR-DEC-11",
+            "BR-DEC-12", "BR-DEC-13", "BR-DEC-14", "BR-DEC-15", "BR-DEC-16", "BR-DEC-17", "BR-DEC-18",
+            "BR-DEC-19", "BR-DEC-20", "BR-DEC-23", "BR-DEC-24", "BR-DEC-25", "BR-DEC-27", "BR-DEC-28",
+        ];
+
         private static readonly RuleCatalog Catalog = RuleCatalog.LoadEmbedded();
 
         [Fact]
         public void Lists_The_Core_Rules_Of_The_Validation_Artefacts() =>
             Assert.Equal(CoreRuleIds, Catalog.Rules.Where(rule => rule.Group == "EN 16931 core rules").Select(rule => rule.Id));
+
+        [Fact]
+        public void Lists_The_Calculation_Rules_Of_The_Validation_Artefacts() =>
+            Assert.Equal(CalculationRuleIds, Catalog.Rules.Where(rule => rule.Group == "EN 16931 calculation rules").Select(rule => rule.Id));
+
+        [Fact]
+        public void Lists_The_Decimal_Rules_Of_The_Validation_Artefacts() =>
+            Assert.Equal(DecimalRuleIds, Catalog.Rules.Where(rule => rule.Group == "EN 16931 decimal rules").Select(rule => rule.Id));
 
         [Fact]
         public void Lists_Only_Rules_The_Module_Implements() =>
@@ -52,8 +76,25 @@ public sealed class RuleCatalogTests
 
             Assert.Equal(
                 (FindingSeverity.Warning, FindingSeverity.Warning, FindingSeverity.Fatal),
-                (rule.SeverityIn(InvoiceSyntax.UblInvoice), rule.SeverityIn(InvoiceSyntax.UblCreditNote), rule.SeverityIn(InvoiceSyntax.Cii)));
+                (rule.SeverityIn(InvoiceSyntax.UblInvoice, RuleSet.En16931), rule.SeverityIn(InvoiceSyntax.UblCreditNote, RuleSet.En16931), rule.SeverityIn(InvoiceSyntax.Cii, RuleSet.En16931)));
         }
+
+        [Fact]
+        public void Weighs_BR_CO_16_As_Information_Only_In_A_Ubl_Invoice_Of_XRechnung_Extension()
+        {
+            var rule = Catalog.Rules.Single(rule => rule.Id == "BR-CO-16");
+
+            Assert.Equal(
+                (FindingSeverity.Information, FindingSeverity.Fatal, FindingSeverity.Fatal, FindingSeverity.Fatal),
+                (rule.SeverityIn(InvoiceSyntax.UblInvoice, RuleSet.XRechnungExtension),
+                    rule.SeverityIn(InvoiceSyntax.UblCreditNote, RuleSet.XRechnungExtension),
+                    rule.SeverityIn(InvoiceSyntax.Cii, RuleSet.XRechnungExtension),
+                    rule.SeverityIn(InvoiceSyntax.UblInvoice, RuleSet.XRechnung)));
+        }
+
+        [Fact]
+        public void Gives_A_Reason_For_Every_Override() =>
+            Assert.All(Catalog.Rules.SelectMany(rule => rule.Overrides), entry => Assert.False(string.IsNullOrWhiteSpace(entry.Reason)));
 
         [Fact]
         public void Names_A_Business_Term_For_Every_Core_Rule() =>
@@ -69,5 +110,25 @@ public sealed class RuleCatalogTests
 
             Assert.Throws<ArgumentException>(() => new RuleCatalog([rule, rule]));
         }
+    }
+
+    public sealed class SeverityIn
+    {
+        private static readonly RuleDefinition Rule = new("BR-99", "Group", "Standard", null, FindingSeverity.Fatal, FindingSeverity.Warning, null, "Message", new HashSet<RuleSet> { RuleSet.XRechnung })
+        {
+            Overrides = [new SeverityOverride(RuleSet.XRechnung, Syntax: null, FindingSeverity.Information, "Reason")],
+        };
+
+        [Fact]
+        public void Prefers_An_Override_Of_The_Rule_Set_To_The_Severity_Of_The_Syntax() =>
+            Assert.Equal(FindingSeverity.Information, Rule.SeverityIn(InvoiceSyntax.UblInvoice, RuleSet.XRechnung));
+
+        [Fact]
+        public void Falls_Back_To_The_Severity_Of_The_Syntax_Under_Another_Rule_Set() =>
+            Assert.Equal(FindingSeverity.Warning, Rule.SeverityIn(InvoiceSyntax.UblInvoice, RuleSet.En16931));
+
+        [Fact]
+        public void Falls_Back_To_The_Rule_s_Own_Severity() =>
+            Assert.Equal(FindingSeverity.Fatal, Rule.SeverityIn(InvoiceSyntax.Cii, RuleSet.En16931));
     }
 }

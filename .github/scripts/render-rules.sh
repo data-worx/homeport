@@ -22,7 +22,8 @@ module_id_pattern='^[a-z0-9]+(-[a-z0-9]+)*$'
 query() { jq -r "$2" <<< "$1" | tr -d '\r'; }
 
 # One section per group and one row per rule, written by a single jq call;
-# the severity names the one of a syntax that weighs the rule otherwise.
+# the severity names the one of a syntax, and of a rule set, that weighs the
+# rule otherwise. The reason of each rule set's override follows the table.
 sections='.groups[]
   | "\n## \(.name)\n\nTaken from \(.standard) and checked under the rule sets "
     + ([.ruleSets[] | "`" + . + "`"] | join(", ")) + ".\n\n"
@@ -32,7 +33,13 @@ sections='.groups[]
         + .severity
         + (if .severityInUbl then ", in UBL " + .severityInUbl else "" end)
         + (if .severityInCii then ", in CII " + .severityInCii else "" end)
-        + " | \(.message) |")'
+        + ([(.overrides // [])[] | ", under `\(.ruleSet)`" + (if .syntax then " in `\(.syntax)`" else "" end) + " " + .severity] | join(""))
+        + " | \(.message) |"),
+    (if any(.rules[]; .overrides) then
+      "\nA rule set weighs a rule otherwise where its validator configuration does:\n",
+      (.rules[] | .id as $id | (.overrides // [])[]
+        | "- \($id) under `\(.ruleSet)`" + (if .syntax then " in `\(.syntax)`" else "" end) + ": \(.reason)")
+    else empty end)'
 
 # render <file> <path>: prints the page of one rules.json, or fails.
 render() {

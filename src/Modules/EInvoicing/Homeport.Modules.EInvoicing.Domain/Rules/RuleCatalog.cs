@@ -2,6 +2,7 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Homeport.Modules.EInvoicing.Domain.Documents;
 using Homeport.Modules.EInvoicing.Domain.Findings;
 using Homeport.Modules.EInvoicing.Domain.RuleSets;
 
@@ -28,6 +29,14 @@ public sealed class RuleCatalog
         ["fatal"] = FindingSeverity.Fatal,
         ["warning"] = FindingSeverity.Warning,
         ["information"] = FindingSeverity.Information,
+    };
+
+    // The syntaxes an override names, spelled as the wire form of the report spells them.
+    private static readonly Dictionary<string, InvoiceSyntax> SyntaxNames = new(StringComparer.Ordinal)
+    {
+        ["ubl-invoice"] = InvoiceSyntax.UblInvoice,
+        ["ubl-credit-note"] = InvoiceSyntax.UblCreditNote,
+        ["cii"] = InvoiceSyntax.Cii,
     };
 
     /// <summary>Creates a catalog of the given rules; every identifier occurs once.</summary>
@@ -70,8 +79,29 @@ public sealed class RuleCatalog
                 rule.SeverityInUbl is { } inUbl ? SeverityNamed(inUbl) : null,
                 rule.SeverityInCii is { } inCii ? SeverityNamed(inCii) : null,
                 rule.Message,
-                ruleSets));
+                ruleSets)
+            {
+                Overrides = [.. (rule.Overrides ?? []).Select(entry => OverrideOf(rule.Id, entry, ruleSets))],
+            });
         }));
+    }
+
+    /// <summary>The override an entry in <c>rules.json</c> stands for, under a rule set the rule is checked under.</summary>
+    private static SeverityOverride OverrideOf(string ruleId, OverrideEntry entry, IReadOnlySet<RuleSet> ruleSets)
+    {
+        var ruleSet = RuleSetNamed(entry.RuleSet);
+        if (!ruleSets.Contains(ruleSet))
+        {
+            throw new InvalidOperationException($"The embedded rule catalog overrides the rule '{ruleId}' under the rule set '{entry.RuleSet}', which does not check it.");
+        }
+
+        var syntax = entry.Syntax is null
+            ? (InvoiceSyntax?)null
+            : SyntaxNames.TryGetValue(entry.Syntax, out var named)
+                ? named
+                : throw new InvalidOperationException($"The embedded rule catalog names the unknown syntax '{entry.Syntax}'.");
+
+        return new SeverityOverride(ruleSet, syntax, SeverityNamed(entry.Severity), entry.Reason);
     }
 
     /// <summary>The rule set a name in <c>rules.json</c> stands for.</summary>
@@ -103,11 +133,20 @@ public sealed class RuleCatalog
     /// <param name="SeverityInUbl">See <see cref="RuleDefinition.SeverityInUbl"/>.</param>
     /// <param name="SeverityInCii">See <see cref="RuleDefinition.SeverityInCii"/>.</param>
     /// <param name="Message">See <see cref="RuleDefinition.Message"/>.</param>
+    /// <param name="Overrides">See <see cref="RuleDefinition.Overrides"/>.</param>
     private sealed record RuleEntry(
         string Id,
         string? BusinessTerm,
         string Severity,
         string? SeverityInUbl,
         string? SeverityInCii,
-        string Message);
+        string Message,
+        IReadOnlyList<OverrideEntry>? Overrides);
+
+    /// <summary>An override in <c>rules.json</c>; the members are those of <see cref="SeverityOverride"/>, by name.</summary>
+    /// <param name="RuleSet">See <see cref="SeverityOverride.RuleSet"/>.</param>
+    /// <param name="Syntax">See <see cref="SeverityOverride.Syntax"/>.</param>
+    /// <param name="Severity">See <see cref="SeverityOverride.Severity"/>.</param>
+    /// <param name="Reason">See <see cref="SeverityOverride.Reason"/>.</param>
+    private sealed record OverrideEntry(string RuleSet, string? Syntax, string Severity, string Reason);
 }

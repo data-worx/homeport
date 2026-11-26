@@ -56,27 +56,6 @@ public static partial class CoreRules
             "rate");
 
     /// <summary>The paths of the VAT breakdowns that lack what <paramref name="has"/> asks for.</summary>
-    private static IEnumerable<string> VatBreakdowns(RuleInput input, Func<XElement, bool, bool> has, string member)
-    {
-        ArgumentNullException.ThrowIfNull(input);
-
-        if (input.IsCii)
-        {
-            var taxes = (input.Root.Element(Rsm + "SupplyChainTradeTransaction")?.Element(Ram + "ApplicableHeaderTradeSettlement")
-                ?.Elements(Ram + "ApplicableTradeTax") ?? []).ToList();
-
-            return taxes.Select((tax, index) => (tax, index))
-                .Where(entry => !has(entry.tax, true))
-                .Select(entry => $"{RulePaths.Item("$.vatBreakdowns", entry.index)}.{member}");
-        }
-
-        // The model holds the subtotals of the invoice's own tax totals, in their order.
-        var modelSubtotals = input.Root.Elements(Cac + "TaxTotal").Elements(Cac + "TaxSubtotal").ToList();
-
-        return input.Root.Descendants(Cac + "TaxSubtotal")
-            .Where(subtotal => subtotal.Parent?.Name == Cac + "TaxTotal" && !has(subtotal, false))
-            .Select(subtotal => IndexOf(modelSubtotals, subtotal) is var index and >= 0
-                ? $"{RulePaths.Item("$.vatBreakdowns", index)}.{member}"
-                : input.LinePathOf(subtotal));
-    }
+    private static IEnumerable<string> VatBreakdowns(RuleInput input, Func<XElement, bool, bool> has, string member) =>
+        RuleContexts.VatBreakdowns(input).Where(context => !has(context.Element, input.IsCii)).Select(context => context.PathTo(member));
 }

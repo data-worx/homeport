@@ -129,8 +129,8 @@ public sealed partial class CoreRulesTests
             Assert.Equal(["$.invoicingPeriod"], CoreRules.Br29(RuleDocuments.Ubl().With("Invoice", "<cac:InvoicePeriod><cbc:StartDate>2026-11-30</cbc:StartDate><cbc:EndDate>2026-11-01</cbc:EndDate></cac:InvoicePeriod>").Input()));
 
         [Fact]
-        public void Breaks_When_A_Ubl_Line_Period_Ends_Before_Its_Start() =>
-            Assert.Equal(["$.lines[0].period"], CoreRules.Br29(RuleDocuments.Ubl().With("InvoiceLine", "<cac:InvoicePeriod><cbc:StartDate>2026-11-30</cbc:StartDate><cbc:EndDate>2026-11-01</cbc:EndDate></cac:InvoicePeriod>").Input()));
+        public void Holds_When_A_Ubl_Line_Period_Ends_Before_Its_Start_Which_BR_30_Checks() =>
+            Assert.Empty(CoreRules.Br29(RuleDocuments.Ubl().With("InvoiceLine", "<cac:InvoicePeriod><cbc:StartDate>2026-11-30</cbc:StartDate><cbc:EndDate>2026-11-01</cbc:EndDate></cac:InvoicePeriod>").Input()));
 
         [Fact]
         public void Breaks_When_The_Cii_Period_Ends_Before_Its_Start() =>
