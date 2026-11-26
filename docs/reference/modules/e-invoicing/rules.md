@@ -136,3 +136,51 @@ Taken from EN 16931 validation artefacts and checked under the rule sets `en1693
 | BR-DEC-25 | BT-137 | fatal | The invoice line allowance base amount (BT-137) carries more than two decimals. |
 | BR-DEC-27 | BT-141 | fatal | The invoice line charge amount (BT-141) carries more than two decimals. |
 | BR-DEC-28 | BT-142 | fatal | The invoice line charge base amount (BT-142) carries more than two decimals. |
+
+## EN 16931 code-list rules
+
+Taken from EN 16931 validation artefacts and checked under the rule sets `en16931`, `xrechnung`, `xrechnung-extension`, `factur-x-basic`, `factur-x-extended`.
+
+| Rule | Business term | Severity | Message |
+|---|---|---|---|
+| BR-CL-01 | BT-3 | fatal | The invoice type code (BT-3) is not a code of UNTDID 1001 for an invoice or a credit note. |
+| BR-CL-03 | BT-5 | fatal | The currency of an amount is not a code of ISO 4217 alpha-3. |
+| BR-CL-04 | BT-5 | fatal | The invoice currency code (BT-5) is not a code of ISO 4217 alpha-3. |
+| BR-CL-05 | BT-6 | fatal | The VAT accounting currency code (BT-6) is not a code of ISO 4217 alpha-3. |
+| BR-CL-06 | BT-8 | fatal | The value added tax point date code (BT-8) is not one of the codes of UNTDID 2005 EN 16931 allows. |
+| BR-CL-07 | BT-18 | fatal | The scheme of the invoiced object identifier (BT-18) is not one of the codes of UNTDID 1153 EN 16931 allows. |
+| BR-CL-08 | BT-21 | fatal | The subject code of an invoice note (BT-21) is not a code of UNTDID 4451. |
+| BR-CL-10 | BT-29 | fatal, under `xrechnung-extension` in `ubl-invoice` information, under `xrechnung-extension` in `cii` information | The scheme of a party identifier (BT-29, BT-46, BT-60) is not a code of ISO 6523 ICD. |
+| BR-CL-11 | BT-30 | fatal, under `xrechnung-extension` in `ubl-invoice` information, under `xrechnung-extension` in `cii` information | The scheme of a legal registration identifier (BT-30, BT-47, BT-61) is not a code of ISO 6523 ICD. |
+| BR-CL-13 | BT-158 | fatal | The scheme of an item classification identifier (BT-158) is not a code of UNTDID 7143. |
+| BR-CL-14 | BT-40 | fatal | A country code of an address (BT-40, BT-55, BT-69, BT-80) is not a code of ISO 3166-1 alpha-2. |
+| BR-CL-15 | BT-159 | fatal | The item country of origin (BT-159) is not a code of ISO 3166-1 alpha-2. |
+| BR-CL-16 | BT-81 | fatal | The payment means type code (BT-81) is not a code of UNTDID 4461. |
+| BR-CL-17 | BT-118 | fatal | A VAT category code (BT-95, BT-102, BT-118) is not a code of UNTDID 5305. |
+| BR-CL-18 | BT-151 | fatal | A VAT category code (BT-118, BT-151) is not a code of UNTDID 5305. |
+| BR-CL-19 | BT-98 | fatal | The reason code of an allowance (BT-98, BT-140) is not a code of UNTDID 5189. |
+| BR-CL-20 | BT-105 | fatal | The reason code of a charge (BT-105, BT-145) is not a code of UNTDID 7161. |
+| BR-CL-21 | BT-157 | fatal, under `xrechnung` warning, under `xrechnung-extension` in `ubl-invoice` information, under `xrechnung-extension` in `cii` information | The scheme of an item standard identifier (BT-157) is not a code of ISO 6523 ICD. |
+| BR-CL-22 | BT-121 | fatal | A VAT exemption reason code (BT-121) is not a code of the VATEX list. |
+| BR-CL-23 | BT-130 | fatal, under `xrechnung` warning, under `xrechnung-extension` warning | The unit of a quantity (BT-130, BT-150) is not a code of UNECE Recommendations 20 and 21. |
+| BR-CL-24 | BT-125 | fatal, under `xrechnung-extension` in `ubl-invoice` information, under `xrechnung-extension` in `cii` information | The MIME code of an attached document (BT-125) is not one of the MIME media types EN 16931 allows. |
+| BR-CL-25 | BT-34 | fatal, under `xrechnung-extension` in `ubl-invoice` information, under `xrechnung-extension` in `cii` information | The scheme of an electronic address (BT-34, BT-49) is not a code of the EAS list. |
+| BR-CL-26 | BT-71 | fatal, under `xrechnung-extension` in `ubl-invoice` information, under `xrechnung-extension` in `cii` information | The scheme of the deliver to location identifier (BT-71) is not a code of ISO 6523 ICD. |
+
+A rule set weighs a rule otherwise where its validator configuration does:
+
+- BR-CL-10 under `xrechnung-extension` in `ubl-invoice`: The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-04).
+- BR-CL-10 under `xrechnung-extension` in `cii`: The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-04).
+- BR-CL-11 under `xrechnung-extension` in `ubl-invoice`: The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-05).
+- BR-CL-11 under `xrechnung-extension` in `cii`: The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-05).
+- BR-CL-21 under `xrechnung`: The XRechnung validator configuration weighs it so for every XRechnung invoice.
+- BR-CL-21 under `xrechnung-extension` in `ubl-invoice`: The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-06).
+- BR-CL-21 under `xrechnung-extension` in `cii`: The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-06).
+- BR-CL-23 under `xrechnung`: The XRechnung validator configuration weighs it so for every XRechnung invoice.
+- BR-CL-23 under `xrechnung-extension`: The XRechnung validator configuration weighs it so for every XRechnung invoice.
+- BR-CL-24 under `xrechnung-extension` in `ubl-invoice`: The XRechnung validator configuration weighs it so, as an extension invoice may attach the further MIME media types of BR-DEX-01.
+- BR-CL-24 under `xrechnung-extension` in `cii`: The XRechnung validator configuration weighs it so, as an extension invoice may attach the further MIME media types of BR-DEX-01.
+- BR-CL-25 under `xrechnung-extension` in `ubl-invoice`: The XRechnung validator configuration weighs it so, as an extension invoice may use the address schemes of DiGA (BR-DEX-07).
+- BR-CL-25 under `xrechnung-extension` in `cii`: The XRechnung validator configuration weighs it so, as an extension invoice may use the address schemes of DiGA (BR-DEX-07).
+- BR-CL-26 under `xrechnung-extension` in `ubl-invoice`: The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-08).
+- BR-CL-26 under `xrechnung-extension` in `cii`: The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-08).

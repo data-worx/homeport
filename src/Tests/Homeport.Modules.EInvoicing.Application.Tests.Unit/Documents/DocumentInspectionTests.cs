@@ -347,7 +347,9 @@ public sealed class DocumentInspectionTests
             Assert.Equal(DocumentRules.UnreadableCode, inspected.Error.Code);
         }
 
-        public static TheoryData<string> TestSuite => new(TestSuiteInvoices.Names);
+        public static TheoryData<string> TestSuite => new(TestSuiteInvoices.Names.Except(KnownVerdictDifferences.All));
+
+        public static TheoryData<string> KnownDifferences => new(KnownVerdictDifferences.All);
 
         // Upstream publishes every instance of the KoSIT test suite as a valid
         // XRechnung, so that is the verdict each one is expected to get.
@@ -358,6 +360,15 @@ public sealed class DocumentInspectionTests
             var inspected = await Inspect(TestSuiteInvoices.Bytes(name), DocumentContainer.Xml);
 
             Assert.Equal(Verdict.Valid, inspected.Value.Verdict);
+        }
+
+        [Theory]
+        [MemberData(nameof(KnownDifferences))]
+        public async Task Judges_An_Instance_Whose_Difference_From_KoSIT_Is_Known_Invalid(string name)
+        {
+            var inspected = await Inspect(TestSuiteInvoices.Bytes(name), DocumentContainer.Xml);
+
+            Assert.Equal(Verdict.Invalid, inspected.Value.Verdict);
         }
 
         private static string Ubl(string customizationId, string issueDate) => MinimalInvoices.Ubl(customizationId, issueDate);

@@ -10,7 +10,7 @@ public static class InvoiceRules
 {
     /// <summary>Every rule the module implements, by its identifier: it returns the JSON path of every place it is broken.</summary>
     public static IReadOnlyDictionary<string, Func<RuleInput, IEnumerable<string>>> Implementations { get; } =
-        CoreRules.All.Concat(CalculationRules.All).Concat(DecimalRules.All).ToDictionary(StringComparer.Ordinal);
+        CoreRules.All.Concat(CalculationRules.All).Concat(DecimalRules.All).Concat(CodeListRules.All).ToDictionary(StringComparer.Ordinal);
 
     /// <summary>The findings of <paramref name="input"/> against every rule of <paramref name="catalog"/> its rule set is checked against.</summary>
     /// <remarks>

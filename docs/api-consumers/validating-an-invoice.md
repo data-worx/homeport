@@ -5,8 +5,8 @@ invoices you receive. It tells which container, syntax and rule set a
 document claims, including the invoice a ZUGFeRD or Factur-X PDF carries,
 and validates the invoice in two stages: against the XML schema of its
 syntax, UBL 2.1 or CII D16B, and, when it fits the schema, against the core,
-calculation and decimal rules of EN 16931. The further rules of EN 16931 and
-those of XRechnung follow in the next releases of M3, as the
+calculation, decimal and code-list rules of EN 16931. The further rules of
+EN 16931 and those of XRechnung follow in the next releases of M3, as the
 [roadmap](../../ROADMAP.md) lists; until then, `valid` means valid against
 the schema and these rules.
 

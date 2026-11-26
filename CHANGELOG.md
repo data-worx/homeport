@@ -61,6 +61,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   prefix, and an amount may carry at most two decimals. Four BR-CO rules no
   machine can check are listed and never reported. See the
   [rules page](docs/reference/modules/e-invoicing/rules.md).
+- The e-invoicing module also checks the 23 code-list rules (BR-CL) of
+  EN 16931: every code, currency, country, unit, scheme and media type must
+  come from its code list, as the EN 16931 validation artefacts 1.3.17 list
+  them. Under XRechnung an unknown unit or item identifier scheme is a
+  warning, and under XRechnung with extension the schemes and media types
+  the extension allows are information, as the KoSIT validator weighs them.
+  See the [rules page](docs/reference/modules/e-invoicing/rules.md).
 
 ### Changed
 
