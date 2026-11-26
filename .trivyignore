@@ -39,11 +39,12 @@ CVE-2026-78667 exp:2026-12-31
 CVE-2026-78669 exp:2026-12-31
 CVE-2026-97031 exp:2026-12-31
 
-# postgres: libxml2 2.13.9-r2 in postgres:18.7-alpine. Alpine fixes it in
-# 2.13.9-r3, but the current digest of 18.7-alpine still carries r2, so no
-# rebuilt image exists yet. Short expiry, so the scan fails again if none has
-# appeared by then; removed with the first rebuilt digest.
-CVE-2026-86144 exp:2026-11-29
+# postgres: libxml2 2.13.9-r2 in postgres:18.7-alpine. Alpine 3.24 ships the
+# fix as 2.13.9-r5, but the current digest of 18.7-alpine, built 2026-11-21,
+# still carries r2, so no rebuilt image exists yet. Short expiry, so the scan
+# fails again if none has appeared by then; removed with the first rebuilt
+# digest.
+CVE-2026-86144 exp:2026-12-06
 
 # keycloak, development and tests only - an operator brings their own identity
 # provider (ADR-0006). No fixed package in Red Hat's base image yet for
