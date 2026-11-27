@@ -40,10 +40,16 @@ CVE-2026-78669 exp:2026-12-31
 CVE-2026-97031 exp:2026-12-31
 
 # postgres: libxml2 2.13.9-r2 in postgres:18.7-alpine. Alpine 3.24 ships the
-# fix as 2.13.9-r5, but the current digest of 18.7-alpine, built 2026-11-21,
-# still carries r2, so no rebuilt image exists yet. Short expiry, so the scan
-# fails again if none has appeared by then; removed with the first rebuilt
-# digest.
+# fixes up to 2.13.9-r5, but the current digest of 18.7-alpine, built
+# 2026-11-21, still carries r2, so no rebuilt image exists yet; 19.0-alpine
+# carries r2 as well. Short expiry, so the scan fails again if none has
+# appeared by then; removed with the first rebuilt digest.
+CVE-2026-11979 exp:2026-12-06
+CVE-2026-86138 exp:2026-12-06
+CVE-2026-86139 exp:2026-12-06
+CVE-2026-86140 exp:2026-12-06
+CVE-2026-86142 exp:2026-12-06
+CVE-2026-86143 exp:2026-12-06
 CVE-2026-86144 exp:2026-12-06
 
 # keycloak, development and tests only - an operator brings their own identity
