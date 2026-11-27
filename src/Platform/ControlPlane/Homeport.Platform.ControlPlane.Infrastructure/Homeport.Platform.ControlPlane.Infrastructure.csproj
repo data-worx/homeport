@@ -16,6 +16,7 @@
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <!-- Only for `dotnet ef migrations add`; flows into nothing that ships. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+    <PackageReference Include="Npgsql" />
   </ItemGroup>
 
   <ItemGroup>
