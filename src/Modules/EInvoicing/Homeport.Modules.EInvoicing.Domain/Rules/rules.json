@@ -128,6 +128,79 @@
         { "id": "BR-DEC-27", "businessTerm": "BT-141", "severity": "fatal", "message": "The invoice line charge amount (BT-141) carries more than two decimals." },
         { "id": "BR-DEC-28", "businessTerm": "BT-142", "severity": "fatal", "message": "The invoice line charge base amount (BT-142) carries more than two decimals." }
       ]
+    },
+    {
+      "name": "EN 16931 code-list rules",
+      "standard": "EN 16931 validation artefacts",
+      "ruleSets": ["en16931", "xrechnung", "xrechnung-extension", "factur-x-basic", "factur-x-extended"],
+      "rules": [
+        { "id": "BR-CL-01", "businessTerm": "BT-3", "severity": "fatal", "message": "The invoice type code (BT-3) is not a code of UNTDID 1001 for an invoice or a credit note." },
+        { "id": "BR-CL-03", "businessTerm": "BT-5", "severity": "fatal", "message": "The currency of an amount is not a code of ISO 4217 alpha-3." },
+        { "id": "BR-CL-04", "businessTerm": "BT-5", "severity": "fatal", "message": "The invoice currency code (BT-5) is not a code of ISO 4217 alpha-3." },
+        { "id": "BR-CL-05", "businessTerm": "BT-6", "severity": "fatal", "message": "The VAT accounting currency code (BT-6) is not a code of ISO 4217 alpha-3." },
+        { "id": "BR-CL-06", "businessTerm": "BT-8", "severity": "fatal", "message": "The value added tax point date code (BT-8) is not one of the codes of UNTDID 2005 EN 16931 allows." },
+        { "id": "BR-CL-07", "businessTerm": "BT-18", "severity": "fatal", "message": "The scheme of the invoiced object identifier (BT-18) is not one of the codes of UNTDID 1153 EN 16931 allows." },
+        { "id": "BR-CL-08", "businessTerm": "BT-21", "severity": "fatal", "message": "The subject code of an invoice note (BT-21) is not a code of UNTDID 4451." },
+        {
+          "id": "BR-CL-10", "businessTerm": "BT-29", "severity": "fatal", "message": "The scheme of a party identifier (BT-29, BT-46, BT-60) is not a code of ISO 6523 ICD.",
+          "overrides": [
+            { "ruleSet": "xrechnung-extension", "syntax": "ubl-invoice", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-04)." },
+            { "ruleSet": "xrechnung-extension", "syntax": "cii", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-04)." }
+          ]
+        },
+        {
+          "id": "BR-CL-11", "businessTerm": "BT-30", "severity": "fatal", "message": "The scheme of a legal registration identifier (BT-30, BT-47, BT-61) is not a code of ISO 6523 ICD.",
+          "overrides": [
+            { "ruleSet": "xrechnung-extension", "syntax": "ubl-invoice", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-05)." },
+            { "ruleSet": "xrechnung-extension", "syntax": "cii", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-05)." }
+          ]
+        },
+        { "id": "BR-CL-13", "businessTerm": "BT-158", "severity": "fatal", "message": "The scheme of an item classification identifier (BT-158) is not a code of UNTDID 7143." },
+        { "id": "BR-CL-14", "businessTerm": "BT-40", "severity": "fatal", "message": "A country code of an address (BT-40, BT-55, BT-69, BT-80) is not a code of ISO 3166-1 alpha-2." },
+        { "id": "BR-CL-15", "businessTerm": "BT-159", "severity": "fatal", "message": "The item country of origin (BT-159) is not a code of ISO 3166-1 alpha-2." },
+        { "id": "BR-CL-16", "businessTerm": "BT-81", "severity": "fatal", "message": "The payment means type code (BT-81) is not a code of UNTDID 4461." },
+        { "id": "BR-CL-17", "businessTerm": "BT-118", "severity": "fatal", "message": "A VAT category code (BT-95, BT-102, BT-118) is not a code of UNTDID 5305." },
+        { "id": "BR-CL-18", "businessTerm": "BT-151", "severity": "fatal", "message": "A VAT category code (BT-118, BT-151) is not a code of UNTDID 5305." },
+        { "id": "BR-CL-19", "businessTerm": "BT-98", "severity": "fatal", "message": "The reason code of an allowance (BT-98, BT-140) is not a code of UNTDID 5189." },
+        { "id": "BR-CL-20", "businessTerm": "BT-105", "severity": "fatal", "message": "The reason code of a charge (BT-105, BT-145) is not a code of UNTDID 7161." },
+        {
+          "id": "BR-CL-21", "businessTerm": "BT-157", "severity": "fatal", "message": "The scheme of an item standard identifier (BT-157) is not a code of ISO 6523 ICD.",
+          "overrides": [
+            { "ruleSet": "xrechnung", "severity": "warning", "reason": "The XRechnung validator configuration weighs it so for every XRechnung invoice." },
+            { "ruleSet": "xrechnung-extension", "syntax": "ubl-invoice", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-06)." },
+            { "ruleSet": "xrechnung-extension", "syntax": "cii", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-06)." }
+          ]
+        },
+        { "id": "BR-CL-22", "businessTerm": "BT-121", "severity": "fatal", "message": "A VAT exemption reason code (BT-121) is not a code of the VATEX list." },
+        {
+          "id": "BR-CL-23", "businessTerm": "BT-130", "severity": "fatal", "message": "The unit of a quantity (BT-130, BT-150) is not a code of UNECE Recommendations 20 and 21.",
+          "overrides": [
+            { "ruleSet": "xrechnung", "severity": "warning", "reason": "The XRechnung validator configuration weighs it so for every XRechnung invoice." },
+            { "ruleSet": "xrechnung-extension", "severity": "warning", "reason": "The XRechnung validator configuration weighs it so for every XRechnung invoice." }
+          ]
+        },
+        {
+          "id": "BR-CL-24", "businessTerm": "BT-125", "severity": "fatal", "message": "The MIME code of an attached document (BT-125) is not one of the MIME media types EN 16931 allows.",
+          "overrides": [
+            { "ruleSet": "xrechnung-extension", "syntax": "ubl-invoice", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may attach the further MIME media types of BR-DEX-01." },
+            { "ruleSet": "xrechnung-extension", "syntax": "cii", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may attach the further MIME media types of BR-DEX-01." }
+          ]
+        },
+        {
+          "id": "BR-CL-25", "businessTerm": "BT-34", "severity": "fatal", "message": "The scheme of an electronic address (BT-34, BT-49) is not a code of the EAS list.",
+          "overrides": [
+            { "ruleSet": "xrechnung-extension", "syntax": "ubl-invoice", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the address schemes of DiGA (BR-DEX-07)." },
+            { "ruleSet": "xrechnung-extension", "syntax": "cii", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the address schemes of DiGA (BR-DEX-07)." }
+          ]
+        },
+        {
+          "id": "BR-CL-26", "businessTerm": "BT-71", "severity": "fatal", "message": "The scheme of the deliver to location identifier (BT-71) is not a code of ISO 6523 ICD.",
+          "overrides": [
+            { "ruleSet": "xrechnung-extension", "syntax": "ubl-invoice", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-08)." },
+            { "ruleSet": "xrechnung-extension", "syntax": "cii", "severity": "information", "reason": "The XRechnung validator configuration weighs it so, as an extension invoice may use the identifier schemes of DiGA (BR-DEX-08)." }
+          ]
+        }
+      ]
     }
   ]
 }

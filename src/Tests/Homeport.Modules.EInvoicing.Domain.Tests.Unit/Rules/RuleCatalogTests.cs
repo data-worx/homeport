@@ -39,6 +39,14 @@ public sealed class RuleCatalogTests
             "BR-DEC-19", "BR-DEC-20", "BR-DEC-23", "BR-DEC-24", "BR-DEC-25", "BR-DEC-27", "BR-DEC-28",
         ];
 
+        // The rule IDs `BR-CL-` of the same artefacts.
+        private static readonly string[] CodeListRuleIds =
+        [
+            "BR-CL-01", "BR-CL-03", "BR-CL-04", "BR-CL-05", "BR-CL-06", "BR-CL-07", "BR-CL-08", "BR-CL-10",
+            "BR-CL-11", "BR-CL-13", "BR-CL-14", "BR-CL-15", "BR-CL-16", "BR-CL-17", "BR-CL-18", "BR-CL-19",
+            "BR-CL-20", "BR-CL-21", "BR-CL-22", "BR-CL-23", "BR-CL-24", "BR-CL-25", "BR-CL-26",
+        ];
+
         private static readonly RuleCatalog Catalog = RuleCatalog.LoadEmbedded();
 
         [Fact]
@@ -52,6 +60,10 @@ public sealed class RuleCatalogTests
         [Fact]
         public void Lists_The_Decimal_Rules_Of_The_Validation_Artefacts() =>
             Assert.Equal(DecimalRuleIds, Catalog.Rules.Where(rule => rule.Group == "EN 16931 decimal rules").Select(rule => rule.Id));
+
+        [Fact]
+        public void Lists_The_Code_List_Rules_Of_The_Validation_Artefacts() =>
+            Assert.Equal(CodeListRuleIds, Catalog.Rules.Where(rule => rule.Group == "EN 16931 code-list rules").Select(rule => rule.Id));
 
         [Fact]
         public void Lists_Only_Rules_The_Module_Implements() =>
@@ -91,6 +103,35 @@ public sealed class RuleCatalogTests
                     rule.SeverityIn(InvoiceSyntax.Cii, RuleSet.XRechnungExtension),
                     rule.SeverityIn(InvoiceSyntax.UblInvoice, RuleSet.XRechnung)));
         }
+
+        [Theory]
+        [InlineData("BR-CL-21", FindingSeverity.Warning)]
+        [InlineData("BR-CL-23", FindingSeverity.Warning)]
+        public void Weighs_A_Code_List_Rule_As_The_XRechnung_Configuration_Does(string id, FindingSeverity severity) =>
+            Assert.All(
+                Enum.GetValues<InvoiceSyntax>(),
+                syntax => Assert.Equal(severity, Catalog.Rules.Single(rule => rule.Id == id).SeverityIn(syntax, RuleSet.XRechnung)));
+
+        [Theory]
+        [InlineData("BR-CL-10", FindingSeverity.Information)]
+        [InlineData("BR-CL-11", FindingSeverity.Information)]
+        [InlineData("BR-CL-21", FindingSeverity.Information)]
+        [InlineData("BR-CL-23", FindingSeverity.Warning)]
+        [InlineData("BR-CL-24", FindingSeverity.Information)]
+        [InlineData("BR-CL-25", FindingSeverity.Information)]
+        [InlineData("BR-CL-26", FindingSeverity.Information)]
+        public void Weighs_A_Code_List_Rule_As_The_XRechnung_Extension_Configuration_Does(string id, FindingSeverity severity)
+        {
+            var rule = Catalog.Rules.Single(rule => rule.Id == id);
+
+            Assert.Equal((severity, severity), (rule.SeverityIn(InvoiceSyntax.UblInvoice, RuleSet.XRechnungExtension), rule.SeverityIn(InvoiceSyntax.Cii, RuleSet.XRechnungExtension)));
+        }
+
+        [Fact]
+        public void Weighs_The_Code_List_Rules_As_Fatal_Under_EN_16931() =>
+            Assert.All(
+                Catalog.Rules.Where(rule => rule.Group == "EN 16931 code-list rules"),
+                rule => Assert.Equal(FindingSeverity.Fatal, rule.SeverityIn(InvoiceSyntax.UblInvoice, RuleSet.En16931)));
 
         [Fact]
         public void Gives_A_Reason_For_Every_Override() =>

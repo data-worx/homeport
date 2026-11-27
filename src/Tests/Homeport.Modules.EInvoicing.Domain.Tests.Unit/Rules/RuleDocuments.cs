@@ -63,6 +63,38 @@ internal static class RuleDocuments
         return root;
     }
 
+    /// <summary>The minimal UBL Invoice turned into a CreditNote: its root, type code, lines and quantities renamed.</summary>
+    public static XElement UblCreditNote()
+    {
+        XNamespace creditNote = "urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2";
+        var root = Ubl();
+        root.Name = creditNote + "CreditNote";
+        foreach (var element in root.Descendants().ToList())
+        {
+            element.Name = element.Name.LocalName switch
+            {
+                "InvoiceTypeCode" => element.Name.Namespace + "CreditNoteTypeCode",
+                "InvoiceLine" => element.Name.Namespace + "CreditNoteLine",
+                "InvoicedQuantity" => element.Name.Namespace + "CreditedQuantity",
+                _ => element.Name,
+            };
+        }
+
+        return root;
+    }
+
+    /// <summary>Sets the attribute <paramref name="name"/> of the element at <paramref name="path"/>; none removes it.</summary>
+    /// <param name="root">The document.</param>
+    /// <param name="path">The first element of this local name, then children by local name, separated by <c>/</c>.</param>
+    /// <param name="name">The name of the attribute.</param>
+    /// <param name="value">The value; none removes the attribute.</param>
+    public static XElement SetAttribute(this XElement root, string path, string name, string? value)
+    {
+        At(root, path).SetAttributeValue(name, value);
+
+        return root;
+    }
+
     /// <summary>The document as a rule checks it, with the invoice read from it.</summary>
     /// <param name="root">The document.</param>
     public static RuleInput Input(this XElement root)

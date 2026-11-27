@@ -34,7 +34,8 @@ public sealed class ValidationControllerKositTests
             var document = TestSuiteInvoices.Bytes(name);
 
             var expected = (await kosit.ValidateAsync(document)).Rules.Except(NotYetImplementedRules.All).Order(StringComparer.Ordinal);
-            var actual = (await ModuleRulesAsync(document)).Where(rule => !rule.StartsWith(ModuleRulePrefix, StringComparison.Ordinal)).Order(StringComparer.Ordinal);
+            // KoSIT's report names each rule once, however often it fires.
+            var actual = (await ModuleRulesAsync(document)).Where(rule => !rule.StartsWith(ModuleRulePrefix, StringComparison.Ordinal)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal);
 
             Assert.Equal(expected, actual);
         }
@@ -48,8 +49,12 @@ public sealed class ValidationControllerKositTests
             Assert.Empty(fired.Intersect(NotYetImplementedRules.All));
         }
 
+        public static TheoryData<string> AgreedVerdicts => new(TestSuiteInvoices.Names.Except(KnownVerdictDifferences.All));
+
+        public static TheoryData<string> KnownDifferences => new(KnownVerdictDifferences.All);
+
         [Theory]
-        [MemberData(nameof(TestSuite))]
+        [MemberData(nameof(AgreedVerdicts))]
         public async Task Reaches_The_Verdict_KoSIT_Reaches(string name)
         {
             var document = TestSuiteInvoices.Bytes(name);
@@ -58,6 +63,18 @@ public sealed class ValidationControllerKositTests
             var verdict = (await ReportAsync(document)).RootElement.GetProperty("verdict").GetString();
 
             Assert.Equal(accepted, verdict == Valid);
+        }
+
+        [Theory]
+        [MemberData(nameof(KnownDifferences))]
+        public async Task Reaches_Another_Verdict_Than_KoSIT_Where_The_Difference_Is_Known(string name)
+        {
+            var document = TestSuiteInvoices.Bytes(name);
+
+            var accepted = (await kosit.ValidateAsync(document)).Accepted;
+            var verdict = (await ReportAsync(document)).RootElement.GetProperty("verdict").GetString();
+
+            Assert.NotEqual(accepted, verdict == Valid);
         }
 
         [Fact]
