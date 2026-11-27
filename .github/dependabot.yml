@@ -49,6 +49,10 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "Microsoft.EntityFrameworkCore*"
         update-types: ["version-update:semver-major"]
+      # Npgsql's major versions follow EF Core and .NET: Npgsql 11 belongs to
+      # the .NET 11 line and moves with the target framework.
+      - dependency-name: Npgsql
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -61,3 +65,10 @@ updates:
       interval: weekly
     commit-message:
       prefix: chore
+    ignore:
+      # A PostgreSQL major version changes the data directory format: an
+      # existing installation needs pg_upgrade or a dump and restore. That is
+      # a decision about the operator's upgrade path, not a digest update.
+      # Dependabot names the image library/postgres, as in its pull requests.
+      - dependency-name: library/postgres
+        update-types: ["version-update:semver-major"]
